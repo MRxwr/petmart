@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "373898644060",
+    "project_id": "petmart-392b1",
+    "storage_bucket": "petmart-392b1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373898644060:android:439f599a5f2f35428bf499",
+        "android_client_info": {
+          "package_name": "com.createq8.pet_mart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373898644060-d7kcs9j3ervfrtj675oiuee0ict67m0e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.createq8.pet_mart",
+            "certificate_hash": "40569f52d9e6c87939671e469e80266f61631584"
+          }
+        },
+        {
+          "client_id": "373898644060-sllkren115u097pgu1t388uic0jsujur.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMUBqHZ0SharXP6Bv0Wf0GGWcH-peUvQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "373898644060-sllkren115u097pgu1t388uic0jsujur.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
