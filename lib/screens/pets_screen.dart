@@ -6,6 +6,7 @@ import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/category_model.dart';
 
 import 'package:pet_mart/model/pets_model.dart' as Model;
+import 'package:pet_mart/screens/pets_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class PetsScreen extends StatefulWidget {
@@ -193,7 +194,9 @@ class _PetsScreenState extends State<PetsScreen> {
               itemBuilder: (context,index){
                 return GestureDetector(
                   onTap: (){
-
+                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                      return new PetsDetailsScreen(postId:petsModel.data[index].postId);
+                    }));
                   },
                   child: Container(
                       margin: EdgeInsets.all(6.w),

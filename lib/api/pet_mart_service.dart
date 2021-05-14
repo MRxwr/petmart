@@ -10,6 +10,7 @@ import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/pets_model.dart';
+import 'package:pet_mart/model/post_details_model.dart';
 import 'package:pet_mart/model/post_model.dart';
 import 'package:pet_mart/model/register_model.dart';
 import 'package:pet_mart/model/reset_model.dart';
@@ -270,5 +271,21 @@ class PetMartService{
     print(petsModel.message);
     print(response.body);
     return petsModel;
+  }
+  Future<PostDetailsModel> petDetails(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/view"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    PostDetailsModel postDetailsModel;
+    if(response.statusCode == 200){
+      postDetailsModel = PostDetailsModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(postDetailsModel.message);
+    print(response.body);
+    return postDetailsModel;
   }
 }
