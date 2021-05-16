@@ -132,6 +132,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           alignment: AlignmentDirectional.center,
         ):
             Container(
+
               child:
               ListView(
                 children: [
