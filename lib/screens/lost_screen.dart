@@ -6,6 +6,7 @@ import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/post_model.dart' as PostModel;
+import 'package:pet_mart/screens/lost_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
@@ -180,17 +181,24 @@ class _LostScreenState extends State<LostScreen> {
                   itemCount: postModel.data.length,
 
                   itemBuilder: (context,index){
-                    return Container(
-                      margin: EdgeInsets.all(6.w),
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                          return new LostDetailScreen(postId:postModel.data[index].postId);
+                        }));
+                      },
+                      child: Container(
+                        margin: EdgeInsets.all(6.w),
 
-                        child:
-                        Card(elevation: 1.w,
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0.h),
-                            ),
-                            color: Color(0xFFFFFFFF),
-                            child: buildItem(postModel.data[index],context)));
+                          child:
+                          Card(elevation: 1.w,
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0.h),
+                              ),
+                              color: Color(0xFFFFFFFF),
+                              child: buildItem(postModel.data[index],context))),
+                    );
                   },
                 ),
               ),
@@ -311,6 +319,7 @@ class _LostScreenState extends State<LostScreen> {
 
                   errorWidget: (context, url, error) => ClipRRect(    borderRadius: BorderRadius.circular(30.0.w),
                       child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
+                        fit: BoxFit.fill,
                         colorBlendMode: BlendMode.difference,)),
 
                 ),

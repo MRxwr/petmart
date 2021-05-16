@@ -9,6 +9,7 @@ import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/post_model.dart' as PostModel;
+import 'package:pet_mart/screens/adaption_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class AdaptionScreen extends StatefulWidget {
@@ -182,18 +183,26 @@ selectedList.add(false);
                       itemCount: postModel.data.length,
 
                       itemBuilder: (context,index){
-                        return Container(
-                            margin: EdgeInsets.all(6.w),
+                        return
+                          GestureDetector(
+                            onTap: (){
+                              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                return new AdaptionDetailsScreen(postId:postModel.data[index].postId);
+                              }));
+                            },
+                            child: Container(
+                              margin: EdgeInsets.all(6.w),
 
-                            child:
-                            Card(
-                                clipBehavior: Clip.antiAliasWithSaveLayer,
-                                elevation: 1.w,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0.h),
-                                ),
-                                color: Color(0xFFFFFFFF),
-                                child: buildItem(postModel.data[index],context)));
+                              child:
+                              Card(
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  elevation: 1.w,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0.h),
+                                  ),
+                                  color: Color(0xFFFFFFFF),
+                                  child: buildItem(postModel.data[index],context))),
+                          );
                       },
                     ),
                   ),

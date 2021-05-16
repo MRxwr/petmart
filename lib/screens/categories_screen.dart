@@ -98,7 +98,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
       margin: EdgeInsets.all(5.h),
       child: Column(
         children: [
-          Expanded(child: CachedNetworkImage(
+          Expanded(child:
+          CachedNetworkImage(
             width: 150.w,
             height: 150.h,
             imageUrl:'${childcategory.categoryImage}',

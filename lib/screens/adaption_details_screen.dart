@@ -25,25 +25,23 @@ import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-class PetsDetailsScreen extends StatefulWidget {
-  static String id = 'PetsDetailsScreen';
- String  postId;
-
-  PetsDetailsScreen({Key key,@required this.postId}) : super(key: key);
+class AdaptionDetailsScreen extends StatefulWidget {
+  String  postId;
+  AdaptionDetailsScreen({Key key,@required this.postId}) : super(key: key);
 
 
   @override
-  _PetsDetailsScreenState createState() => _PetsDetailsScreenState();
+  _AdaptionDetailsScreenState createState() => _AdaptionDetailsScreenState();
 }
 
-class _PetsDetailsScreenState extends State<PetsDetailsScreen> {
+class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   var imageProvider = null;
   double itemWidth;
   double itemHeight;
   String noOfViews ="";
   String noOfShares = "";
-      TextButton previewButton(String text,BuildContext context,ContactDetail contactDetail){
+  TextButton previewButton(String text,BuildContext context,ContactDetail contactDetail){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -57,7 +55,7 @@ class _PetsDetailsScreenState extends State<PetsDetailsScreen> {
     return TextButton(
       style: flatButtonStyle,
       onPressed: () {
-showDialog(contactDetail);
+        showDialog(contactDetail);
 
       },
       child: Text(text,style: TextStyle(
@@ -89,7 +87,7 @@ showDialog(contactDetail);
         }
 
 
-     Navigator.pop(context);
+        Navigator.pop(context);
 
       },
       child: Text(text,style: TextStyle(
@@ -141,12 +139,12 @@ showDialog(contactDetail);
     String loginData = _preferences.getString(kUserModel);
     Map map;
 
-      final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
-      map = {
-        'post_id': widget.postId,
-        'user_id': loginModel.data.customerId
-      };
+    final body = json.decode(loginData);
+    LoginModel   loginModel = LoginModel.fromJson(body);
+    map = {
+      'post_id': widget.postId,
+      'user_id': loginModel.data.customerId
+    };
 
     print('map --> ${map}');
 
@@ -173,7 +171,7 @@ showDialog(contactDetail);
     List<String> mimeTypes = List();
     mimeTypes.add(mimeType);
     print('mimeType --> ${mimeType}');
-   Share.shareFiles(paths,mimeTypes: mimeTypes,subject:'${postDetailsModel.data.postName} \\n ${postDetailsModel.data.postDescription}' );
+    Share.shareFiles(paths,mimeTypes: mimeTypes,subject:'${postDetailsModel.data.postName} \\n ${postDetailsModel.data.postDescription}' );
 
 
 
@@ -319,7 +317,7 @@ showDialog(contactDetail);
                                     imageUrl:'${item.image}',
                                     imageBuilder: (context, imageProvider) {
 
-                                     return Card(
+                                      return Card(
                                         elevation: 1.h,
                                         child: Container(
                                             width: width,
@@ -337,7 +335,7 @@ showDialog(contactDetail);
                                         ),
                                       );
                                     }
-                                        ,
+                                    ,
                                     placeholder: (context, url) =>
                                         Column(
                                           children: [
@@ -393,11 +391,11 @@ showDialog(contactDetail);
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                     postDetailsModel.data.postName,
+                      postDetailsModel.data.postName,
                       style: TextStyle(
                           color: Color(0xFF000000),
-                        fontSize: screenUtil.setSp(14),
-                        fontWeight: FontWeight.normal
+                          fontSize: screenUtil.setSp(14),
+                          fontWeight: FontWeight.normal
 
                       ),
                     ),
@@ -442,9 +440,9 @@ showDialog(contactDetail);
 
                       children: [
 
-                          Image.asset('assets/images/img_view.png',
-                            height: 30.h,width: 30.w,
-                          )
+                        Image.asset('assets/images/img_view.png',
+                          height: 30.h,width: 30.w,
+                        )
 
                         ,
                         Text(
@@ -494,10 +492,10 @@ showDialog(contactDetail);
                         LoginModel   loginModel = LoginModel.fromJson(body);
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                           return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
-                          contactImage:postDetailsModel.data.contactDetail.profileImage ,
-                              contactId:postDetailsModel.data.contactDetail.customerId,
-                          postId: postDetailsModel.data.postId,
-                          userId: loginModel.data.customerId,);
+                            contactImage:postDetailsModel.data.contactDetail.profileImage ,
+                            contactId:postDetailsModel.data.contactDetail.customerId,
+                            postId: postDetailsModel.data.postId,
+                            userId: loginModel.data.customerId,);
                         }));
                       },
                       child: Column(
@@ -506,7 +504,7 @@ showDialog(contactDetail);
                           Image.asset('assets/images/img_contact.png',
                             height: 30.h,width: 30.w,
                           )
-                         ,
+                          ,
                           Text(
                             "${postDetailsModel.data.contactCount} Send Messages" ,
                             style: TextStyle(
@@ -610,7 +608,7 @@ showDialog(contactDetail);
                     return GestureDetector(
                       onTap: (){
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new PetsDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId);
+                          return new AdaptionDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId);
                         }));
                         // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                         //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);

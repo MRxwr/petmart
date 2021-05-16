@@ -9,12 +9,15 @@ import 'package:pet_mart/model/category_model.dart';
 import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/model/message_model.dart';
 import 'package:pet_mart/model/pets_model.dart';
 import 'package:pet_mart/model/post_details_model.dart';
 import 'package:pet_mart/model/post_model.dart';
 import 'package:pet_mart/model/register_model.dart';
 import 'package:pet_mart/model/reset_model.dart';
+import 'package:pet_mart/model/share_model.dart';
 import 'package:pet_mart/model/verify_otp_model.dart';
+import 'package:pet_mart/model/view_model.dart';
 import 'package:pet_mart/utilities/shared_prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -287,5 +290,71 @@ class PetMartService{
     print(postDetailsModel.message);
     print(response.body);
     return postDetailsModel;
+  }
+  Future<ViewModel> viewPet(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/postviewcount"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    ViewModel postDetailsModel;
+    if(response.statusCode == 200){
+      postDetailsModel = ViewModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(postDetailsModel.message);
+    print(response.body);
+    return postDetailsModel;
+  }
+  Future<ShareModel> sharePet(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/sharecount"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    ShareModel postDetailsModel;
+    if(response.statusCode == 200){
+      postDetailsModel = ShareModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(postDetailsModel.message);
+    print(response.body);
+    return postDetailsModel;
+  }
+  Future<MessageModel> getMessages(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}message/detail"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    MessageModel postDetailsModel;
+    if(response.statusCode == 200){
+      postDetailsModel = MessageModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(postDetailsModel.message);
+    print(response.body);
+    return postDetailsModel;
+
+  }
+  Future<MessageModel> postMessages(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}message/sendmessage"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    MessageModel postDetailsModel;
+    if(response.statusCode == 200){
+      postDetailsModel = MessageModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(postDetailsModel.message);
+    print(response.body);
+    return postDetailsModel;
+
   }
 }
