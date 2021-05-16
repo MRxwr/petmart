@@ -7,6 +7,7 @@ import 'package:pet_mart/model/auction_model.dart';
 import 'package:pet_mart/model/bid_model.dart';
 import 'package:pet_mart/model/category_model.dart';
 import 'package:pet_mart/model/cms_model.dart';
+import 'package:pet_mart/model/credit_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/message_model.dart';
@@ -16,6 +17,7 @@ import 'package:pet_mart/model/post_model.dart';
 import 'package:pet_mart/model/register_model.dart';
 import 'package:pet_mart/model/reset_model.dart';
 import 'package:pet_mart/model/share_model.dart';
+import 'package:pet_mart/model/user_model.dart';
 import 'package:pet_mart/model/verify_otp_model.dart';
 import 'package:pet_mart/model/view_model.dart';
 import 'package:pet_mart/utilities/shared_prefs.dart';
@@ -355,6 +357,40 @@ class PetMartService{
     print(postDetailsModel.message);
     print(response.body);
     return postDetailsModel;
+
+  }
+  Future<UserModel> user(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}customer/fetch"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    UserModel userModel;
+    if(response.statusCode == 200){
+      userModel = UserModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(userModel.message);
+    print(response.body);
+    return userModel;
+
+  }
+  Future<CreditModel> credit(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}credit/credit"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    CreditModel creditModel;
+    if(response.statusCode == 200){
+      creditModel = CreditModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(creditModel.message);
+    print(response.body);
+    return creditModel;
 
   }
 }
