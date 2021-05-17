@@ -48,6 +48,7 @@ class PhoneTextField extends StatelessWidget {
           Container(
 
             child: TextFormField(
+              controller: myController,
 
               textAlign: TextAlign.start,
 

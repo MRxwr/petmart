@@ -48,6 +48,7 @@ class NameTextField extends StatelessWidget {
           Container(
 
             child: TextFormField(
+              controller: myController,
 
               textAlign: TextAlign.start,
                 textCapitalization: TextCapitalization.words,

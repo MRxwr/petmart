@@ -32,8 +32,6 @@ dependencies:
   dio: ^4.0.0
   http: any
   toast: any
-
-
   carousel_slider: ^3.0.0
   font_awesome_flutter: any
   shared_preferences: ^2.0.5
@@ -66,6 +64,8 @@ dependencies:
   flutter_cache_manager: ^3.0.2
   image_downloader: ^0.30.0
   grouped_list: ^4.0.0
+  image_picker: ^0.7.5
+
 
 
 
