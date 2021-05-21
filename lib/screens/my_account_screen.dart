@@ -14,6 +14,7 @@ import 'package:pet_mart/model/credit_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/user_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/screens/credit_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/widgets/name_textfield.dart';
 import 'package:pet_mart/widgets/phone_textfield.dart';
@@ -258,12 +259,20 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 fontWeight: FontWeight.normal,
                                 fontSize: screenUtil.setSp(18)
                               ),),
-                              Text('Purchase Credit',
-                                style: TextStyle(
-                                    color: Color(0xFF000000),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenUtil.setSp(18)
-                                ),)
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                    return new CreditScreen();
+
+                                  }));
+                                },
+                                child: Text('Purchase Credit',
+                                  style: TextStyle(
+                                      color: Color(0xFF000000),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenUtil.setSp(18)
+                                  ),),
+                              )
 
                             ],
                           ),

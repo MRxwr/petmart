@@ -6,11 +6,15 @@ import 'package:pet_mart/model/auction_details_model.dart';
 import 'package:pet_mart/model/auction_model.dart';
 import 'package:pet_mart/model/bid_model.dart';
 import 'package:pet_mart/model/category_model.dart';
+import 'package:pet_mart/model/change_password_model.dart';
 import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/model/credit_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/message_model.dart';
+import 'package:pet_mart/model/order_model.dart';
+import 'package:pet_mart/model/package_model.dart';
+import 'package:pet_mart/model/payment_model.dart';
 import 'package:pet_mart/model/pets_model.dart';
 import 'package:pet_mart/model/post_details_model.dart';
 import 'package:pet_mart/model/post_model.dart';
@@ -391,6 +395,91 @@ class PetMartService{
     print(creditModel.message);
     print(response.body);
     return creditModel;
+
+  }
+  Future<PackageModel> package(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}packages/list"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    PackageModel packageModel;
+    if(response.statusCode == 200){
+      packageModel = PackageModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(packageModel.message);
+    print(response.body);
+    return packageModel;
+
+  }
+  Future<PaymentModel> payment(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}packages/order"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    PaymentModel paymentModel;
+    if(response.statusCode == 200){
+      paymentModel = PaymentModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return paymentModel;
+
+  }
+  Future<ChangePasswordModel> changePassword(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}customer/changepassword"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    ChangePasswordModel changePasswordModel;
+    if(response.statusCode == 200){
+      changePasswordModel = ChangePasswordModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return changePasswordModel;
+
+  }
+  Future<OrderModel> orders(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}credit/credit"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    OrderModel changePasswordModel;
+    if(response.statusCode == 200){
+      changePasswordModel = OrderModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return changePasswordModel;
+
+  }
+  Future<PostModel> myPosts(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/mypost"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    PostModel changePasswordModel;
+    if(response.statusCode == 200){
+      changePasswordModel = PostModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return changePasswordModel;
 
   }
 }

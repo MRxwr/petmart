@@ -10,6 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
 import 'package:pet_mart/screens/auction_details_screen.dart';
+import 'package:pet_mart/screens/change_password_screen.dart';
 import 'package:pet_mart/screens/contact_us_screen.dart';
 import 'package:pet_mart/screens/forget_password_screen.dart';
 import 'package:pet_mart/screens/languagee_screen.dart';
@@ -194,6 +195,7 @@ class _MyAppState extends State<MyApp> {
                     OrdersScreen.id: (context) => OrdersScreen(),
                     PushNotificationScreen.id: (context) => PushNotificationScreen(),
                     AuctionDetailsScreen.id: (context) => AuctionDetailsScreen(),
+                    ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
                   },
 
                 ),

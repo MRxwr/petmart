@@ -9,6 +9,7 @@ import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
+import 'package:pet_mart/screens/change_password_screen.dart';
 import 'package:pet_mart/screens/contact_us_screen.dart';
 import 'package:pet_mart/screens/home_screen.dart';
 import 'package:pet_mart/screens/login_screen.dart';
@@ -443,6 +444,20 @@ class _MainScreenState extends State<MainScreen> {
               },
 
               title: Text('Select Language',
+                style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: screenUtil.setSp(17),
+                    fontWeight: FontWeight.normal
+                ),),
+            ),
+            ListTile(
+              onTap: (){
+                Navigator.pop(context);
+                Navigator.pushNamed(context, ChangePasswordScreen.id);
+
+              },
+
+              title: Text('Change Password',
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),

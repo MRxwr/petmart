@@ -326,7 +326,9 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                     children: [
                       Expanded(
                         flex: 1,
-                        child: CachedNetworkImage(
+                        child:
+
+                        CachedNetworkImage(
                           width: 50.w,
                           height: 50.h,
                           imageUrl: mAuctionDetailsModel.data.ownerData.profileImage,

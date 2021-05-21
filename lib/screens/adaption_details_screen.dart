@@ -245,7 +245,8 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
           elevation: 2.0,
         ),
         body: Container(
-          child: postDetailsModel == null?Container(
+          child: postDetailsModel == null?
+          Container(
             child: CircularProgressIndicator(
 
 
