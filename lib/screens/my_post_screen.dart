@@ -9,6 +9,7 @@ import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/post_model.dart' as Model;
 import 'package:pet_mart/model/type_model.dart';
+import 'package:pet_mart/screens/post_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class MyPostScreen extends StatefulWidget {
@@ -24,8 +25,9 @@ class _MyPostScreenState extends State<MyPostScreen> {
   double itemHeight;
   int selectedIndex =0;
   String mLanguage ="";
-  Model.PostModel postModel;
   String userId = "";
+  Model.PostModel postModel;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -133,7 +135,8 @@ class _MyPostScreenState extends State<MyPostScreen> {
       ),
       backgroundColor: Color(0xFFFFFFFF),
       body: Container(
-        child:mLanguage == ""?
+        child:
+        mLanguage == ""?
         Container(
           child: CircularProgressIndicator(
 
@@ -218,9 +221,9 @@ class _MyPostScreenState extends State<MyPostScreen> {
                 itemBuilder: (context,index){
                   return GestureDetector(
                     onTap: (){
-                      // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      //   return new AuctionDetailsScreen(mAuctionModel:auctionModel.data[index]);
-                      // }));
+                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                        return new PostDetailsScreen(postId:postModel.data[index].postId);
+                      }));
                     },
                     child: Container(
                         margin: EdgeInsets.all(6.w),

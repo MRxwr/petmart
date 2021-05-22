@@ -9,9 +9,12 @@ import 'package:pet_mart/model/category_model.dart';
 import 'package:pet_mart/model/change_password_model.dart';
 import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/model/credit_model.dart';
+import 'package:pet_mart/model/delete_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/message_model.dart';
+import 'package:pet_mart/model/my_auction_details_model.dart';
+import 'package:pet_mart/model/my_auctions_model.dart';
 import 'package:pet_mart/model/order_model.dart';
 import 'package:pet_mart/model/package_model.dart';
 import 'package:pet_mart/model/payment_model.dart';
@@ -480,6 +483,74 @@ class PetMartService{
 
     print(response.body);
     return changePasswordModel;
+
+  }
+  Future<DeleteModel> deleteModel(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/delete"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    DeleteModel deleteModel;
+    if(response.statusCode == 200){
+      deleteModel = DeleteModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return deleteModel;
+
+  }
+  Future<DeleteModel> deleteAuction(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}auction/delete"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    DeleteModel deleteModel;
+    if(response.statusCode == 200){
+      deleteModel = DeleteModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return deleteModel;
+
+  }
+  Future<MyAuctionsModel> myAuctions(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}auction/fetch"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    MyAuctionsModel auctionModel;
+    if(response.statusCode == 200){
+      auctionModel = MyAuctionsModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return auctionModel;
+
+  }
+  Future<MyAuctionDetailsModel> myAuctionDetails(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}auction/view"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    MyAuctionDetailsModel auctionModel;
+    if(response.statusCode == 200){
+      auctionModel = MyAuctionDetailsModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return auctionModel;
 
   }
 }
