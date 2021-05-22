@@ -71,10 +71,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           ),
           alignment: AlignmentDirectional.center,
         )
-            :GridView.builder(
+            :
+        GridView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
               childAspectRatio:itemWidth/itemHeight),
           itemCount: categoryModel.data.category[0].childcategory.length,

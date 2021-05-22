@@ -11,11 +11,14 @@ import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/screens/advertise_screen.dart';
 import 'package:pet_mart/screens/categories_screen.dart';
+import 'package:pet_mart/screens/hospitals_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/widgets/arc_widget.dart';
 import 'package:shape_of_view/shape_of_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'hospital_screen.dart';
 class HomeScreen extends StatefulWidget {
   static String id = 'HomeScreen';
   @override
@@ -358,143 +361,159 @@ double height = MediaQuery.of(context).size.height;
               children: [
                 Expanded(
                   flex: 1,
-                  child: Container(
-                    height: 150.h,
-                    child: Column(
-                      children: [
-                        Expanded(flex: 4,
-                            child:CachedNetworkImage(
+                  child: 
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                        return new HospitalsScreen();
+                      }));
+                    },
+                    child: Container(
+                      height: 150.h,
+                      child: Column(
+                        children: [
+                          Expanded(flex: 4,
+                              child:CachedNetworkImage(
 
 
-                              fit: BoxFit.fill,
-                              imageUrl:'${initModel.data.adoptionUrl}',
-                              imageBuilder: (context, imageProvider) => Card(
-                                elevation: 1.h,
-                                child: Container(
-                                    width: width,
+                                fit: BoxFit.fill,
+                                imageUrl:'${initModel.data.adoptionUrl}',
+                                imageBuilder: (context, imageProvider) => Card(
+                                  elevation: 1.h,
+                                  child: Container(
+                                      width: width,
 
 
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
 
 
-                                      image: DecorationImage(
+                                        image: DecorationImage(
 
 
-                                          fit: BoxFit.fill,
-                                          image: imageProvider),
-                                    )
-                                ),
-                              ),
-                              placeholder: (context, url) =>
-                                  Column(
-                                    children: [
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          height: height,
-                                          width: width,
-
-
-                                          alignment: FractionalOffset.center,
-                                          child: SizedBox(
-                                              height: 50.h,
-                                              width: 50.h,
-                                              child: new CircularProgressIndicator()),
-                                        ),
-                                      ),
-                                    ],
+                                            fit: BoxFit.fill,
+                                            image: imageProvider),
+                                      )
                                   ),
+                                ),
+                                placeholder: (context, url) =>
+                                    Column(
+                                      children: [
+                                        Expanded(
+                                          flex: 9,
+                                          child: Container(
+                                            height: height,
+                                            width: width,
 
 
-                              errorWidget: (context, url, error) => Container(
-                                  height: height,
-                                  width: width,
-                                  alignment: FractionalOffset.center,
-                                  child: Icon(Icons.image_not_supported)),
+                                            alignment: FractionalOffset.center,
+                                            child: SizedBox(
+                                                height: 50.h,
+                                                width: 50.h,
+                                                child: new CircularProgressIndicator()),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
 
-                            ),
-                        ),
-                        Expanded(child:   Text(
-                          "Hospital",
-                          style: TextStyle(
-                              color: kMainColor,
-                              fontSize: screenUtil.setSp(16),
-                              fontWeight: FontWeight.bold
+
+                                errorWidget: (context, url, error) => Container(
+                                    height: height,
+                                    width: width,
+                                    alignment: FractionalOffset.center,
+                                    child: Icon(Icons.image_not_supported)),
+
+                              ),
                           ),
-                        ),flex: 1,)
-                      ],
+                          Expanded(child:   Text(
+                            "Hospital",
+                            style: TextStyle(
+                                color: kMainColor,
+                                fontSize: screenUtil.setSp(16),
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),flex: 1,)
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 Expanded(
                   flex: 1,
-                  child: Container(
-                    height: 150.h,
-                    child: Column(
-                      children: [
-                        Expanded(flex: 4,
-                            child: CachedNetworkImage(
+                  child:
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                        return new HospitalScreen();
+                      }));
+                    },
+                    child: Container(
+                      height: 150.h,
+                      child: Column(
+                        children: [
+                          Expanded(flex: 4,
+                              child: CachedNetworkImage(
 
 
-                              fit: BoxFit.fill,
-                              imageUrl:'${initModel.data.shopUrl}',
-                              imageBuilder: (context, imageProvider) => Card(
-                                elevation: 1.h,
-                                child: Container(
-                                    width: width,
+                                fit: BoxFit.fill,
+                                imageUrl:'${initModel.data.shopUrl}',
+                                imageBuilder: (context, imageProvider) => Card(
+                                  elevation: 1.h,
+                                  child: Container(
+                                      width: width,
 
 
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
 
 
-                                      image: DecorationImage(
+                                        image: DecorationImage(
 
 
-                                          fit: BoxFit.fill,
-                                          image: imageProvider),
-                                    )
-                                ),
-                              ),
-                              placeholder: (context, url) =>
-                                  Column(
-                                    children: [
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          height: height,
-                                          width: width,
-
-
-                                          alignment: FractionalOffset.center,
-                                          child: SizedBox(
-                                              height: 50.h,
-                                              width: 50.h,
-                                              child: new CircularProgressIndicator()),
-                                        ),
-                                      ),
-                                    ],
+                                            fit: BoxFit.fill,
+                                            image: imageProvider),
+                                      )
                                   ),
+                                ),
+                                placeholder: (context, url) =>
+                                    Column(
+                                      children: [
+                                        Expanded(
+                                          flex: 9,
+                                          child: Container(
+                                            height: height,
+                                            width: width,
 
 
-                              errorWidget: (context, url, error) => Container(
-                                  height: height,
-                                  width: width,
-                                  alignment: FractionalOffset.center,
-                                  child: Icon(Icons.image_not_supported)),
+                                            alignment: FractionalOffset.center,
+                                            child: SizedBox(
+                                                height: 50.h,
+                                                width: 50.h,
+                                                child: new CircularProgressIndicator()),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
 
-                            )
-                        ),
-                        Expanded(child:   Text(
-                          "Shop",
-                          style: TextStyle(
-                              color: kMainColor,
-                              fontSize: screenUtil.setSp(16),
-                              fontWeight: FontWeight.bold
+
+                                errorWidget: (context, url, error) => Container(
+                                    height: height,
+                                    width: width,
+                                    alignment: FractionalOffset.center,
+                                    child: Icon(Icons.image_not_supported)),
+
+                              )
                           ),
-                        ),flex: 1,)
-                      ],
+                          Expanded(child:   Text(
+                            "Shop",
+                            style: TextStyle(
+                                color: kMainColor,
+                                fontSize: screenUtil.setSp(16),
+                                fontWeight: FontWeight.bold
+                            ),
+                          ),flex: 1,)
+                        ],
+                      ),
                     ),
                   ),
                 ),

@@ -11,6 +11,9 @@ import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/model/credit_model.dart';
 import 'package:pet_mart/model/delete_model.dart';
 import 'package:pet_mart/model/home_model.dart';
+import 'package:pet_mart/model/hospital_details_model.dart';
+import 'package:pet_mart/model/hospital_model.dart';
+import 'package:pet_mart/model/hospitals_model.dart';
 import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/message_model.dart';
@@ -576,6 +579,57 @@ class PetMartService{
 
     print(response.body);
     return auctionModel;
+
+  }
+  Future<HospitalModel> hospitals()async{
+
+
+
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}shop/list"),headers: {"Content-Type": "application/json"});
+    print(' response ${response}');
+    HospitalModel hospitalModel;
+    if(response.statusCode == 200){
+      hospitalModel = HospitalModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return hospitalModel;
+
+  }
+  Future<HospitalsModel> hospital()async{
+
+
+
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}hospitals/list"),headers: {"Content-Type": "application/json"});
+    print(' response ${response}');
+    HospitalsModel hospitalModel;
+    if(response.statusCode == 200){
+      hospitalModel = HospitalsModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return hospitalModel;
+
+  }
+  Future<HospitalDetailsModel> hospitalDetails(String id)async{
+
+
+
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}hospitals/details?id=${id}"),headers: {"Content-Type": "application/json"});
+    print(' response ${response}');
+    HospitalDetailsModel hospitalModel;
+    if(response.statusCode == 200){
+      hospitalModel = HospitalDetailsModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return hospitalModel;
 
   }
 }
