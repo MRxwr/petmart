@@ -9,6 +9,7 @@ import 'package:pet_mart/model/change_password_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:pet_mart/utilities/shared_prefs.dart';
 import 'package:pet_mart/widgets/password_textfield.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -151,11 +152,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
       'new_password': newPassword,
       'language': languageCode};
      ChangePasswordModel changePasswordModel = await petMartService.changePassword(map);
+
     modelHud.changeIsLoading(false);
      String status = changePasswordModel.status;
     _scaffoldKey.currentState.showSnackBar(
         SnackBar(content: Text(changePasswordModel.message)));
      if(status == 'success'){
+       SharedPref sharedPref = SharedPref();
+       await sharedPref.saveString("password", newPassword);
        Navigator.pop(context);
      }
   }

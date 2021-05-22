@@ -48,6 +48,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return  ModalProgressHUD(
       inAsyncCall: Provider.of<ModelHud>(context).isLoading,
       child: Scaffold(
+          resizeToAvoidBottomInset: false,
+
         key: _scaffoldKey,
         backgroundColor: Color(0xFFFFFFFF),
         body: Form(
@@ -231,6 +233,8 @@ uniqueId = await UniqueIdentifier.serial;
         SharedPref sharedPref = SharedPref();
         await sharedPref.save(kUserModel, loginModel);
         await sharedPref.saveBool(kIsLogin, true);
+        await sharedPref.saveString("email", _fullName);
+        await sharedPref.saveString("password", _password);
         modelHud.changeIsLoading(false);
         _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(loginModel.message)));
         Navigator.pushReplacementNamed(context,MainScreen.id);

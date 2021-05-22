@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart';
+import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/screens/advertise_screen.dart';
 import 'package:pet_mart/screens/categories_screen.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   LoginModel loginModel = null;
   HomeModel homeModel = null;
+  InitModel initModel = null;
   int _current =0;
   final CarouselController _controller = CarouselController();
   @override
@@ -46,6 +48,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String loginData = sharedPreferences.getString(kUserModel);
+    String initData = sharedPreferences.getString("initModel");
+    final initBody = json.decode(initData);
+    initModel = InitModel.fromJson(initBody);
 
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
@@ -149,59 +154,56 @@ double height = MediaQuery.of(context).size.height;
                             width: width,
 
                             child:
-                            Hero(
-                              tag: "someTag",
-                              child: CachedNetworkImage(
-                                width: width,
+                            CachedNetworkImage(
+                              width: width,
 
-                                fit: BoxFit.fill,
-                                imageUrl:'${item.image}',
-                                imageBuilder: (context, imageProvider) => Card(
-                                  elevation: 1.h,
-                                  child: Container(
-                                      width: width,
-
-
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
-
-
-                                        image: DecorationImage(
-
-
-                                            fit: BoxFit.fill,
-                                            image: imageProvider),
-                                      )
-                                  ),
-                                ),
-                                placeholder: (context, url) =>
-                                    Column(
-                                      children: [
-                                        Expanded(
-                                          flex: 9,
-                                          child: Container(
-                                            height: height,
-                                            width: width,
-
-
-                                            alignment: FractionalOffset.center,
-                                            child: SizedBox(
-                                                height: 50.h,
-                                                width: 50.h,
-                                                child: new CircularProgressIndicator()),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-
-
-                                errorWidget: (context, url, error) => Container(
-                                    height: height,
+                              fit: BoxFit.fill,
+                              imageUrl:'${item.image}',
+                              imageBuilder: (context, imageProvider) => Card(
+                                elevation: 1.h,
+                                child: Container(
                                     width: width,
-                                    alignment: FractionalOffset.center,
-                                    child: Icon(Icons.image_not_supported)),
 
+
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
+
+
+                                      image: DecorationImage(
+
+
+                                          fit: BoxFit.fill,
+                                          image: imageProvider),
+                                    )
+                                ),
                               ),
+                              placeholder: (context, url) =>
+                                  Column(
+                                    children: [
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                          height: height,
+                                          width: width,
+
+
+                                          alignment: FractionalOffset.center,
+                                          child: SizedBox(
+                                              height: 50.h,
+                                              width: 50.h,
+                                              child: new CircularProgressIndicator()),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+
+                              errorWidget: (context, url, error) => Container(
+                                  height: height,
+                                  width: width,
+                                  alignment: FractionalOffset.center,
+                                  child: Icon(Icons.image_not_supported)),
+
                             ),
                             // Image.network(
                             //
@@ -263,56 +265,53 @@ double height = MediaQuery.of(context).size.height;
                         children: [
 
 
-                          Hero(
-                            tag: 'bannerImage',
-                            child: CachedNetworkImage(
-                              width: width,
-                              height: 120.h,
+                          CachedNetworkImage(
+                            width: width,
+                            height: 120.h,
 
-                              fit: BoxFit.fill,
-                              imageUrl:homeModel.data.category[index].images[0].image,
-                              imageBuilder: (context, imageProvider) => Container(
-                                  width: width,
+                            fit: BoxFit.fill,
+                            imageUrl:homeModel.data.category[index].images[0].image,
+                            imageBuilder: (context, imageProvider) => Container(
+                                width: width,
 
 
-                                  decoration: BoxDecoration(
+                                decoration: BoxDecoration(
 
 
-                                    image: DecorationImage(
+                                  image: DecorationImage(
 
 
-                                        fit: BoxFit.fill,
-                                        image: imageProvider),
-                                  )
-                              ),
-                              placeholder: (context, url) =>
-                                  Column(
-                                    children: [
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          height: height,
-                                          width: width,
-
-
-                                          alignment: FractionalOffset.center,
-                                          child: SizedBox(
-                                              height: 50.h,
-                                              width: 50.h,
-                                              child: new CircularProgressIndicator()),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-
-                              errorWidget: (context, url, error) => Container(
-                                  height: height,
-                                  width: width,
-                                  alignment: FractionalOffset.center,
-                                  child: Icon(Icons.image_not_supported)),
-
+                                      fit: BoxFit.fill,
+                                      image: imageProvider),
+                                )
                             ),
+                            placeholder: (context, url) =>
+                                Column(
+                                  children: [
+                                    Expanded(
+                                      flex: 9,
+                                      child: Container(
+                                        height: height,
+                                        width: width,
+
+
+                                        alignment: FractionalOffset.center,
+                                        child: SizedBox(
+                                            height: 50.h,
+                                            width: 50.h,
+                                            child: new CircularProgressIndicator()),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+
+                            errorWidget: (context, url, error) => Container(
+                                height: height,
+                                width: width,
+                                alignment: FractionalOffset.center,
+                                child: Icon(Icons.image_not_supported)),
+
                           ),
                           Positioned.directional(
                             textDirection:  Directionality.of(context),
@@ -357,40 +356,146 @@ double height = MediaQuery.of(context).size.height;
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  height: 100.h,
-                  child: Column(
-                    children: [
-                      Expanded(flex: 4,
-                          child: Image.asset('assets/images/img_add_adoption.jpeg')
-                      ),
-                      Expanded(child:   Text(
-                        "Hospital",
-                        style: TextStyle(
-                            color: kMainColor,
-                            fontSize: screenUtil.setSp(16),
-                            fontWeight: FontWeight.bold
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: 150.h,
+                    child: Column(
+                      children: [
+                        Expanded(flex: 4,
+                            child:CachedNetworkImage(
+
+
+                              fit: BoxFit.fill,
+                              imageUrl:'${initModel.data.adoptionUrl}',
+                              imageBuilder: (context, imageProvider) => Card(
+                                elevation: 1.h,
+                                child: Container(
+                                    width: width,
+
+
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
+
+
+                                      image: DecorationImage(
+
+
+                                          fit: BoxFit.fill,
+                                          image: imageProvider),
+                                    )
+                                ),
+                              ),
+                              placeholder: (context, url) =>
+                                  Column(
+                                    children: [
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                          height: height,
+                                          width: width,
+
+
+                                          alignment: FractionalOffset.center,
+                                          child: SizedBox(
+                                              height: 50.h,
+                                              width: 50.h,
+                                              child: new CircularProgressIndicator()),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+
+                              errorWidget: (context, url, error) => Container(
+                                  height: height,
+                                  width: width,
+                                  alignment: FractionalOffset.center,
+                                  child: Icon(Icons.image_not_supported)),
+
+                            ),
                         ),
-                      ),flex: 1,)
-                    ],
+                        Expanded(child:   Text(
+                          "Hospital",
+                          style: TextStyle(
+                              color: kMainColor,
+                              fontSize: screenUtil.setSp(16),
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),flex: 1,)
+                      ],
+                    ),
                   ),
                 ),
-                Container(
-                  height: 100.h,
-                  child: Column(
-                    children: [
-                      Expanded(flex: 4,
-                          child: Image.asset('assets/images/img_shop.jpg')
-                      ),
-                      Expanded(child:   Text(
-                        "Shop",
-                        style: TextStyle(
-                            color: kMainColor,
-                            fontSize: screenUtil.setSp(16),
-                            fontWeight: FontWeight.bold
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    height: 150.h,
+                    child: Column(
+                      children: [
+                        Expanded(flex: 4,
+                            child: CachedNetworkImage(
+
+
+                              fit: BoxFit.fill,
+                              imageUrl:'${initModel.data.shopUrl}',
+                              imageBuilder: (context, imageProvider) => Card(
+                                elevation: 1.h,
+                                child: Container(
+                                    width: width,
+
+
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
+
+
+                                      image: DecorationImage(
+
+
+                                          fit: BoxFit.fill,
+                                          image: imageProvider),
+                                    )
+                                ),
+                              ),
+                              placeholder: (context, url) =>
+                                  Column(
+                                    children: [
+                                      Expanded(
+                                        flex: 9,
+                                        child: Container(
+                                          height: height,
+                                          width: width,
+
+
+                                          alignment: FractionalOffset.center,
+                                          child: SizedBox(
+                                              height: 50.h,
+                                              width: 50.h,
+                                              child: new CircularProgressIndicator()),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+
+                              errorWidget: (context, url, error) => Container(
+                                  height: height,
+                                  width: width,
+                                  alignment: FractionalOffset.center,
+                                  child: Icon(Icons.image_not_supported)),
+
+                            )
                         ),
-                      ),flex: 1,)
-                    ],
+                        Expanded(child:   Text(
+                          "Shop",
+                          style: TextStyle(
+                              color: kMainColor,
+                              fontSize: screenUtil.setSp(16),
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),flex: 1,)
+                      ],
+                    ),
                   ),
                 ),
 

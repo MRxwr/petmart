@@ -11,6 +11,7 @@ import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/model/credit_model.dart';
 import 'package:pet_mart/model/delete_model.dart';
 import 'package:pet_mart/model/home_model.dart';
+import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/message_model.dart';
 import 'package:pet_mart/model/my_auction_details_model.dart';
@@ -56,6 +57,30 @@ class PetMartService{
     }
 
     return cmsModel;
+
+
+  }
+  Future<InitModel> init()async{
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+    InitModel initModel;
+
+    var dio = Dio();
+
+
+    var response = await dio.get(TAG_BASE_URL + "initialization/index");
+
+    if (response.statusCode == 200) {
+
+
+
+
+      initModel =
+          InitModel.fromJson(Map<String, dynamic>.from(response.data));
+    }
+
+    return initModel;
 
 
   }
