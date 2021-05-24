@@ -48,6 +48,7 @@ class PasswordTextField extends StatelessWidget {
           Container(
 
             child: TextFormField(
+              initialValue: mText,
 
               textAlign: TextAlign.start,
               textCapitalization: TextCapitalization.words,

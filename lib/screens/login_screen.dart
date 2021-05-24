@@ -87,9 +87,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     child:  Center(
                       child:
                       NameTextField(hint:"Email Address",onClick: (value){
+                        print(value);
                         _fullName= value;
+                        setState(() {
 
+                        });
                       },
+
                       ),
                     )),
                 Expanded(flex: 2,
@@ -97,9 +101,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: AlignmentDirectional.center,
                       child:
                       PasswordTextField(hint:"Password",onClick: (value){
+                        print(value);
+                        setState(() {
+
+                        });
                         _password= value;
 
                       },
+                        mText: _password,
                       ),
                     )),
                 Expanded(flex: 1,

@@ -1,14 +1,17 @@
 
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/utilities/call_services.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/utilities/service_locator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 class ContactUsScreen extends StatefulWidget {
   static String id = 'ContactUsScreen';
@@ -27,21 +30,37 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     } on PlatformException {
       platformVersion = 'Failed to get platform version.';
     }
+    _platformVersion = platformVersion;
 
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     if (!mounted) return;
 
-    setState(() {
-      _platformVersion = platformVersion;
-    });
+
   }
+  Future<InitModel> init() async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    String initData = sharedPreferences.getString("initModel");
+    print('initData --> ${initData}');
+    final initBody = json.decode(initData);
+    InitModel initModel = InitModel.fromJson(initBody);
+    return initModel;
+  }
+  InitModel initModel;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    initPlatformState();
+    initPlatformState().whenComplete(() {
+      init().then((value) {
+        setState(() {
+          initModel = value;
+        });
+
+      });
+    });
   }
   @override
   Widget build(BuildContext context) {
@@ -81,7 +100,15 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         ],
 
       ),
-       body: Container(
+       body: initModel == null?
+       Container(
+         child: CircularProgressIndicator(
+
+
+         ),
+         alignment: AlignmentDirectional.center,
+       ):
+       Container(
          child: Column(
            children: [
              Expanded(
@@ -110,7 +137,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _service.sendEmail('info@petmart.com');
+                         _service.sendEmail(initModel.data.email);
                        },
                        child: Padding(
                          padding:  EdgeInsets.all(2.0.h),
@@ -124,7 +151,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text('info@petmart.com',
+                             Text(initModel.data.email,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -136,7 +163,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _service.call('+9656124578');
+                         _service.call(initModel.data.mobile);
 
 
                        },
@@ -153,7 +180,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text('+9656124578',
+                             Text(initModel.data.mobile,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -165,7 +192,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _openUrl(url("9656124578", ""));
+                         _openUrl(url(initModel.data.mobile, ""));
 
                        },
                        child: Padding(
@@ -180,7 +207,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text('+9656124578',
+                             Text(initModel.data.mobile,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -220,10 +247,10 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   String url(String phone,String message) {
     if (Platform.isAndroid) {
       // add the [https]
-      return "https://wa.me/$phone/?text=${Uri.parse(message)}"; // new line
+      return "https://wa.me/$phone/?text=+${Uri.parse(message)}"; // new line
     } else {
       // add the [https]
-      return "https://api.whatsapp.com/send?phone=$phone=${Uri.parse(message)}"; // new line
+      return "https://api.whatsapp.com/send?phone=+$phone=${Uri.parse(message)}"; // new line
     }
   }
 }

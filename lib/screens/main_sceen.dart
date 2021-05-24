@@ -16,6 +16,7 @@ import 'package:pet_mart/screens/login_screen.dart';
 import 'package:pet_mart/screens/lost_screen.dart';
 import 'package:pet_mart/screens/my_account_screen.dart';
 import 'package:pet_mart/screens/my_auction_screen.dart';
+import 'package:pet_mart/screens/my_message_screen.dart';
 import 'package:pet_mart/screens/my_post_screen.dart';
 import 'package:pet_mart/screens/orders_screen.dart';
 import 'package:pet_mart/screens/privacy_screen.dart';
@@ -130,12 +131,19 @@ class _MainScreenState extends State<MainScreen> {
               color: Colors.white,
             ),
           ),
-          Padding(
-            padding: EdgeInsets.all(4.h),
-            child: ImageIcon(
-              AssetImage('assets/images/img_msg.png'
-              ),size: 20.h,
-              color: Colors.white,
+          GestureDetector(
+            onTap: (){
+              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                return new MyMessagesScreen();
+              }));
+            },
+            child: Padding(
+              padding: EdgeInsets.all(4.h),
+              child: ImageIcon(
+                AssetImage('assets/images/img_msg.png'
+                ),size: 20.h,
+                color: Colors.white,
+              ),
             ),
           )
 

@@ -13,12 +13,14 @@ import 'package:pet_mart/model/delete_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/hospital_details_model.dart';
 import 'package:pet_mart/model/hospital_model.dart';
+import 'package:pet_mart/model/hospital_share_model.dart';
 import 'package:pet_mart/model/hospitals_model.dart';
 import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/message_model.dart';
 import 'package:pet_mart/model/my_auction_details_model.dart';
 import 'package:pet_mart/model/my_auctions_model.dart';
+import 'package:pet_mart/model/my_message_model.dart';
 import 'package:pet_mart/model/order_model.dart';
 import 'package:pet_mart/model/package_model.dart';
 import 'package:pet_mart/model/payment_model.dart';
@@ -581,6 +583,23 @@ class PetMartService{
     return auctionModel;
 
   }
+  Future<MyMessageModel> myMessages(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}message/list"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    MyMessageModel auctionModel;
+    if(response.statusCode == 200){
+      auctionModel = MyMessageModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return auctionModel;
+
+  }
   Future<HospitalModel> hospitals()async{
 
 
@@ -625,6 +644,23 @@ class PetMartService{
     HospitalDetailsModel hospitalModel;
     if(response.statusCode == 200){
       hospitalModel = HospitalDetailsModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return hospitalModel;
+
+  }
+  Future<HospitalShareModel> hospitalShare(String id)async{
+
+
+
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}hospitals/shared?id=${id}"),headers: {"Content-Type": "application/json"});
+    print(' response ${response}');
+    HospitalShareModel hospitalModel;
+    if(response.statusCode == 200){
+      hospitalModel = HospitalShareModel.fromJson(jsonDecode(response.body));
     }
 
 
