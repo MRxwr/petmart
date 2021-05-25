@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/model/search_screen.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
 import 'package:pet_mart/screens/change_password_screen.dart';
@@ -123,12 +124,19 @@ class _MainScreenState extends State<MainScreen> {
     },
     ),
         actions: [
-          Padding(
-            padding: EdgeInsets.all(4.h),
-            child: ImageIcon(
-              AssetImage('assets/images/img_search.png'
+          GestureDetector(
+            onTap: (){
+              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                return new SearcgScreen();
+              }));
+            },
+            child: Padding(
+              padding: EdgeInsets.all(4.h),
+              child: ImageIcon(
+                AssetImage('assets/images/img_search.png'
+                ),
+                color: Colors.white,
               ),
-              color: Colors.white,
             ),
           ),
           GestureDetector(
