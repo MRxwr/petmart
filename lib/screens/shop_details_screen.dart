@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
@@ -41,6 +42,8 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
 appBar:     AppBar(
   backgroundColor: kMainColor,
@@ -77,6 +80,65 @@ appBar:     AppBar(
       backgroundColor: Color(0xFFFFFFFF),
       body: Container(
         margin: EdgeInsets.all(10.h),
+        child:shopdetailsModel == null?
+        Container(
+          child: CircularProgressIndicator(
+
+
+          ),
+          alignment: AlignmentDirectional.center,
+        ):  CachedNetworkImage(
+          width: screenUtil.screenWidth,
+          height: height,
+
+          fit: BoxFit.fill,
+          imageUrl:shopdetailsModel.data[0].shopImage,
+          imageBuilder: (context, imageProvider) {
+
+            return Container(
+                width: screenUtil.screenWidth,
+                height: height,
+
+
+                decoration: BoxDecoration(
+
+
+                  image: DecorationImage(
+
+
+                      fit: BoxFit.fill,
+                      image: imageProvider),
+                )
+            );
+          }
+          ,
+          placeholder: (context, url) =>
+              Column(
+                children: [
+                  Expanded(
+                    flex: 9,
+                    child: Container(
+                      width: screenUtil.screenWidth,
+                      height: screenUtil.scaleHeight,
+
+
+                      alignment: FractionalOffset.center,
+                      child: SizedBox(
+                          height: 100.h,
+                          width: 100.h,
+                          child: new CircularProgressIndicator()),
+                    ),
+                  ),
+                ],
+              ),
+
+
+          errorWidget: (context, url, error) => ClipRRect(
+              child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,
+                colorBlendMode: BlendMode.difference,)),
+
+        ),
+
 
       ),
     );
