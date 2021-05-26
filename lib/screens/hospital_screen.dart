@@ -2,8 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/hospital_model.dart';
+import 'package:pet_mart/screens/shop_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class HospitalScreen extends StatefulWidget {
   const HospitalScreen({Key key}) : super(key: key);
 
@@ -16,8 +19,12 @@ class _HospitalScreenState extends State<HospitalScreen> {
   double itemWidth;
   double itemHeight;
   ScreenUtil screenUtil = ScreenUtil();
+  String mLanguage ="";
 
   Future<HospitalModel> getHospitals()async{
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    mLanguage = languageCode;
     PetMartService petMartService = PetMartService();
     HospitalModel hospitalModel =await petMartService.hospitals();
     return hospitalModel;
@@ -94,6 +101,10 @@ Container(
     itemBuilder: (context,index){
       return GestureDetector(child: buildItem(hospitalModel.data[index],context)
         ,onTap: (){
+          String mHospitalName = hospitalModel.data[index].shopName;
+          Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
+            return new ShopDetailsScreen(id:hospitalModel.data[index].shopId,name: mHospitalName);
+          }));
 
         },);
     },

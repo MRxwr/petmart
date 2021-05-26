@@ -29,7 +29,9 @@ import 'package:pet_mart/model/post_details_model.dart';
 import 'package:pet_mart/model/post_model.dart';
 import 'package:pet_mart/model/register_model.dart';
 import 'package:pet_mart/model/reset_model.dart';
+import 'package:pet_mart/model/search_model.dart';
 import 'package:pet_mart/model/share_model.dart';
+import 'package:pet_mart/model/shopdetails_model.dart';
 import 'package:pet_mart/model/user_model.dart';
 import 'package:pet_mart/model/verify_otp_model.dart';
 import 'package:pet_mart/model/view_model.dart';
@@ -292,6 +294,22 @@ class PetMartService{
     CategoryModel categoryModel;
     if(response.statusCode == 200){
       categoryModel = CategoryModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(categoryModel.message);
+    print(response.body);
+    return categoryModel;
+  }
+  Future<SearchModel> search(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/list"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    SearchModel categoryModel;
+    if(response.statusCode == 200){
+      categoryModel = SearchModel.fromJson(jsonDecode(response.body));
     }
 
     print(categoryModel.message);
@@ -667,5 +685,21 @@ class PetMartService{
     print(response.body);
     return hospitalModel;
 
+  }
+  Future<ShopdetailsModel> shopDetails(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}shop/detail"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    ShopdetailsModel shopdetailsModel;
+    if(response.statusCode == 200){
+      shopdetailsModel = ShopdetailsModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(shopdetailsModel.message);
+    print(response.body);
+    return shopdetailsModel;
   }
 }

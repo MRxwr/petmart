@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/login_model.dart';
-import 'package:pet_mart/model/search_screen.dart';
+import 'package:pet_mart/screens/search_screen.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
 import 'package:pet_mart/screens/change_password_screen.dart';
