@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -12,6 +13,7 @@ import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/credit_model.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/model/update_profile_model.dart';
 import 'package:pet_mart/model/user_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/credit_screen.dart';
@@ -21,6 +23,9 @@ import 'package:pet_mart/widgets/phone_textfield.dart';
 import 'package:pet_mart/widgets/user_name_textfield.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:unique_identifier/unique_identifier.dart';
+
+import 'main_sceen.dart';
 class MyAccountScreen extends StatefulWidget {
   static String id = 'MyAccountScreen';
 
@@ -34,6 +39,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   String mChooseImage="اختار الصورة";
   File _image = null;
   bool isSelected = false;
+  String userId ="";
 
   Future<NAlertDialog> showPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
@@ -119,18 +125,20 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   String lastName = "";
   String phone ="";
   String email ="";
+  String mLanguage="";
 
   Future<UserModel> user() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-
+    mLanguage = languageCode;
     String loginData = _preferences.getString(kUserModel);
     Map map ;
 
 
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
+      userId = loginModel.data.customerId;
       map = {
         "id":loginModel.data.customerId,
         "language":languageCode};
@@ -548,9 +556,35 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       _globalKey.currentState.save();
       if(path != null)
       {
-        final bytes =_image.readAsBytesSync();
-        String _img64 = base64Encode(bytes);
-        print(_img64);
+        dynamic response;
+        final modelHud = Provider.of<ModelHud>(context,listen: false);
+        modelHud.changeIsLoading(true);
+        // final bytes =_image.readAsBytesSync();
+        // String _img64 = base64Encode(bytes);
+        // print(_img64);
+        PetMartService petMartService = PetMartService();
+        String deviceType="";
+        String uniqueId="";
+
+        if(Platform.isAndroid){
+          deviceType = "a";
+          uniqueId = await UniqueIdentifier.serial;
+        }else{
+          deviceType = "i";
+          final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+          var data = await deviceInfoPlugin.iosInfo;
+          uniqueId = data.identifierForVendor;
+        }
+        response =await petMartService.updateProfile(userId, firstName, lastName, email, phone, "", "kuwait", "sfsfsf", uniqueId, deviceType, mLanguage, _image);
+        String status = response['status'];
+        modelHud.changeIsLoading(false);
+        if(status == 'success'){
+          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(response['message'])));
+          Navigator.pushReplacementNamed(context,MainScreen.id);
+        }else{
+          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(response['message'])));
+
+        }
 
 
 
@@ -562,6 +596,32 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Update Data')));
 
         }else{
+          dynamic response;
+          final modelHud = Provider.of<ModelHud>(context,listen: false);
+          modelHud.changeIsLoading(true);
+          PetMartService petMartService = PetMartService();
+          String deviceType="";
+          String uniqueId="";
+
+          if(Platform.isAndroid){
+            deviceType = "a";
+            uniqueId = await UniqueIdentifier.serial;
+          }else{
+            deviceType = "i";
+            final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+            var data = await deviceInfoPlugin.iosInfo;
+            uniqueId = data.identifierForVendor;
+          }
+          response =await petMartService.updateProfile(userId, firstName, lastName, email, phone, "", "kuwait", "sfsfsf", uniqueId, deviceType, mLanguage, _image);
+          modelHud.changeIsLoading(false);
+          String status = response['status'];
+          if(status == 'success'){
+            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(response['message'])));
+            Navigator.pushReplacementNamed(context,MainScreen.id);
+          }else{
+            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(response['message'])));
+
+          }
 
         }
       }

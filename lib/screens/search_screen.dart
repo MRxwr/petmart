@@ -576,7 +576,8 @@ category();
                 children: <Widget>[
 
                   Expanded(
-                    child: TextField(
+                    child:
+                    TextField(
 
                       keyboardType: TextInputType.number,
                       minLines: 1,

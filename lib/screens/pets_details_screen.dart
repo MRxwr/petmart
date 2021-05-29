@@ -650,7 +650,7 @@ showDialog(contactDetail);
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.gallery[0].image,
+                  imageUrl:data.postImage,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(

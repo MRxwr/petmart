@@ -19,6 +19,7 @@ import 'package:pet_mart/model/post_details_model.dart';
 import 'package:pet_mart/model/share_model.dart';
 import 'package:pet_mart/model/view_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/screens/edit_post_screen.dart';
 import 'package:pet_mart/screens/message_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
@@ -45,6 +46,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
   double itemHeight;
   String noOfViews ="";
   String noOfShares = "";
+  String userId="";
   TextButton previewButton(String text,BuildContext context,ContactDetail contactDetail){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
@@ -59,7 +61,9 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     return TextButton(
       style: flatButtonStyle,
       onPressed: () {
-        showDialog(contactDetail);
+        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+          return new EditPostScreen(postDetailsModel:postDetailsModel,userId: userId);
+        }));
 
       },
       child: Text(text,style: TextStyle(
@@ -166,6 +170,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     }else{
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
+      userId = loginModel.data.customerId;
       map = {
         'post_id': widget.postId,
         'user_id': loginModel.data.customerId,
@@ -716,7 +721,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.gallery[0].image,
+                  imageUrl:data.postImage,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(

@@ -1,12 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 
 import 'package:dio/dio.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/add_post_model.dart';
 import 'package:pet_mart/model/auction_details_model.dart';
 import 'package:pet_mart/model/auction_model.dart';
 import 'package:pet_mart/model/bid_model.dart';
 import 'package:pet_mart/model/category_model.dart';
 import 'package:pet_mart/model/change_password_model.dart';
+import 'package:pet_mart/model/check_credit_model.dart';
 import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/model/credit_model.dart';
 import 'package:pet_mart/model/delete_model.dart';
@@ -32,6 +37,7 @@ import 'package:pet_mart/model/reset_model.dart';
 import 'package:pet_mart/model/search_model.dart';
 import 'package:pet_mart/model/share_model.dart';
 import 'package:pet_mart/model/shopdetails_model.dart';
+import 'package:pet_mart/model/update_profile_model.dart';
 import 'package:pet_mart/model/user_model.dart';
 import 'package:pet_mart/model/verify_otp_model.dart';
 import 'package:pet_mart/model/view_model.dart';
@@ -618,6 +624,23 @@ class PetMartService{
     return auctionModel;
 
   }
+  Future<CheckCreditModel> checkCredit(Map map)async{
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}credit/check"),headers: {"Content-Type": "application/json"},body: body);
+    print(' response ${response}');
+    CheckCreditModel checkCreditModel;
+    if(response.statusCode == 200){
+      checkCreditModel = CheckCreditModel.fromJson(jsonDecode(response.body));
+    }
+
+
+    print(response.body);
+    return checkCreditModel;
+
+  }
   Future<HospitalModel> hospitals()async{
 
 
@@ -701,5 +724,218 @@ class PetMartService{
     print(shopdetailsModel.message);
     print(response.body);
     return shopdetailsModel;
+  }
+  Future<dynamic> updateProfile(String id,String firstName,String lastName,String email,String Phone,String date_of_birth, String country,String device_token, String imei_number,String device_type,
+ String language, File image )async{
+    SharedPref sharedPref = SharedPref();
+
+
+
+
+    UpdateProfileModel updateProfileModel;
+    dynamic resp;
+    try {
+      var dio = Dio();
+
+
+      String fileName = image.path
+          .split('/')
+          .last;
+      FormData formData = FormData.fromMap({
+        "profile_image":
+        await MultipartFile.fromFile(image.path, filename: fileName),
+        "id":id,
+        "firstname":firstName,
+        "lastname":lastName,
+        "date_of_birth":date_of_birth,
+        "country":country,
+        "device_token":device_token,
+        "imei_number":imei_number,
+        "device_type":device_type,
+        "language":language,
+
+
+
+
+        "mobile": Phone,
+        "email": email,
+
+      });
+
+      final  response = await dio.post(TAG_BASE_URL + "customer/update", data: formData);
+      print(response.data);
+      if (response.statusCode == 200) {
+        resp = response.data;
+      }
+
+    } on DioError catch(e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      resp =e.response.data;
+
+
+
+    }
+    return resp;
+
+
+  }
+  Future<dynamic> addPost(String english_name,String arabic_name,String post_type,String english_description,String arabic_description, String price,String category_id, String age,String age_id,
+      String gender, String owner_id, String sub_category_id,
+      String contact_no,String mLanguage,List<File> images ,File vedio)async{
+    SharedPref sharedPref = SharedPref();
+
+
+
+
+    AddPostModel addPostModel;
+    dynamic resp;
+    try {
+      var dio ;
+      BaseOptions options = new BaseOptions(
+          baseUrl: TAG_BASE_URL,
+          receiveDataWhenStatusError: true,
+          connectTimeout: 600*1000, // 60 seconds
+          receiveTimeout: 600*1000 // 60 seconds
+      );
+
+      dio = new Dio(options);
+      dio.options.contentType = 'application/json';
+
+
+      Map<String, dynamic> map = Map();
+
+      map['english_name'] = english_name;
+      map['arabic_name'] = arabic_name;
+      map['post_type'] = post_type;
+      map['english_description'] = english_description;
+      map['arabic_description'] = arabic_description;
+      map['price'] = price;
+      map['category_id'] = category_id;
+      map['age'] = age;
+      map['age_id'] = age_id;
+      map['gender'] = gender;
+      map['owner_id'] = owner_id;
+      map['sub_category_id'] = sub_category_id;
+      map['contact_no'] = contact_no;
+      map['language'] = mLanguage;
+      for(int i =0;i<images.length;i++){
+        String path = images[i].path;
+        print('path --> ${images[i].path}');
+
+        String childFileName = path
+            .split('/')
+            .last;
+        print ('childFileName ${childFileName}');
+        map['images[${i}]']=  await MultipartFile.fromFile(path, filename: childFileName);
+      }
+  // File vedioFile =  File.fromRawPath(Uint8List.fromList([0]));
+  //         String childFileName = vedioFile.path
+  //             .split('/')
+  //         .last;
+      // map['videos[0]'] = await MultipartFile.fromFile(vedioFile.path, filename: childFileName);
+      FormData formData = new FormData.fromMap(map);
+      final  response = await dio.post("post/create", data: formData);
+
+      if (response.statusCode == 200) {
+        resp = response.data;
+        print(resp);
+      }
+
+    } on DioError catch(e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      resp =e.response.data;
+      print(resp);
+
+
+
+    }
+    return resp;
+
+
+  }
+  Future<dynamic> addAuction(String english_name,String arabic_name,String english_description,String arabic_description, String start_date,String end_date, String bid_value,String auction_type,
+      String category_id, String owner_id, String sub_category_id,
+     String mLanguage,List<File> images ,List<File> vedio)async{
+    SharedPref sharedPref = SharedPref();
+
+
+
+
+    AddPostModel addPostModel;
+    dynamic resp;
+    try {
+      var dio ;
+
+
+      BaseOptions options = new BaseOptions(
+          baseUrl: TAG_BASE_URL,
+          receiveDataWhenStatusError: true,
+          connectTimeout: 600*1000, // 60 seconds
+          receiveTimeout: 600*1000 // 60 seconds
+      );
+
+      dio = new Dio(options);
+      dio.options.contentType = 'application/json';
+      Map<String, dynamic> map = Map();
+
+      map['english_name'] = english_name;
+      map['arabic_name'] = arabic_name;
+
+      map['english_description'] = english_description;
+      map['arabic_description'] = arabic_description;
+      map['start_date'] = start_date;
+      map['end_date'] = end_date;
+      map['category_id'] = category_id;
+      map['bid_value'] = bid_value;
+      map['auction_type'] = auction_type;
+
+      map['owner_id'] = owner_id;
+      map['sub_category_id'] = sub_category_id;
+
+      map['language'] = mLanguage;
+      for(int i =0;i<images.length;i++){
+        print('path --> ${images[i].path}');
+
+        String childFileName = images[i].path
+            .split('/')
+            .last;
+        print ('childFileName ${childFileName}');
+        map['images[${i}]']=  await MultipartFile.fromFile(images[i].path, filename: childFileName);
+      }
+      if(vedio.isNotEmpty){
+        for(int i =0;i<vedio.length;i++){
+          print('path --> ${vedio[i].path}');
+
+          String childFileName = vedio[i].path
+              .split('/')
+              .last;
+          print ('childFileName ${childFileName}');
+          map['videos[${i}]']=  await MultipartFile.fromFile(vedio[i].path, filename: childFileName);
+        }
+      }
+
+      print('map --> ${map}');
+         FormData formData = new FormData.fromMap(map);
+      final  response = await dio.post("auction/create", data: formData);
+
+      if (response.statusCode == 200) {
+        resp = response.data;
+        print(resp);
+      }
+
+    } on DioError catch(e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      resp =e.response.data;
+      print(resp);
+
+
+
+    }
+    return resp;
+
+
   }
 }

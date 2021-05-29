@@ -5,8 +5,12 @@ import 'dart:core';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/check_credit_model.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/search_screen.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
@@ -28,6 +32,7 @@ import 'package:pet_mart/utilities/shared_prefs.dart';
 import 'package:pet_mart/widgets/fab_bottom_app_bar.dart';
 import 'package:pet_mart/widgets/fab_with_icons.dart';
 import 'package:pet_mart/widgets/layout.dart';
+import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -97,138 +102,142 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(
-          title,
-          style: TextStyle(
-            color: Color(0xFFFFFFFF),
-            fontSize: screenUtil.setSp(16),
-            fontWeight: FontWeight.bold
-          ),
-        ),
-        backgroundColor: kMainColor,
-         leading: Builder(
-          builder: (BuildContext context) {
     return
-      IconButton(
+      ModalProgressHUD(
+        inAsyncCall: Provider.of<ModelHud>(context).isLoading,
+        child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            title,
+            style: TextStyle(
+              color: Color(0xFFFFFFFF),
+              fontSize: screenUtil.setSp(16),
+              fontWeight: FontWeight.bold
+            ),
+          ),
+          backgroundColor: kMainColor,
+           leading: Builder(
+            builder: (BuildContext context) {
+    return
+        IconButton(
     icon: const Icon(Icons.menu,color: Color(0xFFFFFFFFF),),
     onPressed: () {
     Scaffold.of(context).openDrawer();
     },
     tooltip: MaterialLocalizations
-        .of(context)
-        .openAppDrawerTooltip,
+          .of(context)
+          .openAppDrawerTooltip,
     );
     },
     ),
-        actions: [
-          GestureDetector(
-            onTap: (){
-              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                return new SearcgScreen();
-              }));
-            },
-            child: Padding(
-              padding: EdgeInsets.all(4.h),
-              child: ImageIcon(
-                AssetImage('assets/images/img_search.png'
+          actions: [
+            GestureDetector(
+              onTap: (){
+                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                  return new SearcgScreen();
+                }));
+              },
+              child: Padding(
+                padding: EdgeInsets.all(4.h),
+                child: ImageIcon(
+                  AssetImage('assets/images/img_search.png'
+                  ),
+                  color: Colors.white,
                 ),
-                color: Colors.white,
               ),
             ),
-          ),
-          GestureDetector(
-            onTap: (){
-              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                return new MyMessagesScreen();
-              }));
-            },
-            child: Padding(
-              padding: EdgeInsets.all(4.h),
-              child: ImageIcon(
-                AssetImage('assets/images/img_msg.png'
-                ),size: 20.h,
-                color: Colors.white,
+            GestureDetector(
+              onTap: (){
+                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                  return new MyMessagesScreen();
+                }));
+              },
+              child: Padding(
+                padding: EdgeInsets.all(4.h),
+                child: ImageIcon(
+                  AssetImage('assets/images/img_msg.png'
+                  ),size: 20.h,
+                  color: Colors.white,
+                ),
+              ),
+            )
+
+
+          ],
+
+        ),
+        drawer: isLogIn?
+        loggedDrawer(context,loginModel):visitorDrawer(context),
+
+        body:
+        IndexedStack(
+          index: index,
+          children: [
+            Navigator(
+              key: _vediosScreen,
+              onGenerateRoute: (route) => MaterialPageRoute(
+                settings: route,
+                builder: (context) => AuctionScreen(),
               ),
             ),
-          )
-
-
-        ],
-
-      ),
-      drawer: isLogIn?
-      loggedDrawer(context,loginModel):visitorDrawer(context),
-
-      body:
-      IndexedStack(
-        index: index,
-        children: [
-          Navigator(
-            key: _vediosScreen,
-            onGenerateRoute: (route) => MaterialPageRoute(
-              settings: route,
-              builder: (context) => AuctionScreen(),
+            Navigator(
+              key: _amateursNews,
+              onGenerateRoute: (route) => MaterialPageRoute(
+                settings: route,
+                builder: (context) => LostScreen(),
+              ),
             ),
-          ),
-          Navigator(
-            key: _amateursNews,
-            onGenerateRoute: (route) => MaterialPageRoute(
-              settings: route,
-              builder: (context) => LostScreen(),
+            Navigator(
+              key: _competitionNewsScreen,
+              onGenerateRoute: (route) => MaterialPageRoute(
+                settings: route,
+                builder: (context) => AdaptionScreen(),
+              ),
             ),
-          ),
-          Navigator(
-            key: _competitionNewsScreen,
-            onGenerateRoute: (route) => MaterialPageRoute(
-              settings: route,
-              builder: (context) => AdaptionScreen(),
+            Navigator(
+              key: _homeScreen,
+              onGenerateRoute: (route) => MaterialPageRoute(
+                settings: route,
+                builder: (context) => HomeScreen(),
+              ),
             ),
-          ),
-          Navigator(
-            key: _homeScreen,
-            onGenerateRoute: (route) => MaterialPageRoute(
-              settings: route,
-              builder: (context) => HomeScreen(),
-            ),
-          ),
 
 
 
 
 
-        ],
-      ),
-      bottomNavigationBar: FABBottomAppBar(
+          ],
+        ),
+        bottomNavigationBar: FABBottomAppBar(
 
 
-        backgroundColor: kMainColor,
-        centerItemText: 'Add Post',
+          backgroundColor: kMainColor,
+          centerItemText: 'Add Post',
 
-        color: Color(0xFFFFFFFF),
-        selectedColor: Color(0xFFFFFFFF),
-        notchedShape: CircularNotchedRectangle(),
+          color: Color(0xFFFFFFFF),
+          selectedColor: Color(0xFFFFFFFF),
+          notchedShape: CircularNotchedRectangle(),
 
-        onTabSelected: (val) {
-          return  _onTap(val, context);
-        },
-        items: [
+          onTabSelected: (val) {
+            return  _onTap(val, context);
+          },
+          items: [
 
-          FABBottomAppBarItem(iconPath:
-          'assets/images/img_auction.png', text: 'Auction'),
-          FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: 'Lost'),
+            FABBottomAppBarItem(iconPath:
+            'assets/images/img_auction.png', text: 'Auction'),
+            FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: 'Lost'),
 
-          FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: 'Adaption'),
-          FABBottomAppBarItem(iconPath:'assets/images/img_home.png', text: 'Home'),
+            FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: 'Adaption'),
+            FABBottomAppBarItem(iconPath:'assets/images/img_home.png', text: 'Home'),
 
-        ],
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: _buildFab(
-          context), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+          ],
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButton: _buildFab(
+            context), // This trailing comma makes auto-formatting nicer for build methods.
+    ),
+      );
   }
 
   Drawer visitorDrawer(BuildContext context) {
@@ -548,9 +557,22 @@ class _MainScreenState extends State<MainScreen> {
     final icons = [ Icons.sms, Icons.mail, Icons.phone ];
     return  FloatingActionButton(
         onPressed: () {
+          final modelHud = Provider.of<ModelHud>(context,listen: false);
+          modelHud.changeIsLoading(true);
+          checkCreditModel().then((value){
+            modelHud.changeIsLoading(false);
+            int credit = int.parse(value.data.credit);
+            print('credit --->${credit}');
+            ShowAlertDialog(context, value.message);
+            if(credit>0){
+              Navigator.of(context,rootNavigator: true).pushNamed(AddAdvertiseScreen.id);
+
+            }else{
+              ShowAlertDialog(context, value.message);
+            }
+          });
           print("true");
-         Navigator.of(context,rootNavigator: true).pushNamed(AddAdvertiseScreen.id);
-        },
+          },
         tooltip: 'Increment',
         child: Image.asset('assets/images/img_add_post.png'),
         elevation: 2.0,
@@ -696,4 +718,73 @@ class _MainScreenState extends State<MainScreen> {
     });
 
   }
+  Future<CheckCreditModel> checkCreditModel() async{
+
+
+
+    Map map ;
+
+
+    map = {"user_id":loginModel.data.customerId};
+
+
+
+
+
+    PetMartService petMartService = PetMartService();
+    CheckCreditModel creditModel = await petMartService.checkCredit(map);
+    return creditModel;
+  }
+  Future<void> ShowAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            "Ok",
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        )
+      ],
+    );
+    alert.show();
+
+  }
+
 }

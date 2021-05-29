@@ -64,10 +64,12 @@ dependencies:
   flutter_cache_manager: ^3.0.2
   image_downloader: ^0.30.0
   grouped_list: ^4.0.0
-  image_picker: ^0.7.5
+  image_picker: ^0.7.5+3
   my_fatoorah: ^3.0.2
   flutter_webview_plugin: ^0.3.11
   group_radio_button: ^1.1.0
+  wechat_assets_picker: ^5.5.3
+
 
 
 

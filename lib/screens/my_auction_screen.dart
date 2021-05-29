@@ -141,7 +141,14 @@ Container(
   ),
   alignment: AlignmentDirectional.center,
 ):
-    Column(
+    ListView(
+      padding: EdgeInsets.zero,
+      scrollDirection: Axis.vertical,
+
+
+
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       children: [
 
         SizedBox(height: 5.h,width: width,
@@ -212,7 +219,7 @@ Container(
 
 
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                   childAspectRatio:itemWidth/itemHeight),
               itemCount: myAuctionsModel.data.auctionData.length,

@@ -143,7 +143,14 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
           ),
           alignment: AlignmentDirectional.center,
-        ):Column(
+        ):ListView(
+          padding: EdgeInsets.zero,
+          scrollDirection: Axis.vertical,
+
+
+
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           children: [
             SizedBox(height: 5.h,width: width,
             ),
