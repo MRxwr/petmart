@@ -150,7 +150,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
 
           shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
+          physics: const AlwaysScrollableScrollPhysics(),
           children: [
             SizedBox(height: 5.h,width: width,
             ),
@@ -220,7 +220,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
 
                 shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                     childAspectRatio:itemWidth/itemHeight),
                 itemCount: postModel.data.length,

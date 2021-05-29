@@ -148,7 +148,7 @@ Container(
 
 
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const AlwaysScrollableScrollPhysics(),
       children: [
 
         SizedBox(height: 5.h,width: width,
@@ -219,7 +219,7 @@ Container(
 
 
               shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                   childAspectRatio:itemWidth/itemHeight),
               itemCount: myAuctionsModel.data.auctionData.length,
