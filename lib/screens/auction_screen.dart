@@ -137,7 +137,14 @@ homeModel = value;
     itemHeight = 200.h;
 
     return Scaffold(
-      body: Column(
+      body: ListView(
+        padding: EdgeInsets.zero,
+        scrollDirection: Axis.vertical,
+
+
+
+        shrinkWrap: true,
+        physics: const AlwaysScrollableScrollPhysics(),
         children: [
           
           Container(
@@ -327,44 +334,41 @@ homeModel = value;
             flex: 4,
             child: Stack(
               children: [
-                Hero(
-                  tag: 'imageHero',
-                  child: CachedNetworkImage(
-                    width: itemWidth,
-                    imageUrl:data.gallery[0].image,
-                    imageBuilder: (context, imageProvider) => Stack(
-                      children: [
-                        ClipRRect(
+                CachedNetworkImage(
+                  width: itemWidth,
+                  imageUrl:data.gallery[0].image,
+                  imageBuilder: (context, imageProvider) => Stack(
+                    children: [
+                      ClipRRect(
 
-                          child: Container(
-                              width: itemWidth,
+                        child: Container(
+                            width: itemWidth,
 
-                              decoration: BoxDecoration(
+                            decoration: BoxDecoration(
 
-                                shape: BoxShape.rectangle,
+                              shape: BoxShape.rectangle,
 
-                                image: DecorationImage(
-                                    fit: BoxFit.fill,
-                                    image: imageProvider),
-                              )
-                          ),
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: imageProvider),
+                            )
                         ),
-                      ],
-                    ),
-                    placeholder: (context, url) =>
-                        Center(
-                          child: SizedBox(
-                              height: 50.h,
-                              width: 50.h,
-                              child: new CircularProgressIndicator()),
-                        ),
-
-
-                    errorWidget: (context, url, error) => ClipRRect(
-                        child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
-                          colorBlendMode: BlendMode.difference,)),
-
+                      ),
+                    ],
                   ),
+                  placeholder: (context, url) =>
+                      Center(
+                        child: SizedBox(
+                            height: 50.h,
+                            width: 50.h,
+                            child: new CircularProgressIndicator()),
+                      ),
+
+
+                  errorWidget: (context, url, error) => ClipRRect(
+                      child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
+                        colorBlendMode: BlendMode.difference,)),
+
                 ),
                 Positioned.directional(
                   textDirection:  Directionality.of(context),

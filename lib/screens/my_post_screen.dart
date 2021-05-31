@@ -229,7 +229,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
                   return GestureDetector(
                     onTap: (){
                       Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new PostDetailsScreen(postId:postModel.data[index].postId);
+                        return new PostDetailsScreen(postId:postModel.data[index].postId,postName:postModel.data[index].postName ,);
                       }));
                     },
                     child: Container(

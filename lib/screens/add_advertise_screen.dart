@@ -86,6 +86,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
 
       isSelected = true;
       File _image = File(pickedFile.path);
+      print('Path --->${_image.absolute.path}');
 
       mImages.add(_image) ;
     Paths.add(_image.path);

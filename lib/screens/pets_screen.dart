@@ -16,7 +16,8 @@ class PetsScreen extends StatefulWidget {
 
   CategoryModel categoryModel;
   int selectCategory;
-   PetsScreen({Key key,@required this.childcategory,@required this.categoryModel,@required this.parentCategoryId,@required this.selectCategory}) : super(key: key);
+  String categryName;
+   PetsScreen({Key key,@required this.childcategory,@required this.categoryModel,@required this.parentCategoryId,@required this.selectCategory,@required this.categryName}) : super(key: key);
 
   @override
   _PetsScreenState createState() => _PetsScreenState();
@@ -121,6 +122,39 @@ class _PetsScreenState extends State<PetsScreen> {
     itemWidth = width / 2;
     itemHeight = 200.h;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: kMainColor,
+        title: Container(
+          alignment: AlignmentDirectional.center,
+          child: Padding(
+            padding:  EdgeInsets.symmetric(horizontal: 10.h),
+            child: Text(
+              widget.categryName,
+              style: TextStyle(
+                  color: Color(0xFFFFFFFF),
+                  fontSize: screenUtil.setSp(16),
+                  fontWeight: FontWeight.bold
+
+              ),
+
+
+            ),
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
+
+          },
+          child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+        ),
+
+
+        actions: [
+
+        ],
+
+      ),
       body: ListView(
         children: [
           Container(
@@ -195,7 +229,7 @@ class _PetsScreenState extends State<PetsScreen> {
                 return GestureDetector(
                   onTap: (){
                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      return new PetsDetailsScreen(postId:petsModel.data[index].postId);
+                      return new PetsDetailsScreen(postId:petsModel.data[index].postId,postName: petsModel.data[index].postName,);
                     }));
                   },
                   child: Container(
@@ -228,7 +262,7 @@ class _PetsScreenState extends State<PetsScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.gallery[0].image,
+                  imageUrl:data.postImage,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(

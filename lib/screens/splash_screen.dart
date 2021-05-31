@@ -3,12 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info/device_info.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/model/push_notification.dart';
 import 'package:pet_mart/screens/languagee_screen.dart';
 import 'package:pet_mart/screens/main_sceen.dart';
 import 'package:pet_mart/utilities/constants.dart';
@@ -22,12 +27,16 @@ class SplashScreen extends StatefulWidget {
   _SplashScreenState createState() => _SplashScreenState();
 }
 
+
 class _SplashScreenState extends State<SplashScreen> {
   StreamSubscription sub;
-  @override
+    FirebaseMessaging _messaging;
+  int _counter = 0;
+    @override
   void initState() {
-    // TODO: implement initState
-    super.initState();
+    var initializationSettingsAndroid =
+
+
     home().then((value) {
 
     }).whenComplete((){
@@ -60,7 +69,10 @@ class _SplashScreenState extends State<SplashScreen> {
     //
     // );
       }
-Future<bool> getLanguageSelected()async{
+
+
+
+  Future<bool> getLanguageSelected()async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return sharedPreferences.getBool("selectLanguage")??false;
 }

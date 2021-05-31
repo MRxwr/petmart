@@ -228,7 +228,7 @@ Container(
                 return GestureDetector(
                   onTap: (){
                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      return new MyAuctionDetails(id:myAuctionsModel.data.auctionData[index].auctionId);
+                      return new MyAuctionDetails(id:myAuctionsModel.data.auctionData[index].auctionId,postName:myAuctionsModel.data.auctionData[index].auctionName ,);
                     }));
                   },
                   child: Container(

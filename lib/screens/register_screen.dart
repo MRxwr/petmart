@@ -246,9 +246,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (confirmPassword == password) {
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
-        String deviceToken = "testtest";
-
         SharedPreferences _preferences = await SharedPreferences.getInstance();
+        String deviceToken =_preferences.getString("token")??"";
+
+
+
         String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
         String deviceType = "";
 

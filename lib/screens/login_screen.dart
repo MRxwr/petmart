@@ -33,14 +33,25 @@ class _LoginScreenState extends State<LoginScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   String _fullName ="";
   String _password="";
-  String token ="soksokfojrr3wow";
+  String token ="";
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String _platformImei = 'Unknown';
   String uniqueId = "Unknown";
+  Future<String> getToken() async{
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String mToken =_preferences.getString("token")??"";
+    return mToken;
+
+  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    getToken().then((value) {
+      setState(() {
+        token = value;
+      });
+    });
 
   }
   @override

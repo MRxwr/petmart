@@ -61,6 +61,39 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     itemWidth = width / 2;
     itemHeight = 200.h;
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: kMainColor,
+        title: Container(
+          alignment: AlignmentDirectional.center,
+          child: Padding(
+            padding:  EdgeInsets.symmetric(horizontal: 10.h),
+            child: Text(
+              widget.category.categoryName,
+              style: TextStyle(
+                  color: Color(0xFFFFFFFF),
+                  fontSize: screenUtil.setSp(16),
+                  fontWeight: FontWeight.bold
+
+              ),
+
+
+            ),
+          ),
+        ),
+        leading: GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
+
+          },
+          child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+        ),
+
+
+        actions: [
+
+        ],
+
+      ),
       body: Container(
         margin: EdgeInsets.all(10.h),
         child: categoryModel == null ?
@@ -82,9 +115,9 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           itemBuilder: (context,index){
             return GestureDetector(child: buildItem(categoryModel.data.category[0].childcategory[index],context)
             ,onTap: (){
-               Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
+               Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                           return new PetsScreen(childcategory: categoryModel.data.category[0].childcategory[index],
-                          categoryModel : categoryModel,parentCategoryId: widget.category.categoryId,selectCategory: index+1,);
+                          categoryModel : categoryModel,parentCategoryId: widget.category.categoryId,selectCategory: index+1,categryName: widget.category.categoryName,);
                         }));
               },);
           },

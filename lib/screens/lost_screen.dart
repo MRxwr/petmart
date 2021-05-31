@@ -106,8 +106,14 @@ class _LostScreenState extends State<LostScreen> {
       body: Container(
           margin: EdgeInsets.all(10.w),
           child:
-          Column(
+          ListView(
+            padding: EdgeInsets.zero,
+            scrollDirection: Axis.vertical,
 
+
+
+            shrinkWrap: true,
+            physics: const AlwaysScrollableScrollPhysics(),
 
             children: [
               Container(
@@ -184,7 +190,7 @@ class _LostScreenState extends State<LostScreen> {
                     return GestureDetector(
                       onTap: (){
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new LostDetailScreen(postId:postModel.data[index].postId);
+                          return new LostDetailScreen(postId:postModel.data[index].postId,postName:postModel.data[index].postName);
                         }));
                       },
                       child: Container(

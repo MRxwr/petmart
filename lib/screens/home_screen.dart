@@ -254,7 +254,7 @@ double height = MediaQuery.of(context).size.height;
                   return
                     GestureDetector(
                       onTap: (){
-                        Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
+                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                           return new CategoriesScreen(category:homeModel.data.category[index]);
                         }));
                       },
@@ -351,7 +351,9 @@ double height = MediaQuery.of(context).size.height;
 
                   ),
                     );
-                }, separatorBuilder: (context,index){
+                },
+
+                separatorBuilder: (context,index){
               return Container(height: 10.h,
                 color: Color(0xFFFFFFFF),);
             }, itemCount: homeModel.data.category.length),

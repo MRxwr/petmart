@@ -27,7 +27,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 class AdaptionDetailsScreen extends StatefulWidget {
   String  postId;
-  AdaptionDetailsScreen({Key key,@required this.postId}) : super(key: key);
+  String postName;
+  AdaptionDetailsScreen({Key key,@required this.postId,@required this.postName}) : super(key: key);
 
 
   @override
@@ -231,19 +232,40 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
     return ModalProgressHUD(
       inAsyncCall: Provider.of<ModelHud>(context).isLoading,
       child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: kMainColor,
+          title: Container(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding:  EdgeInsets.symmetric(horizontal: 10.h),
+              child: Text(
+                widget.postName,
+                style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: screenUtil.setSp(16),
+                    fontWeight: FontWeight.bold
 
-        floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-        floatingActionButton:  FloatingActionButton(
-          onPressed: () {
-            print("true");
-            Navigator.pop(context);
-          },
-          tooltip: 'Increment',
-          child:Container(
-              alignment: AlignmentDirectional.center,
-              width: 60.w, height: 60.w, child: Center(child: Icon(Icons.arrow_back_ios,color: Color(0xFFFFFFFF),))),
-          elevation: 2.0,
+                ),
+
+
+              ),
+            ),
+          ),
+          leading: GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+
+            },
+            child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+          ),
+
+
+          actions: [
+
+          ],
+
         ),
+
         body: Container(
           child: postDetailsModel == null?
           Container(
@@ -609,7 +631,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                     return GestureDetector(
                       onTap: (){
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new AdaptionDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId);
+                          return new AdaptionDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId,postName: postDetailsModel.data.relatePost[index].postName,);
                         }));
                         // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                         //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
@@ -649,7 +671,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.gallery[0].image,
+                  imageUrl:data.postImage,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(

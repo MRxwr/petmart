@@ -32,8 +32,9 @@ import 'main_sceen.dart';
 class PostDetailsScreen extends StatefulWidget {
   static String id = 'PetsDetailsScreen';
   String  postId;
+  String postName;
 
-  PostDetailsScreen({Key key,@required this.postId}) : super(key: key);
+  PostDetailsScreen({Key key,@required this.postId,@required this.postName}) : super(key: key);
   @override
   _PostDetailsScreenState createState() => _PostDetailsScreenState();
 }
@@ -288,17 +289,38 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       inAsyncCall: Provider.of<ModelHud>(context).isLoading,
       child: Scaffold(
         key: _scaffoldKey,
-        floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-        floatingActionButton:  FloatingActionButton(
-          onPressed: () {
-            print("true");
-            Navigator.pop(context);
-          },
-          tooltip: 'Increment',
-          child:Container(
-              alignment: AlignmentDirectional.center,
-              width: 60.w, height: 60.w, child: Center(child: Icon(Icons.arrow_back_ios,color: Color(0xFFFFFFFF),))),
-          elevation: 2.0,
+        appBar: AppBar(
+          backgroundColor: kMainColor,
+          title: Container(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding:  EdgeInsets.symmetric(horizontal: 10.h),
+              child: Text(
+                widget.postName,
+                style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: screenUtil.setSp(16),
+                    fontWeight: FontWeight.bold
+
+                ),
+
+
+              ),
+            ),
+          ),
+          leading: GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+
+            },
+            child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+          ),
+
+
+          actions: [
+
+          ],
+
         ),
         body: Container(
           child: postDetailsModel == null?Container(

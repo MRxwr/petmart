@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_mart/model/post_details_model.dart';
 import 'dart:convert';
@@ -147,6 +148,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   CategoryParent.HomeModel homeModel;
   List<CategoryParent.Category> categoryList;
+  List<Gallery> galleryList = List();
   @override
   void initState() {
     // TODO: implement initState
@@ -163,6 +165,8 @@ if(key == 'sell'){
     }else if(key == 'lost-animal'){
   typesList[2].selected = true;
 }
+    galleryList.clear() ;
+galleryList = widget.postDetailsModel.data.gallery;
     categoryId = widget.postDetailsModel.data.categoryId;
 subCategoryId = widget.postDetailsModel.data.subCategoryId;
 categoryName = widget.postDetailsModel.data.categoryName;
@@ -423,6 +427,7 @@ _ageController.text = widget.postDetailsModel.data.age;
                         fontSize: screenUtil.setSp(16),
                         fontWeight: FontWeight.bold
                     ),),
+
                   Container(
                     height: 100.h,
                     width: screenUtil.screenWidth,
@@ -456,6 +461,19 @@ _ageController.text = widget.postDetailsModel.data.age;
                             child: Icon(Icons.add,color: kMainColor,size: 50.h,),
                           ),
                         ),
+                        SizedBox(width: 10.w,
+                          height: 100.h,),
+                        ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context,index){
+                              return buildImage(galleryList[index],index);
+                            }, separatorBuilder: (context,index) {
+                          return Container(width: 10.h,
+                            color: Color(0xFFFFFFFF),);
+                        }
+                            , itemCount: galleryList.length),
                         SizedBox(width: 10.w,
                           height: 100.h,),
                         ListView.separated(
@@ -1070,7 +1088,7 @@ _ageController.text = widget.postDetailsModel.data.age;
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
       PetMartService petMartService = PetMartService();
-      dynamic response = await petMartService.addPost(postTitle, postTitle, key, postDescription, postDescription, price, categoryId, age, ageId, genderId, userId, subCategoryId, phoneNumber, mLanguage,mImages, null);
+      dynamic response = await petMartService.editPost(widget.postDetailsModel.data.postId,postTitle, postTitle, key, postDescription, postDescription, price, categoryId, age, ageId, genderId, userId, subCategoryId, phoneNumber, mLanguage,mImages, null);
       modelHud.changeIsLoading(false);
       String status = response['status'];
       if(status == 'success'){
@@ -1190,4 +1208,79 @@ _ageController.text = widget.postDetailsModel.data.age;
     alert.show();
 
   }
+  Widget buildImage(Gallery gallery, int index) {
+    return Container(
+      width: 100.h,
+      height: 100.h,
+
+
+      child: Container(
+
+          child:   CachedNetworkImage(
+            width: 100.h,
+            height: 100.h,
+            imageUrl:gallery.image,
+            imageBuilder: (context, imageProvider) => Stack(
+              children: [
+                ClipRRect(
+
+                  child: Container(
+                    width: 100.h,
+
+                    decoration:BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        borderRadius: BorderRadius.circular(5.0.h),
+                        color: Color(0xFFFFFFFF),
+                        border: Border.all(
+                            color: Color(0xCC000000),
+                            width: 1.0.w
+                        ),
+                        image: DecorationImage(
+                            fit: BoxFit.fill,
+
+                            image: imageProvider)
+                    ), child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+                    alignment: AlignmentDirectional.topStart,
+                    child: GestureDetector(
+                        onTap: (){
+                          galleryList.removeAt(index);
+                          setState(() {
+
+                          });
+
+                        },
+                        child: Icon(Icons.delete,color: Colors.red,size: 20.h,)),
+
+                  ),
+
+
+
+                  ),
+                ),
+              ],
+            ),
+            placeholder: (context, url) =>
+                Center(
+                  child: SizedBox(
+                      height: 50.h,
+                      width: 50.h,
+                      child: new CircularProgressIndicator()),
+                ),
+
+
+            errorWidget: (context, url, error) => ClipRRect(
+                child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
+                  colorBlendMode: BlendMode.difference,)),
+
+          ),
+
+      ),
+
+
+    );
+
+  }
 }
+
+

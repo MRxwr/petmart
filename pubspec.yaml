@@ -32,6 +32,7 @@ dependencies:
   dio: ^4.0.0
   http: any
   toast: any
+  firebase_messaging: ^10.0.0
   carousel_slider: ^3.0.0
   font_awesome_flutter: any
   shared_preferences: ^2.0.5
@@ -53,7 +54,7 @@ dependencies:
   rflutter_alert: ^2.0.2
   flutter_dropdown: ^0.0.8
   ndialog: ^4.1.0
-  unique_identifier: ^0.0.3
+  unique_identifier: ^0.2.0
   pin_code_fields: ^7.1.0
   shape_of_view: ^1.0.2
   back_button_interceptor: ^5.0.0
@@ -66,9 +67,13 @@ dependencies:
   grouped_list: ^4.0.0
   image_picker: ^0.7.5+3
   my_fatoorah: ^3.0.2
-  flutter_webview_plugin: ^0.3.11
+  flutter_webview_plugin: ^0.4.0
   group_radio_button: ^1.1.0
-  wechat_assets_picker: ^5.5.3
+  firebase_core: ^1.2.0
+  firebase_database: ^7.0.0
+  overlay_support: ^1.2.1
+  flutter_local_notifications: ^6.0.0
+  fluttertoast: ^8.0.7
 
 
 

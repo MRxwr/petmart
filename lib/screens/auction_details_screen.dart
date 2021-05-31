@@ -127,17 +127,38 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
       ModalProgressHUD(
         inAsyncCall: Provider.of<ModelHud>(context).isLoading,
         child: Scaffold(
-          floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-          floatingActionButton:  FloatingActionButton(
-            onPressed: () {
-              print("true");
-             Navigator.pop(context);
-            },
-            tooltip: 'Increment',
-            child:Container(
+          appBar: AppBar(
+            backgroundColor: kMainColor,
+            title: Container(
               alignment: AlignmentDirectional.center,
-                width: 60.w, height: 60.w, child: Center(child: Icon(Icons.arrow_back_ios,color: Color(0xFFFFFFFF),))),
-            elevation: 2.0,
+              child: Padding(
+                padding:  EdgeInsets.symmetric(horizontal: 10.h),
+                child: Text(
+                  widget.mAuctionModel.name,
+                  style: TextStyle(
+                      color: Color(0xFFFFFFFF),
+                      fontSize: screenUtil.setSp(16),
+                      fontWeight: FontWeight.bold
+
+                  ),
+
+
+                ),
+              ),
+            ),
+            leading: GestureDetector(
+              onTap: (){
+                Navigator.pop(context);
+
+              },
+              child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+            ),
+
+
+            actions: [
+
+            ],
+
           ),
           key: _scaffoldKey,
 

@@ -26,6 +26,8 @@ import 'package:pet_mart/model/message_model.dart';
 import 'package:pet_mart/model/my_auction_details_model.dart';
 import 'package:pet_mart/model/my_auctions_model.dart';
 import 'package:pet_mart/model/my_message_model.dart';
+import 'package:pet_mart/model/notification_model.dart';
+import 'package:pet_mart/model/notify_model.dart';
 import 'package:pet_mart/model/order_model.dart';
 import 'package:pet_mart/model/package_model.dart';
 import 'package:pet_mart/model/payment_model.dart';
@@ -736,20 +738,22 @@ class PetMartService{
     dynamic resp;
     try {
       var dio = Dio();
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
+      String deviceToken =_preferences.getString("token")??"";
 
 
-      String fileName = image.path
+      String fileName = image.absolute.path
           .split('/')
           .last;
       FormData formData = FormData.fromMap({
         "profile_image":
-        await MultipartFile.fromFile(image.path, filename: fileName),
+        await MultipartFile.fromFile(image.absolute.path, filename: fileName),
         "id":id,
         "firstname":firstName,
         "lastname":lastName,
         "date_of_birth":date_of_birth,
         "country":country,
-        "device_token":device_token,
+        "device_token":deviceToken,
         "imei_number":imei_number,
         "device_type":device_type,
         "language":language,
@@ -820,8 +824,8 @@ class PetMartService{
       map['contact_no'] = contact_no;
       map['language'] = mLanguage;
       for(int i =0;i<images.length;i++){
-        String path = images[i].path;
-        print('path --> ${images[i].path}');
+        String path = images[i].absolute.path;
+        print('path --> ${images[i].absolute.path}');
 
         String childFileName = path
             .split('/')
@@ -896,19 +900,19 @@ class PetMartService{
 
       map['language'] = mLanguage;
       for(int i =0;i<images.length;i++){
-        print('path --> ${images[i].path}');
+        print('path --> ${images[i].absolute.path}');
 
-        String childFileName = images[i].path
+        String childFileName = images[i].absolute.path
             .split('/')
             .last;
         print ('childFileName ${childFileName}');
-        map['images[${i}]']=  await MultipartFile.fromFile(images[i].path, filename: childFileName);
+        map['images[${i}]']=  await MultipartFile.fromFile(images[i].absolute.path, filename: childFileName);
       }
       if(vedio.isNotEmpty){
         for(int i =0;i<vedio.length;i++){
-          print('path --> ${vedio[i].path}');
+          print('path --> ${vedio[i].absolute.path}');
 
-          String childFileName = vedio[i].path
+          String childFileName = vedio[i].absolute.path
               .split('/')
               .last;
           print ('childFileName ${childFileName}');
@@ -937,5 +941,113 @@ class PetMartService{
     return resp;
 
 
+  }
+  Future<dynamic> editPost(String id,String english_name,String arabic_name,String post_type,String english_description,String arabic_description, String price,String category_id, String age,String age_id,
+      String gender, String owner_id, String sub_category_id,
+      String contact_no,String mLanguage,List<File> images ,File vedio)async{
+    SharedPref sharedPref = SharedPref();
+
+
+
+
+    AddPostModel addPostModel;
+    dynamic resp;
+    try {
+      var dio ;
+      BaseOptions options = new BaseOptions(
+          baseUrl: TAG_BASE_URL,
+          receiveDataWhenStatusError: true,
+          connectTimeout: 600*1000, // 60 seconds
+          receiveTimeout: 600*1000 // 60 seconds
+      );
+
+      dio = new Dio(options);
+      dio.options.contentType = 'application/json';
+
+
+      Map<String, dynamic> map = Map();
+      map['post_id'] = id;
+
+      map['english_name'] = english_name;
+      map['arabic_name'] = arabic_name;
+      map['post_type'] = post_type;
+      map['english_description'] = english_description;
+      map['arabic_description'] = arabic_description;
+      map['price'] = price;
+      map['category_id'] = category_id;
+      map['age'] = age;
+      map['age_id'] = age_id;
+      map['gender'] = gender;
+      map['owner_id'] = owner_id;
+      map['sub_category_id'] = sub_category_id;
+      map['contact_no'] = contact_no;
+      map['language'] = mLanguage;
+      for(int i =0;i<images.length;i++){
+        String path = images[i].absolute.path;
+        print('path --> ${images[i].absolute.path}');
+
+        String childFileName = path
+            .split('/')
+            .last;
+        print ('childFileName ${childFileName}');
+        map['images[${i}]']=  await MultipartFile.fromFile(path, filename: childFileName);
+      }
+      // File vedioFile =  File.fromRawPath(Uint8List.fromList([0]));
+      //         String childFileName = vedioFile.path
+      //             .split('/')
+      //         .last;
+      // map['videos[0]'] = await MultipartFile.fromFile(vedioFile.path, filename: childFileName);
+      FormData formData = new FormData.fromMap(map);
+      final  response = await dio.post("post/update", data: formData);
+
+      if (response.statusCode == 200) {
+        resp = response.data;
+        print(resp);
+      }
+
+    } on DioError catch(e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      resp =e.response.data;
+      print(resp);
+
+
+
+    }
+    return resp;
+
+
+  }
+  Future<NotificationModel> notification(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}notification/list"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    NotificationModel notificationModel;
+    if(response.statusCode == 200){
+      notificationModel = NotificationModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(notificationModel.message);
+    print(response.body);
+    return notificationModel;
+  }
+  Future<NotifyModel> notify(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}customer/notify"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    NotifyModel notificationModel;
+    if(response.statusCode == 200){
+      notificationModel = NotifyModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(notificationModel.message);
+    print(response.body);
+    return notificationModel;
   }
 }

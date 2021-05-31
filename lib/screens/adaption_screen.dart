@@ -187,7 +187,7 @@ selectedList.add(false);
                           GestureDetector(
                             onTap: (){
                               Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                return new AdaptionDetailsScreen(postId:postModel.data[index].postId);
+                                return new AdaptionDetailsScreen(postId:postModel.data[index].postId,postName: postModel.data[index].postName,);
                               }));
                             },
                             child: Container(
