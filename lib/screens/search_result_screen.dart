@@ -71,7 +71,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
         return GestureDetector(
           onTap: (){
             Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-              return new PetsDetailsScreen(postId:widget.searchModel.data[index].postId);
+              return new PetsDetailsScreen(postId:widget.searchModel.data[index].postId,postName: widget.searchModel.data[index].postName,);
             }));
           },
           child: Container(

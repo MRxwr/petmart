@@ -85,8 +85,9 @@ class _MainScreenState extends State<MainScreen> {
     });
   }
   Future<bool> isLoggedIn() async{
-    SharedPref sharedPref = SharedPref();
-    bool isLoggedIn = await sharedPref.readBool(kIsLogin);
+    SharedPreferences sharedPref =await SharedPreferences.getInstance();
+    bool isLoggedIn =  sharedPref.getBool(kIsLogin)??false;
+    print('isLogIn ${isLoggedIn}');
     return isLoggedIn;
   }
   Future<LoginModel> getLoginModel() async{
@@ -149,9 +150,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             GestureDetector(
               onTap: (){
-                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                  return new MyMessagesScreen();
-                }));
+                myMessages(context);
               },
               child: Padding(
                 padding: EdgeInsets.all(4.h),
@@ -533,8 +532,14 @@ class _MainScreenState extends State<MainScreen> {
             ),
             ListTile(
               onTap: (){
+                logout(context).then((value) {
+                  setState(() {
+                    isLogIn = value;
+                    print('log---> ${isLogIn}');
+                  });
+                });
                 Navigator.pop(context);
-                logout(context);
+
                 // Navigator.pushNamed(context, LoginScreen.id);
 
               },
@@ -557,21 +562,8 @@ class _MainScreenState extends State<MainScreen> {
     final icons = [ Icons.sms, Icons.mail, Icons.phone ];
     return  FloatingActionButton(
         onPressed: () {
-          final modelHud = Provider.of<ModelHud>(context,listen: false);
-          modelHud.changeIsLoading(true);
-          checkCreditModel().then((value){
-            modelHud.changeIsLoading(false);
-            int credit = int.parse(value.data.credit);
-            print('credit --->${credit}');
-            ShowAlertDialog(context, value.message);
-            if(credit>0){
-              Navigator.of(context,rootNavigator: true).pushNamed(AddAdvertiseScreen.id);
+          createAdd(context);
 
-            }else{
-              ShowAlertDialog(context, value.message);
-            }
-          });
-          print("true");
           },
         tooltip: 'Increment',
         child: Image.asset('assets/images/img_add_post.png'),
@@ -710,12 +702,11 @@ class _MainScreenState extends State<MainScreen> {
 
   }
 
-  void logout(BuildContext context) async{
-    SharedPref sharedPref = SharedPref();
-    await sharedPref.saveBool(kIsLogin, true);
-    setState(() {
-      isLogIn = false;
-    });
+  Future<bool> logout(BuildContext context) async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setBool(kIsLogin, false);
+    
+    return sharedPreferences.getBool(kIsLogin);
 
   }
   Future<CheckCreditModel> checkCreditModel() async{
@@ -786,5 +777,109 @@ class _MainScreenState extends State<MainScreen> {
     alert.show();
 
   }
+  createAdd(BuildContext context) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      checkCreditModel().then((value){
+        modelHud.changeIsLoading(false);
+        int credit = int.parse(value.data.credit);
+        print('credit --->${credit}');
 
+        if(credit>0){
+          Navigator.of(context,rootNavigator: true).pushNamed(AddAdvertiseScreen.id);
+
+        }else{
+          ShowAlertDialog(context, value.message);
+        }
+      });
+      print("true");
+    }else{
+      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+    }
+
+  }
+  Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            "Ok",
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+              return new LoginScreen();
+            }));
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            "No",
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+      ],
+    );
+    alert.show();
+
+  }
+
+  myMessages(BuildContext context) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+        return new MyMessagesScreen();
+      }));
+
+    }else{
+      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+    }
+
+  }
 }

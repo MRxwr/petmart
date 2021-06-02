@@ -330,7 +330,7 @@ setState(() {
                                     modelHud.changeIsLoading(false);
                                   int credit = int.parse(value.data.credit);
                                   print('credit --->${credit}');
-                                  ShowAlertDialog(context, value.message);
+
                                   if(credit>0){
                                     Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
                                       return new CreateAuctionScreen();

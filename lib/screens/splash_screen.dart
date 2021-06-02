@@ -80,11 +80,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String loginData = sharedPreferences.getString(kUserModel);
+    String deviceToken =sharedPreferences.getString("token")??"";
     print('loginData --> ${loginData}');
     LoginModel  loginModel = null;
+    bool isLoggedIn =  sharedPreferences.getBool(kIsLogin)??false;
     String uniqueId;
-    if(loginData != null){
-      String token ="soksokfojrr3wow";
+    if(isLoggedIn){
+      String token =deviceToken;
       final body = json.decode(loginData);
       String fullName = sharedPreferences.getString('email');
       String password= sharedPreferences.getString('password');

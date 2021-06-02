@@ -22,9 +22,12 @@ import 'package:pet_mart/screens/message_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'login_screen.dart';
 class LostDetailScreen extends StatefulWidget {
   String  postId;
   String postName;
@@ -55,7 +58,8 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     return TextButton(
       style: flatButtonStyle,
       onPressed: () {
-        showDialog(contactDetail);
+        contact(context, contactDetail);
+
 
       },
       child: Text(text,style: TextStyle(
@@ -480,7 +484,8 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                     ),
                     GestureDetector(
                       onTap: (){
-                        SharePets();
+                        share(context);
+
                       },
                       child: Column(
 
@@ -504,20 +509,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                     ),
                     GestureDetector(
                       onTap: ()async{
-                        SharedPreferences _preferences = await SharedPreferences.getInstance();
-                        String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-                        String loginData = _preferences.getString(kUserModel);
-                        Map map;
-
-                        final body = json.decode(loginData);
-                        LoginModel   loginModel = LoginModel.fromJson(body);
-                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
-                            contactImage:postDetailsModel.data.contactDetail.profileImage ,
-                            contactId:postDetailsModel.data.contactDetail.customerId,
-                            postId: postDetailsModel.data.postId,
-                            userId: loginModel.data.customerId,);
-                        }));
+                        message(context);
                       },
                       child: Column(
 
@@ -778,7 +770,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              height: 150.h,
+              height: 180.h,
               child: Container(
                 margin: EdgeInsets.all(20.w),
                 child: Column(
@@ -905,5 +897,119 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       },
     );
   }
+  contact(BuildContext context,ContactDetail contactDetail) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      showDialog(contactDetail);
+
+    }else{
+      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+    }
+
+  }
+  share(BuildContext context) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      SharePets();
+
+    }else{
+      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+    }
+
+  }
+  message(BuildContext context) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
+      String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+      String loginData = _preferences.getString(kUserModel);
+      Map map;
+
+      final body = json.decode(loginData);
+      LoginModel   loginModel = LoginModel.fromJson(body);
+      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+        return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
+          contactImage:postDetailsModel.data.contactDetail.profileImage ,
+          contactId:postDetailsModel.data.contactDetail.customerId,
+          postId: postDetailsModel.data.postId,
+          userId: loginModel.data.customerId,);
+      }));
+
+    }else{
+      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+    }
+
+  }
+  Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            "Ok",
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+              return new LoginScreen();
+            }));
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            "No",
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+      ],
+    );
+    alert.show();
+
+  }
+
 
 }

@@ -7,12 +7,19 @@ import 'package:intl/intl.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/auction_model.dart' as AuctionModel;
+import 'package:pet_mart/model/check_credit_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/auction_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timer_count_down/timer_count_down.dart';
+
+import 'create_auction_screen.dart';
+import 'login_screen.dart';
 class AuctionScreen extends StatefulWidget {
   static String id = 'AuctionScreen';
   @override
@@ -318,6 +325,8 @@ homeModel = value;
       style: flatButtonStyle,
       onPressed: () {
 
+        createAuction(context);
+
       },
       child: Text(text,style: TextStyle(
           color: Color(0xFF000000),
@@ -472,4 +481,120 @@ homeModel = value;
 
     return tokens.join(':');
   }
+  Future<CheckCreditModel> checkCreditModel() async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String loginData = sharedPreferences.getString(kUserModel);
+
+    final body = json.decode(loginData);
+    LoginModel   loginModel = LoginModel.fromJson(body);
+
+
+    Map map ;
+
+
+    map = {"user_id":loginModel.data.customerId};
+
+
+
+
+
+    PetMartService petMartService = PetMartService();
+    CheckCreditModel creditModel = await petMartService.checkCredit(map);
+    return creditModel;
+  }
+  createAuction(BuildContext context) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      checkCreditModel().then((value){
+        modelHud.changeIsLoading(false);
+        int credit = int.parse(value.data.credit);
+        print('credit --->${credit}');
+
+        if(credit>0){
+          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+            return new CreateAuctionScreen();
+          }));
+        }else{
+          ShowAlertDialog(context, value.message);
+        }
+      });
+      print("true");
+
+    }else{
+      ShowAlertDialog(context,"You're Not Logged In, Logged In First");
+    }
+
+  }
+  Future<void> ShowAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            "Ok",
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+              return new LoginScreen();
+            }));
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            "No",
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+      ],
+    );
+    alert.show();
+
+  }
 }
+
+
