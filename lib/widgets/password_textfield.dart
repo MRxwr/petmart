@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/utilities/constants.dart';
 
 
@@ -136,7 +137,7 @@ class PasswordTextField extends StatelessWidget {
   String validateName(String value) {
 
     if (value.length == 0) {
-      return "Please Enter Password";
+      return getTranslated(context, 'password_error');
     }
 
     return null;

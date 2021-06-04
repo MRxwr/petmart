@@ -69,14 +69,14 @@ class _EditPostScreenState extends State<EditPostScreen> {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text("اختار الصورة"),
+      content: Padding(child: Text(getTranslated(context, 'select_image')),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text("كاميرا"),onPressed: () {
+        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
 
           _getImageFromCamera(context);
         }),
-        FlatButton(child: Text("الوسائط المتعددة"),onPressed: () {
+        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
           _getImageFromGallery(context);
         }),
 
@@ -304,7 +304,7 @@ _ageController.text = widget.postDetailsModel.data.age;
               child: Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 10.h),
                 child: Text(
-                  'ِEdit Post',
+                  getTranslated(context, 'edit_post'),
                   style: TextStyle(
                       color: Color(0xFFFFFFFF),
                       fontSize: screenUtil.setSp(16),
@@ -332,7 +332,7 @@ _ageController.text = widget.postDetailsModel.data.age;
           backgroundColor: Color(0xFFFFFFFF),
           body: Container(
             margin: EdgeInsets.all(10.h),
-            child: mSubCategoryModel == null?
+            child: homeModel == null?
             Container(
               child: CircularProgressIndicator(
 
@@ -352,7 +352,7 @@ _ageController.text = widget.postDetailsModel.data.age;
                 physics: const AlwaysScrollableScrollPhysics(),
 
                 children: [
-                  Text('Select Post Type',
+                  Text(getTranslated(context, 'select_post_type'),
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -421,7 +421,7 @@ _ageController.text = widget.postDetailsModel.data.age;
                   ),
                   SizedBox(height: 5.h,width: screenUtil.screenWidth,
                   ),
-                  Text('Add Photo',
+                  Text(getTranslated(context, 'add_photo'),
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -538,7 +538,7 @@ _ageController.text = widget.postDetailsModel.data.age;
                       color: Color(0xFFc3c3c3),
                     ),),
                   SizedBox(height: 10.h,),
-                  Container(
+                  SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
                     child: mSubCategoryModel == null?
@@ -556,33 +556,31 @@ _ageController.text = widget.postDetailsModel.data.age;
                     ):  SizedBox(
                       height: 50.h,
                       width: screenUtil.screenWidth,
-                      child: Expanded(
-                        child: DropDown<SubCategory.Childcategory>(
+                      child: DropDown<SubCategory.Childcategory>(
 
 
 
 
 
-                          items: mSubCategoryModel.data.category[0].childcategory,
+                        items: mSubCategoryModel.data.category[0].childcategory,
 
-                          hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
+                        hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
 
-                                color: Color(0xFF000000),
-                                fontWeight: FontWeight.w600,
-                                fontSize: screenUtil.setSp(15)
-                            ),),
-                          onChanged: (SubCategory.Childcategory category){
-                            subCategoryId = category.categoryId;
+                              color: Color(0xFF000000),
+                              fontWeight: FontWeight.w600,
+                              fontSize: screenUtil.setSp(15)
+                          ),),
+                        onChanged: (SubCategory.Childcategory category){
+                          subCategoryId = category.categoryId;
 
 
 
-                          },
-                          customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
-                          isExpanded: true,
-                          showUnderline: false,
-                        ),
+                        },
+                        customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                        isExpanded: true,
+                        showUnderline: false,
                       ),
                     ),
                   ),
@@ -607,7 +605,7 @@ _ageController.text = widget.postDetailsModel.data.age;
 
 
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: 'Post Title',
+                    decoration: InputDecoration(hintText: getTranslated(context, 'post_title'),
                         isCollapsed: true,
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -640,7 +638,7 @@ _ageController.text = widget.postDetailsModel.data.age;
 
 
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: 'Post Description',
+                    decoration: InputDecoration(hintText: getTranslated(context, 'post_description'),
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         enabledBorder: InputBorder.none,
@@ -682,7 +680,7 @@ _ageController.text = widget.postDetailsModel.data.age;
 
 
                             textCapitalization: TextCapitalization.sentences,
-                            decoration: InputDecoration(hintText: 'Age',
+                            decoration: InputDecoration(hintText: getTranslated(context, 'age_string'),
                                 isCollapsed: true,
                                 border: InputBorder.none,
                                 focusedBorder: InputBorder.none,
@@ -751,34 +749,32 @@ _ageController.text = widget.postDetailsModel.data.age;
                   SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child: Expanded(
-                      child: DropDown<Gender_list>(
+                    child: DropDown<Gender_list>(
 
 
 
 
 
 
-                        items: genderList,
+                      items: genderList,
 
-                        hint:  Text(genderName ,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
+                      hint:  Text(genderName ,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
 
-                              color: Color(0xFF000000),
-                              fontWeight: FontWeight.w600,
-                              fontSize: screenUtil.setSp(15)
-                          ),),
-                        onChanged: (Gender_list gender){
-                          genderId = gender.id;
+                            color: Color(0xFF000000),
+                            fontWeight: FontWeight.w600,
+                            fontSize: screenUtil.setSp(15)
+                        ),),
+                      onChanged: (Gender_list gender){
+                        genderId = gender.id;
 
 
 
-                        },
-                        customWidgets: genderList.map((p) => builGenderRow(p)).toList(),
-                        isExpanded: true,
-                        showUnderline: false,
-                      ),
+                      },
+                      customWidgets: genderList.map((p) => builGenderRow(p)).toList(),
+                      isExpanded: true,
+                      showUnderline: false,
                     ),
                   ),
                   Container(
@@ -805,7 +801,7 @@ _ageController.text = widget.postDetailsModel.data.age;
 
 
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: 'Post Price',
+                    decoration: InputDecoration(hintText: getTranslated(context, 'post_price'),
                         isCollapsed: true,
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -828,7 +824,7 @@ _ageController.text = widget.postDetailsModel.data.age;
                       )
                   ),
                   SizedBox(height: 10.h,),
-                  sumbitButton('Submit Post',context)
+                  sumbitButton(getTranslated(context, 'sumbit_post'),context)
 
 
                 ],
@@ -861,117 +857,73 @@ _ageController.text = widget.postDetailsModel.data.age;
       ),),
     );
   }
-  Row builGenderRow(Gender_list gender) {
-    return Row(
-
-
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child:
-          Container(
+  Widget builGenderRow(Gender_list gender) {
+    return Container(
 
 
 
 
 
 
-              alignment: AlignmentDirectional.centerStart,
+        alignment: AlignmentDirectional.centerStart,
 
-              child: Text(gender.name ,
-                style: TextStyle(
-                    color: Color(0xFF000000),
-                    fontWeight: FontWeight.w600,
-                    fontSize: screenUtil.setSp(15)
-                ),)),
-        ),
-
-      ],
-    );
+        child: Text(gender.name ,
+          style: TextStyle(
+              color: Color(0xFF000000),
+              fontWeight: FontWeight.w600,
+              fontSize: screenUtil.setSp(15)
+          ),));
   }
-  Row buildSubCategoryRow(SubCategory.Childcategory category) {
-    return Row(
-
-
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child:
-          Container(
+  Widget buildSubCategoryRow(SubCategory.Childcategory category) {
+    return Container(
 
 
 
 
 
 
-              alignment: AlignmentDirectional.centerStart,
+        alignment: AlignmentDirectional.centerStart,
 
-              child: Text(category.categoryName ,
-                style: TextStyle(
-                    color: Color(0xFF000000),
-                    fontWeight: FontWeight.w600,
-                    fontSize: screenUtil.setSp(15)
-                ),)),
-        ),
-
-      ],
-    );
+        child: Text(category.categoryName ,
+          style: TextStyle(
+              color: Color(0xFF000000),
+              fontWeight: FontWeight.w600,
+              fontSize: screenUtil.setSp(15)
+          ),));
   }
-  Row buildAgeRow(Age age) {
-    return Row(
-
-
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child:
-          Container(
+  Widget buildAgeRow(Age age) {
+    return Container(
 
 
 
 
 
 
-              alignment: AlignmentDirectional.centerStart,
+        alignment: AlignmentDirectional.centerStart,
 
-              child: Text(age.name ,
-                style: TextStyle(
-                    color: Color(0xFF000000),
-                    fontWeight: FontWeight.w600,
-                    fontSize: screenUtil.setSp(15)
-                ),)),
-        ),
-
-      ],
-    );
+        child: Text(age.name ,
+          style: TextStyle(
+              color: Color(0xFF000000),
+              fontWeight: FontWeight.w600,
+              fontSize: screenUtil.setSp(15)
+          ),));
   }
-  Row buildDropDownRow(CategoryParent.Category category) {
-    return Row(
-
-
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child:
-          Container(
+  Widget buildDropDownRow(CategoryParent.Category category) {
+    return Container(
 
 
 
 
 
 
-              alignment: AlignmentDirectional.centerStart,
+        alignment: AlignmentDirectional.centerStart,
 
-              child: Text(category.categoryName ,
-                style: TextStyle(
-                    color: Color(0xFF000000),
-                    fontWeight: FontWeight.w600,
-                    fontSize: screenUtil.setSp(15)
-                ),)),
-        ),
-
-      ],
-    );
+        child: Text(category.categoryName ,
+          style: TextStyle(
+              color: Color(0xFF000000),
+              fontWeight: FontWeight.w600,
+              fontSize: screenUtil.setSp(15)
+          ),));
   }
   Container pickedImga(File image,int position){
     return Container(
@@ -1058,29 +1010,29 @@ _ageController.text = widget.postDetailsModel.data.age;
     String age = _ageController.text;
     String price = _priceController.text;
     if(mImages.isEmpty){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Select Image at Least")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
 
     }else if(subCategoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Select Category")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'category_error'))));
 
     }else if(categoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Select Sub Category")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'sub_category_error'))));
 
     }
     else if(postTitle==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Insert post Title")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'title_error'))));
 
     }else if(postDescription==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Insert post Description")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'description_error'))));
 
     }else if(age==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Insert age")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'age_error'))));
 
     }else if(price==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Insert price")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'price_error'))));
 
     }else if(genderId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Select Gender")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'gender_error'))));
 
     }else{
       String userId = loginModel.data.customerId;
@@ -1137,7 +1089,7 @@ _ageController.text = widget.postDetailsModel.data.age;
 
         DialogButton(
           child: Text(
-            "Ok",
+            getTranslated(context, 'ok'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1188,7 +1140,7 @@ _ageController.text = widget.postDetailsModel.data.age;
 
         DialogButton(
           child: Text(
-            "Ok",
+           getTranslated(context, 'ok'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

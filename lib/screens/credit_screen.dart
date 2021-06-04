@@ -57,7 +57,7 @@ class _CreditScreenState extends State<CreditScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Package',
+              getTranslated(context, 'package'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -188,7 +188,7 @@ class _CreditScreenState extends State<CreditScreen> {
                           ),
                           Column(
                             children: [
-                              Text('Valid for : ${packageModel.data[index].duration}',
+                              Text('${getTranslated(context, 'valid_for')} ${packageModel.data[index].duration}',
                                 style: TextStyle(
                                     color: kMainColor,
                                     fontSize: screenUtil.setSp(10),
@@ -202,7 +202,7 @@ class _CreditScreenState extends State<CreditScreen> {
                                 ),),
                             ],
                           ),
-                          confirmButton('BUY',context,index)
+                          confirmButton(getTranslated(context, 'buy'),context,index)
                         ],
                       )
                     ))

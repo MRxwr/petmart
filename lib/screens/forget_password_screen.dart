@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/reset_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/login_screen.dart';
@@ -36,7 +37,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                'Forget Password',
+                getTranslated(context, 'forget_password'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -70,7 +71,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
               children: [
                 Center(child: Image.asset('assets/images/img_language_logo.png',height:200.h ,width: 200.w,)),
                  SizedBox(height: 10.h,),
-                NameTextField(hint:"Email Address",onClick: (value){
+                NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
                   _email = value;
 
                 },
@@ -78,7 +79,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                 SizedBox(height: 14.h,),
 
                 Center(
-                  child: Text('Enter your email address & we\'ll send you An email message contain new password rest link.',
+                  child: Text(getTranslated(context, 'enter_email_address'),
                     textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF000000),
@@ -87,7 +88,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   ),),
                 ),
                 SizedBox(height: 25.h,),
-                confirmButton('Confirm',context)
+                confirmButton(getTranslated(context, 'confirm'),context)
 
               ],
             ),

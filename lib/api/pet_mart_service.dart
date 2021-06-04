@@ -292,6 +292,22 @@ class PetMartService{
     print(response.body);
     return postModel;
   }
+  Future<BidModel> translationModel(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}auction/submitbid"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    BidModel postModel;
+    if(response.statusCode == 200){
+      postModel = BidModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(postModel.message);
+    print(response.body);
+    return postModel;
+  }
   Future<CategoryModel> category(Map map) async {
     print(map);
 

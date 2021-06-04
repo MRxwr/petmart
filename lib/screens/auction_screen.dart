@@ -157,7 +157,7 @@ homeModel = value;
           Container(
             alignment: AlignmentDirectional.centerEnd,
             padding: EdgeInsets.all(10.h),
-              child: previewButton('Create Auction', context)),
+              child: previewButton(getTranslated(context, 'create_auction'), context)),
           SizedBox(height: 1,width: width,
           child: Container(
             color: Color(0xFF0000000),
@@ -165,7 +165,7 @@ homeModel = value;
           Container(
             alignment: AlignmentDirectional.centerStart,
             padding: EdgeInsets.all(10.h),
-            child: Text('Running Auction'
+            child: Text(getTranslated(context, 'run_auction')
             ,style: TextStyle(color: Color(0xFF000000),fontSize: screenUtil.setSp(16),
               fontWeight: FontWeight.bold),),
           ),
@@ -390,7 +390,7 @@ homeModel = value;
                       alignment: AlignmentDirectional.centerEnd,
                       child: Text(
 
-                          'Remaining  ${formatDuration(time.toInt())} ',
+                          '${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
                           style: TextStyle(
                             color: Color(0xFF000000),
                             fontSize: screenUtil.setSp(12),
@@ -524,7 +524,7 @@ homeModel = value;
       print("true");
 
     }else{
-      ShowAlertDialog(context,"You're Not Logged In, Logged In First");
+      ShowAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
   }
@@ -564,7 +564,7 @@ homeModel = value;
 
         DialogButton(
           child: Text(
-            "Ok",
+            getTranslated(context, 'ok'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -580,7 +580,7 @@ homeModel = value;
         ),
         DialogButton(
           child: Text(
-            "No",
+            getTranslated(context, 'no'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

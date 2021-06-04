@@ -12,6 +12,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/forget_password_screen.dart';
 import 'package:pet_mart/screens/register_screen.dart';
+import 'package:pet_mart/screens/verify_otp_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/utilities/shared_prefs.dart';
 import 'package:pet_mart/widgets/name_textfield.dart';
@@ -80,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onTap: (){
                             Navigator.pushReplacementNamed(context, MainScreen.id);
                           },
-                          child: Text('Skip',
+                          child: Text(getTranslated(context, 'skip'),
                           style: TextStyle(
                             color:Color(0xFF000000),
                             fontSize: screenUtil.setSp(16)
@@ -97,7 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 Expanded(flex: 2,
                     child:  Center(
                       child:
-                      NameTextField(hint:"Email Address",onClick: (value){
+                      NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
                         print(value);
                         _fullName= value;
                         setState(() {
@@ -111,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child:  Container(
                       alignment: AlignmentDirectional.center,
                       child:
-                      PasswordTextField(hint:"Password",onClick: (value){
+                      PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
                         print(value);
                         setState(() {
 
@@ -130,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Container(
                         alignment: AlignmentDirectional.centerEnd,
                         child: Text(
-                          'Forget Password?',
+                          getTranslated(context, 'forget_password_string'),
                           style: TextStyle(
                             color: Color(0xFF0000000),
                             fontSize: screenUtil.setSp(16),
@@ -144,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child:  Container(
                       alignment: AlignmentDirectional.center,
                       child:
-                      LoginButton('Login',context)
+                      LoginButton(getTranslated(context, 'login'),context)
                     )
                 ),
                 Expanded(flex: 4,
@@ -154,7 +155,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            'Don\'t have account?',
+                         getTranslated(context, 'dont_have_account'),
                             style: TextStyle(
                                 color: Color(0xFF0000000),
                                 fontSize: screenUtil.setSp(16),
@@ -168,7 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                             child:
                             Text(
-                              'Register Now',
+                              getTranslated(context, 'register_now'),
                               style: TextStyle(
                                   color: Color(0xFF0000000),
                                   fontSize: screenUtil.setSp(16),
@@ -262,6 +263,10 @@ uniqueId = await UniqueIdentifier.serial;
 
       }else{
         modelHud.changeIsLoading(false);
+        if(loginModel.message.contains("OTP")){
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: loginModel.data.mobile,otp: loginModel.data.otp.toString(),userId: loginModel.data.customerId,)));
+
+        }
         _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(loginModel.message)));
       }
     }

@@ -45,14 +45,14 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text("اختار الصورة"),
+      content: Padding(child: Text(getTranslated(context, 'select_image')),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text("كاميرا"),onPressed: () {
+        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
 
           _getImageFromCamera(context);
         }),
-        FlatButton(child: Text("الوسائط المتعددة"),onPressed: () {
+        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
           _getImageFromGallery(context);
         }),
 
@@ -211,7 +211,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                'My Account',
+              getTranslated(context, 'my_account'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -261,7 +261,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Your credits : ${creditModel.data.credit}',
+                              Text('${getTranslated(context, 'your_credit')} ${creditModel.data.credit}',
                               style: TextStyle(
                                 color: Color(0xFFFFFFFF),
                                 fontWeight: FontWeight.normal,
@@ -274,7 +274,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
                                   }));
                                 },
-                                child: Text('Purchase Credit',
+                                child: Text(getTranslated(context,'purchase_credit'),
                                   style: TextStyle(
                                       color: Color(0xFF000000),
                                       fontWeight: FontWeight.bold,
@@ -475,7 +475,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       SizedBox(height: 10.h,width: width,),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
-                        child: UserNameTextField(hint:"First Name",onClick: (value){
+                        child: UserNameTextField(hint:getTranslated(context,'first_name'),onClick: (value){
                           firstName = value;
 
                         },mText: userModel.data.firstname,
@@ -485,7 +485,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       SizedBox(height: 10.h,width: width,),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
-                        child: UserNameTextField(hint:"Last Name",onClick: (value){
+                        child: UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
                           lastName = value;
 
                         },mText: userModel.data.lastname,
@@ -495,7 +495,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       SizedBox(height: 10.h,width: width,),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
-                        child: NameTextField(hint:"Email Address",onClick: (value){
+                        child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
                           email = value;
 
                         },
@@ -506,7 +506,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
                         child:
-                        PhoneTextField(hint:"Mobile Number",onClick: (value){
+                        PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
                           phone = value;
 
                         },
@@ -514,7 +514,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         ),
                       ),
                       SizedBox(height: 20.h,width: width,),
-                      Center(child: confirmButton('Update Profile',context)),
+                      Center(child: confirmButton(getTranslated(context, 'update_profile'),context)),
                     ],
                   )
                   ,
@@ -593,7 +593,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         if (firstName == userModel.data.firstname &&
             lastName == userModel.data.lastname &&
             email == userModel.data.email && phone == userModel.data.mobile) {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Update Data')));
+          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'update_data'))));
 
         }else{
           dynamic response;

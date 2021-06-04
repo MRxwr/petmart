@@ -108,7 +108,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'My Post',
+              getTranslated(context, 'my_post'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),

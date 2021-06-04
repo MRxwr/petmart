@@ -158,7 +158,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                'Advanced Search',
+                getTranslated(context, 'advanced_search'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -209,7 +209,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
               child: Center(
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 10.w),
-                  child: Text('Search',
+                  child: Text(getTranslated(context, 'search'),
                     style: TextStyle(color:Color(0xFFFFFFFF),
                         fontSize: screenUtil.setSp(12),
                         fontWeight: FontWeight.normal),),
@@ -238,7 +238,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
                 Padding(
                   padding:  EdgeInsets.all(5.h),
                   child: Text(
-                    'Select Post Type',
+                    getTranslated(context, 'select_post_type'),
                     style: TextStyle(
                       color: Color(0xFF000000),
                       fontWeight: FontWeight.normal,
@@ -314,7 +314,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
                 Padding(
                   padding:  EdgeInsets.all(5.h),
                   child: Text(
-                    'Select Category',
+                   getTranslated(context, 'select_category'),
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -381,7 +381,7 @@ category();
                       Padding(
                         padding:  EdgeInsets.all(5.h),
                         child: Text(
-                          'Select Sub Category',
+                          getTranslated(context, 'select_sub_category'),
                           style: TextStyle(
                               color: Color(0xFF000000),
                               fontWeight: FontWeight.normal,
@@ -454,7 +454,7 @@ category();
                       Padding(
                         padding:  EdgeInsets.all(5.h),
                         child: Text(
-                          'Basic',
+                          getTranslated(context, 'basic'),
                           style: TextStyle(
                               color: Color(0xFF000000),
                               fontWeight: FontWeight.normal,
@@ -469,7 +469,7 @@ category();
                       Padding(
                         padding:  EdgeInsets.all(5.h),
                         child: Text(
-                          'Price',
+                          getTranslated(context, 'price'),
                           style: TextStyle(
                               color: Color(0xFF000000),
                               fontWeight: FontWeight.normal,
@@ -535,7 +535,7 @@ category();
 
 
                       textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration.collapsed(hintText: 'ُType your text here',hintStyle: TextStyle(
+                      decoration: InputDecoration.collapsed(hintText: getTranslated(context, 'type_text_here'),hintStyle: TextStyle(
                         color: Color(0xFFa3a3a3)
                       )
                       ),
@@ -591,7 +591,7 @@ category();
 
 
                       textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration.collapsed(hintText: '0.000 KWD',hintStyle: TextStyle(
+                      decoration: InputDecoration.collapsed(hintText: '0.000 ${getTranslated(context, 'kwd')}',hintStyle: TextStyle(
                           color: Color(0xFFa3a3a3)
                       )
                       ),
@@ -646,7 +646,7 @@ category();
 
 
                       textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration.collapsed(hintText: '1000.000 KWD',hintStyle: TextStyle(
+                      decoration: InputDecoration.collapsed(hintText: '1000.000 ${getTranslated(context, 'kwd')}',hintStyle: TextStyle(
                           color: Color(0xFFa3a3a3)
                       )
                       ),

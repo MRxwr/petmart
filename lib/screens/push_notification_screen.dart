@@ -63,7 +63,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                'Push Notification',
+                getTranslated(context, 'push_notification'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -100,7 +100,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                   Text(
-                  'TURN OFF PUSH NOTIFICATION',
+                 getTranslated(context, 'turn_off_push'),
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(16),

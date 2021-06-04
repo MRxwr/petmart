@@ -56,7 +56,7 @@ class _MyMessagesScreenState extends State<MyMessagesScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Messages',
+              getTranslated(context, 'messages'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),

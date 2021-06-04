@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/search_model.dart';
 import 'package:pet_mart/screens/pets_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
@@ -31,7 +32,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Search Results',
+              getTranslated(context, 'search_results'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),

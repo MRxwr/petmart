@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/order_model.dart';
 import 'package:pet_mart/utilities/constants.dart';
 class OrderDetailsScreen extends StatefulWidget {
@@ -23,7 +24,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Order Details',
+            getTranslated(context, 'order_details'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -72,7 +73,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 10.w),
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('Purchase Date : ',
+                  child: Text(getTranslated(context, 'purchase_date'),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           color: Color(0xFF000000),
@@ -107,7 +108,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 10.w),
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('Payment Method : ',
+                  child: Text(getTranslated(context, 'payment_method'),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           color: Color(0xFF000000),
@@ -142,7 +143,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 10.w),
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('Payment Id : ',
+                  child: Text(getTranslated(context, 'payment_id'),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           color: Color(0xFF000000),
@@ -177,7 +178,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 10.w),
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('Transaction Id : ',
+                  child: Text(getTranslated(context, 'transaction_id'),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           color: Color(0xFF000000),
@@ -212,7 +213,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 10.w),
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('Payment Amount : ',
+                  child: Text(getTranslated(context, 'payment_amount'),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           color: Color(0xFF000000),
@@ -247,7 +248,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 child: Container(
                   margin: EdgeInsets.symmetric(horizontal: 10.w),
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text('Payment Status : ',
+                  child: Text(getTranslated(context, 'payment_status'),
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           color: Color(0xFF000000),

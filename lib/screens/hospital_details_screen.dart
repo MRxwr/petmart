@@ -178,8 +178,8 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      callButton('CALL NOW ',context),
-                      details('DETAILS ',context),
+                      callButton(getTranslated(context, 'call_now'),context),
+                      details(getTranslated(context, 'details'),context),
                     ],
                   ),
                 ),
@@ -220,7 +220,7 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                               alignment: Alignment.center,
                             ),
                             Text(
-                              '${hospitalDetailsModel.data.shared} Shares',
+                              '${hospitalDetailsModel.data.shared} ${getTranslated(context, 'shares')}',
                               style: TextStyle(
                                   color: Color(0xFF000000),
                                   fontSize: screenUtil.setSp(18),
@@ -241,7 +241,7 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                             alignment: Alignment.center,
                           ),
                           Text(
-                            "${hospitalDetailsModel.data.mostView} Views",
+                            "${hospitalDetailsModel.data.mostView} ${getTranslated(context, 'views')}",
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(18),

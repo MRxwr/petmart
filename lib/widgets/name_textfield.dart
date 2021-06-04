@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/utilities/constants.dart';
 
 
@@ -137,7 +138,7 @@ class NameTextField extends StatelessWidget {
     bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
 
     if (!emailValid) {
-      return "Please Enter Your Email Address";
+      return getTranslated(context, 'email_error');
     }
 
     return null;

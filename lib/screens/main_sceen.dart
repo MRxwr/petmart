@@ -103,6 +103,7 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    title = getTranslated(context, 'home');
     return
       ModalProgressHUD(
         inAsyncCall: Provider.of<ModelHud>(context).isLoading,
@@ -212,7 +213,7 @@ class _MainScreenState extends State<MainScreen> {
 
 
           backgroundColor: kMainColor,
-          centerItemText: 'Add Post',
+          centerItemText: getTranslated(context, 'add_post'),
 
           color: Color(0xFFFFFFFF),
           selectedColor: Color(0xFFFFFFFF),
@@ -224,11 +225,11 @@ class _MainScreenState extends State<MainScreen> {
           items: [
 
             FABBottomAppBarItem(iconPath:
-            'assets/images/img_auction.png', text: 'Auction'),
-            FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: 'Lost'),
+            'assets/images/img_auction.png', text: getTranslated(context, 'auction')),
+            FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: getTranslated(context, 'lost')),
 
-            FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: 'Adaption'),
-            FABBottomAppBarItem(iconPath:'assets/images/img_home.png', text: 'Home'),
+            FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: getTranslated(context, 'adaption')),
+            FABBottomAppBarItem(iconPath:'assets/images/img_home.png', text: getTranslated(context, 'home')),
 
           ],
         ),
@@ -264,7 +265,7 @@ class _MainScreenState extends State<MainScreen> {
                 ShowLanguageDialog(context);
               },
 
-              title: Text('Select Language',
+              title: Text(getTranslated(context, 'select_language'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -278,7 +279,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Contact Us',
+              title: Text(getTranslated(context,'contact_us' ),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -292,7 +293,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Terms and Conditions',
+              title: Text(getTranslated(context, 'terms_conditions'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -306,7 +307,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Privacy Policy',
+              title: Text(getTranslated(context, 'privacy_policy'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -320,7 +321,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Login',
+              title: Text(getTranslated(context, 'login'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -372,7 +373,7 @@ class _MainScreenState extends State<MainScreen> {
 
                               
                               padding: EdgeInsetsDirectional.only(start: 4.h),
-                              child: Text('Current credit : ${loginModel.data.availableCredit}',
+                              child: Text('${getTranslated(context, 'current_credit')}${loginModel.data.availableCredit}',
 
                               style: TextStyle(
                                 color: Color(0xFF000000),
@@ -382,7 +383,7 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.only(start: 4.h),
-                              child: Text('Credit expiry : ${loginModel.data.lastLogin}',
+                              child: Text('${getTranslated(context, 'credit_expiry')}${loginModel.data.lastLogin}',
 
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -402,7 +403,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('My Account',
+              title: Text(getTranslated(context, 'my_account'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -415,7 +416,7 @@ class _MainScreenState extends State<MainScreen> {
                 Navigator.pushNamed(context, MyPostScreen.id);
               },
 
-              title: Text('My Post',
+              title: Text(getTranslated(context, 'my_post'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -428,7 +429,7 @@ class _MainScreenState extends State<MainScreen> {
                 Navigator.pushNamed(context, MyAuctionScreen.id);
               },
 
-              title: Text('My Auction',
+              title: Text(getTranslated(context, 'my_auction'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -441,7 +442,7 @@ class _MainScreenState extends State<MainScreen> {
                 Navigator.pushNamed(context, OrdersScreen.id);
               },
 
-              title: Text('Order',
+              title: Text(getTranslated(context, 'order'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -454,7 +455,7 @@ class _MainScreenState extends State<MainScreen> {
                 Navigator.pushNamed(context, PushNotificationScreen.id);
               },
 
-              title: Text('Push Notification',
+              title: Text(getTranslated(context, 'push_notification'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -467,7 +468,7 @@ class _MainScreenState extends State<MainScreen> {
                 ShowLanguageDialog(context);
               },
 
-              title: Text('Select Language',
+              title: Text(getTranslated(context, 'select_language'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -481,7 +482,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Change Password',
+              title: Text(getTranslated(context, 'change_password'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -495,7 +496,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Contact Us',
+              title: Text(getTranslated(context, 'contact_us'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -509,7 +510,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Terms and Conditions',
+              title: Text(getTranslated(context, 'terms_conditions'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -523,7 +524,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Privacy Policy',
+              title: Text(getTranslated(context, 'privacy_policy'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -535,6 +536,7 @@ class _MainScreenState extends State<MainScreen> {
                 logout(context).then((value) {
                   setState(() {
                     isLogIn = value;
+                    Navigator.pushReplacementNamed(context, MainScreen.id);
                     print('log---> ${isLogIn}');
                   });
                 });
@@ -544,7 +546,7 @@ class _MainScreenState extends State<MainScreen> {
 
               },
 
-              title: Text('Logout',
+              title: Text(getTranslated(context, 'log_out'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -613,13 +615,13 @@ class _MainScreenState extends State<MainScreen> {
         setState(() {
           index = val;
           if(index ==0){
-            title='AUCTION';
+            title=getTranslated(context, 'auction').toUpperCase();
           }else if(index == 1){
-            title='LOST';
+            title=getTranslated(context, 'lost').toUpperCase();
           }else if(index == 2){
-            title='ADAPTION';
+            title=getTranslated(context, 'adaption').toUpperCase();
           }else if(index == 3){
-            title='HOME';
+            title=getTranslated(context, 'home').toUpperCase();
           }
           print('index ${index}');
         });
@@ -655,13 +657,13 @@ class _MainScreenState extends State<MainScreen> {
       context: context,
       style: alertStyle,
 
-      title: "Select Language",
+      title: getTranslated(context, 'select_language'),
 
 
       buttons: [
         DialogButton(
           child: Text(
-            "English",
+            getTranslated(context, 'english'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async{
@@ -677,7 +679,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         DialogButton(
           child: Text(
-            "Arabic",
+            getTranslated(context, 'arabic'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -705,6 +707,8 @@ class _MainScreenState extends State<MainScreen> {
   Future<bool> logout(BuildContext context) async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setBool(kIsLogin, false);
+    sharedPreferences.remove(kUserModel);
+
     
     return sharedPreferences.getBool(kIsLogin);
 
@@ -762,7 +766,7 @@ class _MainScreenState extends State<MainScreen> {
 
         DialogButton(
           child: Text(
-            "Ok",
+            getTranslated(context, 'ok'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -797,7 +801,7 @@ class _MainScreenState extends State<MainScreen> {
       });
       print("true");
     }else{
-      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
   }
@@ -837,7 +841,7 @@ class _MainScreenState extends State<MainScreen> {
 
         DialogButton(
           child: Text(
-            "Ok",
+           getTranslated(context, 'ok'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -853,7 +857,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         DialogButton(
           child: Text(
-            "No",
+            getTranslated(context, 'no'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -878,7 +882,7 @@ class _MainScreenState extends State<MainScreen> {
       }));
 
     }else{
-      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
   }

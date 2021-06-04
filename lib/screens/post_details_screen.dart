@@ -347,7 +347,6 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                           autoPlay: true,
                           autoPlayInterval: Duration(seconds: 10),
 
-                          scrollPhysics:   const NeverScrollableScrollPhysics(),
 
                           height: double.infinity,
                           viewportFraction: 1.0,
@@ -507,9 +506,9 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              deleteButton('Delete Post', context,postDetailsModel.data.contactDetail),
+                              deleteButton(getTranslated(context, 'delete_post'), context,postDetailsModel.data.contactDetail),
                               SizedBox(width: 2.h,),
-                              previewButton('Edit Post', context,postDetailsModel.data.contactDetail),
+                              previewButton(getTranslated(context, 'edit_post'), context,postDetailsModel.data.contactDetail),
 
 
                             ],
@@ -541,7 +540,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
                         ,
                         Text(
-                          "${noOfViews} Views" ,
+                          "${noOfViews} ${getTranslated(context, 'views')}" ,
                           style: TextStyle(
                               color: Color(0xFF000000),
                               fontSize: screenUtil.setSp(14),
@@ -564,7 +563,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                           )
                           ,
                           Text(
-                            "${noOfShares} Shared" ,
+                            "${noOfShares} ${getTranslated(context, 'shared')}" ,
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(14),
@@ -601,7 +600,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                           )
                           ,
                           Text(
-                            "${postDetailsModel.data.contactCount} Send Messages" ,
+                            "${postDetailsModel.data.contactCount} ${getTranslated(context, 'send_messages')}" ,
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(14),
@@ -628,7 +627,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Gender : ${postDetailsModel.data.gender}  " ,
+                      "${getTranslated(context, 'gender')} ${postDetailsModel.data.gender}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -637,7 +636,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                       ),
                     ),
                     Text(
-                      "Age : ${postDetailsModel.data.age}  Week" ,
+                      "${getTranslated(context, 'age')} ${postDetailsModel.data.ageLabel}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -673,7 +672,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
-                  "Similar Ads" ,
+                  "${getTranslated(context, 'similar_ads')}" ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -860,7 +859,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     Align(
                       alignment: AlignmentDirectional.topStart,
                       child: Text(
-                        'Contact for sell',
+                        '${getTranslated(context, 'contact_for_sell')}',
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Color(0xFF000000),
@@ -917,7 +916,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                'By ${contactDetail.customerName}',
+                                '${getTranslated(context, 'by')} ${contactDetail.customerName}',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -955,7 +954,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                             ),
                           ],
                         ),
-                        callButton('Call Now', context, contactDetail.mobile)
+                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile)
                       ],
                     )
                   ],

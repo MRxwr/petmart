@@ -55,7 +55,7 @@ class _HospitalScreenState extends State<HospitalScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Shop',
+              getTranslated(context, 'shop'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),

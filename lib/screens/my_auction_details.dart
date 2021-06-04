@@ -14,6 +14,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/my_auction_details_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
+import 'package:pet_mart/screens/vedio_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -180,7 +181,6 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                     autoPlay: true,
                                     autoPlayInterval: Duration(seconds: 10),
 
-                                    scrollPhysics:   const NeverScrollableScrollPhysics(),
 
                                     height: double.infinity,
                                     viewportFraction: 1.0,
@@ -201,81 +201,117 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                 items: mAuctionDetailsModel.data.gallery.map((item) =>
                                     Stack(
 
+
                                       children: [
+
                                         GestureDetector(
                                           onTap: (){
                                             String url = item.image.trim();
-                                            if(url.isNotEmpty) {
+                                            String type = item.type;
+                                            if(type == 'video'){
                                               Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                                return new PhotoScreen(imageProvider: NetworkImage(
-                                                    url
-                                                ),);
+                                                return new VideoScreen(vedioUrl:url,auctionName: mAuctionDetailsModel.data.auctionName,);
                                               }));
+                                            }else {
+                                              if (url.isNotEmpty) {
+                                                Navigator.of(context, rootNavigator: true)
+                                                    .push(new MaterialPageRoute(
+                                                    builder: (BuildContext context) {
+                                                      return new PhotoScreen(
+                                                        imageProvider: NetworkImage(
+                                                            url
+                                                        ),);
+                                                    }));
+                                              }
                                             }
-
                                           },
 
 
                                           child:
-                                          Container(
-                                            width: width,
+                                          Stack(
+                                            children: [
+                                              Container(
+                                                width: width,
 
-                                            child:
-                                            CachedNetworkImage(
-                                              width: width,
+                                                child:
+                                                CachedNetworkImage(
+                                                  width: width,
 
-                                              fit: BoxFit.fill,
-                                              imageUrl:'${item.image}',
-                                              imageBuilder: (context, imageProvider) => Card(
-                                                elevation: 1.h,
-                                                child: Container(
-                                                    width: width,
-
-
-                                                    decoration: BoxDecoration(
-
-
-                                                      image: DecorationImage(
+                                                  fit: BoxFit.fill,
+                                                  imageUrl:'${item.image}',
+                                                  imageBuilder: (context, imageProvider) => Card(
+                                                    elevation: 1.h,
+                                                    child: Container(
+                                                        width: width,
 
 
-                                                          fit: BoxFit.fill,
-                                                          image: imageProvider),
-                                                    )
-                                                ),
-                                              ),
-                                              placeholder: (context, url) =>
-                                                  Column(
-                                                    children: [
-                                                      Expanded(
-                                                        flex: 9,
-                                                        child: Container(
-                                                          height: height,
-                                                          width: width,
+                                                        decoration: BoxDecoration(
 
 
-                                                          alignment: FractionalOffset.center,
-                                                          child: SizedBox(
-                                                              height: 50.h,
-                                                              width: 50.h,
-                                                              child: new CircularProgressIndicator()),
-                                                        ),
-                                                      ),
-                                                    ],
+                                                          image: DecorationImage(
+
+
+                                                              fit: BoxFit.fill,
+                                                              image: imageProvider),
+                                                        )
+                                                    ),
                                                   ),
+                                                  placeholder: (context, url) =>
+                                                      Column(
+                                                        children: [
+                                                          Expanded(
+                                                            flex: 9,
+                                                            child: Container(
+                                                              height: height,
+                                                              width: width,
 
 
-                                              errorWidget: (context, url, error) => ClipRRect(
-                                                  child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
-                                                    colorBlendMode: BlendMode.difference,fit: BoxFit.fill,)),
+                                                              alignment: FractionalOffset.center,
+                                                              child: SizedBox(
+                                                                  height: 50.h,
+                                                                  width: 50.h,
+                                                                  child: new CircularProgressIndicator()),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
 
-                                            ),
-                                            // Image.network(
-                                            //
-                                            //
-                                            // '${kBaseUrl}${mAdsPhoto}${item.photo}'  , fit: BoxFit.fitWidth,
-                                            //   height: 600.h,),
+
+                                                  errorWidget: (context, url, error) => ClipRRect(
+                                                      child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),fit: BoxFit.fill,
+                                                        colorBlendMode: BlendMode.difference,)),
+
+                                                ),
+                                                // Image.network(
+                                                //
+                                                //
+                                                // '${kBaseUrl}${mAdsPhoto}${item.photo}'  , fit: BoxFit.fitWidth,
+                                                //   height: 600.h,),
+                                              ),
+                                            ],
                                           ),
                                         ),
+                                        Positioned.directional(textDirection:  Directionality.of(context),
+                                            start: 0,
+                                            end: 0,
+                                            top: 0,
+                                            bottom: 0,
+                                            child: item.type =='video' ?
+                                            Center(
+                                              child: Container(
+                                                height: 60.h,
+                                                width: 60.h,
+
+                                                decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: AssetImage('assets/images/youtube_icon.png'),
+                                                        fit: BoxFit.fill
+                                                    )
+                                                ),
+                                                child: Icon(Icons.video_collection,color: kMainColor,size: 50.h),
+                                              ),
+                                            ):
+                                            Container())
 
                                       ] ,
                                     )).toList(),
@@ -324,7 +360,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('Start Date : ',
+                                child: Text(getTranslated(context, 'start_date'),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -359,7 +395,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('End Date : ',
+                                child: Text(getTranslated(context, 'end_date'),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -394,7 +430,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('Bid Value : ',
+                                child: Text(getTranslated(context, 'bid_value'),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -429,7 +465,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('Current Value : ',
+                                child: Text(getTranslated(context, 'current_value'),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -444,7 +480,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data.currentBidValue} KWD',
+                                child: Text('${mAuctionDetailsModel.data.currentBidValue} ${getTranslated(context, 'kwd')}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -464,7 +500,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('Participate : ',
+                                child: Text(getTranslated(context,'participate'),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -479,7 +515,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data.totalParticipate} Person',
+                                child: Text('${mAuctionDetailsModel.data.totalParticipate} ${getTranslated(context,'person')}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -498,7 +534,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                       bottom: 0,
                       start: 0,
                       end: 0,
-                      child: deleteButton('Stop Auction',context))
+                      child: deleteButton(getTranslated(context, 'stop_auction'),context))
                 ],
               ),
           ),
@@ -556,13 +592,13 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
       context: context,
       style: alertStyle,
 
-      title: "Are you sure want to stop this auction?",
+      title: getTranslated(context, 'stop_auction_message'),
 
 
       buttons: [
         DialogButton(
           child: Text(
-            "Yes",
+           getTranslated(context, 'ok'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async{
@@ -579,7 +615,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
         ),
         DialogButton(
           child: Text(
-            "No",
+            getTranslated(context, 'no'),
             style: TextStyle(color: Color(0xFF000000), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

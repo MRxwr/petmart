@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/utilities/constants.dart';
 
 
@@ -134,13 +135,13 @@ class UserNameTextField extends StatelessWidget {
   }
   String validateName(String value) {
     String errorMessage ;
-    if(hint == 'First Name'){
+    if(hint == getTranslated(context, 'first_name')){
       if(value.length == 0){
-        errorMessage = "Please Enter Your First Name";
+        errorMessage = getTranslated(context, 'first_name_error');
       }
-    }else if(hint == 'Last Name'){
+    }else if(hint == getTranslated(context, 'last_name')){
       if(value.length == 0){
-        errorMessage = "Please Enter Your Last Name";
+        errorMessage = getTranslated(context, 'last_name_error');
       }
     }
 

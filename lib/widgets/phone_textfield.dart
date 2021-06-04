@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/utilities/constants.dart';
 
 
@@ -139,10 +140,10 @@ class PhoneTextField extends StatelessWidget {
     String patttern = r'(^(?:[+0]9)?[0-9]{8}$)';
     RegExp regExp = new RegExp(patttern);
     if (value.length == 0) {
-      return "Please Enter Phone Number";
+      return getTranslated(context, 'mobile_error');
     }
     else if (!regExp.hasMatch(value)) {
-      return "Please Enter Valid Phone Number";
+      return getTranslated(context, 'mobile_error');
     }
     return null;
 

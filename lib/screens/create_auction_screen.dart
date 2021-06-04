@@ -56,14 +56,14 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text("اختار الصورة"),
+      content: Padding(child: Text(getTranslated(context, 'select_image')),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text("كاميرا"),onPressed: () {
+        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
 
           _getImageFromCamera(context);
         }),
-        FlatButton(child: Text("الوسائط المتعددة"),onPressed: () {
+        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
           _getImageFromGallery(context);
         }),
 
@@ -76,14 +76,14 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text("اختار الفيديو"),
+      content: Padding(child: Text(getTranslated(context, 'select_vedio')),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text("كاميرا"),onPressed: () {
+        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
 
           _getVedioFromCamera(context);
         }),
-        FlatButton(child: Text("الوسائط المتعددة"),onPressed: () {
+        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
           _getVedioFromGallery(context);
         }),
 
@@ -279,7 +279,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                'Create Auction',
+                getTranslated(context, 'create_auction'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -331,7 +331,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
 
                 children: [
-                  Text('Auction Cover Photo',
+                  Text(getTranslated(context, 'auction_cover_photo'),
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -392,7 +392,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                   ),
                   SizedBox(height: 5.h,width: screenUtil.screenWidth,
                   ),
-                  Text('Add Video',
+                  Text(getTranslated(context, 'add_vedio'),
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -460,7 +460,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
                       items: categoryList,
 
-                      hint:  Text('Select Category' ,
+                      hint:  Text(getTranslated(context, 'select_category') ,
                         textAlign: TextAlign.start,
                         style: TextStyle(
 
@@ -496,14 +496,13 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                       color: Color(0xFFc3c3c3),
                     ),),
                   SizedBox(height: 10.h,),
-                  Container(
+                  SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
                     child: mSubCategoryModel == null?
-                    Container(
-                      alignment: AlignmentDirectional.centerStart,
+                    SizedBox(
 
-                      child: Text('Select Sub Category',
+                      child: Text(getTranslated(context, 'select_sub_category'),
                         textAlign: TextAlign.start,
                         style: TextStyle(
 
@@ -514,33 +513,31 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                     ):  SizedBox(
                       height: 50.h,
                       width: screenUtil.screenWidth,
-                      child: Expanded(
-                        child: DropDown<SubCategory.Childcategory>(
+                      child: DropDown<SubCategory.Childcategory>(
 
 
 
 
 
-                          items: mSubCategoryModel.data.category[0].childcategory,
+                        items: mSubCategoryModel.data.category[0].childcategory,
 
-                          hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
+                        hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
 
-                                color: Color(0xFF000000),
-                                fontWeight: FontWeight.w600,
-                                fontSize: screenUtil.setSp(15)
-                            ),),
-                          onChanged: (SubCategory.Childcategory category){
-                            subCategoryId = category.categoryId;
+                              color: Color(0xFF000000),
+                              fontWeight: FontWeight.w600,
+                              fontSize: screenUtil.setSp(15)
+                          ),),
+                        onChanged: (SubCategory.Childcategory category){
+                          subCategoryId = category.categoryId;
 
 
 
-                          },
-                          customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
-                          isExpanded: true,
-                          showUnderline: false,
-                        ),
+                        },
+                        customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                        isExpanded: true,
+                        showUnderline: false,
                       ),
                     ),
                   ),
@@ -565,7 +562,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
 
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: 'Auction Title',
+                    decoration: InputDecoration(hintText: getTranslated(context, 'auction_title'),
                         isCollapsed: true,
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -598,7 +595,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
 
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: 'Auction Description',
+                    decoration: InputDecoration(hintText: getTranslated(context, 'auction_description'),
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         enabledBorder: InputBorder.none,
@@ -632,7 +629,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
 
                     textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: 'Minimum Bid Value',
+                    decoration: InputDecoration(hintText: getTranslated(context, 'minimum_bid'),
                         isCollapsed: true,
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
@@ -655,7 +652,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                       )
                   ),
                   SizedBox(height: 10.h,),
-                  sumbitButton('Create Auction',context)
+                  sumbitButton(getTranslated(context, 'create_auction'),context)
                 ],
               ),
             ),
@@ -763,61 +760,40 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(map);
     return auctionDetailsModel;
   }
-  Row buildDropDownRow(CategoryParent.Category category) {
-    return Row(
-
-
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child:
-          Container(
+  Widget buildDropDownRow(CategoryParent.Category category) {
+    return Container(
 
 
 
 
 
 
-              alignment: AlignmentDirectional.centerStart,
+        alignment: AlignmentDirectional.centerStart,
 
-              child: Text(category.categoryName ,
-                style: TextStyle(
-                    color: Color(0xFF000000),
-                    fontWeight: FontWeight.w600,
-                    fontSize: screenUtil.setSp(15)
-                ),)),
-        ),
-
-      ],
-    );
+        child: Text(category.categoryName ,
+          style: TextStyle(
+              color: Color(0xFF000000),
+              fontWeight: FontWeight.w600,
+              fontSize: screenUtil.setSp(15)
+          ),));
   }
-  Row buildSubCategoryRow(SubCategory.Childcategory category) {
-    return Row(
-
-
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child:
-          Container(
+  Widget buildSubCategoryRow(SubCategory.Childcategory category) {
+    return Container(
 
 
 
 
 
 
-              alignment: AlignmentDirectional.centerStart,
 
-              child: Text(category.categoryName ,
-                style: TextStyle(
-                    color: Color(0xFF000000),
-                    fontWeight: FontWeight.w600,
-                    fontSize: screenUtil.setSp(15)
-                ),)),
-        ),
+        alignment: AlignmentDirectional.centerStart,
 
-      ],
-    );
+        child: Text(category.categoryName ,
+          style: TextStyle(
+              color: Color(0xFF000000),
+              fontWeight: FontWeight.w600,
+              fontSize: screenUtil.setSp(15)
+          ),));
   }
   TextButton sumbitButton(String text,BuildContext context){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
@@ -848,24 +824,24 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
     String price = _priceController.text;
     if(mImages.isEmpty){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Select Image at Least")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
 
     }
     else if(subCategoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Select Category")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'category_error'))));
 
     }else if(categoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Select Sub Category")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'sub_category_error'))));
 
     }
     else if(postTitle==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Insert post Title")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'auction_title_error'))));
 
     }else if(postDescription==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Insert post Description")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'auction_desc_error'))));
 
     }else if(price==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Please Insert price")));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'bid_price_error'))));
 
     }else{
       String userId = loginModel.data.customerId;
@@ -921,7 +897,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
         DialogButton(
           child: Text(
-            "Ok",
+            getTranslated(context, 'ok'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

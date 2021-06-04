@@ -43,7 +43,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                'Change Password',
+                getTranslated(context, 'change_password'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -76,25 +76,25 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             child:
             ListView(
               children: [
-                PasswordTextField(hint:"Old Password",onClick: (value){
+                PasswordTextField(hint:getTranslated(context, 'old_password'),onClick: (value){
                   oldPassword = value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                PasswordTextField(hint:"New Password",onClick: (value){
+                PasswordTextField(hint:getTranslated(context, 'new_password'),onClick: (value){
                   newPassword = value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                PasswordTextField(hint:"Confirm Password",onClick: (value){
+                PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
                   confirmPassword = value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                Center(child: confirmButton('Change Password',context))
+                Center(child: confirmButton(getTranslated(context, 'change_password'),context))
               ],
             ),
           ),
@@ -123,7 +123,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
 
         }else{
           _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text("Password Not equal")));
+              SnackBar(content: Text(getTranslated(context, 'password_not_equal'))));
         }
       }
 

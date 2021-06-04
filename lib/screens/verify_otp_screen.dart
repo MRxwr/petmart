@@ -73,7 +73,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                'Verify Otp',
+                getTranslated(context, 'verify_otp'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -169,14 +169,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                     },
                   ),
                   SizedBox(height: 20.h,),
-                  Center(child: confirmButton('Sumbit',context)),
+                  Center(child: confirmButton(getTranslated(context, 'submit'),context)),
                   SizedBox(height: 10.h,),
                   GestureDetector(
                     onTap: (){
                       reSendotp(context);
                     },
                     child: Center(child:      Text(
-                      'Resend OTP',
+                      getTranslated(context, 'resend_otp'),
                       style: TextStyle(
                           color: Color(0xFF0000000),
                           fontSize: screenUtil.setSp(16),
@@ -212,7 +212,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
       }else{
         _scaffoldKey.currentState.showSnackBar(
-            SnackBar(content: Text("Please Enter Otp ")));
+            SnackBar(content: Text(getTranslated(context, 'enter_otp'))));
       }
 
         // validate(context);

@@ -59,7 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                'Register',
+                getTranslated(context, 'register'),
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -91,48 +91,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
             margin: EdgeInsets.all(10.h),
             child: ListView(
               children: [
-                UserNameTextField(hint:"First Name",onClick: (value){
+                UserNameTextField(hint:getTranslated(context, 'first_name'),onClick: (value){
                   firstName = value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                UserNameTextField(hint:"Last Name",onClick: (value){
+                UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
                   lastName = value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                NameTextField(hint:"Email Address",onClick: (value){
+                NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
                   email = value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                PasswordTextField(hint:"Password",onClick: (value){
+                PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
                   password= value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                PasswordTextField(hint:"Confirm Password",onClick: (value){
+                PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
                   confirmPassword = value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                PhoneTextField(hint:"Mobile Number",onClick: (value){
+                PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
                   mobileNumber = value;
 
                 },
                 ),
                 SizedBox(height: 10.h,),
-                Center(child: confirmButton('Create Account',context)),
+                Center(child: confirmButton(getTranslated(context, 'create_account'),context)),
                 SizedBox(height: 10.h,),
 
                 Center(
                   child:
-                  Text('On click of create Account by default you',
+                  Text(getTranslated(context, 'register_info'),
                     textAlign: TextAlign.center,
                     maxLines: 1,
 
@@ -147,7 +147,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('are agreed with  ',
+                      Text(getTranslated(context, 'agree_with'),
                         textAlign: TextAlign.center,
                         maxLines: 1,
 
@@ -160,7 +160,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onTap: (){
                           Navigator.of(context).pushNamed(TermsScreen.id);
                         },
-                        child: Text('Terms and Conditions',
+                        child: Text(getTranslated(context, 'terms_conditions'),
                           textAlign: TextAlign.center,
                           maxLines: 1,
 
@@ -180,7 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Already Registered ? ',
+                      Text(getTranslated(context, 'already_register'),
                         textAlign: TextAlign.center,
                         maxLines: 1,
 
@@ -193,7 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onTap: (){
                           Navigator.of(context).pushReplacementNamed(LoginScreen.id);
                         },
-                        child: Text('Login Now',
+                        child: Text(getTranslated(context, 'login_now'),
                           textAlign: TextAlign.center,
                           maxLines: 1,
 
@@ -296,7 +296,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     }else{
       _scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text("Password Not equal")));
+          SnackBar(content: Text(getTranslated(context, 'password_not_equal'))));
     }
   }
 

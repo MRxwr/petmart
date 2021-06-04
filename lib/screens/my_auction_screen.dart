@@ -106,7 +106,7 @@ map().then((value) {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'My Auction',
+              getTranslated(context, 'my_auction'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -341,32 +341,32 @@ Container(
                         colorBlendMode: BlendMode.difference,)),
 
                 ),
-                Positioned.directional(
-                  textDirection:  Directionality.of(context),
-                  bottom: 2.h,
-                  start: 4.w,
-                  child:
-                  Countdown(
-                    seconds: getRemainingTime(data.endDate),
-                    build: (BuildContext context, double time) => Container(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: Text(
-
-                          'Remaining  ${formatDuration(time.toInt())} ',
-                          style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontSize: screenUtil.setSp(12),
-                            fontWeight: FontWeight.bold,
-
-                          )
-                      ),
-                    ),
-                    interval: Duration(seconds: 1),
-                    onFinished: () {
-                      print('Timer is done!');
-                    },
-                  ),
-                )
+                // Positioned.directional(
+                //   textDirection:  Directionality.of(context),
+                //   bottom: 2.h,
+                //   start: 4.w,
+                //   child:
+                //   Countdown(
+                //     seconds: getRemainingTime(data.endDate),
+                //     build: (BuildContext context, double time) => Container(
+                //       alignment: AlignmentDirectional.centerEnd,
+                //       child: Text(
+                //
+                //           'Remaining  ${formatDuration(time.toInt())} ',
+                //           style: TextStyle(
+                //             color: Color(0xFF000000),
+                //             fontSize: screenUtil.setSp(12),
+                //             fontWeight: FontWeight.bold,
+                //
+                //           )
+                //       ),
+                //     ),
+                //     interval: Duration(seconds: 1),
+                //     onFinished: () {
+                //       print('Timer is done!');
+                //     },
+                //   ),
+                // )
               ],
             ),
           ),

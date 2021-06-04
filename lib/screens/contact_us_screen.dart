@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/utilities/call_services.dart';
 import 'package:pet_mart/utilities/constants.dart';
@@ -75,7 +76,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Contact Us',
+              getTranslated(context, 'contact_us'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -128,7 +129,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                    children: [
                      Padding(
                        padding:  EdgeInsets.all(2.0.h),
-                       child: Text('For support please contact :',
+                       child: Text(getTranslated(context, 'support'),
                        style: TextStyle(
                          color: Color(0xFF000000),
                          fontSize: screenUtil.setSp(18),
@@ -144,7 +145,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                          child: Row(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
-                             Text('Email :',
+                             Text(getTranslated(context, 'email'),
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -173,7 +174,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                          Row(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
-                             Text('Call :',
+                             Text(getTranslated(context, 'call'),
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -200,7 +201,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                          child: Row(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
-                             Text('WhatsApp :',
+                             Text(getTranslated(context,'whatsapp'),
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),

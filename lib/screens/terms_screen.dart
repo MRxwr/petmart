@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/utilities/constants.dart';
 class TermsScreen extends StatefulWidget {
@@ -40,7 +41,7 @@ class _TermsScreenState extends State<TermsScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Terms and Conditions',
+              getTranslated(context, 'terms_conditions'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),

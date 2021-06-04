@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart'as Home;
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
@@ -26,7 +27,7 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Advertisement',
+              getTranslated(context, 'advertisement_string'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -95,45 +96,42 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
         children: [
           Stack(
             children: [
-              Hero(
-                tag: 'bannerImage',
-                child: CachedNetworkImage(
-                  width:width ,
-                  height: 120.h,
-                  imageUrl:data.image,
-                  imageBuilder: (context, imageProvider) => Stack(
-                    children: [
-                      ClipRRect(
+              CachedNetworkImage(
+                width:width ,
+                height: 120.h,
+                imageUrl:data.image,
+                imageBuilder: (context, imageProvider) => Stack(
+                  children: [
+                    ClipRRect(
 
-                        child: Container(
-                            width: width,
+                      child: Container(
+                          width: width,
 
-                            decoration: BoxDecoration(
+                          decoration: BoxDecoration(
 
-                              shape: BoxShape.rectangle,
+                            shape: BoxShape.rectangle,
 
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: imageProvider),
-                            )
-                        ),
+                            image: DecorationImage(
+                                fit: BoxFit.fill,
+                                image: imageProvider),
+                          )
                       ),
-                    ],
-                  ),
-                  placeholder: (context, url) =>
-                      Center(
-                        child: SizedBox(
-                            height: 50.h,
-                            width: 50.h,
-                            child: new CircularProgressIndicator()),
-                      ),
-
-
-                  errorWidget: (context, url, error) => ClipRRect(
-                      child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
-                        colorBlendMode: BlendMode.difference,)),
-
+                    ),
+                  ],
                 ),
+                placeholder: (context, url) =>
+                    Center(
+                      child: SizedBox(
+                          height: 50.h,
+                          width: 50.h,
+                          child: new CircularProgressIndicator()),
+                    ),
+
+
+                errorWidget: (context, url, error) => ClipRRect(
+                    child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
+                      colorBlendMode: BlendMode.difference,)),
+
               ),
 
             ],

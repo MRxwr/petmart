@@ -294,7 +294,6 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                           autoPlay: true,
                           autoPlayInterval: Duration(seconds: 10),
 
-                          scrollPhysics:   const NeverScrollableScrollPhysics(),
 
                           height: double.infinity,
                           viewportFraction: 1.0,
@@ -445,7 +444,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
                           ),
                         ),
-                        previewButton('Contact Now', context,postDetailsModel.data.contactDetail)
+                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.contactDetail)
                       ],
                     ),
                   ],
@@ -471,7 +470,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
                         ,
                         Text(
-                          "${noOfViews} Views" ,
+                          "${noOfViews} ${getTranslated(context, 'views')}" ,
                           style: TextStyle(
                               color: Color(0xFF000000),
                               fontSize: screenUtil.setSp(14),
@@ -495,7 +494,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                           )
                           ,
                           Text(
-                            "${noOfShares} Shared" ,
+                            "${noOfShares} ${getTranslated(context, 'shared')}" ,
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(14),
@@ -519,7 +518,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                           )
                           ,
                           Text(
-                            "${postDetailsModel.data.contactCount} Send Messages" ,
+                            "${postDetailsModel.data.contactCount} ${getTranslated(context, 'send_messages')}" ,
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(14),
@@ -546,7 +545,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Gender : ${postDetailsModel.data.gender}  " ,
+                      "${getTranslated(context, 'gender')}${postDetailsModel.data.gender}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -555,7 +554,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                       ),
                     ),
                     Text(
-                      "Age : ${postDetailsModel.data.age}  Week" ,
+                      "${getTranslated(context, 'age')} ${postDetailsModel.data.ageLabel}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -591,7 +590,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
-                  "Similar Ads" ,
+                 getTranslated(context, 'similar_ads') ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -778,7 +777,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                     Align(
                       alignment: AlignmentDirectional.topStart,
                       child: Text(
-                        'Contact for sell',
+                        getTranslated(context, 'contact_for_sell'),
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Color(0xFF000000),
@@ -835,7 +834,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                'By ${contactDetail.customerName}',
+                                '${getTranslated(context, 'by')} ${contactDetail.customerName}',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -873,7 +872,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             ),
                           ],
                         ),
-                        callButton('Call Now', context, contactDetail.mobile)
+                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile)
                       ],
                     )
                   ],
@@ -904,7 +903,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       showDialog(contactDetail);
 
     }else{
-      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
   }
@@ -915,7 +914,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       SharePets();
 
     }else{
-      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
   }
@@ -939,7 +938,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       }));
 
     }else{
-      ShowLoginAlertDialog(context,"You're Not Logged In, Logged In First");
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
   }
@@ -979,7 +978,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
         DialogButton(
           child: Text(
-            "Ok",
+            getTranslated(context, 'ok'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -995,7 +994,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
         ),
         DialogButton(
           child: Text(
-            "No",
+            getTranslated(context, 'no'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

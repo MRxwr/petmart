@@ -41,7 +41,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              'Order',
+              getTranslated(context, 'order'),
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -92,7 +92,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             Center(child: Image.asset('assets/images/img_language_logo.png',fit: BoxFit.fill,))),
       Container(
         margin: EdgeInsets.all(5.h),
-        child: Text('Currently you have ${orderModel.data.credit} Credits',
+        child: Text('${getTranslated(context, 'currently_u_have')} ${orderModel.data.credit} ${getTranslated(context, 'credits')}',
           style: TextStyle(
               color: Color(0xFF000000),
               fontSize: screenUtil.setSp(13),
@@ -102,7 +102,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             Container(
                 margin: EdgeInsets.all(5.h),
                 child:
-                Text('Your credit will expire on ${orderModel.data.expiryDate} ',
+                Text('${getTranslated(context, 'expire')} ${orderModel.data.expiryDate} ',
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(13),
@@ -180,7 +180,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                      )),
                                      Expanded(flex:1,child: Container(
                                        alignment: AlignmentDirectional.center,
-                                       child:  Text('Credits',
+                                       child:  Text(getTranslated(context, 'credits'),
                                            textAlign: TextAlign.center,
                                            style: TextStyle(
                                                color: Color(0xFF000000),
@@ -215,7 +215,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                         flex:1,
                                         child: Container(
                                           alignment: AlignmentDirectional.centerStart,
-                                          child: Text('Expiry date : ${orderModel.data.orderHistory[index].packageExpiryDate}',
+                                          child: Text('${getTranslated(context, 'expiry_date')} ${orderModel.data.orderHistory[index].packageExpiryDate}',
                                               textAlign: TextAlign.start,
                                               style: TextStyle(
                                                   color: Color(0xFF000000),

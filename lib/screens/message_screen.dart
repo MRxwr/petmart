@@ -311,7 +311,7 @@ class _MessageScreenState extends State<MessageScreen> {
 
 
                       textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration.collapsed(hintText: 'اكتب رسالتك',
+                      decoration: InputDecoration.collapsed(hintText: getTranslated(context, 'write_message'),
                       ),
                     ),
                   ),
@@ -337,7 +337,7 @@ class _MessageScreenState extends State<MessageScreen> {
                           postComment(comment);
 
                         }else{
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text('Please Insert Your Message')));
+                          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'message_error'))));
 
 
                         }

@@ -74,6 +74,8 @@ dependencies:
   overlay_support: ^1.2.1
   flutter_local_notifications: ^6.0.0
   fluttertoast: ^8.0.7
+  video_player: ^2.1.4
+
 
 
 

@@ -115,7 +115,7 @@ double height = MediaQuery.of(context).size.height;
                     autoPlay: true,
                     autoPlayInterval: Duration(seconds: 10),
 
-                    scrollPhysics:   const NeverScrollableScrollPhysics(),
+
 
                     height: double.infinity,
                     viewportFraction: 1.0,
@@ -240,7 +240,7 @@ double height = MediaQuery.of(context).size.height;
             ),
             Row(
               children: [
-                previewButton('View All',context),
+                previewButton(getTranslated(context, 'view_all'),context),
               ],
             ),
             SizedBox(height: 10.h,),
@@ -428,7 +428,7 @@ double height = MediaQuery.of(context).size.height;
                               ),
                           ),
                           Expanded(child:   Text(
-                            "Hospital",
+                            getTranslated(context, 'hospital'),
                             style: TextStyle(
                                 color: kMainColor,
                                 fontSize: screenUtil.setSp(16),
@@ -507,7 +507,7 @@ double height = MediaQuery.of(context).size.height;
                               )
                           ),
                           Expanded(child:   Text(
-                            "Shop",
+                            getTranslated(context, 'shop'),
                             style: TextStyle(
                                 color: kMainColor,
                                 fontSize: screenUtil.setSp(16),
