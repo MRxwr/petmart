@@ -785,21 +785,7 @@ class _MainScreenState extends State<MainScreen> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      final modelHud = Provider.of<ModelHud>(context,listen: false);
-      modelHud.changeIsLoading(true);
-      checkCreditModel().then((value){
-        modelHud.changeIsLoading(false);
-        int credit = int.parse(value.data.credit);
-        print('credit --->${credit}');
-
-        if(credit>0){
-          Navigator.of(context,rootNavigator: true).pushNamed(AddAdvertiseScreen.id);
-
-        }else{
-          ShowAlertDialog(context, value.message);
-        }
-      });
-      print("true");
+      Navigator.of(context,rootNavigator: true).pushNamed(AddAdvertiseScreen.id);
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }

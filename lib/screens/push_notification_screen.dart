@@ -25,7 +25,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
   Future<NotificationModel> getNotificationList()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    status = _preferences.getBool("enable")??false;
+    status = _preferences.getBool("enable")??true;
     String loginData = _preferences.getString(kUserModel);
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
@@ -191,7 +191,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     modelHud.changeIsLoading(true);
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    status = _preferences.getBool("enable")??false;
+    status = _preferences.getBool("enable")??true;
     String loginData = _preferences.getString(kUserModel);
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);

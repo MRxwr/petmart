@@ -22,6 +22,7 @@ import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'credit_screen.dart';
 import 'main_sceen.dart';
 class AddAdvertiseScreen extends StatefulWidget {
   static String id = 'AddAdvertiseScreen';
@@ -1016,6 +1017,21 @@ setState(() {
         DialogButton(
           child: Text(
             getTranslated(context, 'ok_string'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+              return new CreditScreen();
+
+            }));
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
