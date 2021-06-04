@@ -502,7 +502,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
               Container(
                 padding: EdgeInsets.all(10.h),
                 alignment: AlignmentDirectional.centerStart,
-                child: Text('${getTranslated(context,'current_auction_bid')} ${mAuctionDetailsModel.data.currentBidValue} KWD',style: TextStyle(
+                child: Text('${getTranslated(context,'current_auction_bid')} ${mAuctionDetailsModel.data.currentBidValue} ${getTranslated(context, 'kwd')}',style: TextStyle(
                     color: Color(0xFF000000),
                     fontWeight: FontWeight.bold,
                     fontSize: screenUtil.setSp(13)
@@ -529,7 +529,7 @@ children: [
 
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data.bidRange[0])} ${getTranslated(context, 'kwd"')}',
+            '${int.parse(mAuctionDetailsModel.data.bidRange[0])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: Color(0xFFFFFFFF),
                 fontSize: screenUtil.setSp(14),
@@ -549,7 +549,7 @@ children: [
               )
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data.bidRange[0])} ${getTranslated(context, 'kwd"')}',
+            '${int.parse(mAuctionDetailsModel.data.bidRange[0])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: kMainColor,
                 fontSize: screenUtil.setSp(14),
@@ -578,7 +578,7 @@ children: [
 
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data.bidRange[1])} ${getTranslated(context, 'kwd"')}',
+            '${int.parse(mAuctionDetailsModel.data.bidRange[1])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: Color(0xFFFFFFFF),
                 fontSize: screenUtil.setSp(14),
@@ -598,7 +598,7 @@ children: [
               )
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data.bidRange[1])} ${getTranslated(context, 'kwd"')}',
+            '${int.parse(mAuctionDetailsModel.data.bidRange[1])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: kMainColor,
                 fontSize: screenUtil.setSp(14),
@@ -626,7 +626,7 @@ children: [
 
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data.bidRange[2])} ${getTranslated(context, 'kwd"')}',
+            '${int.parse(mAuctionDetailsModel.data.bidRange[2])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: Color(0xFFFFFFFF),
                 fontSize: screenUtil.setSp(14),
@@ -646,7 +646,7 @@ children: [
               )
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data.bidRange[2])} ${getTranslated(context, 'kwd"')}',
+            '${int.parse(mAuctionDetailsModel.data.bidRange[2])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: kMainColor,
                 fontSize: screenUtil.setSp(14),
@@ -677,7 +677,7 @@ children: [
                 alignment: AlignmentDirectional.center,
                 padding: EdgeInsets.symmetric(horizontal:4.h),
                 child: Text(
-                  '${double.parse(mAuctionDetailsModel.data.currentBidValue)+currentBid} ${getTranslated(context, 'kwd"')}',
+                  '${double.parse(mAuctionDetailsModel.data.currentBidValue)+currentBid} ${getTranslated(context, 'kwd')}',
                   style: TextStyle(
                       color: kMainColor,
                       fontSize: screenUtil.setSp(20),

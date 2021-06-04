@@ -482,33 +482,32 @@ setState(() {
                   ):  SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child: Expanded(
-                      child: DropDown<SubCategory.Childcategory>(
+                    child:
+                    DropDown<SubCategory.Childcategory>(
 
 
 
 
 
-                        items: mSubCategoryModel.data.category[0].childcategory,
+                      items: mSubCategoryModel.data.category[0].childcategory,
 
-                        hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
+                      hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
 
-                              color: Color(0xFF000000),
-                              fontWeight: FontWeight.w600,
-                              fontSize: screenUtil.setSp(15)
-                          ),),
-                        onChanged: (SubCategory.Childcategory category){
-                          subCategoryId = category.categoryId;
+                            color: Color(0xFF000000),
+                            fontWeight: FontWeight.w600,
+                            fontSize: screenUtil.setSp(15)
+                        ),),
+                      onChanged: (SubCategory.Childcategory category){
+                        subCategoryId = category.categoryId;
 
 
 
-                        },
-                        customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
-                        isExpanded: true,
-                        showUnderline: false,
-                      ),
+                      },
+                      customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                      isExpanded: true,
+                      showUnderline: false,
                     ),
                   ),
                 ),
