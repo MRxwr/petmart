@@ -7,6 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -16,10 +17,14 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/push_notification.dart';
 import 'package:pet_mart/screens/languagee_screen.dart';
 import 'package:pet_mart/screens/main_sceen.dart';
+import 'package:pet_mart/screens/push_notification_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/utilities/shared_prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unique_identifier/unique_identifier.dart';
+
+import 'my_message_screen.dart';
+import 'notification_details_screen.dart';
 class SplashScreen extends StatefulWidget {
   static String id = 'SplashScreen';
 
@@ -29,28 +34,80 @@ class SplashScreen extends StatefulWidget {
 
 
 class _SplashScreenState extends State<SplashScreen> {
+  ScreenUtil screenUtil = ScreenUtil();
   StreamSubscription sub;
     FirebaseMessaging _messaging;
   int _counter = 0;
+  Future<void> init()async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+
+
+
+  }
     @override
   void initState() {
-    var initializationSettingsAndroid =
+      super.initState();
+      FirebaseMessaging.instance
+          .getInitialMessage()
+          .then((RemoteMessage message) {
+        print('remoteMessgae sss${message.toString()}');
+
+        print('remoteMessgae sss${message.toString()}');
+        if (message != null) {
+          dynamic dataObject=  message.data;
+          print('dataObject ---> ${dataObject.toString()}');
+          String type = dataObject['push_type'];
+          print('type ---> ${type}');
+          if (type == 'chatuser'){
+
+              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                return new MyMessagesScreen();
+              }));
 
 
-    home().then((value) {
+          }else if(type == 'rateonuser'){
+            String auctionId = dataObject['auction_id'];
+            Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+              return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
+            }));
+          }else{
+            home().then((value) {
 
-    }).whenComplete((){
-      getLanguageSelected().then((value){
-        if(value){
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (BuildContext context) => MainScreen()));
+            }).whenComplete((){
+              getLanguageSelected().then((value){
+                if(value){
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (BuildContext context) => MainScreen()));
+                }else{
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (BuildContext context) => LanguageScreen()));
+                }
+
+              });
+            });
+          }
+
         }else{
-          Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (BuildContext context) => LanguageScreen()));
-        }
+          home().then((value) {
 
+          }).whenComplete((){
+            getLanguageSelected().then((value){
+              if(value){
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (BuildContext context) => MainScreen()));
+              }else{
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (BuildContext context) => LanguageScreen()));
+              }
+
+            });
+          });
+        }
       });
-    });
+
+
+
     // Timer(
     //     Duration(seconds: 3),
     //         () {
@@ -152,10 +209,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     return Scaffold(
       body: Container(
-        color: kMainColor,
+        color: Color(0xFFFFFFFF),
         child: Center(
 
-          child: Image.asset('assets/images/splash_logo.png'),
+          child: Image.asset('assets/images/img_language_logo.png',height: 400.h,width: 400.w,fit: BoxFit.fill,),
         ),
       ),
     );

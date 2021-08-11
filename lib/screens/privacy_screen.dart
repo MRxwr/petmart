@@ -63,6 +63,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 

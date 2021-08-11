@@ -75,6 +75,7 @@ contact(context, contactDetail);
   }
   PostDetailsModel postDetailsModel;
   TextButton callButton(String text,BuildContext context,String phone) {
+    print('phone ---> ${phone}');
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -89,7 +90,7 @@ contact(context, contactDetail);
       style: flatButtonStyle,
       onPressed: ()async {
         if (await canLaunch('tel://+${phone}')) {
-          await launch('tel://+${phone}');
+          await launch('tel://${phone}');
         } else {
           print(' could not launch ');
         }
@@ -158,32 +159,15 @@ contact(context, contactDetail);
 
     PetMartService petMartService = PetMartService();
     ShareModel petsModel = await petMartService.sharePet(map);
-    var imageId =
-    await ImageDownloader.downloadImage(postDetailsModel.data.gallery[0].image);
-    if (imageId == null) {
-      return;
-    }
-    // Below is a method of obtaining saved image information.
-    print('imageId-->${imageId}');
-    var fileName = await ImageDownloader.findName(imageId);
-    var path = await ImageDownloader.findPath(imageId);
-    var size = await ImageDownloader.findByteSize(imageId);
-    var mimeType = await ImageDownloader.findMimeType(imageId);
     modelHud.changeIsLoading(false);
-    // setState(() {
-    //   noOfShares = petsModel.data.shareCount;
-    // });
-    List<String> paths = List();
-    paths.add(path);
-    print('paths --> ${paths}');
-    List<String> mimeTypes = List();
-    mimeTypes.add(mimeType);
-    print('mimeType --> ${mimeType}');
-   Share.shareFiles(paths,mimeTypes: mimeTypes,subject:'${postDetailsModel.data.postName} \\n ${postDetailsModel.data.postDescription}' );
+    //
+    if(Platform.isIOS){
+      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n market://details?id=com.createq8.petMart');
 
+    }else{
+      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
 
-
-
+    }
 
   }
   Future<void> petView() async{
@@ -228,6 +212,7 @@ contact(context, contactDetail);
       petView();
     });
   }
+  int _current =0;
   @override
   Widget build(BuildContext context) {
 
@@ -235,7 +220,7 @@ contact(context, contactDetail);
     itemWidth = width / 2;
     itemHeight = 200.h;
     double height = MediaQuery.of(context).size.height;
-    int _current =0;
+
     return ModalProgressHUD(
       inAsyncCall: Provider.of<ModelHud>(context).isLoading,
       child: Scaffold(
@@ -268,9 +253,9 @@ contact(context, contactDetail);
 
 
           actions: [
+            SizedBox(width: 30.h,)
 
           ],
-
         ),
 
         body: Container(
@@ -295,16 +280,15 @@ contact(context, contactDetail);
 
                       carouselController: _controller,
                       options: CarouselOptions(
-                          autoPlay: true,
-                          autoPlayInterval: Duration(seconds: 10),
 
+                          enableInfiniteScroll: false,
 
                           height: double.infinity,
                           viewportFraction: 1.0,
                           enlargeCenterPage: false,
                           disableCenter: true,
-                          pauseAutoPlayOnTouch: true
-                          ,
+
+
 
 
 
@@ -402,6 +386,32 @@ contact(context, contactDetail);
                           )).toList(),
 
                     ),
+                    Positioned.directional(
+                     textDirection: Directionality.of(context),
+                      bottom: 10.w,
+                      start: 0,
+                      end:0,
+                      child: Opacity(
+                        opacity: postDetailsModel.data.gallery.length>1?1.0:0.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: postDetailsModel.data.gallery.map((item) {
+                            int index =postDetailsModel.data.gallery.indexOf(item);
+                            return Container(
+                              width: 8.0.w,
+                              height: 8.0.h,
+                              margin: EdgeInsets.symmetric(vertical: 10.0.w, horizontal: 2.0.h),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _current == index
+                                    ? kMainColor
+                                    : Color(0xFF707070),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
 
 
 
@@ -469,7 +479,7 @@ contact(context, contactDetail);
                       children: [
 
                           Image.asset('assets/images/img_view.png',
-                            height: 30.h,width: 30.w,
+                            height: 30.w,width: 30.w,fit: BoxFit.fill,
                           )
 
                         ,
@@ -521,7 +531,7 @@ contact(context, contactDetail);
                           )
                          ,
                           Text(
-                            "${postDetailsModel.data.contactCount} ${getTranslated(context,'send_messages')}" ,
+                            "${postDetailsModel.data.postMessageCount} ${getTranslated(context,'send_messages')}" ,
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(14),
@@ -875,7 +885,7 @@ contact(context, contactDetail);
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile)
+                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -914,11 +924,13 @@ contact(context, contactDetail);
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      SharePets();
+      ShareDialog(context);
 
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
+
+
 
   }
   message(BuildContext context) async {
@@ -945,6 +957,73 @@ contact(context, contactDetail);
     }
 
   }
+  Future<void> ShareDialog(BuildContext context ) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: getTranslated(context, 'share_message'),
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            Navigator.pop(context);
+            SharePets();
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            Navigator.pop(context);
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+      ],
+    );
+    alert.show();
+
+  }
+
   Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
     var alert;
     var alertStyle = AlertStyle(
@@ -981,7 +1060,7 @@ contact(context, contactDetail);
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'reg_now'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -995,18 +1074,7 @@ contact(context, contactDetail);
           color: Color(0xFFFFC300),
           radius: BorderRadius.circular(6.w),
         ),
-        DialogButton(
-          child: Text(
-            getTranslated(context, 'no'),
-            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
-          ),
-          onPressed: ()async {
-            await alert.dismiss();
 
-          },
-          color: Color(0xFFFFC300),
-          radius: BorderRadius.circular(6.w),
-        ),
       ],
     );
     alert.show();

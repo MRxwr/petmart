@@ -4,6 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:pet_mart/model/my_auctions_model.dart' as Model;
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/auction_model.dart' as AuctionModel;
@@ -12,6 +13,7 @@ import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/auction_details_screen.dart';
+import 'package:pet_mart/screens/my_auction_details.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -31,6 +33,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   List<Category> categories = List();
   List<bool> selectedList = List();
+  Model.MyAuctionsModel myAuctionModel = null;
   HomeModel homeModel;
   AuctionModel.AuctionModel auctionModel;
   double itemWidth;
@@ -53,6 +56,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
       map = {"category_id":catId,
         "id":loginModel.data.customerId,
         "language":languageCode};
+
     }
 
 
@@ -62,6 +66,8 @@ class _AuctionScreenState extends State<AuctionScreen> {
     AuctionModel.AuctionModel auctionModel = await petMartService.auction(map);
     return auctionModel;
   }
+  String loginData = null;
+  String userId="";
   Future<void> getList(String catId) async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -72,12 +78,16 @@ class _AuctionScreenState extends State<AuctionScreen> {
     print('loginData ${loginData}');
 
     if(loginData == null){
+      userId = "";
       map = {"category_id":catId,
         "id":"",
         "language":languageCode};
     }else{
+
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
+      userId = loginModel.data.customerId;
+      print('userId --> ${userId}');
       map = {"category_id":catId,
         "id":loginModel.data.customerId,
         "language":languageCode};
@@ -103,6 +113,28 @@ print('homeString --> ${homeString}');
 
     final body = json.decode(homeString);
     homeModel = HomeModel.fromJson(body);
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+    String loginData = _preferences.getString(kUserModel);
+    Map map ;
+    print('loginData ${loginData}');
+
+    if(loginData != null) {
+      final body = json.decode(loginData);
+      LoginModel   loginModel = LoginModel.fromJson(body);
+      Map myAuctionMap;
+      userId = loginModel.data.customerId;
+      myAuctionMap = {
+        "id": loginModel.data.customerId,
+        "language": languageCode,
+        "auction_type": "all"};
+
+
+      PetMartService petMartService = PetMartService();
+      myAuctionModel = await petMartService.myAuctions(myAuctionMap);
+      print('myAuctionModel --> ${myAuctionModel}');
+    }
 
 
 
@@ -142,128 +174,215 @@ homeModel = value;
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     itemWidth = width / 2;
-    itemHeight = 200.h;
+    itemHeight = 230.h;
 
     return Scaffold(
-      body: ListView(
-        padding: EdgeInsets.zero,
-        scrollDirection: Axis.vertical,
+      body: Container(
+
+        child: homeModel == null?
+        Container(
+          child: CircularProgressIndicator(
 
 
-
-        shrinkWrap: true,
-        physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          
-          Container(
-            alignment: AlignmentDirectional.centerEnd,
-            padding: EdgeInsets.all(10.h),
-              child: previewButton(getTranslated(context, 'create_auction'), context)),
-          SizedBox(height: 1,width: width,
-          child: Container(
-            color: Color(0xFF0000000),
-          ),),
-          Container(
-            alignment: AlignmentDirectional.centerStart,
-            padding: EdgeInsets.all(10.h),
-            child: Text(getTranslated(context, 'run_auction')
-            ,style: TextStyle(color: Color(0xFF000000),fontSize: screenUtil.setSp(16),
-              fontWeight: FontWeight.bold),),
           ),
-          SizedBox(height: 1,width: width,
+          alignment: AlignmentDirectional.center,
+        ):
+        ListView(
+          padding: EdgeInsets.zero,
+          scrollDirection: Axis.vertical,
+
+
+
+          shrinkWrap: true,
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+
+            Container(
+
+              padding: EdgeInsets.all(10.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Opacity(
+                      opacity: userId == ""?0.0:1.0,
+                      child: Container(
+
+
+                        child: Text(getTranslated(context, 'my_auction')
+                          ,style: TextStyle(color: Color(0xFF000000),fontSize: screenUtil.setSp(16),
+                              fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+                    previewButton(getTranslated(context, 'create_auction'), context),
+
+                  ],
+                )),
+            SizedBox(height: 1,width: width,
             child: Container(
               color: Color(0xFF0000000),
             ),),
-          Container(
-            margin: EdgeInsets.all(10.h),
-            height: 35.h,
-            child: ListView.separated(
+            Container(
+              child:userId== "" || myAuctionModel == null?
+                Container()
+          :Column(
+                children: [
+                  SizedBox(height: 10.w,),
+                  Container(
+                    child:
+                    Container(
+                      height: 200.h,
+                      width: width,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                          itemBuilder:(context,index){
+                        return GestureDetector(
+                          onTap: (){
+                            Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                              return new MyAuctionDetails(id:myAuctionModel.data.auctionData[index].auctionId,postName:myAuctionModel.data.auctionData[index].auctionName ,);
+                            }));
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(6.w),
+                            child: Card(
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                elevation: 1.w,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0.h),
+                                ),
+                                color: Color(0xFFFFFFFF),
+                                child: buildMyAuctionItem(myAuctionModel.data.auctionData[index],context)),
+                          ),
+                        );
+                      } , separatorBuilder: (context,index){
+                        return Container(width: 10.w,);
+                      }, itemCount: myAuctionModel.data.auctionData.length),
+                    ),
+                  ),
+                  SizedBox(height: 10.w,),
+                  SizedBox(height: 1,width: width,
+                    child: Container(
+                      color: Color(0xFF0000000),
+                    ),),
+                ],
+              ),
+            ),
+            Container(
+              alignment: AlignmentDirectional.centerStart,
+              padding: EdgeInsets.all(10.h),
+              child: Text(getTranslated(context, 'run_auction')
+              ,style: TextStyle(color: Color(0xFF000000),fontSize: screenUtil.setSp(16),
+                fontWeight: FontWeight.bold),),
+            ),
+            SizedBox(height: 1,width: width,
+              child: Container(
+                color: Color(0xFF0000000),
+              ),),
+            Container(
+              margin: EdgeInsets.all(10.h),
+              height: 35.h,
+              child: ListView.separated(
 
-                scrollDirection: Axis.horizontal,
+                  scrollDirection: Axis.horizontal,
 
-                itemBuilder: (context,index){
-                  return
-                    GestureDetector(
-                      onTap: (){
-                        bool selectedIndex = selectedList[index];
-                        if(!selectedIndex){
-                          auctionModel = null;
-                          for(int i =0;i<selectedList.length;i++){
-                            if(i == index){
-                              selectedList[i]= true;
-                            }else{
-                              selectedList[i]= false;
+                  itemBuilder: (context,index){
+                    return
+                      GestureDetector(
+                        onTap: (){
+                          bool selectedIndex = selectedList[index];
+                          if(!selectedIndex){
+                            auctionModel = null;
+                            for(int i =0;i<selectedList.length;i++){
+                              if(i == index){
+                                selectedList[i]= true;
+                              }else{
+                                selectedList[i]= false;
+                              }
                             }
+
+                            setState(() {
+
+                            });
+                            getList(categories[index].categoryId);
+
                           }
 
-                          setState(() {
+                        },
+                        child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10.w),
+                            child: selectRow(categories[index],context,index)),
+                      );
+                  }
+                  ,
+                  separatorBuilder: (context,index) {
+                    return Container(height: 10.h,
+                      color: Color(0xFFFFFFFF),);
+                  }
+                  ,itemCount: categories.length),
 
-                          });
-                          getList(categories[index].categoryId);
-
-                        }
-
-                      },
-                      child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: selectRow(categories[index],context,index)),
-                    );
-                }
-                ,
-                separatorBuilder: (context,index) {
-                  return Container(height: 10.h,
-                    color: Color(0xFFFFFFFF),);
-                }
-                ,itemCount: categories.length),
-
-          ),
-          SizedBox(height: 5.h,width: width,
-          ),
-          Container(
-            child:
-            auctionModel== null?
-            Container(
-              child: CircularProgressIndicator(
-
-
-              ),
-              alignment: AlignmentDirectional.center,
-            ):
-
-            GridView.builder(scrollDirection: Axis.vertical,
-
-
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                  childAspectRatio:itemWidth/itemHeight),
-              itemCount: auctionModel.data.length,
-
-              itemBuilder: (context,index){
-                return GestureDetector(
-                  onTap: (){
-                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      return new AuctionDetailsScreen(mAuctionModel:auctionModel.data[index]);
-                    }));
-                  },
-                  child: Container(
-                      margin: EdgeInsets.all(6.w),
-
-                      child:
-                      Card(
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          elevation: 1.w,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0.h),
-                          ),
-                          color: Color(0xFFFFFFFF),
-                          child: buildItem(auctionModel.data[index],context))),
-                );
-              },
             ),
-          ),
+            SizedBox(height: 5.h,width: width,
+            ),
+            Container(
+              child:
+              auctionModel== null?
+              Container(
+                child: CircularProgressIndicator(
 
-        ],
+
+                ),
+                alignment: AlignmentDirectional.center,
+              ):
+              auctionModel.data.isEmpty?
+
+              Container(
+                child: Text(
+                  auctionModel.message,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: screenUtil.setSp(16),
+                      fontWeight: FontWeight.w600
+                  ),
+                ),
+                alignment: AlignmentDirectional.center,
+              )
+                  :
+
+              GridView.builder(scrollDirection: Axis.vertical,
+
+
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+                    childAspectRatio:itemWidth/itemHeight),
+                itemCount: auctionModel.data.length,
+
+                itemBuilder: (context,index){
+                  return GestureDetector(
+                    onTap: (){
+                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                        return new AuctionDetailsScreen(mAuctionModel:auctionModel.data[index]);
+                      }));
+                    },
+                    child: Container(
+                        margin: EdgeInsets.all(6.w),
+
+
+                        child:
+                        Card(
+                            clipBehavior: Clip.antiAliasWithSaveLayer,
+                            elevation: 1.w,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0.h),
+                            ),
+                            color: Color(0xFFFFFFFF),
+                            child: buildItem(auctionModel.data[index],context))),
+                  );
+                },
+              ),
+            ),
+
+          ],
+        ),
       ),
     );
   }
@@ -341,12 +460,12 @@ homeModel = value;
       child: Column(
         children: [
           Expanded(
-            flex: 4,
+            flex: 2,
             child: Stack(
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.gallery[0].image,
+                  imageUrl:data.gallery.isEmpty?"":data.gallery[0].image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -380,32 +499,13 @@ homeModel = value;
                         colorBlendMode: BlendMode.difference,)),
 
                 ),
-                Positioned.directional(
-                  textDirection:  Directionality.of(context),
-                  bottom: 2.h,
-                  start: 4.w,
-                  child:
-                  Countdown(
-                    seconds: getRemainingTime(data.endDate),
-                    build: (BuildContext context, double time) => Container(
-                      alignment: AlignmentDirectional.centerEnd,
-                      child: Text(
-
-                          '${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
-                          style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontSize: screenUtil.setSp(12),
-                            fontWeight: FontWeight.bold,
-
-                          )
-                      ),
-                    ),
-                    interval: Duration(seconds: 1),
-                    onFinished: () {
-                      print('Timer is done!');
-                    },
-                  ),
-                )
+                // Positioned.directional(
+                //   textDirection:  Directionality.of(context),
+                //   bottom: 2.h,
+                //   start: 4.w,
+                //   child:
+                //
+                // )
               ],
             ),
           ),
@@ -442,7 +542,158 @@ homeModel = value;
                       ),
                     ),
                   ],
+                )),
+                Expanded(child: Container(
+                  margin: EdgeInsetsDirectional.only(start: 4.w),
+                  child:    Countdown(
+                    seconds: getRemainingTime(data.endDate),
+                    build: (BuildContext context, double time) => Container(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: Text(
+
+                          time.toInt()<=0 ? getTranslated(context, 'complete_string') :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
+                          style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontSize: screenUtil.setSp(12),
+                            fontWeight: FontWeight.bold,
+
+                          )
+                      ),
+                    ),
+                    interval: Duration(seconds: 1),
+                    onFinished: () {
+                      print('Timer is done!');
+                    },
+                  ),
                 ))
+              ],
+            ),
+          ))
+
+        ],
+      ),
+    );
+
+  }
+  Widget buildMyAuctionItem(Model.AuctionData data, BuildContext context) {
+    String timer ="";
+    return Container(
+      width: 150.w,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 4,
+            child: Stack(
+              children: [
+                CachedNetworkImage(
+                  width: itemWidth,
+                  imageUrl:data.gallery.isEmpty?"":data.gallery[0].image,
+                  imageBuilder: (context, imageProvider) => Stack(
+                    children: [
+                      ClipRRect(
+
+                        child: Container(
+                            width: itemWidth,
+
+                            decoration: BoxDecoration(
+
+                              shape: BoxShape.rectangle,
+
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: imageProvider),
+                            )
+                        ),
+                      ),
+                    ],
+                  ),
+                  placeholder: (context, url) =>
+                      Center(
+                        child: SizedBox(
+                            height: 50.h,
+                            width: 50.h,
+                            child: new CircularProgressIndicator()),
+                      ),
+
+
+                  errorWidget: (context, url, error) => ClipRRect(
+                      child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
+                        colorBlendMode: BlendMode.difference,fit: BoxFit.fill,)),
+
+                ),
+                // Positioned.directional(
+                //   textDirection:  Directionality.of(context),
+                //   bottom: 2.h,
+                //   start: 4.w,
+                //   child:
+                //
+                // )
+              ],
+            ),
+          ),
+          Expanded(flex:3,child: Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex:1,child:
+                Container(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    data.auctionName,
+                    style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontWeight: FontWeight.normal,
+                        fontSize: screenUtil.setSp(12)
+                    ),
+
+                  ),
+                )),
+                Expanded(flex:1,child:
+                Row(
+                  children: [
+                    Image.asset('assets/images/placeholder_image_count.png',height: 20.h,
+                    width: 20.w,fit: BoxFit.fill,),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child: Text(
+                        data.imageCount.toString(),
+                        style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontWeight: FontWeight.normal,
+                            fontSize: screenUtil.setSp(14)
+                        ),
+
+                      ),
+                    ),
+                  ],
+                )),
+                Expanded(
+                  flex: 1,
+                  child: Countdown(
+                    seconds: getRemainingTime(data.endDate),
+                    build: (BuildContext context, double time) => Container(
+                      alignment: AlignmentDirectional.centerStart,
+                      margin: EdgeInsetsDirectional.only(start: 4.w),
+                      child: Text(
+
+
+                          time.toInt()<=0 ? getTranslated(context, 'complete_string') :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
+                          style: TextStyle(
+
+                            color: Color(0xFF000000),
+                            fontSize: screenUtil.setSp(12),
+                            fontWeight: FontWeight.bold,
+
+                          )
+                      ),
+                    ),
+                    interval: Duration(seconds: 1),
+                    onFinished: () {
+                      print('Timer is done!');
+                    },
+                  ),
+                ),
               ],
             ),
           ))

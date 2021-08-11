@@ -24,6 +24,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
     PetMartService petMartService = PetMartService();
+    print(widget.id);
     Map map = {
       "shop_id":widget.id
     };
@@ -73,6 +74,7 @@ appBar:     AppBar(
   ),
 
   actions: [
+    SizedBox(width: 30.h,)
 
   ],
 

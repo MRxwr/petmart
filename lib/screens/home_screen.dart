@@ -105,139 +105,154 @@ double height = MediaQuery.of(context).size.height;
           physics: const AlwaysScrollableScrollPhysics(),
 
           children: [
-            Container(
-              height: 120.h,
-              width: width,
-              child:  CarouselSlider(
+            Stack(
+              children: [
+                Container(
+                  height: 120.h,
+                  width: width,
+                  child:
 
-                carouselController: _controller,
-                options: CarouselOptions(
-                    autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 10),
+                  CarouselSlider(
 
+                    carouselController: _controller,
+                    options: CarouselOptions(
+                        autoPlay: false,
 
-
-                    height: double.infinity,
-                    viewportFraction: 1.0,
-                    enlargeCenterPage: false,
-                    disableCenter: true,
-                    pauseAutoPlayOnTouch: true
-                    ,
+                        enableInfiniteScroll: false,
 
 
+                        height: double.infinity,
+                        viewportFraction: 1.0,
+                        enlargeCenterPage: false,
+                        disableCenter: true,
 
 
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _current = index;
-                      });
-                    }
-                ),
-                items: homeModel.data.banner.map((item) =>
-                    Stack(
-
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            String url = item.image.trim();
-                            if(url.isNotEmpty) {
-                              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                return new PhotoScreen(imageProvider: NetworkImage(
-                                  url,
-                                ),);
-                              }));
-
-                            }
-
-                          },
 
 
-                          child:
-                          Container(
-                            width: width,
-
-                            child:
-                            CachedNetworkImage(
-                              width: width,
-
-                              fit: BoxFit.fill,
-                              imageUrl:'${item.image}',
-                              imageBuilder: (context, imageProvider) => Card(
-                                elevation: 1.h,
-                                child: Container(
-                                    width: width,
 
 
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _current = index;
+                          });
+                        }
+                    ),
+                    items: homeModel.data.banner.map((item) =>
+                        Stack(
+
+                          children: [
+                            GestureDetector(
+                              onTap: (){
+                                String url = item.image.trim();
+                                if(url.isNotEmpty) {
+                                  Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                    return new PhotoScreen(imageProvider: NetworkImage(
+                                      url,
+                                    ),);
+                                  }));
+
+                                }
+
+                              },
 
 
-                                      image: DecorationImage(
+                              child:
+                              Container(
+                                width: width,
 
-
-                                          fit: BoxFit.fill,
-                                          image: imageProvider),
-                                    )
-                                ),
-                              ),
-                              placeholder: (context, url) =>
-                                  Column(
-                                    children: [
-                                      Expanded(
-                                        flex: 9,
-                                        child: Container(
-                                          height: height,
-                                          width: width,
-
-
-                                          alignment: FractionalOffset.center,
-                                          child: SizedBox(
-                                              height: 50.h,
-                                              width: 50.h,
-                                              child: new CircularProgressIndicator()),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-
-                              errorWidget: (context, url, error) => Container(
-                                  height: height,
+                                child:
+                                CachedNetworkImage(
                                   width: width,
-                                  alignment: FractionalOffset.center,
-                                  child: Icon(Icons.image_not_supported)),
 
+                                  fit: BoxFit.fill,
+                                  imageUrl:'${item.image}',
+                                  imageBuilder: (context, imageProvider) => Card(
+                                    elevation: 1.h,
+                                    child: Container(
+                                        width: width,
+
+
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
+
+
+                                          image: DecorationImage(
+
+
+                                              fit: BoxFit.fill,
+                                              image: imageProvider),
+                                        )
+                                    ),
+                                  ),
+                                  placeholder: (context, url) =>
+                                      Column(
+                                        children: [
+                                          Expanded(
+                                            flex: 9,
+                                            child: Container(
+                                              height: height,
+                                              width: width,
+
+
+                                              alignment: FractionalOffset.center,
+                                              child: SizedBox(
+                                                  height: 50.h,
+                                                  width: 50.h,
+                                                  child: new CircularProgressIndicator()),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+
+                                  errorWidget: (context, url, error) => Container(
+                                      height: height,
+                                      width: width,
+                                      alignment: FractionalOffset.center,
+                                      child: Icon(Icons.image_not_supported)),
+
+                                ),
+                                // Image.network(
+                                //
+                                //
+                                // '${kBaseUrl}${mAdsPhoto}${item.photo}'  , fit: BoxFit.fitWidth,
+                                //   height: 600.h,),
+                              ),
                             ),
-                            // Image.network(
-                            //
-                            //
-                            // '${kBaseUrl}${mAdsPhoto}${item.photo}'  , fit: BoxFit.fitWidth,
-                            //   height: 600.h,),
-                          ),
-                        ),
 
-                      ] ,
-                    )).toList(),
+                          ] ,
+                        )).toList(),
 
-              ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: homeModel.data.banner.map((item) {
-                int index = homeModel.data.banner.indexOf(item);
-                return Container(
-                  width: 8.0.w,
-                  height: 8.0.h,
-                  margin: EdgeInsets.symmetric(vertical: 10.0.w, horizontal: 2.0.h),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _current == index
-                        ? Color(0xFFEFA18B)
-                        : Color(0xFF707070),
                   ),
-                );
-              }).toList(),
+                ),
+                Positioned.directional(textDirection: Directionality.of(context),
+                    bottom: 2.w,
+                    start: 0,
+                    end: 0,
+
+                    child:  Opacity(
+                      opacity: homeModel.data.banner.length>1?1.0:0.0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: homeModel.data.banner.map((item) {
+                          int index = homeModel.data.banner.indexOf(item);
+                          return Container(
+                            width: 8.0.w,
+                            height: 8.0.h,
+                            margin: EdgeInsets.symmetric(vertical: 10.0.w, horizontal: 2.0.h),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _current == index
+                                  ? Color(0xFFEFA18B)
+                                  : Color(0xFF707070),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),)
+              ],
             ),
+
             Row(
               children: [
                 previewButton(getTranslated(context, 'view_all'),context),
@@ -325,20 +340,16 @@ double height = MediaQuery.of(context).size.height;
                               width: width,
                               child: Row(
                                 children: [
+
                                   Padding(
-                                    padding: EdgeInsets.only(left:10.w,right: 10.h),
-                                    child: ImageIcon(
-                                      AssetImage('assets/images/pawprint.png'
-                                      ),size: 20.h,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    homeModel.data.category[index].categoryName,
-                                    style: TextStyle(
-                                        color: Color(0xFFFFFFFF),
-                                        fontSize: screenUtil.setSp(16),
-                                        fontWeight: FontWeight.bold
+                                    padding:  EdgeInsetsDirectional.only(start: 10.h),
+                                    child: Text(
+                                      homeModel.data.category[index].categoryName,
+                                      style: TextStyle(
+                                          color: Color(0xFFFFFFFF),
+                                          fontSize: screenUtil.setSp(16),
+                                          fontWeight: FontWeight.bold
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -361,161 +372,74 @@ double height = MediaQuery.of(context).size.height;
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(
-                  flex: 1,
-                  child: 
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new HospitalsScreen();
-                      }));
-                    },
-                    child: Container(
-                      height: 150.h,
-                      child: Column(
-                        children: [
-                          Expanded(flex: 4,
-                              child:CachedNetworkImage(
-
-
-                                fit: BoxFit.fill,
-                                imageUrl:'${initModel.data.adoptionUrl}',
-                                imageBuilder: (context, imageProvider) => Card(
-                                  elevation: 1.h,
-                                  child: Container(
-                                      width: width,
-
-
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
-
-
-                                        image: DecorationImage(
-
-
-                                            fit: BoxFit.fill,
-                                            image: imageProvider),
-                                      )
-                                  ),
-                                ),
-                                placeholder: (context, url) =>
-                                    Column(
-                                      children: [
-                                        Expanded(
-                                          flex: 9,
-                                          child: Container(
-                                            height: height,
-                                            width: width,
-
-
-                                            alignment: FractionalOffset.center,
-                                            child: SizedBox(
-                                                height: 50.h,
-                                                width: 50.h,
-                                                child: new CircularProgressIndicator()),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-
-
-                                errorWidget: (context, url, error) => Container(
-                                    height: height,
-                                    width: width,
-                                    alignment: FractionalOffset.center,
-                                    child: Icon(Icons.image_not_supported)),
-
-                              ),
+                GestureDetector(
+                  onTap: (){
+                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                      return new HospitalsScreen();
+                    }));
+                  },
+                  child: Container(
+                    height: 120.h,
+                    width: 120.w,
+                    decoration: BoxDecoration(
+                      color: kMainColor,
+                      borderRadius:BorderRadius.all(Radius.circular(10.w))
+                    ),
+                    child: Column(
+                      children: [
+                        Expanded(flex: 4,
+                            child:Center(
+                              child: Image.asset('assets/images/hospital_icon.png',width: 90.w,
+                              height: 90.w,
+                           ),
+                            )
+                        ),
+                        Expanded(child:   Text(
+                          getTranslated(context, 'hospital'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Color(0xFFFFFFFF),
+                              fontSize: screenUtil.setSp(16),
+                              fontWeight: FontWeight.bold
                           ),
-                          Expanded(child:   Text(
-                            getTranslated(context, 'hospital'),
-                            style: TextStyle(
-                                color: kMainColor,
-                                fontSize: screenUtil.setSp(16),
-                                fontWeight: FontWeight.bold
-                            ),
-                          ),flex: 1,)
-                        ],
-                      ),
+                        ),flex: 1,)
+                      ],
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 1,
-                  child:
-                  GestureDetector(
-                    onTap: (){
-                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new HospitalScreen();
-                      }));
-                    },
-                    child: Container(
-                      height: 150.h,
-                      child: Column(
-                        children: [
-                          Expanded(flex: 4,
-                              child: CachedNetworkImage(
+                GestureDetector(
+                  onTap: (){
+                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                      return new HospitalScreen();
+                    }));
+                  },
+                  child: Container(
+                    height: 120.h,
+                    width: 120.w,
+                    decoration: BoxDecoration(
+                        color: kMainColor,
+                        borderRadius:BorderRadius.all(Radius.circular(10.w))
+                    ),
+                    child: Column(
+                      children: [
+                        Expanded(flex: 4,
+                            child: Center(
+                              child: Image.asset('assets/images/shop_icon.png',width: 90.w,
+                                height: 90.w,
+                              ),
+                            )
+                        ),
+                        Expanded(child:   Text(
 
-
-                                fit: BoxFit.fill,
-                                imageUrl:'${initModel.data.shopUrl}',
-                                imageBuilder: (context, imageProvider) => Card(
-                                  elevation: 1.h,
-                                  child: Container(
-                                      width: width,
-
-
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
-
-
-                                        image: DecorationImage(
-
-
-                                            fit: BoxFit.fill,
-                                            image: imageProvider),
-                                      )
-                                  ),
-                                ),
-                                placeholder: (context, url) =>
-                                    Column(
-                                      children: [
-                                        Expanded(
-                                          flex: 9,
-                                          child: Container(
-                                            height: height,
-                                            width: width,
-
-
-                                            alignment: FractionalOffset.center,
-                                            child: SizedBox(
-                                                height: 50.h,
-                                                width: 50.h,
-                                                child: new CircularProgressIndicator()),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-
-
-                                errorWidget: (context, url, error) => Container(
-                                    height: height,
-                                    width: width,
-                                    alignment: FractionalOffset.center,
-                                    child: Icon(Icons.image_not_supported)),
-
-                              )
+                          getTranslated(context, 'shop'),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Color(0xFFFFFFFF),
+                              fontSize: screenUtil.setSp(16),
+                              fontWeight: FontWeight.bold
                           ),
-                          Expanded(child:   Text(
-                            getTranslated(context, 'shop'),
-                            style: TextStyle(
-                                color: kMainColor,
-                                fontSize: screenUtil.setSp(16),
-                                fontWeight: FontWeight.bold
-                            ),
-                          ),flex: 1,)
-                        ],
-                      ),
+                        ),flex: 1,)
+                      ],
                     ),
                   ),
                 ),

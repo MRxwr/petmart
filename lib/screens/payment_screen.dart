@@ -13,11 +13,14 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/package_model.dart'as Model;
 import 'package:pet_mart/model/payment_model.dart';
 import 'package:pet_mart/providers/model_hud.dart' as Hud;
+import 'package:pet_mart/screens/splash_screen.dart';
 
 
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sweetalert/sweetalert.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'main_sceen.dart';
@@ -71,15 +74,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
     flutterWebViewPlugin.onUrlChanged.listen((String url) {
       print('url ---> ${url}');
       if (url.contains('fail')) {
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Payment Fail")));
+        new Future.delayed( Duration(seconds: 5), () {
+          Navigator.pushReplacementNamed(context,SplashScreen.id);
 
-        flutterWebViewPlugin.close();
-        Navigator.pop(context);
+        });
       }else if (url.contains('success')) {
-        flutterWebViewPlugin.close();
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text("Payment Success")));
+        new Future.delayed( Duration(seconds: 5), () {
+          Navigator.pushReplacementNamed(context,SplashScreen.id);
 
-        Navigator.pushReplacementNamed(context,MainScreen.id);
+        });
       }
     });
     payment().then((value) {
@@ -87,6 +90,92 @@ class _PaymentScreenState extends State<PaymentScreen> {
         paymentModel = value;
       });
     });
+  }
+
+  Future<void> ShowAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'go_to_main'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            flutterWebViewPlugin.close();
+            Navigator.pushReplacementNamed(context,MainScreen.id);
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+
+      ],
+    );
+    alert.show();
+
+  }
+
+  Future<void> showSuccessDialog() async{
+    await SweetAlert.show(context,
+        title: getTranslated(context, 'success'),
+        subtitle: getTranslated(context, 'payment_success'),
+
+        showCancelButton: false,
+        confirmButtonColor: kMainColor,
+        confirmButtonText: getTranslated(context, 'go_to_main'),
+        style: SweetAlertStyle.success,
+    onPress: (bool isConfirm){
+      flutterWebViewPlugin.close();
+      Navigator.pushReplacementNamed(context,MainScreen.id);
+      return true;
+    });
+  }
+  Future<void> showFailDialog() async{
+   await SweetAlert.show(context,
+        title: getTranslated(context, 'fail'),
+        subtitle: getTranslated(context, 'payment_fail'),
+        showCancelButton: false,
+        confirmButtonColor: Color(0xFFFF0000),
+        confirmButtonText: getTranslated(context, 'go_to_main'),
+        style: SweetAlertStyle.error,
+        onPress: (bool isConfirm){
+          flutterWebViewPlugin.close();
+          Navigator.pushReplacementNamed(context,SplashScreen.id);
+          return false;
+        });
   }
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override

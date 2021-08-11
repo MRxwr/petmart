@@ -46,6 +46,7 @@ class _MessageScreenState extends State<MessageScreen> {
         'receiver_id': widget.contactId,
         'user_id': widget.userId,
         'message': '',
+        'post_id':widget.postId,
         'language': languageCode
       };
 
@@ -98,7 +99,7 @@ class _MessageScreenState extends State<MessageScreen> {
       ModalProgressHUD(
         inAsyncCall: Provider.of<ModelHud>(context).isLoading,
         child: Scaffold(
-
+          resizeToAvoidBottomInset:true,
         key: _scaffoldKey,
         appBar:    AppBar(
           backgroundColor: kMainColor,
@@ -179,6 +180,7 @@ class _MessageScreenState extends State<MessageScreen> {
           ),
 
           actions: [
+            SizedBox(width: 30.h,)
 
           ],
 
@@ -192,72 +194,77 @@ class _MessageScreenState extends State<MessageScreen> {
 
               child:
         ListView(
-                children: [
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.8,
-                    child: GroupedListView<Element, DateTime>(
-                      elements: elements,
-                      order: GroupedListOrder.DESC,
-                      reverse: true,
-                      floatingHeader: true,
-                      useStickyGroupSeparators: true,
-                      groupBy: (Element element) => DateTime(
-                          element.date.year, element.date.month, element.date.day),
-                      groupHeaderBuilder: (Element element) => Container(
-                        height: 40.h,
-                        child: Align(
-                          child: Container(
-                            width: 120.w,
-                            decoration: BoxDecoration(
-                              color: kMainColor,
-                              borderRadius:
-                              BorderRadius.all(Radius.circular(10.0.w)),
-                            ),
-                            child: Padding(
-                              padding:  EdgeInsets.all(8.0.w),
-                              child: Text(
-                                '${DateFormat.yMMMd().format(element.date)}',
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
+          physics: AlwaysScrollableScrollPhysics(),
+
+          children: [
+            Container(
+
+              child: GroupedListView<Element, DateTime>(
+                physics: NeverScrollableScrollPhysics(),
+                shrinkWrap: true,
+                elements: elements,
+                order: GroupedListOrder.DESC,
+                reverse: true,
+                floatingHeader: true,
+                useStickyGroupSeparators: true,
+                groupBy: (Element element) => DateTime(
+                    element.date.year, element.date.month, element.date.day),
+                groupHeaderBuilder: (Element element) => Container(
+                  height: 40.h,
+                  child: Align(
+                    child: Container(
+                      width: 120.w,
+                      decoration: BoxDecoration(
+                        color: kMainColor,
+                        borderRadius:
+                        BorderRadius.all(Radius.circular(10.0.w)),
+                      ),
+                      child: Padding(
+                        padding:  EdgeInsets.all(8.0.w),
+                        child: Text(
+                          '${DateFormat.yMMMd().format(element.date)}',
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                      itemBuilder: (_, Element element) {
-                        return Align(
-                          alignment: element.sender
-                              ? AlignmentDirectional.centerEnd
-                              : AlignmentDirectional.centerStart,
-                          child: Container(
-
-                            child: Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(6.0.w),
-                              ),
-                              elevation: 8.0,
-                              margin:  EdgeInsets.symmetric(
-                                  horizontal: 10.0.w, vertical: 6.0.h),
-                              child: ListTile(
-                                contentPadding:  EdgeInsets.symmetric(
-                                    horizontal: 20.0.w, vertical: 10.0.h),
-                                leading: element.sender
-                                    ? Text(DateFormat.Hm().format(element.date))
-                                    : const Icon(Icons.person),
-                                title: Container(alignment: element.sender?AlignmentDirectional.centerEnd:AlignmentDirectional.centerStart
-                                    ,
-                                    child: Text(element.name)),
-                                trailing: element.sender
-                                    ? const Icon(Icons.person_outline)
-                                    : Text(DateFormat.Hm().format(element.date)),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
                     ),
                   ),
-                ],
+                ),
+                itemBuilder: (_, Element element) {
+                  return Align(
+                    alignment: element.sender
+                        ? AlignmentDirectional.centerEnd
+                        : AlignmentDirectional.centerStart,
+                    child: Container(
+
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6.0.w),
+                        ),
+                        elevation: 8.0,
+                        margin:  EdgeInsets.symmetric(
+                            horizontal: 10.0.w, vertical: 6.0.h),
+                        child: ListTile(
+                          contentPadding:  EdgeInsets.symmetric(
+                              horizontal: 20.0.w, vertical: 10.0.h),
+                          leading: element.sender
+                              ? Text(DateFormat.Hm().format(element.date))
+                              : const Icon(Icons.person),
+                          title: Container(alignment: element.sender?AlignmentDirectional.centerEnd:AlignmentDirectional.centerStart
+                              ,
+                              child: Text(element.name)),
+                          trailing: element.sender
+                              ? const Icon(Icons.person_outline)
+                              : Text(DateFormat.Hm().format(element.date)),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
+            ),
+            SizedBox(height: 70.h,)
+          ],
+        ),
             ),
             Positioned.directional(textDirection: Directionality.of(context)
               , child:
@@ -370,6 +377,7 @@ class _MessageScreenState extends State<MessageScreen> {
       'receiver_id': widget.contactId,
       'user_id': widget.userId,
       'message': comment,
+      'post_id':widget.postId,
       'language': languageCode
     };
 

@@ -36,198 +36,221 @@ class _MyMessagesScreenState extends State<MyMessagesScreen> {
     MyMessageModel messageModel =await petMartService.myMessages(map);
     return messageModel;
   }
+  String status = "";
+  String messaage = "";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getMessages().then((value) {
       setState(() {
+        status = value.status;
+        messaage = value.message;
+
         messageModel = value;
       });
     });
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar:  AppBar(
-        backgroundColor: kMainColor,
-        title: Container(
-          alignment: AlignmentDirectional.center,
-          child: Padding(
-            padding:  EdgeInsets.symmetric(horizontal: 10.h),
-            child: Text(
-              getTranslated(context, 'messages'),
-              style: TextStyle(
-                  color: Color(0xFFFFFFFF),
-                  fontSize: screenUtil.setSp(16),
-                  fontWeight: FontWeight.bold
+    return GestureDetector(
+      onTap: (){
+        FocusManager.instance.primaryFocus?.unfocus();
+
+      },
+      child: Scaffold(
+        appBar:  AppBar(
+          backgroundColor: kMainColor,
+          title: Container(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding:  EdgeInsets.symmetric(horizontal: 10.h),
+              child: Text(
+                getTranslated(context, 'messages'),
+                style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: screenUtil.setSp(16),
+                    fontWeight: FontWeight.bold
+
+                ),
+
 
               ),
-
-
             ),
           ),
+          leading: GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+
+            },
+            child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+          ),
+
+          actions: [
+            SizedBox(width: 30.h,)
+
+          ],
+
         ),
-        leading: GestureDetector(
-          onTap: (){
-            Navigator.pop(context);
-
-          },
-          child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
-        ),
-
-        actions: [
-
-        ],
-
-      ),
-      backgroundColor: Color(0xFFFFFFFF),
-      body: Container(
-child: messageModel == null?
+        backgroundColor: Color(0xFFFFFFFF),
+        body: Container(
+child: status == ""?
 Container(
   child: CircularProgressIndicator(
 
 
   ),
   alignment: AlignmentDirectional.center,
-):Container(
+):status == "fail"?
+Container(
+  child: Text(messaage,
+  style: TextStyle(
+        color: Colors.black,
+      fontSize: screenUtil.setSp(18),
+      fontWeight: FontWeight.w600
+  ),),
+  alignment: AlignmentDirectional.center,
+)
+      :
+      Container(
   margin: EdgeInsets.all(10.h),
   child: ListView.separated(
-      padding: EdgeInsets.zero,
-      scrollDirection: Axis.vertical,
+        padding: EdgeInsets.zero,
+        scrollDirection: Axis.vertical,
 
 
-      shrinkWrap: true,
-      physics: const AlwaysScrollableScrollPhysics(),
+        shrinkWrap: true,
+        physics: const AlwaysScrollableScrollPhysics(),
 
 
-      itemBuilder:(context,index){
-        return
-          Container(
-          height: 100.h,
-          width: screenUtil.screenWidth,
-          child:
+        itemBuilder:(context,index){
+          return
+            Container(
+            height: 100.h,
+            width: screenUtil.screenWidth,
+            child:
 
-          InkWell(
-            onTap: (){
-              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                return new MessageScreen(contactName:messageModel.data[index].senderName,
-                  contactImage:messageModel.data[index].senderImage ,
-                  contactId:messageModel.data[index].receiverId,
-                  postId: messageModel.data[index].messageId,
-                  userId: loginModel.data.customerId,);
-              }));
+            InkWell(
+              onTap: (){
+                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                  return new MessageScreen(contactName:messageModel.data[index].senderName,
+                    contactImage:messageModel.data[index].senderImage ,
+                    contactId:messageModel.data[index].receiverId,
+                    postId: messageModel.data[index].postId,
+                    userId: loginModel.data.customerId);
+                }));
 
-            },
-            child: Row(
-              children: [
-                Expanded(child:
-                CachedNetworkImage(
-                  width: 90.w,
-                  height: 90.h,
-                  imageUrl:'${messageModel.data[index].senderImage}',
-                  imageBuilder: (context, imageProvider) =>
-                      Container(
-                          width: 90.w,
-                          height: 90.h,
+              },
+              child: Row(
+                children: [
+                  Expanded(child:
+                  CachedNetworkImage(
+                    width: 90.w,
+                    height: 90.h,
+                    imageUrl:'${messageModel.data[index].senderImage}',
+                    imageBuilder: (context, imageProvider) =>
+                        Container(
+                            width: 90.w,
+                            height: 90.h,
 
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
 
-                            image: DecorationImage(
-                                fit: BoxFit.fill,
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
 
-                                image: imageProvider),
-                          )
-                      ),
-                  placeholder: (context, url) =>
-                      Center(
-                        child: SizedBox(
-                            height: 30.h,
-                            width: 30.h,
-                            child: new CircularProgressIndicator()),
-                      ),
+                                  image: imageProvider),
+                            )
+                        ),
+                    placeholder: (context, url) =>
+                        Center(
+                          child: SizedBox(
+                              height: 30.h,
+                              width: 30.h,
+                              child: new CircularProgressIndicator()),
+                        ),
 
 
-                  errorWidget: (context, url, error) =>  Container(
-                      width: 50.w,
-                      height: 50.h,
+                    errorWidget: (context, url, error) =>  Container(
+                        width: 50.w,
+                        height: 50.h,
 
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
 
-                        image: DecorationImage(
-                            image: AssetImage('assets/images/icon.png')),
-                      )
+                          image: DecorationImage(
+                              image: AssetImage('assets/images/icon.png')),
+                        )
+                    ),
+
                   ),
-
-                ),
-                  flex: 1,),
-                SizedBox(width: 6.h,),
-                Expanded(flex:3,child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      messageModel.data[index].senderName,
-                      style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: screenUtil.setSp(16),
-                          fontWeight: FontWeight.bold
+                    flex: 1,),
+                  SizedBox(width: 6.h,),
+                  Expanded(flex:3,child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        messageModel.data[index].senderName,
+                        style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontSize: screenUtil.setSp(16),
+                            fontWeight: FontWeight.bold
+                        ),
                       ),
-                    ),
-                    Text(
-                      messageModel.data[index].message,
-                      style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: screenUtil.setSp(14),
-                          fontWeight: FontWeight.normal
+                      Text(
+                        messageModel.data[index].message,
+                        style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontSize: screenUtil.setSp(14),
+                            fontWeight: FontWeight.normal
+                        ),
                       ),
-                    ),
-                  ],
-                ) ),
-                Expanded(flex:1,child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      messageModel.data[index].dayAgo,
-                      style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: screenUtil.setSp(14),
-                          fontWeight: FontWeight.normal
+                    ],
+                  ) ),
+                  Expanded(flex:1,child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        messageModel.data[index].dayAgo,
+                        style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontSize: screenUtil.setSp(14),
+                            fontWeight: FontWeight.normal
+                        ),
                       ),
-                    ),
-                    Container(
-                      width: 30.w,
-                      height: 30.h,
-                      alignment: AlignmentDirectional.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: kMainColor,
+                      Container(
+                        width: 30.w,
+                        height: 30.h,
+                        alignment: AlignmentDirectional.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: kMainColor,
 
 
-                      ),
-                      child:
-                      Text('${messageModel.data[index].messageCount} ',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: screenUtil.setSp(14),
-                              fontWeight: FontWeight.normal
-                          )
-                      ),
-                    )
-                  ],
-                ) )
-              ],
+                        ),
+                        child:
+                        Text('${messageModel.data[index].messageCount} ',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xFFFFFFFF),
+                                fontSize: screenUtil.setSp(14),
+                                fontWeight: FontWeight.normal
+                            )
+                        ),
+                      )
+                    ],
+                  ) )
+                ],
+              ),
             ),
-          ),
-        );
-      }, separatorBuilder: (context,index){
-    return Container(height: 1.h,
-    color: Color(0xFF000000),);}, itemCount: messageModel.data.length),
+          );
+        }, separatorBuilder: (context,index){
+      return Container(height: 1.h,
+      color: Color(0xFF000000),);}, itemCount: messageModel.data.length),
 ),
+        ),
       ),
     );
   }

@@ -9,6 +9,7 @@ import 'package:pet_mart/screens/login_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/widgets/name_textfield.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 class ForgetPasswordScreen extends StatefulWidget {
   static String id = 'ForgetPasswordScreen';
@@ -58,6 +59,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
           ),
 
           actions: [
+            SizedBox(width: 30.h,)
 
           ],
 
@@ -130,15 +132,125 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       String mStatus = resetModel.status;
       if(mStatus.trim() == 'success'){
         modelHud.changeIsLoading(false);
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(resetModel.message)));
-        Navigator.pushReplacementNamed(context,LoginScreen.id);
+        // _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(resetModel.message)));
+        successAlertDialog(context,resetModel.message);
       }else{
         modelHud.changeIsLoading(false);
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(resetModel.message)));
-      }
+        failAlertDialog(context,resetModel.message);
+
+              }
 
     }
   }
+
+
+  Future<void> successAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.pushReplacementNamed(context,LoginScreen.id);
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+
+      ],
+    );
+    alert.show();
+
+  }
+  Future<void> failAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+
+      ],
+    );
+    alert.show();
+
+  }
+
 }
 
 

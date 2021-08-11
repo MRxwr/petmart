@@ -12,7 +12,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:pet_mart/api/pet_mart_service.dart';
+import 'package:pet_mart/model/token_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
 import 'package:pet_mart/screens/auction_details_screen.dart';
 import 'package:pet_mart/screens/change_password_screen.dart';
@@ -20,10 +23,13 @@ import 'package:pet_mart/screens/contact_us_screen.dart';
 import 'package:pet_mart/screens/forget_password_screen.dart';
 import 'package:pet_mart/screens/languagee_screen.dart';
 import 'package:pet_mart/screens/login_screen.dart';
+import 'package:pet_mart/screens/lost_screen.dart';
 import 'package:pet_mart/screens/main_sceen.dart';
 import 'package:pet_mart/screens/my_account_screen.dart';
 import 'package:pet_mart/screens/my_auction_screen.dart';
+import 'package:pet_mart/screens/my_message_screen.dart';
 import 'package:pet_mart/screens/my_post_screen.dart';
+import 'package:pet_mart/screens/notification_details_screen.dart';
 import 'package:pet_mart/screens/orders_screen.dart';
 import 'package:pet_mart/screens/privacy_screen.dart';
 import 'package:pet_mart/screens/push_notification_screen.dart';
@@ -83,6 +89,12 @@ void main() async{
     badge: true,
     sound: true,
   );
+  FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
 
   runApp(MyApp());
 }
@@ -125,6 +137,8 @@ String constructFCMPayload(String token) {
 }
 
 class _MyAppState extends State<MyApp> {
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey(debugLabel: "Main Navigator");
+
   String messageTitle = "Empty";
   String notificationAlert = "alert";
   String _token;
@@ -163,9 +177,34 @@ Future <void> getToken() async{
   if(mToken ==""){
     String toke = await FirebaseMessaging.instance.getToken();
     print('token --> ${toke}');
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+
+
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     _preferences.setString("token", toke);
     print('Token Saved!');
+    PetMartService petMartService  = PetMartService();
+    String deviceType = "";
+    if(Platform.isAndroid){
+      deviceType = "a";
+    }else{
+      deviceType = "i";
+    }
+    Map<String,String> map = Map();
+    map['device_token'] = toke;
+    map['language']= languageCode;
+    map['device_type']= deviceType;
+    print(map);
+
+    TokenModel tokenModel = await petMartService.registerToken(map);
+    print('message ----> ${tokenModel.message}');
   }
+
+}
+Future<void> init() async{
+  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+
 
 }
   @override
@@ -175,14 +214,33 @@ Future <void> getToken() async{
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage message) {
-      if (message != null) {
-        // Navigator.pushNamed(context, '/message',
-        //     arguments: MessageArguments(message, true));
-      }
-    });
-   getToken().then((value) {
 
-   });
+
+      print('remoteMessgae sss${message.toString()}');
+      dynamic dataObject=  message.data;
+      print('dataObject ---> ${dataObject.toString()}');
+      String type = dataObject['push_type'];
+
+      print('type ---> ${type}');
+      if (type == 'chatuser'){
+
+          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+            return new MyMessagesScreen();
+          }));
+
+
+
+      }else if(type == 'rateonuser'){
+        String auctionId = dataObject['auction_id'];
+        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+          return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
+        }));
+      }
+
+    });
+    getToken().then((value) {
+
+    });
 
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -208,9 +266,27 @@ Future <void> getToken() async{
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
+      String remoteMessgae = message.data.toString();
+      dynamic dataObject=  message.data;
+      print('dataObject ---> ${dataObject.toString()}');
+      String type = dataObject['push_type'];
+      if (type == 'chatuser'){
+        Navigator.of(navigatorKey.currentContext,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+          return new MyMessagesScreen();
+        }));
+      }else if(type == 'rateonuser'){
+        String auctionId = dataObject['auction_id'];
+        Navigator.of(navigatorKey.currentContext,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+          return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
+        }));
+      }
+
+      print('remoteMessgae ${remoteMessgae}');
+
       // Navigator.pushNamed(context, '/message',
       //     arguments: MessageArguments(message, true));
     });
+
 
   }
 
@@ -283,6 +359,7 @@ Future <void> getToken() async{
                     OverlaySupport(
 
                       child: MaterialApp(
+                          navigatorKey: navigatorKey ,
 
 
                         theme: ThemeData(
@@ -348,6 +425,8 @@ Future <void> getToken() async{
                           PushNotificationScreen.id: (context) => PushNotificationScreen(),
                           AuctionDetailsScreen.id: (context) => AuctionDetailsScreen(),
                           ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
+                          AdaptionScreen.id: (context) => AdaptionScreen(),
+                          LostScreen.id: (context) => LostScreen(),
                         },
 
                       ),

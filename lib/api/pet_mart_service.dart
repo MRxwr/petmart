@@ -29,16 +29,19 @@ import 'package:pet_mart/model/my_message_model.dart';
 import 'package:pet_mart/model/notification_model.dart';
 import 'package:pet_mart/model/notify_model.dart';
 import 'package:pet_mart/model/order_model.dart';
+import 'package:pet_mart/model/otp_model.dart';
 import 'package:pet_mart/model/package_model.dart';
 import 'package:pet_mart/model/payment_model.dart';
 import 'package:pet_mart/model/pets_model.dart';
 import 'package:pet_mart/model/post_details_model.dart';
 import 'package:pet_mart/model/post_model.dart';
+import 'package:pet_mart/model/rating_model.dart';
 import 'package:pet_mart/model/register_model.dart';
 import 'package:pet_mart/model/reset_model.dart';
 import 'package:pet_mart/model/search_model.dart';
 import 'package:pet_mart/model/share_model.dart';
 import 'package:pet_mart/model/shopdetails_model.dart';
+import 'package:pet_mart/model/token_model.dart';
 import 'package:pet_mart/model/update_profile_model.dart';
 import 'package:pet_mart/model/user_model.dart';
 import 'package:pet_mart/model/verify_otp_model.dart';
@@ -78,21 +81,23 @@ class PetMartService{
   Future<InitModel> init()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-
+Map map = Map();
+map['language'] = languageCode;
     InitModel initModel;
 
     var dio = Dio();
+    String body = json.encode(map);
+    var response =  await http.post(Uri.parse("${TAG_BASE_URL}initialization/index"),headers: {"Content-Type": "application/json"},body: body);
 
 
-    var response = await dio.get(TAG_BASE_URL + "initialization/index");
 
     if (response.statusCode == 200) {
 
 
 
 
-      initModel =
-          InitModel.fromJson(Map<String, dynamic>.from(response.data));
+      initModel =InitModel.fromJson(jsonDecode(response.body));
+
     }
 
     return initModel;
@@ -124,6 +129,20 @@ class PetMartService{
 
 
   }
+  Future<OtpModel> resentOtp(Map map) async {
+
+    String body = json.encode(map);
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}customer/resentotp"),headers: {"Content-Type": "application/json"},body: body);
+    print(response);
+    OtpModel otpModel;
+    if(response.statusCode == 200){
+      otpModel = OtpModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(response.body);
+    print(response.body);
+    return otpModel;
+  }
   Future<LoginModel> loginModel(Map map) async {
 
     String body = json.encode(map);
@@ -132,6 +151,20 @@ class PetMartService{
     LoginModel loginModel;
     if(response.statusCode == 200){
       loginModel = LoginModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(loginModel.message);
+    print(response.body);
+    return loginModel;
+  }
+  Future<TokenModel> registerToken(Map map) async {
+
+    String body = json.encode(map);
+    final response = await http.post(Uri.parse("https://petmart.createkwservers.com/apis/guests/save"),headers: {"Content-Type": "application/json"},body: body);
+    print('token response ${response.body}');
+    TokenModel loginModel;
+    if(response.statusCode == 200){
+      loginModel = TokenModel.fromJson(jsonDecode(response.body));
     }
 
     print(loginModel.message);
@@ -261,19 +294,19 @@ class PetMartService{
     return auctionModel;
   }
   Future<AuctionDetailsModel> auctionDetails(Map map) async {
-    print(map);
+    print('map ---> ${map}');
 
     String body = json.encode(map);
 
     final response = await http.post(Uri.parse("${TAG_BASE_URL}auction/view"),headers: {"Content-Type": "application/json"},body: body);
-    print(response);
+    print(response.body);
     AuctionDetailsModel auctionDetailsModel;
     if(response.statusCode == 200){
       auctionDetailsModel = AuctionDetailsModel.fromJson(jsonDecode(response.body));
     }
 
     print(auctionDetailsModel.message);
-    print(response.body);
+    print('response.body ---> ${response.body}');
     return auctionDetailsModel;
   }
   Future<BidModel> postAuctionModel(Map map) async {
@@ -314,7 +347,7 @@ class PetMartService{
     String body = json.encode(map);
 
     final response = await http.post(Uri.parse("${TAG_BASE_URL}category/list"),headers: {"Content-Type": "application/json"},body: body);
-    print(' PostModel ${response}');
+    print(' PostModel ${response.body}');
     CategoryModel categoryModel;
     if(response.statusCode == 200){
       categoryModel = CategoryModel.fromJson(jsonDecode(response.body));
@@ -372,6 +405,22 @@ class PetMartService{
     print(response.body);
     return postDetailsModel;
   }
+  Future<PostDetailsModel> shopProductDetails(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}product/view"),headers: {"Content-Type": "application/json"},body: body);
+    print(' PostModel ${response}');
+    PostDetailsModel postDetailsModel;
+    if(response.statusCode == 200){
+      postDetailsModel = PostDetailsModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(postDetailsModel.message);
+    print(response.body);
+    return postDetailsModel;
+  }
   Future<ViewModel> viewPet(Map map) async {
     print(map);
 
@@ -388,6 +437,7 @@ class PetMartService{
     print(response.body);
     return postDetailsModel;
   }
+
   Future<ShareModel> sharePet(Map map) async {
     print(map);
 
@@ -412,6 +462,7 @@ class PetMartService{
     final response = await http.post(Uri.parse("${TAG_BASE_URL}message/detail"),headers: {"Content-Type": "application/json"},body: body);
     print(' PostModel ${response}');
     MessageModel postDetailsModel;
+    print(response.statusCode);
     if(response.statusCode == 200){
       postDetailsModel = MessageModel.fromJson(jsonDecode(response.body));
     }
@@ -456,18 +507,24 @@ class PetMartService{
 
   }
   Future<CreditModel> credit(Map map)async{
-    print(map);
+    print('credit ---> ${map}');
 
     String body = json.encode(map);
 
     final response = await http.post(Uri.parse("${TAG_BASE_URL}credit/credit"),headers: {"Content-Type": "application/json"},body: body);
     print(' PostModel ${response}');
     CreditModel creditModel;
-    if(response.statusCode == 200){
-      creditModel = CreditModel.fromJson(jsonDecode(response.body));
+    try{
+      if(response.statusCode == 200){
+        creditModel = CreditModel.fromJson(jsonDecode(response.body));
+      }
+    }catch(e){
+      creditModel = null;
     }
 
-    print(creditModel.message);
+
+
+
     print(response.body);
     return creditModel;
 
@@ -529,7 +586,7 @@ class PetMartService{
     String body = json.encode(map);
 
     final response = await http.post(Uri.parse("${TAG_BASE_URL}credit/credit"),headers: {"Content-Type": "application/json"},body: body);
-    print(' response ${response}');
+    print(' response ${response.body}');
     OrderModel changePasswordModel;
     if(response.statusCode == 200){
       changePasswordModel = OrderModel.fromJson(jsonDecode(response.body));
@@ -598,13 +655,21 @@ class PetMartService{
 
     final response = await http.post(Uri.parse("${TAG_BASE_URL}auction/fetch"),headers: {"Content-Type": "application/json"},body: body);
     print(' response ${response}');
-    MyAuctionsModel auctionModel;
-    if(response.statusCode == 200){
-      auctionModel = MyAuctionsModel.fromJson(jsonDecode(response.body));
+    MyAuctionsModel auctionModel ;
+    print(' my Auctions ${response.body}');
+    try{
+      if(response.statusCode == 200){
+        auctionModel = MyAuctionsModel.fromJson(jsonDecode(response.body));
+        print(' my Auctions ${response.body}');
+      }
+    }catch(e){
+      auctionModel = null;
+      print('auctionModel ${auctionModel}');
     }
 
 
-    print(response.body);
+
+
     return auctionModel;
 
   }
@@ -633,8 +698,10 @@ class PetMartService{
     final response = await http.post(Uri.parse("${TAG_BASE_URL}message/list"),headers: {"Content-Type": "application/json"},body: body);
     print(' response ${response}');
     MyMessageModel auctionModel;
+
     if(response.statusCode == 200){
       auctionModel = MyMessageModel.fromJson(jsonDecode(response.body));
+      print(auctionModel.status);
     }
 
 
@@ -728,6 +795,7 @@ class PetMartService{
 
   }
   Future<ShopdetailsModel> shopDetails(Map map) async {
+    print('${TAG_BASE_URL}shop/detail');
     print(map);
 
     String body = json.encode(map);
@@ -756,31 +824,55 @@ class PetMartService{
       var dio = Dio();
       SharedPreferences _preferences = await SharedPreferences.getInstance();
       String deviceToken =_preferences.getString("token")??"";
-
-
-      String fileName = image.absolute.path
-          .split('/')
-          .last;
-      FormData formData = FormData.fromMap({
-        "profile_image":
-        await MultipartFile.fromFile(image.absolute.path, filename: fileName),
-        "id":id,
-        "firstname":firstName,
-        "lastname":lastName,
-        "date_of_birth":date_of_birth,
-        "country":country,
-        "device_token":deviceToken,
-        "imei_number":imei_number,
-        "device_type":device_type,
-        "language":language,
+      FormData formData;
+      if(image == null){
+        formData = FormData.fromMap({
+               "id":id,
+          "firstname":firstName,
+          "lastname":lastName,
+          "date_of_birth":date_of_birth,
+          "country":country,
+          "device_token":deviceToken,
+          "imei_number":imei_number,
+          "device_type":device_type,
+          "language":language,
 
 
 
 
-        "mobile": Phone,
-        "email": email,
+          "mobile": Phone,
+          "email": email,
 
-      });
+        });
+
+      }else{
+        String fileName = image.absolute.path
+            .split('/')
+            .last;
+        formData = FormData.fromMap({
+          "profile_image":
+          await MultipartFile.fromFile(image.absolute.path, filename: fileName),
+          "id":id,
+          "firstname":firstName,
+          "lastname":lastName,
+          "date_of_birth":date_of_birth,
+          "country":country,
+          "device_token":deviceToken,
+          "imei_number":imei_number,
+          "device_type":device_type,
+          "language":language,
+
+
+
+
+          "mobile": Phone,
+          "email": email,
+
+        });
+
+      }
+
+
 
       final  response = await dio.post(TAG_BASE_URL + "customer/update", data: formData);
       print(response.data);
@@ -1065,5 +1157,21 @@ class PetMartService{
     print(notificationModel.message);
     print(response.body);
     return notificationModel;
+  }
+  Future<RatingModel> rating(Map map) async {
+    print(map);
+
+    String body = json.encode(map);
+
+    final response = await http.post(Uri.parse("${TAG_BASE_URL}auction/rating"),headers: {"Content-Type": "application/json"},body: body);
+    print(response.body);
+    RatingModel ratingModel;
+    if(response.statusCode == 200){
+      ratingModel = RatingModel.fromJson(jsonDecode(response.body));
+    }
+
+    print(ratingModel.message);
+    print(response.body);
+    return ratingModel;
   }
 }

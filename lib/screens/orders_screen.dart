@@ -62,6 +62,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 
@@ -75,8 +76,33 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
           ),
           alignment: AlignmentDirectional.center,
+        ): orderModel.status == 'fail'?
+        Container(
+          child: Text(
+            orderModel.message,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: screenUtil.setSp(16),
+                fontWeight: FontWeight.w600
+            ),
+          ),
+          alignment: AlignmentDirectional.center,
+        ):
+        orderModel.data.orderHistory.isEmpty?
+
+        Container(
+          child: Text(
+            orderModel.message,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: screenUtil.setSp(16),
+                fontWeight: FontWeight.w600
+            ),
+          ),
+          alignment: AlignmentDirectional.center,
         )
-        :ListView(
+            :
+        ListView(
           padding: EdgeInsets.zero,
           scrollDirection: Axis.vertical,
 

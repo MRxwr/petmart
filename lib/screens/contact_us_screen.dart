@@ -97,6 +97,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 
@@ -231,13 +232,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   }
   Future<void> _launched;
 
-  Future<void> _openUrl(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+
   Future<void> _makePhoneCall(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -252,6 +247,13 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     } else {
       // add the [https]
       return "https://api.whatsapp.com/send?phone=+$phone=${Uri.parse(message)}"; // new line
+    }
+  }
+  Future<void> _openUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 }

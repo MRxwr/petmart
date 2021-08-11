@@ -151,6 +151,7 @@ class _PetsScreenState extends State<PetsScreen> {
 
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 
@@ -208,13 +209,28 @@ class _PetsScreenState extends State<PetsScreen> {
           Container(
             child:
             petsModel== null?
-            Container(
-              child: CircularProgressIndicator(
+    Container(
+    child: CircularProgressIndicator(
 
 
-              ),
-              alignment: AlignmentDirectional.center,
-            ):
+    ),
+    alignment: AlignmentDirectional.center,
+    ):
+    petsModel.data.isEmpty?
+
+    Container(
+    child: Text(
+    petsModel.message,
+    style: TextStyle(
+    color: Colors.black,
+    fontSize: screenUtil.setSp(16),
+    fontWeight: FontWeight.w600
+    ),
+    ),
+    alignment: AlignmentDirectional.center,
+    )
+        :
+
 
             GridView.builder(scrollDirection: Axis.vertical,
 

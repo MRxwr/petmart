@@ -57,10 +57,10 @@ class Data {
   String _endDate;
   String _bidValue;
   String _auctionImage;
-  int _rating;
+  dynamic _rating;
   List<Gallery> _gallery;
 
-  Data({String auctionId, String auctionName, String auctionDescription, String auctionStatus, String auctionRemaining, String highestBidderImage, String highestBidderName, String highestBidderValue,  OwnerData ownerData, int totalParticipate, String minBidValue, String currentBidValue, List<String> bidRange, String auctionDate, String category, String categoryId, String subCategory, String subCategoryId, String stateDate, String endDate, String bidValue, String auctionImage, int rating, List<Gallery> gallery}) {
+  Data({String auctionId, String auctionName, String auctionDescription, String auctionStatus, String auctionRemaining, String highestBidderImage, String highestBidderName, String highestBidderValue,  OwnerData ownerData, int totalParticipate, String minBidValue, String currentBidValue, List<String> bidRange, String auctionDate, String category, String categoryId, String subCategory, String subCategoryId, String stateDate, String endDate, String bidValue, String auctionImage, dynamic rating, List<Gallery> gallery}) {
     this._auctionId = auctionId;
     this._auctionName = auctionName;
     this._auctionDescription = auctionDescription;
@@ -132,8 +132,8 @@ class Data {
   set bidValue(String bidValue) => _bidValue = bidValue;
   String get auctionImage => _auctionImage;
   set auctionImage(String auctionImage) => _auctionImage = auctionImage;
-  int get rating => _rating;
-  set rating(int rating) => _rating = rating;
+  dynamic get rating => _rating;
+  set rating(dynamic rating) => _rating = rating;
   List<Gallery> get gallery => _gallery;
   set gallery(List<Gallery> gallery) => _gallery = gallery;
 

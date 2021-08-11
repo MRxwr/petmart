@@ -117,8 +117,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     Navigator.pop(context);
 
   }
+  LoginModel   loginModel;
   UserModel userModel;
-  CreditModel creditModel;
+
   ScreenUtil screenUtil = ScreenUtil();
   String imageUrl ="";
   String firstName = "";
@@ -137,7 +138,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
 
       final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
+         loginModel = LoginModel.fromJson(body);
       userId = loginModel.data.customerId;
       map = {
         "id":loginModel.data.customerId,
@@ -149,6 +150,13 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
     PetMartService petMartService = PetMartService();
     UserModel userModel = await petMartService.user(map);
+
+
+
+
+
+
+
     return userModel;
   }
   Future<CreditModel> credit() async{
@@ -179,16 +187,12 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     // TODO: implement initState
     super.initState();
     user().then((value){
-      userModel = value;
-      imageUrl = value.data.profileImage;
-    }).whenComplete((){
-     credit().then((value) {
-       setState(() {
-         creditModel = value;
-       });
-     });
-
+      setState(() {
+        userModel = value;
+        imageUrl = value.data.profileImage;
+      });
     });
+
 
 
 
@@ -232,6 +236,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           ),
 
           actions: [
+            SizedBox(width: 30.h,)
 
           ],
 
@@ -241,7 +246,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           key: _globalKey,
           child: Container(
 
-            child: creditModel == null?
+            child: userModel == null?
             Container(
               child: CircularProgressIndicator(
 
@@ -261,7 +266,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('${getTranslated(context, 'your_credit')} ${creditModel.data.credit}',
+                              Text('${getTranslated(context, 'your_credit')} ${ loginModel.data.availableCredit}',
                               style: TextStyle(
                                 color: Color(0xFFFFFFFF),
                                 fontWeight: FontWeight.normal,

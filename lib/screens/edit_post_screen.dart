@@ -325,6 +325,7 @@ _ageController.text = widget.postDetailsModel.data.age;
             ),
 
             actions: [
+              SizedBox(width: 30.h,)
 
             ],
 
@@ -785,43 +786,50 @@ _ageController.text = widget.postDetailsModel.data.age;
                         color: Color(0xFFc3c3c3),
                       )
                   ),
-                  SizedBox(height: 10.h,),
-                  TextField(
-
-                    keyboardType: TextInputType.number,
-                    minLines: 1,
-                    maxLines: 1,
-                    enableInteractiveSelection: true,
-                    controller: _priceController,
-
-                    textInputAction: TextInputAction.done,
-                    textAlign: TextAlign.start,
-                    textAlignVertical: TextAlignVertical.center,
-
-
-
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: getTranslated(context, 'post_price'),
-                        isCollapsed: true,
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10.h),
-                        hintStyle: TextStyle(
-                          color: Color(0xFFa3a3a3),
-
-                        )
-                    ),
-                  ),
                   Container(
-                      height: 1.h,
-                      child:
+                    child: key =='sell'?
+                    Column(
+                      children: [
+                        SizedBox(height: 10.h,),
+                        TextField(
 
-                      Container(
-                        color: Color(0xFFc3c3c3),
-                      )
+                          keyboardType: TextInputType.number,
+                          minLines: 1,
+                          maxLines: 1,
+                          enableInteractiveSelection: true,
+                          controller: _priceController,
+
+                          textInputAction: TextInputAction.done,
+                          textAlign: TextAlign.start,
+                          textAlignVertical: TextAlignVertical.center,
+
+
+
+                          textCapitalization: TextCapitalization.sentences,
+                          decoration: InputDecoration(hintText: getTranslated(context, 'post_price'),
+                              isCollapsed: true,
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              contentPadding: EdgeInsets.all(10.h),
+                              hintStyle: TextStyle(
+                                color: Color(0xFFa3a3a3),
+
+                              )
+                          ),
+                        ),
+                        Container(
+                            height: 1.h,
+                            child:
+
+                            Container(
+                              color: Color(0xFFc3c3c3),
+                            )
+                        ),
+                      ],
+                    ):Container()
                   ),
                   SizedBox(height: 10.h,),
                   sumbitButton(getTranslated(context, 'sumbit_post'),context)
@@ -1009,10 +1017,7 @@ _ageController.text = widget.postDetailsModel.data.age;
     String postDescription =_descriptionController.text;
     String age = _ageController.text;
     String price = _priceController.text;
-    if(mImages.isEmpty){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
-
-    }else if(subCategoryId==""){
+     if(subCategoryId==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'category_error'))));
 
     }else if(categoryId==""){
@@ -1028,27 +1033,77 @@ _ageController.text = widget.postDetailsModel.data.age;
     }else if(age==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'age_error'))));
 
-    }else if(price==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'price_error'))));
-
     }else if(genderId==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'gender_error'))));
 
     }else{
-      String userId = loginModel.data.customerId;
-      String phoneNumber = loginModel.data.mobile;
-      final modelHud = Provider.of<ModelHud>(context,listen: false);
-      modelHud.changeIsLoading(true);
-      PetMartService petMartService = PetMartService();
-      dynamic response = await petMartService.editPost(widget.postDetailsModel.data.postId,postTitle, postTitle, key, postDescription, postDescription, price, categoryId, age, ageId, genderId, userId, subCategoryId, phoneNumber, mLanguage,mImages, null);
-      modelHud.changeIsLoading(false);
-      String status = response['status'];
-      if(status == 'success'){
-        ShowPostAlertDialog(context,response['message'],true);
+      if(key =='sell') {
+        if(price == ""){
+          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'price_error'))));
 
+        }else {
+          String userId = loginModel.data.customerId;
+          String phoneNumber = loginModel.data.mobile;
+          final modelHud = Provider.of<ModelHud>(context, listen: false);
+          modelHud.changeIsLoading(true);
+          PetMartService petMartService = PetMartService();
+          dynamic response = await petMartService.editPost(
+              widget.postDetailsModel.data.postId,
+              postTitle,
+              postTitle,
+              key,
+              postDescription,
+              postDescription,
+              price,
+              categoryId,
+              age,
+              ageId,
+              genderId,
+              userId,
+              subCategoryId,
+              phoneNumber,
+              mLanguage,
+              mImages,
+              null);
+          modelHud.changeIsLoading(false);
+          String status = response['status'];
+          if (status == 'success') {
+            ShowPostAlertDialog(context, response['message'], true);
+          } else {
+            ShowPostAlertDialog(context, response['message'], false);
+          }
+        }
       }else{
-        ShowPostAlertDialog(context,response['message'],false);
-
+        String userId = loginModel.data.customerId;
+        String phoneNumber = loginModel.data.mobile;
+        final modelHud = Provider.of<ModelHud>(context, listen: false);
+        modelHud.changeIsLoading(true);
+        PetMartService petMartService = PetMartService();
+        dynamic response = await petMartService.editPost(
+            widget.postDetailsModel.data.postId,
+            postTitle,
+            postTitle,
+            key,
+            postDescription,
+            postDescription,
+            price,
+            categoryId,
+            age,
+            ageId,
+            genderId,
+            userId,
+            subCategoryId,
+            phoneNumber,
+            mLanguage,
+            mImages,
+            null);
+        modelHud.changeIsLoading(false);
+        String status = response['status'];
+        if (status == 'success') {
+          ShowPostAlertDialog(context, response['message'], true);
+        } else {
+          ShowPostAlertDialog(context, response['message'], false);
+        }
       }
     }
 

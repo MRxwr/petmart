@@ -78,6 +78,7 @@ class _CreditScreenState extends State<CreditScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 

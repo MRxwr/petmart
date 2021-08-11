@@ -15,6 +15,7 @@ import 'package:pet_mart/model/bid_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/post_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/screens/adaption_photo_screen.dart';
 import 'package:pet_mart/screens/login_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/screens/vedio_screen.dart';
@@ -66,6 +67,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
       map = {"auction_id":widget.mAuctionModel.auctionId,
         "user_id":loginModel.data.customerId,
         "language":languageCode};
+      print(map);
     }
 
 
@@ -77,6 +79,9 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
   }
   Future<void> auctionLoad() async{
     mAuctionDetailsModel = null;
+     _current =0;
+     currentBid  =0;
+
     setState(() {
 
     });
@@ -103,7 +108,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
 
     PetMartService petMartService = PetMartService();
     mAuctionDetailsModel = await petMartService.auctionDetails(map);
-    _rating = mAuctionDetailsModel.data.rating.toDouble();
+    _rating =double.parse(mAuctionDetailsModel.data.rating);
     setState(() {
 
     });
@@ -115,7 +120,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
     auction().then((value){
       setState(() {
         mAuctionDetailsModel = value;
-        _rating = mAuctionDetailsModel.data.rating.toDouble();
+        _rating = double.parse(mAuctionDetailsModel.data.rating);
 
       });
     });
@@ -158,6 +163,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
 
 
             actions: [
+              SizedBox(width: 30.h,)
 
             ],
 
@@ -192,16 +198,15 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
 
                       carouselController: _controller,
                       options: CarouselOptions(
-                          autoPlay: true,
-                          autoPlayInterval: Duration(seconds: 10),
 
+                          enableInfiniteScroll: false,
 
                           height: double.infinity,
                           viewportFraction: 1.0,
                           enlargeCenterPage: false,
                           disableCenter: true,
-                          pauseAutoPlayOnTouch: true
-                          ,
+
+
 
 
 
@@ -231,10 +236,8 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                                       Navigator.of(context, rootNavigator: true)
                                           .push(new MaterialPageRoute(
                                           builder: (BuildContext context) {
-                                            return new PhotoScreen(
-                                              imageProvider: NetworkImage(
-                                                  url
-                                              ),);
+                                            return new ZoomClass(
+                                              url: url,);
                                           }));
                                     }
                                   }
@@ -247,7 +250,19 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                                     Container(
                                       width: width,
 
-                                      child:
+                                      child:item.type == 'video'?
+                                          GestureDetector(
+                                            onTap: (){
+                                              String url = item.image.trim();
+                                              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                                return new VideoScreen(vedioUrl:url,auctionName: mAuctionDetailsModel.data.auctionName,);
+                                              }));
+                                            },
+                                            child: Container(
+                                              color: Colors.black,
+                                            ),
+                                          ):
+
                                       CachedNetworkImage(
                                         width: width,
 
@@ -291,9 +306,20 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                                             ),
 
 
-                                        errorWidget: (context, url, error) => ClipRRect(
-                                            child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),fit: BoxFit.fill,
-                                              colorBlendMode: BlendMode.difference,)),
+                                        errorWidget: (context, url, error) => Container(
+
+                                          child:  item.type == 'video'?
+                                              Container(
+                                                width: width,
+                                                height: height,
+                                                color: Color(0xFF000000),
+                                              )
+                                              :
+
+                                          ClipRRect(
+                                              child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),fit: BoxFit.fill,
+                                                colorBlendMode: BlendMode.difference,)),
+                                        ),
 
                                       ),
                                       // Image.network(
@@ -312,24 +338,58 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                                   bottom: 0,
                                    child: item.type =='video' ?
                                    Center(
-                                  child: Container(
-                                  height: 60.h,
-                                  width: 60.h,
+                                  child: GestureDetector(
+                                    onTap: (){
+                                      String url = item.image.trim();
+                                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                        return new VideoScreen(vedioUrl:url,auctionName: mAuctionDetailsModel.data.auctionName,);
+                                      }));
+                                    },
+                                    child: Container(
+                                    height: 60.h,
+                                    width: 60.h,
 
-                                  decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                  image: AssetImage('assets/images/youtube_icon.png'),
+                                    decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                    image: AssetImage('assets/images/youtube_icon.png'),
                     fit: BoxFit.fill
                 )
           ),
-                                    child: Icon(Icons.video_collection,color: kMainColor,size: 50.h),
+                                      child: Icon(Icons.video_collection,color: kMainColor,size: 50.h),
         ),
+                                  ),
         ):
                               Container())
 
                             ] ,
                           )).toList(),
 
+                    ),
+                    Positioned.directional(
+                      textDirection: Directionality.of(context),
+                      bottom: 10.w,
+                      start: 0,
+                      end:0,
+                      child: Opacity(
+                        opacity: mAuctionDetailsModel.data.gallery.length>1?1.0:0.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: mAuctionDetailsModel.data.gallery.map((item) {
+                            int index =mAuctionDetailsModel.data.gallery.indexOf(item);
+                            return Container(
+                              width: 8.0.w,
+                              height: 8.0.h,
+                              margin: EdgeInsets.symmetric(vertical: 10.0.w, horizontal: 2.0.h),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _current == index
+                                    ? kMainColor
+                                    : Color(0xFF707070),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
                     ),
 
 
@@ -443,17 +503,19 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                               unratedColor: Colors.amber.withAlpha(50),
                               itemCount: 5,
                               itemSize: 20.0.h,
+                              tapOnlyMode: true,
                               itemPadding: EdgeInsets.symmetric(horizontal: 2.0.w),
                               itemBuilder: (context, _) => Icon(
                                  Icons.star,
                                 color: Colors.amber,
                               ),
-                              onRatingUpdate: (rating) {
-                                setState(() {
-                                  _rating = rating;
-                                });
-                              },
-                              updateOnDrag: true,
+
+                              // onRatingUpdate: (rating) {
+                              //   setState(() {
+                              //     _rating = rating;
+                              //   });
+                              // },
+                              updateOnDrag: false,
                             ),
                           ],
                         ),
@@ -502,7 +564,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
               Container(
                 padding: EdgeInsets.all(10.h),
                 alignment: AlignmentDirectional.centerStart,
-                child: Text('${getTranslated(context,'current_auction_bid')} ${mAuctionDetailsModel.data.currentBidValue} ${getTranslated(context, 'kwd')}',style: TextStyle(
+                child: Text('${getTranslated(context,'current_auction_bid')} ${mAuctionDetailsModel.data.highestBidderValue} ${getTranslated(context, 'kwd')}',style: TextStyle(
                     color: Color(0xFF000000),
                     fontWeight: FontWeight.bold,
                     fontSize: screenUtil.setSp(13)
@@ -677,7 +739,7 @@ children: [
                 alignment: AlignmentDirectional.center,
                 padding: EdgeInsets.symmetric(horizontal:4.h),
                 child: Text(
-                  '${double.parse(mAuctionDetailsModel.data.currentBidValue)+currentBid} ${getTranslated(context, 'kwd')}',
+                  '${double.parse(mAuctionDetailsModel.data.highestBidderValue)+currentBid} ${getTranslated(context, 'kwd')}',
                   style: TextStyle(
                       color: kMainColor,
                       fontSize: screenUtil.setSp(20),
@@ -768,7 +830,7 @@ children: [
         Map map = {
           'auction_id': mAuctionDetailsModel.data.auctionId,
           'user_id': loginModel.data.customerId,
-          'bid_value': currentBid.toString(),
+          'bid_value': '${double.parse(mAuctionDetailsModel.data.highestBidderValue)+currentBid}',
           'rating': _rating.toString(),
 
           'language': languageCode
@@ -866,5 +928,7 @@ children: [
     alert.show();
 
   }
+
+
 
 }

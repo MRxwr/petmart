@@ -53,13 +53,27 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 
       ),
       backgroundColor: Color(0xFFFFFFFF),
       body: Container(
-    child:    GridView.builder(scrollDirection: Axis.vertical,
+    child:    widget.searchModel.data.isEmpty?
+    Container(
+      child: Text(
+        widget.searchModel.message,
+        style: TextStyle(
+            color: Colors.black,
+            fontSize: screenUtil.setSp(16),
+            fontWeight: FontWeight.w600
+        ),
+      ),
+      alignment: AlignmentDirectional.center,
+    )
+        :
+        GridView.builder(scrollDirection: Axis.vertical,
 
 
       shrinkWrap: true,

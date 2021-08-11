@@ -13,6 +13,7 @@ import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/screens/splash_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -268,398 +269,405 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   Widget build(BuildContext context) {
     return
 
-      ModalProgressHUD(
-        inAsyncCall: Provider.of<ModelHud>(context).isLoading,
-        child: Scaffold(
-          key: _scaffoldKey,
-        appBar: AppBar(
-          backgroundColor: kMainColor,
-          title: Container(
-            alignment: AlignmentDirectional.center,
-            child: Padding(
-              padding:  EdgeInsets.symmetric(horizontal: 10.h),
-              child: Text(
-                getTranslated(context, 'create_auction'),
-                style: TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontSize: screenUtil.setSp(16),
-                    fontWeight: FontWeight.bold
+      GestureDetector(
+        onTap: (){
+          FocusManager.instance.primaryFocus?.unfocus();
+
+        },
+        child: ModalProgressHUD(
+          inAsyncCall: Provider.of<ModelHud>(context).isLoading,
+          child: Scaffold(
+            key: _scaffoldKey,
+          appBar: AppBar(
+            backgroundColor: kMainColor,
+            title: Container(
+              alignment: AlignmentDirectional.center,
+              child: Padding(
+                padding:  EdgeInsets.symmetric(horizontal: 10.h),
+                child: Text(
+                  getTranslated(context, 'create_auction'),
+                  style: TextStyle(
+                      color: Color(0xFFFFFFFF),
+                      fontSize: screenUtil.setSp(16),
+                      fontWeight: FontWeight.bold
+
+                  ),
+
 
                 ),
-
-
               ),
             ),
+            leading: GestureDetector(
+              onTap: (){
+                Navigator.pop(context);
+
+              },
+              child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+            ),
+
+
+            actions: [
+              SizedBox(width: 30.h,)
+
+            ],
+
           ),
-          leading: GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-
-            },
-            child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
-          ),
-
-
-          actions: [
-
-          ],
-
-        ),
-        backgroundColor: Color(0xFFFFFFFF),
-        body: Container(
-          margin: EdgeInsets.all(10.w),
-          child:
-
-          Container(
-            child: homeModel == null?Container(
-              child: CircularProgressIndicator(
-
-
-              ),
-              alignment: AlignmentDirectional.center,
-            )
-                :
+          backgroundColor: Color(0xFFFFFFFF),
+          body: Container(
+            margin: EdgeInsets.all(10.w),
+            child:
 
             Container(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                scrollDirection: Axis.vertical,
+              child: homeModel == null?Container(
+                child: CircularProgressIndicator(
+
+
+                ),
+                alignment: AlignmentDirectional.center,
+              )
+                  :
+
+              Container(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  scrollDirection: Axis.vertical,
 
 
 
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
+                  shrinkWrap: true,
+                  physics: const AlwaysScrollableScrollPhysics(),
 
-                children: [
-                  Text(getTranslated(context, 'auction_cover_photo'),
-                    style: TextStyle(
-                        color: Color(0xFF000000),
-                        fontSize: screenUtil.setSp(16),
-                        fontWeight: FontWeight.bold
-                    ),),
-                  SizedBox(height: 5.h,width: screenUtil.screenWidth,
-                  ),
-                  Container(
-                    height: 100.h,
-                    width: screenUtil.screenWidth,
+                  children: [
+                    Text(getTranslated(context, 'auction_cover_photo'),
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(16),
+                          fontWeight: FontWeight.bold
+                      ),),
+                    SizedBox(height: 5.h,width: screenUtil.screenWidth,
+                    ),
+                    Container(
+                      height: 100.h,
+                      width: screenUtil.screenWidth,
 
-                    child:
-                    ListView(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
+                      child:
+                      ListView(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
 
 
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            showPickerDialog(context).then((value){
-                              value.show(context);
-                            });
-                          },
-                          child:
-                          Container(
-                            width: 100.h,
-                            height: 100.h,
-                            padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0.h),
-                                color: Color(0xFFFFFFFF),
-                                border: Border.all(
-                                    color: Color(0xCC000000),
-                                    width: 1.0.w
-                                )
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+                              showPickerDialog(context).then((value){
+                                value.show(context);
+                              });
+                            },
+                            child:
+                            Container(
+                              width: 100.h,
+                              height: 100.h,
+                              padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5.0.h),
+                                  color: Color(0xFFFFFFFF),
+                                  border: Border.all(
+                                      color: Color(0xCC000000),
+                                      width: 1.0.w
+                                  )
+                              ),
+                              child: Icon(Icons.add,color: kMainColor,size: 50.h,),
                             ),
-                            child: Icon(Icons.add,color: kMainColor,size: 50.h,),
                           ),
-                        ),
-                        SizedBox(width: 10.w,
-                          height: 100.h,),
-                        ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context,index){
-                              return pickedImga(mImages[index],index);
-                            }, separatorBuilder: (context,index) {
-                          return Container(width: 10.h,
-                            color: Color(0xFFFFFFFF),);
-                        }
-                            , itemCount: mImages.length),
+                          SizedBox(width: 10.w,
+                            height: 100.h,),
+                          ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context,index){
+                                return pickedImga(mImages[index],index);
+                              }, separatorBuilder: (context,index) {
+                            return Container(width: 10.h,
+                              color: Color(0xFFFFFFFF),);
+                          }
+                              , itemCount: mImages.length),
 
 
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 5.h,width: screenUtil.screenWidth,
-                  ),
-                  Text(getTranslated(context, 'add_vedio'),
-                    style: TextStyle(
-                        color: Color(0xFF000000),
-                        fontSize: screenUtil.setSp(16),
-                        fontWeight: FontWeight.bold
-                    ),),
-                  Container(
-                    height: 100.h,
-                    width: screenUtil.screenWidth,
+                    SizedBox(height: 5.h,width: screenUtil.screenWidth,
+                    ),
+                    Text(getTranslated(context, 'add_vedio'),
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(16),
+                          fontWeight: FontWeight.bold
+                      ),),
+                    Container(
+                      height: 100.h,
+                      width: screenUtil.screenWidth,
 
-                    child:
-                    ListView(
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
+                      child:
+                      ListView(
+                        scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
 
 
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            showVedioPickerDialog(context).then((value){
-                              value.show(context);
-                            });
-                          },
-                          child:
-                          Container(
-                            width: 100.h,
-                            height: 100.h,
-                            padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0.h),
-                                color: Color(0xFFFFFFFF),
-                                border: Border.all(
-                                    color: Color(0xCC000000),
-                                    width: 1.0.w
-                                )
+                        children: [
+                          GestureDetector(
+                            onTap: (){
+                              showVedioPickerDialog(context).then((value){
+                                value.show(context);
+                              });
+                            },
+                            child:
+                            Container(
+                              width: 100.h,
+                              height: 100.h,
+                              padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5.0.h),
+                                  color: Color(0xFFFFFFFF),
+                                  border: Border.all(
+                                      color: Color(0xCC000000),
+                                      width: 1.0.w
+                                  )
+                              ),
+                              child: Icon(Icons.add,color: kMainColor,size: 50.h,),
                             ),
-                            child: Icon(Icons.add,color: kMainColor,size: 50.h,),
                           ),
-                        ),
-                        SizedBox(width: 10.w,
-                          height: 100.h,),
-                        ListView.separated(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemBuilder: (context,index){
-                              return pickedVedio(vedios[index],index);
-                            }, separatorBuilder: (context,index) {
-                          return Container(width: 10.h,
-                            color: Color(0xFFFFFFFF),);
-                        }
-                            , itemCount: vedios.length),
+                          SizedBox(width: 10.w,
+                            height: 100.h,),
+                          ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              itemBuilder: (context,index){
+                                return pickedVedio(vedios[index],index);
+                              }, separatorBuilder: (context,index) {
+                            return Container(width: 10.h,
+                              color: Color(0xFFFFFFFF),);
+                          }
+                              , itemCount: vedios.length),
 
 
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 50.h,
-                    width: screenUtil.screenWidth,
-                    child: DropDown<CategoryParent.Category>(
-
-
-
-
-
-                      items: categoryList,
-
-                      hint:  Text(getTranslated(context, 'select_category') ,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-
-                            color: Color(0xFFc3c3c3),
-                            fontWeight: FontWeight.w600,
-                            fontSize: screenUtil.setSp(15)
-                        ),),
-                      onChanged: (CategoryParent.Category category){
-                        mSubCategoryModel = null;
-                        categoryId = category.categoryId;
-                        print('CategoryId -->${categoryId}');
-                        final modelHud = Provider.of<ModelHud>(context,listen: false);
-                        modelHud.changeIsLoading(true);
-                        subCategory(categoryId).then((value){
-                          modelHud.changeIsLoading(false);
-                          setState(() {
-                            subCategoryId = value.data.category[0].childcategory[0].categoryId;
-                            mSubCategoryModel = value;
-                            print('subCategoryId -->${subCategoryId}');
-                          });
-                        });
-
-
-                      },
-                      customWidgets: categoryList.map((p) => buildDropDownRow(p)).toList(),
-                      isExpanded: true,
-                      showUnderline: false,
-                    ),
-                  ),
-                  SizedBox(height: 1.h,
-                    width: screenUtil.screenWidth,
-                    child: Container(
-                      color: Color(0xFFc3c3c3),
-                    ),),
-                  SizedBox(height: 10.h,),
-                  SizedBox(
-                    height: 50.h,
-                    width: screenUtil.screenWidth,
-                    child: mSubCategoryModel == null?
                     SizedBox(
-
-                      child: Text(getTranslated(context, 'select_sub_category'),
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-
-                            color: Color(0xFFc3c3c3),
-                            fontWeight: FontWeight.w600,
-                            fontSize: screenUtil.setSp(15)
-                        ),),
-                    ):  SizedBox(
                       height: 50.h,
                       width: screenUtil.screenWidth,
-                      child: DropDown<SubCategory.Childcategory>(
+                      child: DropDown<CategoryParent.Category>(
 
 
 
 
 
-                        items: mSubCategoryModel.data.category[0].childcategory,
+                        items: categoryList,
 
-                        hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                        hint:  Text(getTranslated(context, 'select_category') ,
                           textAlign: TextAlign.start,
                           style: TextStyle(
 
-                              color: Color(0xFF000000),
+                              color: Color(0xFFc3c3c3),
                               fontWeight: FontWeight.w600,
                               fontSize: screenUtil.setSp(15)
                           ),),
-                        onChanged: (SubCategory.Childcategory category){
-                          subCategoryId = category.categoryId;
-
+                        onChanged: (CategoryParent.Category category){
+                          mSubCategoryModel = null;
+                          categoryId = category.categoryId;
+                          print('CategoryId -->${categoryId}');
+                          final modelHud = Provider.of<ModelHud>(context,listen: false);
+                          modelHud.changeIsLoading(true);
+                          subCategory(categoryId).then((value){
+                            modelHud.changeIsLoading(false);
+                            setState(() {
+                              subCategoryId = value.data.category[0].childcategory[0].categoryId;
+                              mSubCategoryModel = value;
+                              print('subCategoryId -->${subCategoryId}');
+                            });
+                          });
 
 
                         },
-                        customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                        customWidgets: categoryList.map((p) => buildDropDownRow(p)).toList(),
                         isExpanded: true,
                         showUnderline: false,
                       ),
                     ),
-                  ),
-                  SizedBox(height: 1.h,
-                    width: screenUtil.screenWidth,
-                    child: Container(
-                      color: Color(0xFFc3c3c3),
-                    ),),
-                  SizedBox(height: 10.h,),
-                  TextField(
-
-                    keyboardType: TextInputType.text,
-                    minLines: 1,
-                    maxLines: 1,
-                    enableInteractiveSelection: true,
-                    controller: _titleController,
-
-                    textInputAction: TextInputAction.next,
-                    textAlign: TextAlign.start,
-                    textAlignVertical: TextAlignVertical.center,
-
-
-
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: getTranslated(context, 'auction_title'),
-                        isCollapsed: true,
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10.h),
-                        hintStyle: TextStyle(
-                          color: Color(0xFFa3a3a3),
-
-                        )
-                    ),
-                  ),
-                  SizedBox(height: 1.h,
-                    width: screenUtil.screenWidth,
-                    child: Container(
-                      color: Color(0xFFc3c3c3),
-                    ),),  SizedBox(height: 10.h,),
-                  TextField(
-
-                    keyboardType: TextInputType.multiline,
-                    minLines: 1,
-                    maxLines: 50,
-                    enableInteractiveSelection: true,
-                    controller: _descriptionController,
-
-                    textInputAction: TextInputAction.newline,
-                    textAlign: TextAlign.start,
-                    textAlignVertical: TextAlignVertical.center,
-
-
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: getTranslated(context, 'auction_description'),
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        isCollapsed: true,
-                        contentPadding: EdgeInsets.all(10.h),
-                        hintStyle: TextStyle(
-                          color: Color(0xFFa3a3a3),
-
-                        )
-                    ),
-                  ),
-                  SizedBox(height: 1.h,
-                    width: screenUtil.screenWidth,
-                    child: Container(
-                      color: Color(0xFFc3c3c3),
-                    ),),  SizedBox(height: 10.h,),
-                  TextField(
-
-                    keyboardType: TextInputType.number,
-                    minLines: 1,
-                    maxLines: 1,
-                    enableInteractiveSelection: true,
-                    controller: _priceController,
-
-                    textInputAction: TextInputAction.done,
-                    textAlign: TextAlign.start,
-                    textAlignVertical: TextAlignVertical.center,
-
-
-
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: getTranslated(context, 'minimum_bid'),
-                        isCollapsed: true,
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10.h),
-                        hintStyle: TextStyle(
-                          color: Color(0xFFa3a3a3),
-
-                        )
-                    ),
-                  ),
-                  Container(
-                      height: 1.h,
-                      child:
-
-                      Container(
+                    SizedBox(height: 1.h,
+                      width: screenUtil.screenWidth,
+                      child: Container(
                         color: Color(0xFFc3c3c3),
-                      )
-                  ),
-                  SizedBox(height: 10.h,),
-                  sumbitButton(getTranslated(context, 'create_auction'),context)
-                ],
+                      ),),
+                    SizedBox(height: 10.h,),
+                    SizedBox(
+                      height: 50.h,
+                      width: screenUtil.screenWidth,
+                      child: mSubCategoryModel == null?
+                      SizedBox(
+
+                        child: Text(getTranslated(context, 'select_sub_category'),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+
+                              color: Color(0xFFc3c3c3),
+                              fontWeight: FontWeight.w600,
+                              fontSize: screenUtil.setSp(15)
+                          ),),
+                      ):  SizedBox(
+                        height: 50.h,
+                        width: screenUtil.screenWidth,
+                        child: DropDown<SubCategory.Childcategory>(
+
+
+
+
+
+                          items: mSubCategoryModel.data.category[0].childcategory,
+
+                          hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+
+                                color: Color(0xFF000000),
+                                fontWeight: FontWeight.w600,
+                                fontSize: screenUtil.setSp(15)
+                            ),),
+                          onChanged: (SubCategory.Childcategory category){
+                            subCategoryId = category.categoryId;
+
+
+
+                          },
+                          customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                          isExpanded: true,
+                          showUnderline: false,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 1.h,
+                      width: screenUtil.screenWidth,
+                      child: Container(
+                        color: Color(0xFFc3c3c3),
+                      ),),
+                    SizedBox(height: 10.h,),
+                    TextField(
+
+                      keyboardType: TextInputType.text,
+                      minLines: 1,
+                      maxLines: 1,
+                      enableInteractiveSelection: true,
+                      controller: _titleController,
+
+                      textInputAction: TextInputAction.next,
+                      textAlign: TextAlign.start,
+                      textAlignVertical: TextAlignVertical.center,
+
+
+
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: InputDecoration(hintText: getTranslated(context, 'auction_title'),
+                          isCollapsed: true,
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.all(10.h),
+                          hintStyle: TextStyle(
+                            color: Color(0xFFa3a3a3),
+
+                          )
+                      ),
+                    ),
+                    SizedBox(height: 1.h,
+                      width: screenUtil.screenWidth,
+                      child: Container(
+                        color: Color(0xFFc3c3c3),
+                      ),),  SizedBox(height: 10.h,),
+                    TextField(
+
+                      keyboardType: TextInputType.multiline,
+                      minLines: 1,
+                      maxLines: 50,
+                      enableInteractiveSelection: true,
+                      controller: _descriptionController,
+
+                      textInputAction: TextInputAction.newline,
+                      textAlign: TextAlign.start,
+                      textAlignVertical: TextAlignVertical.center,
+
+
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: InputDecoration(hintText: getTranslated(context, 'auction_description'),
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          isCollapsed: true,
+                          contentPadding: EdgeInsets.all(10.h),
+                          hintStyle: TextStyle(
+                            color: Color(0xFFa3a3a3),
+
+                          )
+                      ),
+                    ),
+                    SizedBox(height: 1.h,
+                      width: screenUtil.screenWidth,
+                      child: Container(
+                        color: Color(0xFFc3c3c3),
+                      ),),  SizedBox(height: 10.h,),
+                    TextField(
+
+                      keyboardType: TextInputType.number,
+                      minLines: 1,
+                      maxLines: 1,
+                      enableInteractiveSelection: true,
+                      controller: _priceController,
+
+                      textInputAction: TextInputAction.done,
+                      textAlign: TextAlign.start,
+                      textAlignVertical: TextAlignVertical.center,
+
+
+
+                      textCapitalization: TextCapitalization.sentences,
+                      decoration: InputDecoration(hintText: getTranslated(context, 'minimum_bid'),
+                          isCollapsed: true,
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.all(10.h),
+                          hintStyle: TextStyle(
+                            color: Color(0xFFa3a3a3),
+
+                          )
+                      ),
+                    ),
+                    Container(
+                        height: 1.h,
+                        child:
+
+                        Container(
+                          color: Color(0xFFc3c3c3),
+                        )
+                    ),
+                    SizedBox(height: 10.h,),
+                    sumbitButton(getTranslated(context, 'create_auction'),context)
+                  ],
+                ),
               ),
             ),
-          ),
 
-        ),
+          ),
     ),
+        ),
       );
   }
   Container pickedImga(File image,int position){
@@ -903,7 +911,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
           onPressed: ()async {
             if(success){
               await alert.dismiss();
-              Navigator.pushReplacementNamed(context,MainScreen.id);
+              Navigator.pushReplacementNamed(context,SplashScreen.id);
             }else{
               await alert.dismiss();
             }

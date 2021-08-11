@@ -23,7 +23,8 @@ class OrderModel {
   OrderModel.fromJson(dynamic json) {
     _status = json["status"];
     _message = json["message"];
-    _data = json["data"] != null ? Data.fromJson(json["data"]) : null;
+    print(json["data"]);
+    _data = json["data"].toString() != '[]' ? Data.fromJson(json["data"]) : null;
   }
 
   Map<String, dynamic> toJson() {

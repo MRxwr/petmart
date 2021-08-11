@@ -10,6 +10,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/notification_model.dart';
 import 'package:pet_mart/model/notify_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/screens/notification_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -22,9 +23,11 @@ class PushNotificationScreen extends StatefulWidget {
 class _PushNotificationScreenState extends State<PushNotificationScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   bool status = false;
+  String language = "";
   Future<NotificationModel> getNotificationList()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    language = languageCode;
     status = _preferences.getBool("enable")??true;
     String loginData = _preferences.getString(kUserModel);
     final body = json.decode(loginData);
@@ -84,6 +87,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
           ),
 
           actions: [
+            SizedBox(width: 30.h,)
 
           ],
 
@@ -147,32 +151,54 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context,index){
-                      return Container(
-                        margin: EdgeInsets.symmetric(horizontal: 6.h),
-                        height: 100.h,
-                        width: screenUtil.screenWidth,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                notificationModel.data[index].date,
-                                style: TextStyle(
-                                    color: Color(0xFF000000),
-                                    fontSize: screenUtil.setSp(14),
-                                    fontWeight: FontWeight.bold
+                      return
+                        GestureDetector(
+                          onTap: (){
+                            String type = notificationModel.data[index].type;
+                            if(type == "auction"){
+                              String id = notificationModel.data[index].details[0].auctionId;
+                              String englishName= notificationModel.data[index].details[0].englishName;
+                              String arabicName= notificationModel.data[index].details[0].arabicName;
+                              String name = "";
+                              if(language == 'ar'){
+                                name = arabicName;
+                              }else{
+                                name = englishName;
 
-                                )),
-                            Text(
-                                notificationModel.data[index].message,
-                                style: TextStyle(
-                                    color: Color(0xFF000000),
-                                    fontSize: screenUtil.setSp(12),
-                                    fontWeight: FontWeight.normal
+                              }
+                              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                return new NotificationDetailsScreen(id:id,name: name,);
+                              }));
+                            }
 
-                                ))
-                          ],
-                        ),
-                      );
+                          },
+                          child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 6.h),
+                          height: 100.h,
+                          width: screenUtil.screenWidth,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  notificationModel.data[index].date,
+                                  style: TextStyle(
+                                      color: Color(0xFF000000),
+                                      fontSize: screenUtil.setSp(14),
+                                      fontWeight: FontWeight.bold
+
+                                  )),
+                              Text(
+                                  notificationModel.data[index].message,
+                                  style: TextStyle(
+                                      color: Color(0xFF000000),
+                                      fontSize: screenUtil.setSp(12),
+                                      fontWeight: FontWeight.normal
+
+                                  ))
+                            ],
+                          ),
+                      ),
+                        );
                     }, separatorBuilder:  (context,index){
                   return Container(height: 1.h,
                     color: Colors.grey[400],);

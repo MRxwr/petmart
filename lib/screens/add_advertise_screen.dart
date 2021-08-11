@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/type_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/create_auction_screen.dart';
+import 'package:pet_mart/screens/splash_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -50,6 +52,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   String ageName="";
   String key ="sell";
   LoginModel loginModel;
+  bool hidePrice = false;
   SubCategory.CategoryModel mSubCategoryModel;
   final TextEditingController _titleController = new TextEditingController();
   final TextEditingController _descriptionController = new TextEditingController();
@@ -233,381 +236,525 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   @override
   Widget build(BuildContext context) {
     return
-      ModalProgressHUD(
-        inAsyncCall: Provider.of<ModelHud>(context).isLoading,
-        child: Scaffold(
-          key: _scaffoldKey,
-        appBar: AppBar(
-          backgroundColor: kMainColor,
-          title: Container(
-            alignment: AlignmentDirectional.center,
-            child: Padding(
-              padding:  EdgeInsets.symmetric(horizontal: 10.h),
-              child: Text(
-                getTranslated(context, 'create_post'),
-                style: TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontSize: screenUtil.setSp(16),
-                    fontWeight: FontWeight.bold
+      GestureDetector(
+        onTap: (){
+          FocusManager.instance.primaryFocus?.unfocus();
+
+        },
+        child: ModalProgressHUD(
+          inAsyncCall: Provider.of<ModelHud>(context).isLoading,
+          child: Scaffold(
+            key: _scaffoldKey,
+          appBar: AppBar(
+            backgroundColor: kMainColor,
+            title: Container(
+              alignment: AlignmentDirectional.center,
+              child: Padding(
+                padding:  EdgeInsets.symmetric(horizontal: 10.h),
+                child: Text(
+                  getTranslated(context, 'create_post'),
+                  style: TextStyle(
+                      color: Color(0xFFFFFFFF),
+                      fontSize: screenUtil.setSp(16),
+                      fontWeight: FontWeight.bold
+
+                  ),
+
 
                 ),
+              ),
+            ),
+            leading: GestureDetector(
+              onTap: (){
+                Navigator.pop(context);
+
+              },
+              child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+            ),
+
+            actions: [
+              SizedBox(width: 30.h,)
+
+            ],
+
+          ),
+          backgroundColor: Color(0xFFFFFFFF),
+          body: Container(
+            margin: EdgeInsets.all(10.h),
+            child: homeModel == null?
+            Container(
+              child: CircularProgressIndicator(
 
 
               ),
-            ),
-          ),
-          leading: GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-
-            },
-            child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
-          ),
-
-          actions: [
-
-          ],
-
-        ),
-        backgroundColor: Color(0xFFFFFFFF),
-        body: Container(
-          margin: EdgeInsets.all(10.h),
-          child: homeModel == null?
-          Container(
-            child: CircularProgressIndicator(
-
-
-            ),
-            alignment: AlignmentDirectional.center,
-          )
-          :
-          Container(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              scrollDirection: Axis.vertical,
+              alignment: AlignmentDirectional.center,
+            )
+            :
+            Container(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                scrollDirection: Axis.vertical,
 
 
 
-              shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
 
-              children: [
-                Text(getTranslated(context, 'select_post_type'),
-                  style: TextStyle(
-                      color: Color(0xFF000000),
-                      fontSize: screenUtil.setSp(16),
-                      fontWeight: FontWeight.bold
-                  ),),
-                Container(
-                  height: 35.h,
-                  child: ListView.separated(
+                children: [
+                  Text(getTranslated(context, 'select_post_type'),
+                    style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontSize: screenUtil.setSp(16),
+                        fontWeight: FontWeight.bold
+                    ),),
+                  Container(
+                    height: 35.h,
+                    child: ListView.separated(
 
-                      scrollDirection: Axis.horizontal,
+                        scrollDirection: Axis.horizontal,
 
-                      itemBuilder: (context,index){
-                        return
-                          GestureDetector(
-                            onTap: (){
-                              bool selectedIndex = typesList[index].selected;
-                              print('selectedIndex ${selectedIndex}');
+                        itemBuilder: (context,index){
+                          return
+                            GestureDetector(
+                              onTap: (){
+                                bool selectedIndex = typesList[index].selected;
+                                print('selectedIndex ${selectedIndex}');
 
-                              if(!selectedIndex){
-                                key = typesList[index].key;
-                                for(int i =0;i<typesList.length;i++){
-                                  if(i == index){
-                                    typesList[i].selected= true;
-                                  }else{
-                                    typesList[i].selected= false;
+                                if(!selectedIndex){
+                                  key = typesList[index].key;
+                                  for(int i =0;i<typesList.length;i++){
+                                    if(i == index){
+                                      typesList[i].selected= true;
+                                    }else{
+                                      typesList[i].selected= false;
+                                    }
+
                                   }
-
-                                }
 setState(() {
 
 });
-                                if(key ==''){
-                                  final modelHud = Provider.of<ModelHud>(context,listen: false);
-                                  modelHud.changeIsLoading(true);
-                                  checkCreditModel().then((value){
-                                    modelHud.changeIsLoading(false);
-                                  int credit = int.parse(value.data.credit);
-                                  print('credit --->${credit}');
+                                  if(key ==''){
+                                    final modelHud = Provider.of<ModelHud>(context,listen: false);
+                                    modelHud.changeIsLoading(true);
+                                    checkCreditModel().then((value){
+                                      modelHud.changeIsLoading(false);
+                                    int credit = int.parse(value.data.credit);
+                                    print('credit --->${credit}');
 
-                                  if(credit>0){
-                                    Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
-                                      return new CreateAuctionScreen();
-                                    }));
+                                    if(credit>0){
+                                      Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
+                                        return new CreateAuctionScreen();
+                                      }));
+                                    }else{
+                                      ShowAlertDialog(context, value.message);
+                                    }
+                                    });
+
+                                  }else if(key == 'adoption'){
+hidePrice = true;
+
+                                  }else if(key == 'lost-animal'){
+                                    hidePrice = true;
                                   }else{
-                                    ShowAlertDialog(context, value.message);
+                                    hidePrice = false;
                                   }
-                                  });
+
 
                                 }
 
-
-                              }
-
-                            },
-                            child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                                child: selectRow(typesList[index],context,index,mLanguage)),
-                          );
-                      }
-                      ,
-                      separatorBuilder: (context,index) {
-                        return Container(height: 10.h,
-                          color: Color(0xFFFFFFFF),);
-                      }
-                      ,itemCount: typesList.length),
-                ),
-                SizedBox(height: 5.h,width: screenUtil.screenWidth,
-                ),
-                Text(getTranslated(context,'add_photo'),
-                  style: TextStyle(
-                      color: Color(0xFF000000),
-                      fontSize: screenUtil.setSp(16),
-                      fontWeight: FontWeight.bold
-                  ),),
-                Container(
-                  height: 100.h,
-                  width: screenUtil.screenWidth,
-
-                  child:
-                  ListView(
-                    scrollDirection: Axis.horizontal,
-                    shrinkWrap: true,
-
-
-                    children: [
-                      GestureDetector(
-                        onTap: (){
-                          showPickerDialog(context).then((value){
-                            value.show(context);
-                          });
-                        },
-                        child:
-                        Container(
-                          width: 100.h,
-                          height: 100.h,
-                          padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.0.h),
-                              color: Color(0xFFFFFFFF),
-                              border: Border.all(
-                                  color: Color(0xCC000000),
-                                  width: 1.0.w
-                              )
-                          ),
-                          child: Icon(Icons.add,color: kMainColor,size: 50.h,),
-                        ),
-                      ),
-                      SizedBox(width: 10.w,
-                      height: 100.h,),
-                      ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context,index){
-                        return pickedImga(mImages[index],index);
-                      }, separatorBuilder: (context,index) {
-                        return Container(width: 10.h,
-                          color: Color(0xFFFFFFFF),);
-                      }
-                          , itemCount: mImages.length)
-
-                    ],
+                              },
+                              child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                  child: selectRow(typesList[index],context,index,mLanguage)),
+                            );
+                        }
+                        ,
+                        separatorBuilder: (context,index) {
+                          return Container(height: 10.h,
+                            color: Color(0xFFFFFFFF),);
+                        }
+                        ,itemCount: typesList.length),
                   ),
-                ),
-                SizedBox(
-                  height: 50.h,
-                  width: screenUtil.screenWidth,
-                  child: DropDown<CategoryParent.Category>(
-
-
-
-
-
-                    items: categoryList,
-
-                    hint:  Text(getTranslated(context, 'select_category') ,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-
-                          color: Color(0xFFc3c3c3),
-                          fontWeight: FontWeight.w600,
-                          fontSize: screenUtil.setSp(15)
-                      ),),
-                    onChanged: (CategoryParent.Category category){
-                      mSubCategoryModel = null;
-                      categoryId = category.categoryId;
-                      print('CategoryId -->${categoryId}');
-                      final modelHud = Provider.of<ModelHud>(context,listen: false);
-                      modelHud.changeIsLoading(true);
-                      subCategory(categoryId).then((value){
-                        modelHud.changeIsLoading(false);
-                        setState(() {
-                          subCategoryId = value.data.category[0].childcategory[0].categoryId;
-                          mSubCategoryModel = value;
-                          print('subCategoryId -->${subCategoryId}');
-                        });
-                      });
-
-
-                    },
-                    customWidgets: categoryList.map((p) => buildDropDownRow(p)).toList(),
-                    isExpanded: true,
-                    showUnderline: false,
+                  SizedBox(height: 5.h,width: screenUtil.screenWidth,
                   ),
-                ),
-                SizedBox(height: 1.h,
-                width: screenUtil.screenWidth,
-                child: Container(
-                  color: Color(0xFFc3c3c3),
-                ),),
-                SizedBox(height: 10.h,),
-                SizedBox(
-                  height: 50.h,
-                  width: screenUtil.screenWidth,
-                  child: mSubCategoryModel == null?
+                  Text(getTranslated(context,'add_photo'),
+                    style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontSize: screenUtil.setSp(16),
+                        fontWeight: FontWeight.bold
+                    ),),
                   Container(
-                    alignment: AlignmentDirectional.centerStart,
+                    height: 100.h,
+                    width: screenUtil.screenWidth,
 
-                    child: Text(getTranslated(context,'select_sub_category'),
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
+                    child:
+                    ListView(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
 
-                          color: Color(0xFFc3c3c3),
-                          fontWeight: FontWeight.w600,
-                          fontSize: screenUtil.setSp(15)
-                      ),),
-                  ):  SizedBox(
+
+                      children: [
+                        GestureDetector(
+                          onTap: (){
+                            showPickerDialog(context).then((value){
+                              value.show(context);
+                            });
+                          },
+                          child:
+                          Container(
+                            width: 100.h,
+                            height: 100.h,
+                            padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.0.h),
+                                color: Color(0xFFFFFFFF),
+                                border: Border.all(
+                                    color: Color(0xCC000000),
+                                    width: 1.0.w
+                                )
+                            ),
+                            child: Icon(Icons.add,color: kMainColor,size: 50.h,),
+                          ),
+                        ),
+                        SizedBox(width: 10.w,
+                        height: 100.h,),
+                        ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context,index){
+                          return pickedImga(mImages[index],index);
+                        }, separatorBuilder: (context,index) {
+                          return Container(width: 10.h,
+                            color: Color(0xFFFFFFFF),);
+                        }
+                            , itemCount: mImages.length)
+
+                      ],
+                    ),
+                  ),
+                  SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child:
-                    DropDown<SubCategory.Childcategory>(
+                    child: DropDown<CategoryParent.Category>(
 
 
 
 
 
-                      items: mSubCategoryModel.data.category[0].childcategory,
+                      items: categoryList,
 
-                      hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                      hint:  Text(getTranslated(context, 'select_category') ,
                         textAlign: TextAlign.start,
                         style: TextStyle(
 
-                            color: Color(0xFF000000),
+                            color: Color(0xFFc3c3c3),
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (SubCategory.Childcategory category){
-                        subCategoryId = category.categoryId;
-
+                      onChanged: (CategoryParent.Category category){
+                        mSubCategoryModel = null;
+                        categoryId = category.categoryId;
+                        print('CategoryId -->${categoryId}');
+                        final modelHud = Provider.of<ModelHud>(context,listen: false);
+                        modelHud.changeIsLoading(true);
+                        subCategory(categoryId).then((value){
+                          modelHud.changeIsLoading(false);
+                          setState(() {
+                            subCategoryId = value.data.category[0].childcategory[0].categoryId;
+                            mSubCategoryModel = value;
+                            print('subCategoryId -->${subCategoryId}');
+                          });
+                        });
 
 
                       },
-                      customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                      customWidgets: categoryList.map((p) => buildDropDownRow(p)).toList(),
                       isExpanded: true,
                       showUnderline: false,
                     ),
                   ),
-                ),
-                SizedBox(height: 1.h,
+                  SizedBox(height: 1.h,
                   width: screenUtil.screenWidth,
                   child: Container(
                     color: Color(0xFFc3c3c3),
                   ),),
-                SizedBox(height: 10.h,),
-                TextField(
+                  SizedBox(height: 10.h,),
+                  SizedBox(
+                    height: 50.h,
+                    width: screenUtil.screenWidth,
+                    child: mSubCategoryModel == null?
+                    Container(
+                      alignment: AlignmentDirectional.centerStart,
 
-                  keyboardType: TextInputType.text,
-                  minLines: 1,
-                  maxLines: 1,
-                  enableInteractiveSelection: true,
-                  controller: _titleController,
+                      child: Text(getTranslated(context,'select_sub_category'),
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
 
-                  textInputAction: TextInputAction.next,
-                  textAlign: TextAlign.start,
-                  textAlignVertical: TextAlignVertical.center,
+                            color: Color(0xFFc3c3c3),
+                            fontWeight: FontWeight.w600,
+                            fontSize: screenUtil.setSp(15)
+                        ),),
+                    ):  SizedBox(
+                      height: 50.h,
+                      width: screenUtil.screenWidth,
+                      child:
+                      DropDown<SubCategory.Childcategory>(
 
 
 
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(hintText: getTranslated(context, 'post_title'),
-                      isCollapsed: true,
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10.h),
-                      hintStyle: TextStyle(
-                      color: Color(0xFFa3a3a3),
 
-                  )
+
+                        items: mSubCategoryModel.data.category[0].childcategory,
+
+                        hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+
+                              color: Color(0xFF000000),
+                              fontWeight: FontWeight.w600,
+                              fontSize: screenUtil.setSp(15)
+                          ),),
+                        onChanged: (SubCategory.Childcategory category){
+                          subCategoryId = category.categoryId;
+
+
+
+                        },
+                        customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                        isExpanded: true,
+                        showUnderline: false,
+                      ),
+                    ),
                   ),
-                ),
-                SizedBox(height: 1.h,
-                  width: screenUtil.screenWidth,
-                  child: Container(
-                    color: Color(0xFFc3c3c3),
-                  ),),  SizedBox(height: 10.h,),
-                TextField(
+                  SizedBox(height: 1.h,
+                    width: screenUtil.screenWidth,
+                    child: Container(
+                      color: Color(0xFFc3c3c3),
+                    ),),
+                  SizedBox(height: 10.h,),
+                  TextField(
 
-                  keyboardType: TextInputType.multiline,
-                  minLines: 1,
-                  maxLines: 50,
-                  enableInteractiveSelection: true,
-                  controller: _descriptionController,
-
-                  textInputAction: TextInputAction.newline,
-                  textAlign: TextAlign.start,
-                  textAlignVertical: TextAlignVertical.center,
+                    keyboardType: TextInputType.text,
+                    minLines: 1,
+                    maxLines: 1,
+                    enableInteractiveSelection: true,
+                    controller: _titleController,
 
 
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(hintText: getTranslated(context, 'post_description'),
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      isCollapsed: true,
-                      contentPadding: EdgeInsets.all(10.h),
-                      hintStyle: TextStyle(
+                    textInputAction: TextInputAction.next,
+                    textAlign: TextAlign.start,
+                    textAlignVertical: TextAlignVertical.center,
+
+
+
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(hintText: getTranslated(context, 'post_title'),
+                        isCollapsed: true,
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.all(10.h),
+                        hintStyle: TextStyle(
                         color: Color(0xFFa3a3a3),
 
-                      )
+                    )
+                    ),
                   ),
-                ),
-                SizedBox(height: 1.h,
-                  width: screenUtil.screenWidth,
-                  child: Container(
-                    color: Color(0xFFc3c3c3),
-                  ),),  SizedBox(height: 10.h,),
-                Container(
-                  height: 50.h,
-                  width: screenUtil.screenWidth,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(
-                        flex:1,
-                        child: TextField(
+                  SizedBox(height: 1.h,
+                    width: screenUtil.screenWidth,
+                    child: Container(
+                      color: Color(0xFFc3c3c3),
+                    ),),  SizedBox(height: 10.h,),
+                  TextField(
+
+                    keyboardType: TextInputType.multiline,
+                    minLines: 1,
+                    maxLines: 50,
+                    enableInteractiveSelection: true,
+                    controller: _descriptionController,
+
+                    textInputAction: TextInputAction.newline,
+                    textAlign: TextAlign.start,
+                    textAlignVertical: TextAlignVertical.center,
+
+
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(hintText: getTranslated(context, 'post_description'),
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        isCollapsed: true,
+                        contentPadding: EdgeInsets.all(10.h),
+                        hintStyle: TextStyle(
+                          color: Color(0xFFa3a3a3),
+
+                        )
+                    ),
+                  ),
+                  SizedBox(height: 1.h,
+                    width: screenUtil.screenWidth,
+                    child: Container(
+                      color: Color(0xFFc3c3c3),
+                    ),),  SizedBox(height: 10.h,),
+                  Container(
+                    height: 50.h,
+                    width: screenUtil.screenWidth,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          flex:1,
+                          child: TextField(
+                            inputFormatters: [new WhitelistingTextInputFormatter(RegExp("[0-9]"))],
+
+                            keyboardType: TextInputType.number,
+                            minLines: 1,
+                            maxLines: 1,
+                            enableInteractiveSelection: true,
+                            controller: _ageController,
+
+                            textInputAction: TextInputAction.next,
+                            textAlign: TextAlign.start,
+                            textAlignVertical: TextAlignVertical.center,
+
+
+
+                            textCapitalization: TextCapitalization.sentences,
+                            decoration: InputDecoration(hintText: getTranslated(context, 'age_string'),
+                                isCollapsed: true,
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.all(10.h),
+                                hintStyle: TextStyle(
+                                  color: Color(0xFFa3a3a3),
+
+                                )
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 5.w,),
+                        Expanded(
+                          flex: 1,
+                          child:
+                          DropDown<Age>(
+
+
+
+
+
+                            items: agesList,
+
+                            hint:  Text(agesList[0].name,
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+
+                                  color: Color(0xFF000000),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: screenUtil.setSp(15)
+                              ),),
+                            onChanged: (Age age){
+                              ageId = age.id;
+                              ageName = age.name;
+
+
+
+                            },
+                            customWidgets: agesList.map((p) => buildAgeRow(p)).toList(),
+                            isExpanded: true,
+                            showUnderline: false,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 1.h,
+                    child: Row(
+                      children: [
+                        Expanded(flex: 1,
+                            child: Container(
+                          color: Color(0xFFc3c3c3),
+                        )),
+                        SizedBox(width: 5.w,),
+                        Expanded(flex: 1,
+                            child: Container(
+                              color: Color(0xFFc3c3c3),
+                            )),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10.h,),
+                  SizedBox(
+                    height: 50.h,
+                    width: screenUtil.screenWidth,
+                    child: DropDown<Gender_list>(
+
+
+
+
+
+                      items: genderList,
+
+                      hint:  Text(getTranslated(context, 'select_gender') ,
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+
+                            color: Color(0xFFc3c3c3),
+                            fontWeight: FontWeight.w600,
+                            fontSize: screenUtil.setSp(15)
+                        ),),
+                      onChanged: (Gender_list gender){
+                        genderId = gender.id;
+
+
+
+                      },
+                      customWidgets: genderList.map((p) => builGenderRow(p)).toList(),
+                      isExpanded: true,
+                      showUnderline: false,
+                    ),
+                  ),
+                  Container(
+                    height: 1.h,
+                    child:
+
+                    Container(
+                      color: Color(0xFFc3c3c3),
+                    )
+                  ),
+                  SizedBox(height: 10.h,),
+                  Container(
+                    child:hidePrice == true?
+                        Container()
+                        :
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        TextField(
+                          inputFormatters: [new WhitelistingTextInputFormatter(RegExp("[0-9]"))],
 
                           keyboardType: TextInputType.number,
                           minLines: 1,
                           maxLines: 1,
                           enableInteractiveSelection: true,
-                          controller: _ageController,
+                          controller: _priceController,
 
-                          textInputAction: TextInputAction.next,
+                          textInputAction: TextInputAction.done,
                           textAlign: TextAlign.start,
                           textAlignVertical: TextAlignVertical.center,
 
 
 
                           textCapitalization: TextCapitalization.sentences,
-                          decoration: InputDecoration(hintText: getTranslated(context, 'age_string'),
+                          decoration: InputDecoration(hintText: getTranslated(context, 'post_price'),
                               isCollapsed: true,
                               border: InputBorder.none,
                               focusedBorder: InputBorder.none,
@@ -621,143 +768,27 @@ setState(() {
                               )
                           ),
                         ),
-                      ),
-                      SizedBox(width: 5.w,),
-                      Expanded(
-                        flex: 1,
-                        child: DropDown<Age>(
+                        Container(
+                            height: 1.h,
+                            child:
 
-
-
-
-
-                          items: agesList,
-
-                          hint:  Text(agesList[0].name,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-
-                                color: Color(0xFF000000),
-                                fontWeight: FontWeight.w600,
-                                fontSize: screenUtil.setSp(15)
-                            ),),
-                          onChanged: (Age age){
-                            ageId = age.id;
-                            ageName = age.name;
-
-
-
-                          },
-                          customWidgets: agesList.map((p) => buildAgeRow(p)).toList(),
-                          isExpanded: true,
-                          showUnderline: false,
+                            Container(
+                              color: Color(0xFFc3c3c3),
+                            )
                         ),
-                      )
-                    ],
+                        SizedBox(height: 10.h,),
+                      ],
+                    ),
                   ),
-                ),
-                Container(
-                  height: 1.h,
-                  child: Row(
-                    children: [
-                      Expanded(flex: 1,
-                          child: Container(
-                        color: Color(0xFFc3c3c3),
-                      )),
-                      SizedBox(width: 5.w,),
-                      Expanded(flex: 1,
-                          child: Container(
-                            color: Color(0xFFc3c3c3),
-                          )),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10.h,),
-                SizedBox(
-                  height: 50.h,
-                  width: screenUtil.screenWidth,
-                  child: DropDown<Gender_list>(
+                  sumbitButton(getTranslated(context, 'sumbit_post'),context)
 
 
-
-
-
-                    items: genderList,
-
-                    hint:  Text(getTranslated(context, 'select_gender') ,
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-
-                          color: Color(0xFFc3c3c3),
-                          fontWeight: FontWeight.w600,
-                          fontSize: screenUtil.setSp(15)
-                      ),),
-                    onChanged: (Gender_list gender){
-                      genderId = gender.id;
-
-
-
-                    },
-                    customWidgets: genderList.map((p) => builGenderRow(p)).toList(),
-                    isExpanded: true,
-                    showUnderline: false,
-                  ),
-                ),
-                Container(
-                  height: 1.h,
-                  child:
-
-                  Container(
-                    color: Color(0xFFc3c3c3),
-                  )
-                ),
-                SizedBox(height: 10.h,),
-                TextField(
-
-                  keyboardType: TextInputType.number,
-                  minLines: 1,
-                  maxLines: 1,
-                  enableInteractiveSelection: true,
-                  controller: _priceController,
-
-                  textInputAction: TextInputAction.done,
-                  textAlign: TextAlign.start,
-                  textAlignVertical: TextAlignVertical.center,
-
-
-
-                  textCapitalization: TextCapitalization.sentences,
-                  decoration: InputDecoration(hintText: getTranslated(context, 'post_price'),
-                      isCollapsed: true,
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10.h),
-                      hintStyle: TextStyle(
-                        color: Color(0xFFa3a3a3),
-
-                      )
-                  ),
-                ),
-                Container(
-                    height: 1.h,
-                    child:
-
-                    Container(
-                      color: Color(0xFFc3c3c3),
-                    )
-                ),
-                SizedBox(height: 10.h,),
-                sumbitButton(getTranslated(context, 'sumbit_post'),context)
-
-
-              ],
+                ],
+              ),
             ),
           ),
-        ),
     ),
+        ),
       );
   }
   TextButton sumbitButton(String text,BuildContext context){
@@ -954,27 +985,75 @@ setState(() {
     }else if(age==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'age_error'))));
 
-    }else if(price==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'price_error'))));
-
     }else if(genderId==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'gender_error'))));
 
-    }else{
-      String userId = loginModel.data.customerId;
-      String phoneNumber = loginModel.data.mobile;
-      final modelHud = Provider.of<ModelHud>(context,listen: false);
-      modelHud.changeIsLoading(true);
-      PetMartService petMartService = PetMartService();
-      dynamic response = await petMartService.addPost(postTitle, postTitle, key, postDescription, postDescription, price, categoryId, age, ageId, genderId, userId, subCategoryId, phoneNumber, mLanguage,mImages, null);
-      modelHud.changeIsLoading(false);
-      String status = response['status'];
-      if(status == 'success'){
-        ShowPostAlertDialog(context,response['message'],true);
-
-      }else{
-        ShowPostAlertDialog(context,response['message'],false);
-
+    }else {
+      if (key == 'sell') {
+        if (price == "") {
+          _scaffoldKey.currentState.showSnackBar(
+              SnackBar(content: Text(getTranslated(context, 'price_error'))));
+        }else{
+          String userId = loginModel.data.customerId;
+          String phoneNumber = loginModel.data.mobile;
+          final modelHud = Provider.of<ModelHud>(context, listen: false);
+          modelHud.changeIsLoading(true);
+          PetMartService petMartService = PetMartService();
+          dynamic response = await petMartService.addPost(
+              postTitle,
+              postTitle,
+              key,
+              postDescription,
+              postDescription,
+              price,
+              categoryId,
+              age,
+              ageId,
+              genderId,
+              userId,
+              subCategoryId,
+              phoneNumber,
+              mLanguage,
+              mImages,
+              null);
+          modelHud.changeIsLoading(false);
+          String status = response['status'];
+          if (status == 'success') {
+            ShowPostAlertDialog(context, response['message'], true);
+          } else {
+            ShowPostAlertDialog(context, response['message'], false);
+          }
+        }
+      } else {
+        String userId = loginModel.data.customerId;
+        String phoneNumber = loginModel.data.mobile;
+        final modelHud = Provider.of<ModelHud>(context, listen: false);
+        modelHud.changeIsLoading(true);
+        PetMartService petMartService = PetMartService();
+        dynamic response = await petMartService.addPost(
+            postTitle,
+            postTitle,
+            key,
+            postDescription,
+            postDescription,
+            price,
+            categoryId,
+            age,
+            ageId,
+            genderId,
+            userId,
+            subCategoryId,
+            phoneNumber,
+            mLanguage,
+            mImages,
+            null);
+        modelHud.changeIsLoading(false);
+        String status = response['status'];
+        if (status == 'success') {
+          ShowPostAlertDialog(context, response['message'], true);
+        } else {
+          ShowPostAlertDialog(context, response['message'], false);
+        }
       }
     }
 
@@ -1087,7 +1166,7 @@ setState(() {
           onPressed: ()async {
             if(success){
               await alert.dismiss();
-              Navigator.pushReplacementNamed(context,MainScreen.id);
+              Navigator.pushReplacementNamed(context,SplashScreen.id);
             }else{
               await alert.dismiss();
             }

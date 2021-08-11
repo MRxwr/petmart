@@ -62,6 +62,7 @@ class _TermsScreenState extends State<TermsScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 

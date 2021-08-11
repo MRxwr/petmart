@@ -47,167 +47,174 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return ModalProgressHUD(
-      inAsyncCall: Provider.of<ModelHud>(context).isLoading,
-      child: Scaffold(
-        key: _scaffoldKey,
-        appBar:
-        AppBar(
-          backgroundColor: kMainColor,
-          title: Container(
-            alignment: AlignmentDirectional.center,
-            child: Padding(
-              padding:  EdgeInsets.symmetric(horizontal: 10.h),
-              child: Text(
-                getTranslated(context, 'register'),
-                style: TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontSize: screenUtil.setSp(16),
-                    fontWeight: FontWeight.bold
+    return GestureDetector(
+      onTap: (){
+        FocusManager.instance.primaryFocus?.unfocus();
+
+      },
+      child: ModalProgressHUD(
+        inAsyncCall: Provider.of<ModelHud>(context).isLoading,
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar:
+          AppBar(
+            backgroundColor: kMainColor,
+            title: Container(
+              alignment: AlignmentDirectional.center,
+              child: Padding(
+                padding:  EdgeInsets.symmetric(horizontal: 10.h),
+                child: Text(
+                  getTranslated(context, 'register'),
+                  style: TextStyle(
+                      color: Color(0xFFFFFFFF),
+                      fontSize: screenUtil.setSp(16),
+                      fontWeight: FontWeight.bold
+
+                  ),
+
 
                 ),
-
-
               ),
             ),
+            leading: GestureDetector(
+              onTap: (){
+                Navigator.pop(context);
+
+              },
+              child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+            ),
+
+            actions: [
+              SizedBox(width: 30.h,)
+
+            ],
+
           ),
-          leading: GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
+          backgroundColor: Color(0xFFFFFFFF),
+          body: Form(
+            key: widget._globalKey,
+            child: Container(
+              margin: EdgeInsets.all(10.h),
+              child: ListView(
+                children: [
+                  UserNameTextField(hint:getTranslated(context, 'first_name'),onClick: (value){
+                    firstName = value;
 
-            },
-            child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
-          ),
+                  },
+                  ),
+                  SizedBox(height: 10.h,),
+                  UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
+                    lastName = value;
 
-          actions: [
+                  },
+                  ),
+                  SizedBox(height: 10.h,),
+                  NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
+                    email = value;
 
-          ],
+                  },
+                  ),
+                  SizedBox(height: 10.h,),
+                  PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
+                    password= value;
 
-        ),
-        backgroundColor: Color(0xFFFFFFFF),
-        body: Form(
-          key: widget._globalKey,
-          child: Container(
-            margin: EdgeInsets.all(10.h),
-            child: ListView(
-              children: [
-                UserNameTextField(hint:getTranslated(context, 'first_name'),onClick: (value){
-                  firstName = value;
+                  },
+                  ),
+                  SizedBox(height: 10.h,),
+                  PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
+                    confirmPassword = value;
 
-                },
-                ),
-                SizedBox(height: 10.h,),
-                UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
-                  lastName = value;
+                  },
+                  ),
+                  SizedBox(height: 10.h,),
+                  PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
+                    mobileNumber = value;
 
-                },
-                ),
-                SizedBox(height: 10.h,),
-                NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
-                  email = value;
+                  },
+                  ),
+                  SizedBox(height: 10.h,),
+                  Center(child: confirmButton(getTranslated(context, 'create_account'),context)),
+                  SizedBox(height: 10.h,),
 
-                },
-                ),
-                SizedBox(height: 10.h,),
-                PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
-                  password= value;
+                  Center(
+                    child:
+                    Text(getTranslated(context, 'register_info'),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
 
-                },
-                ),
-                SizedBox(height: 10.h,),
-                PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
-                  confirmPassword = value;
-
-                },
-                ),
-                SizedBox(height: 10.h,),
-                PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
-                  mobileNumber = value;
-
-                },
-                ),
-                SizedBox(height: 10.h,),
-                Center(child: confirmButton(getTranslated(context, 'create_account'),context)),
-                SizedBox(height: 10.h,),
-
-                Center(
-                  child:
-                  Text(getTranslated(context, 'register_info'),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-
-                    style: TextStyle(
-                        color: Color(0xFF000000),
-                        fontWeight: FontWeight.normal,
-                        fontSize: screenUtil.setSp(12)
-                    ),),
-                ),
-                Center(
-                  child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(getTranslated(context, 'agree_with'),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
-
-                        style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontWeight: FontWeight.normal,
-                            fontSize: screenUtil.setSp(12)
-                        ),),
-                      GestureDetector(
-                        onTap: (){
-                          Navigator.of(context).pushNamed(TermsScreen.id);
-                        },
-                        child: Text(getTranslated(context, 'terms_conditions'),
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontWeight: FontWeight.normal,
+                          fontSize: screenUtil.setSp(12)
+                      ),),
+                  ),
+                  Center(
+                    child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(getTranslated(context, 'agree_with'),
                           textAlign: TextAlign.center,
                           maxLines: 1,
 
                           style: TextStyle(
-                              decoration: TextDecoration.underline,
                               color: Color(0xFF000000),
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.normal,
                               fontSize: screenUtil.setSp(12)
                           ),),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 10.h,),
-                Center(
-                  child:
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(getTranslated(context, 'already_register'),
-                        textAlign: TextAlign.center,
-                        maxLines: 1,
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.of(context).pushNamed(TermsScreen.id);
+                          },
+                          child: Text(getTranslated(context, 'terms_conditions'),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
 
-                        style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontWeight: FontWeight.normal,
-                            fontSize: screenUtil.setSp(16)
-                        ),),
-                      GestureDetector(
-                        onTap: (){
-                          Navigator.of(context).pushReplacementNamed(LoginScreen.id);
-                        },
-                        child: Text(getTranslated(context, 'login_now'),
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Color(0xFF000000),
+                                fontWeight: FontWeight.bold,
+                                fontSize: screenUtil.setSp(12)
+                            ),),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10.h,),
+                  Center(
+                    child:
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(getTranslated(context, 'already_register'),
                           textAlign: TextAlign.center,
                           maxLines: 1,
 
                           style: TextStyle(
-
                               color: Color(0xFF000000),
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.normal,
                               fontSize: screenUtil.setSp(16)
                           ),),
-                      ),
-                    ],
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.of(context).pushReplacementNamed(LoginScreen.id);
+                          },
+                          child: Text(getTranslated(context, 'login_now'),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+
+                            style: TextStyle(
+
+                                color: Color(0xFF000000),
+                                fontWeight: FontWeight.bold,
+                                fontSize: screenUtil.setSp(16)
+                            ),),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

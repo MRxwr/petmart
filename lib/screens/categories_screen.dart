@@ -90,6 +90,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 
@@ -103,8 +104,22 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
           ),
           alignment: AlignmentDirectional.center,
+        ):
+        categoryModel.data.category.isEmpty?
+
+        Container(
+          child: Text(
+            categoryModel.message,
+            style: TextStyle(
+                color: Colors.black,
+                fontSize: screenUtil.setSp(16),
+                fontWeight: FontWeight.w600
+            ),
+          ),
+          alignment: AlignmentDirectional.center,
         )
             :
+
         GridView.builder(
           scrollDirection: Axis.vertical,
           shrinkWrap: true,

@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -59,6 +61,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
       map = {"auction_id":widget.id,
         "user_id":loginModel.data.customerId,
         "language":languageCode};
+      print(map);
 
 
 
@@ -92,7 +95,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
 
     PetMartService petMartService = PetMartService();
     mAuctionDetailsModel = await petMartService.myAuctionDetails(map);
-    _rating = mAuctionDetailsModel.data.rating.toDouble();
+    _rating = double.parse(mAuctionDetailsModel.data.rating.toDouble());
     setState(() {
 
     });
@@ -104,7 +107,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     auction().then((value){
       setState(() {
         mAuctionDetailsModel = value;
-        _rating = mAuctionDetailsModel.data.rating.toDouble();
+        _rating = double.parse(mAuctionDetailsModel.data.rating.toString());
 
       });
     });
@@ -145,6 +148,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
 
 
             actions: [
+              SizedBox(width: 30.h,)
 
             ],
 
@@ -178,16 +182,15 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
 
                                 carouselController: _controller,
                                 options: CarouselOptions(
-                                    autoPlay: true,
-                                    autoPlayInterval: Duration(seconds: 10),
-
+                                    autoPlay: false,
+                                    enableInfiniteScroll: false,
 
                                     height: double.infinity,
                                     viewportFraction: 1.0,
                                     enlargeCenterPage: false,
                                     disableCenter: true,
-                                    pauseAutoPlayOnTouch: true
-                                    ,
+
+
 
 
 
@@ -233,7 +236,19 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                               Container(
                                                 width: width,
 
-                                                child:
+                                                child:item.type == 'video'?
+                                                GestureDetector(
+                                                  onTap: (){
+                                                    String url = item.image.trim();
+                                                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                                      return new VideoScreen(vedioUrl:url,auctionName: mAuctionDetailsModel.data.auctionName,);
+                                                    }));
+                                                  },
+                                                  child: Container(
+                                                    color: Colors.black,
+                                                  ),
+                                                ):
+
                                                 CachedNetworkImage(
                                                   width: width,
 
@@ -316,6 +331,32 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                       ] ,
                                     )).toList(),
 
+                              ),
+                              Positioned.directional(
+                                textDirection: Directionality.of(context),
+                                bottom: 10.w,
+                                start: 0,
+                                end:0,
+                                child: Opacity(
+                                  opacity: mAuctionDetailsModel.data.gallery.length>1?1.0:0.0,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: mAuctionDetailsModel.data.gallery.map((item) {
+                                      int index =mAuctionDetailsModel.data.gallery.indexOf(item);
+                                      return Container(
+                                        width: 8.0.w,
+                                        height: 8.0.h,
+                                        margin: EdgeInsets.symmetric(vertical: 10.0.w, horizontal: 2.0.h),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: _current == index
+                                              ? kMainColor
+                                              : Color(0xFF707070),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
                               ),
 
 
@@ -410,7 +451,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data.endDate}',
+                                child: Text(getFormattedDate(mAuctionDetailsModel.data.endDate),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -534,7 +575,9 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                       bottom: 0,
                       start: 0,
                       end: 0,
-                      child: deleteButton(getTranslated(context, 'stop_auction'),context))
+                      child: Opacity(
+                        opacity: compareDate(mAuctionDetailsModel.data.endDate)?1.0:0.0,
+                          child: deleteButton(getTranslated(context, 'stop_auction'),context)))
                 ],
               ),
           ),
@@ -651,5 +694,39 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     if(status == 'success'){
       Navigator.pushReplacementNamed(context,MainScreen.id);
     }
+  }
+  String getFormattedDate(String date) {
+    /// Convert into local date format.
+    var localDate = DateTime.parse(date);
+
+    /// inputFormat - format getting from api or other func.
+    /// e.g If 2021-05-27 9:34:12.781341 then format must be yyyy-MM-dd HH:mm
+    /// If 27/05/2021 9:34:12.781341 then format must be dd/MM/yyyy HH:mm
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(localDate.toString());
+
+    /// outputFormat - convert into format you want to show.
+    var outputFormat = DateFormat('dd MMM AT hh:mm a');
+    var outputDate = outputFormat.format(inputDate);
+
+    return outputDate.toString();
+  }
+  bool compareDate(String date){
+    var now = new DateTime.now();
+    var localDate = DateTime.parse(date);
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(localDate.toString());
+    int month = inputDate.month;
+    print('month --> ${month}');
+    var berlinWallFellDate = new DateTime.utc(inputDate.year, inputDate.month, inputDate.day,inputDate.hour,inputDate.second);
+// 0 denotes being equal positive value greater and negative value being less
+    if(berlinWallFellDate.compareTo(now)>0)
+    {
+      return true;
+      //peform logic here.....
+    }else{
+      return false;
+    }
+
   }
 }

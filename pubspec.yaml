@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.2.0+12
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -31,8 +31,7 @@ dependencies:
   logger: any
   dio: ^4.0.0
   http: any
-  toast: any
-  firebase_messaging: ^10.0.0
+  firebase_messaging: ^10.0.4
   carousel_slider: ^3.0.0
   font_awesome_flutter: any
   shared_preferences: ^2.0.5
@@ -69,12 +68,15 @@ dependencies:
   my_fatoorah: ^3.0.2
   flutter_webview_plugin: ^0.4.0
   group_radio_button: ^1.1.0
-  firebase_core: ^1.2.0
+  firebase_core: ^1.4.0
   firebase_database: ^7.0.0
   overlay_support: ^1.2.1
-  flutter_local_notifications: ^6.0.0
+  flutter_local_notifications: ^5.0.0
   fluttertoast: ^8.0.7
   video_player: ^2.1.4
+  rating_bar: ^0.2.0
+  sweetalert: ^0.0.1
+  pinch_zoom_image_last: ^0.3.2
 
 
 
@@ -91,6 +93,21 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.9.0
+  flutter_launcher_name:
+    git:
+      url: https://github.com/ride4sun/flutter_launcher_name
+      ref: "0.9.1"
+
+flutter_launcher_name:
+  name: "Petmart"
+
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/icon.png"
+  remove_alpha_ios: true
+
 
 
 # For information on the generic Dart part of this file, see the

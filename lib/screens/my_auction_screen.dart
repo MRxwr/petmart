@@ -47,7 +47,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
     super.initState();
     typesList.add(TypeModel(typeNameAr: 'الكل',typeNameEn: 'All',key: 'all',selected: true));
     typesList.add(TypeModel(typeNameAr: 'مستمر',typeNameEn: 'Running',key: 'running',selected: false));
-    typesList.add(TypeModel(typeNameAr: 'القادمة',typeNameEn: 'Upcoming',key: 'upcoming',selected: false));
+   typesList.add(TypeModel(typeNameAr: 'القادمة',typeNameEn: 'Upcoming',key: 'upcoming',selected: false));
     typesList.add(TypeModel(typeNameAr: 'اكتمال',typeNameEn: 'Complete',key: 'complete',selected: false));
 map().then((value) {
   userId = value["userId"];
@@ -127,6 +127,7 @@ map().then((value) {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 
@@ -215,7 +216,21 @@ Container(
 
               ),
               alignment: AlignmentDirectional.center,
-            ):GridView.builder(scrollDirection: Axis.vertical,
+            ):
+            myAuctionsModel.data.auctionData.isEmpty?
+
+            Container(
+              child: Text(
+                myAuctionsModel.message,
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: screenUtil.setSp(16),
+                    fontWeight: FontWeight.w600
+                ),
+              ),
+              alignment: AlignmentDirectional.center,
+            )
+                :GridView.builder(scrollDirection: Axis.vertical,
 
 
               shrinkWrap: true,

@@ -5,6 +5,7 @@ import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/hospital_model.dart';
 import 'package:pet_mart/screens/shop_details_screen.dart';
+import 'package:pet_mart/screens/shop_products_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class HospitalScreen extends StatefulWidget {
@@ -76,6 +77,7 @@ class _HospitalScreenState extends State<HospitalScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 
@@ -103,7 +105,7 @@ Container(
         ,onTap: (){
           String mHospitalName = hospitalModel.data[index].shopName;
           Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
-            return new ShopDetailsScreen(id:hospitalModel.data[index].shopId,name: mHospitalName);
+            return new ShopProductsScreen(id:hospitalModel.data[index].shopId,name: mHospitalName);
           }));
 
         },);

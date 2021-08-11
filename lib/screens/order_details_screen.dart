@@ -45,9 +45,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
-
       ),
         backgroundColor: Color(0xFFFFFFFF),
       body: ListView(

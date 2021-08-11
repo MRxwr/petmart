@@ -24,10 +24,12 @@ import 'package:pet_mart/screens/message_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'login_screen.dart';
 import 'main_sceen.dart';
 class PostDetailsScreen extends StatefulWidget {
   static String id = 'PetsDetailsScreen';
@@ -137,7 +139,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       style: flatButtonStyle,
       onPressed: ()async {
         if (await canLaunch('tel://+${phone}')) {
-          await launch('tel://+${phone}');
+          await launch('tel://${phone}');
         } else {
           print(' could not launch ');
         }
@@ -186,6 +188,72 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
     return petsModel;
   }
+  Future<void> ShareDialog(BuildContext context ) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: getTranslated(context, 'share_message'),
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            Navigator.pop(context);
+            share(context);
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            Navigator.pop(context);
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+      ],
+    );
+    alert.show();
+
+  }
   Future<void> SharePets() async{
     final modelHud = Provider.of<ModelHud>(context,listen: false);
     modelHud.changeIsLoading(true);
@@ -207,31 +275,15 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
     PetMartService petMartService = PetMartService();
     ShareModel petsModel = await petMartService.sharePet(map);
-    var imageId =
-    await ImageDownloader.downloadImage(postDetailsModel.data.gallery[0].image);
-    if (imageId == null) {
-      return;
-    }
-    // Below is a method of obtaining saved image information.
-    print('imageId-->${imageId}');
-    var fileName = await ImageDownloader.findName(imageId);
-    var path = await ImageDownloader.findPath(imageId);
-    var size = await ImageDownloader.findByteSize(imageId);
-    var mimeType = await ImageDownloader.findMimeType(imageId);
     modelHud.changeIsLoading(false);
-    // setState(() {
-    //   noOfShares = petsModel.data.shareCount;
-    // });
-    List<String> paths = List();
-    paths.add(path);
-    print('paths --> ${paths}');
-    List<String> mimeTypes = List();
-    mimeTypes.add(mimeType);
-    print('mimeType --> ${mimeType}');
-    Share.shareFiles(paths,mimeTypes: mimeTypes,subject:'${postDetailsModel.data.postName} \\n ${postDetailsModel.data.postDescription}' );
+    //
+    if(Platform.isIOS){
+      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n market://details?id=com.createq8.petMart');
 
+    }else{
+      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
 
-
+    }
 
 
   }
@@ -318,6 +370,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
 
           actions: [
+            SizedBox(width: 30.h,)
 
           ],
 
@@ -344,16 +397,13 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
                       carouselController: _controller,
                       options: CarouselOptions(
-                          autoPlay: true,
-                          autoPlayInterval: Duration(seconds: 10),
 
-
+                          enableInfiniteScroll: false,
                           height: double.infinity,
                           viewportFraction: 1.0,
                           enlargeCenterPage: false,
                           disableCenter: true,
-                          pauseAutoPlayOnTouch: true
-                          ,
+
 
 
 
@@ -488,15 +538,18 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          flex:1,
-                          child: Text(
-                            '${postDetailsModel.data.postPrice}',
-                            style: TextStyle(
-                                color: kMainColor,
-                                fontSize: screenUtil.setSp(14),
-                                fontWeight: FontWeight.normal
+                        Opacity(
+                          opacity: postDetailsModel.data.postType == 'sell'?1.0:0.0,
+                          child: Expanded(
+                            flex:1,
+                            child: Text(
+                              '${postDetailsModel.data.postPrice}',
+                              style: TextStyle(
+                                  color: kMainColor,
+                                  fontSize: screenUtil.setSp(14),
+                                  fontWeight: FontWeight.normal
 
+                              ),
                             ),
                           ),
                         ),
@@ -838,6 +891,86 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     );
 
   }
+  share(BuildContext context) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      ShareDialog(context);
+
+    }else{
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+    }
+
+  }
+  Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+              return new LoginScreen();
+            }));
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+      ],
+    );
+    alert.show();
+
+  }
+
+
   void showDialog(ContactDetail contactDetail) {
     showGeneralDialog(
       barrierLabel: "Barrier",
@@ -954,7 +1087,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile)
+                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile.replaceAll('+', ''))
                       ],
                     )
                   ],

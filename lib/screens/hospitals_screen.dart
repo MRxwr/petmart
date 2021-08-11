@@ -72,8 +72,8 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
           },
           child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
         ),
-
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 

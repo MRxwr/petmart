@@ -8,7 +8,8 @@
   "contact_for_sell": "Contact for sell",
   "by": "By",
   "call_now": "Call Now",
-  "not_login": "You're Not Logged In, Logged In First",
+  "not_login": " Logged In First",
+  "reg_now": "LogIn Now",
   "ok": "Ok",
   "no": "No",
   "select_image": "Select Image",
@@ -152,7 +153,15 @@
   "password_error": "Please Enter Password",
   "mobile_error": "Please Enter Valid Phone Number",
   "first_name_error": "Please Enter Your First Name",
-  "last_name_error": "Please Enter Your Last Name"
+  "last_name_error": "Please Enter Your Last Name",
+  "complete_string": "Completed",
+  "share_message": "Are You Want to Share",
+  "payment_success": "Payment completed successfully",
+  "payment_fail": "Payment failed",
+  "success": "Success",
+  "fail": "Fail",
+  "go_to_main": "Go To Main"
+
 
 
 

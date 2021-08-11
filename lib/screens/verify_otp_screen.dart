@@ -5,12 +5,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/otp_model.dart';
 import 'package:pet_mart/model/verify_otp_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/login_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart' as Alert;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
@@ -92,8 +94,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             },
             child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
           ),
-
           actions: [
+            SizedBox(width: 30.h,)
 
           ],
 
@@ -241,13 +243,12 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     String mStatus = verifyOtpModel.status;
     if (mStatus.trim() == 'success') {
       modelHud.changeIsLoading(false);
-      Navigator.of(context).pushReplacementNamed(LoginScreen.id);
-      _scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text(verifyOtpModel.message)));
+      successAlertDialog(context,verifyOtpModel.message);
+
     }else{
       modelHud.changeIsLoading(false);
-      _scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text(verifyOtpModel.message)));
+      failAlertDialog(context, verifyOtpModel.message);
+
     }
 
   }
@@ -257,15 +258,127 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     final modelHud = Provider.of<ModelHud>(context, listen: false);
     modelHud.changeIsLoading(true);
 
-    String url = 'http://api.smart2group.net/api/send.aspx?username=petmart&password=jvZ8sbsubBAA3w&language=1&sender=Pet%20Mart&mobile=+965${widget.mobile}&message=${widget.otp} is your verification code for petmart App ';
 
+   Map map = Map();
+   map['user_id'] =widget.userId;
+    map['mobile'] =widget.mobile;
 
     PetMartService petMartService = PetMartService();
-    String resp  = await petMartService.resendOtp(url);
+    OtpModel resp  = await petMartService.resentOtp(map);
+    widget.otp = resp.data.otp.toString();
+    print('widget.otp ---> ${widget.otp}');
     print(resp);
     modelHud.changeIsLoading(false);
 
     _scaffoldKey.currentState.showSnackBar(
-        SnackBar(content: Text('Otp Send SuccessFully')));
+        SnackBar(content: Text(resp.message)));
   }
+
+  Future<void> successAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = Alert.AlertStyle(
+
+      animationType: Alert.AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =  Alert.Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        Alert.DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.pushReplacementNamed(context,LoginScreen.id);
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+
+      ],
+    );
+    alert.show();
+
+  }
+  Future<void> failAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = Alert.AlertStyle(
+
+      animationType: Alert.AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert.Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        Alert.DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+
+      ],
+    );
+    alert.show();
+
+  }
+
 }

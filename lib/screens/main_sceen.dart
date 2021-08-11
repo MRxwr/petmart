@@ -2,13 +2,17 @@
 
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
 
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/check_credit_model.dart';
+import 'package:pet_mart/model/home_model.dart';
+import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/search_screen.dart';
@@ -35,6 +39,7 @@ import 'package:pet_mart/widgets/layout.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:unique_identifier/unique_identifier.dart';
 
 import '../main.dart';
 import 'auction_screen.dart';
@@ -44,7 +49,7 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientMixin{
   String _lastSelected = 'TAB: 0';
   final _homeScreen = GlobalKey<NavigatorState>();
   final _competitionNewsScreen = GlobalKey<NavigatorState>();
@@ -79,6 +84,7 @@ class _MainScreenState extends State<MainScreen> {
       getLoginModel().then((value){
         setState(() {
           loginModel = value;
+          _title = getTranslated(context, 'home');
         });
 
       });
@@ -99,19 +105,91 @@ class _MainScreenState extends State<MainScreen> {
     LoginModel   loginModel = LoginModel.fromJson(body);
     return loginModel;
   }
-  String title = 'Home';
+  Future<HomeModel> home() async{
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String loginData = sharedPreferences.getString(kUserModel);
+    String deviceToken =sharedPreferences.getString("token")??"";
+    print('loginData --> ${loginData}');
+    LoginModel  loginModel = null;
+    bool isLoggedIn =  sharedPreferences.getBool(kIsLogin)??false;
+    String uniqueId;
+    if(isLoggedIn){
+      String token =deviceToken;
+      final body = json.decode(loginData);
+      String fullName = sharedPreferences.getString('email');
+      String password= sharedPreferences.getString('password');
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
+      String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+      PetMartService petMartService = PetMartService();
+      String deviceType="";
+
+      if(Platform.isAndroid){
+        deviceType = "a";
+        uniqueId = await UniqueIdentifier.serial;
+      }else{
+        deviceType = "i";
+        final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
+        var data = await deviceInfoPlugin.iosInfo;
+        uniqueId = data.identifierForVendor;
+      }
+      Map map = {
+        'email':fullName,
+        'password':password,
+        'device_token':token,
+        'imei_number': uniqueId,
+        'device_type': deviceType,
+        'language':languageCode
+
+
+      };
+      loginModel = await petMartService.loginModel(map);
+      String mStatus = loginModel.status;
+      if(mStatus.trim() == 'success') {
+        SharedPref sharedPref = SharedPref();
+        await sharedPref.save(kUserModel, loginModel);
+        await sharedPref.saveBool(kIsLogin, true);
+        await sharedPref.saveString("emil", fullName);
+        await sharedPref.saveString("password", password);
+      }
+    }
+
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    Map map ;
+    if(loginModel == null){
+      map = {'id': "",
+        "language":languageCode
+      };
+    }else{
+      map = {'id': loginModel.data.customerId,
+        "language":languageCode
+      };
+    }
+
+    print('map --> ${map}');
+    PetMartService petMartService = PetMartService();
+    InitModel initModel = await petMartService.init();
+    SharedPref sharedPref = SharedPref();
+    await sharedPref.save('initModel', initModel);
+    HomeModel home = await petMartService.home(map);
+    return home;
+  }
+  String _title = 'Home' ;
 
   @override
   Widget build(BuildContext context) {
-    title = getTranslated(context, 'home');
+
     return
       ModalProgressHUD(
         inAsyncCall: Provider.of<ModelHud>(context).isLoading,
         child: Scaffold(
-        appBar: AppBar(
+        appBar:
+        AppBar(
           centerTitle: true,
           title: Text(
-            title,
+            _title,
             style: TextStyle(
               color: Color(0xFFFFFFFF),
               fontSize: screenUtil.setSp(16),
@@ -171,13 +249,14 @@ class _MainScreenState extends State<MainScreen> {
         loggedDrawer(context,loginModel):visitorDrawer(context),
 
         body:
-        IndexedStack(
+         IndexedStack(
           index: index,
           children: [
             Navigator(
               key: _vediosScreen,
               onGenerateRoute: (route) => MaterialPageRoute(
                 settings: route,
+                maintainState: false,
                 builder: (context) => AuctionScreen(),
               ),
             ),
@@ -185,6 +264,7 @@ class _MainScreenState extends State<MainScreen> {
               key: _amateursNews,
               onGenerateRoute: (route) => MaterialPageRoute(
                 settings: route,
+                maintainState: false,
                 builder: (context) => LostScreen(),
               ),
             ),
@@ -192,6 +272,7 @@ class _MainScreenState extends State<MainScreen> {
               key: _competitionNewsScreen,
               onGenerateRoute: (route) => MaterialPageRoute(
                 settings: route,
+                maintainState: false,
                 builder: (context) => AdaptionScreen(),
               ),
             ),
@@ -199,8 +280,10 @@ class _MainScreenState extends State<MainScreen> {
               key: _homeScreen,
               onGenerateRoute: (route) => MaterialPageRoute(
                 settings: route,
+                maintainState: false,
                 builder: (context) => HomeScreen(),
               ),
+
             ),
 
 
@@ -383,7 +466,7 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                             Padding(
                               padding: EdgeInsetsDirectional.only(start: 4.h),
-                              child: Text('${getTranslated(context, 'credit_expiry')}${loginModel.data.lastLogin}',
+                              child: Text('${getTranslated(context, 'credit_expiry')}${loginModel.data.expiryDate}',
 
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -580,6 +663,7 @@ class _MainScreenState extends State<MainScreen> {
           print(val);
 
           _homeScreen.currentState.popUntil((route) => route.isFirst);
+          _title=getTranslated(context, 'home');
           setState(() {
 
           });
@@ -588,6 +672,7 @@ class _MainScreenState extends State<MainScreen> {
         case 2:
           print(val);
           _competitionNewsScreen.currentState.popUntil((route) => route.isFirst);
+          _title=getTranslated(context, 'adaption');
           setState(() {
 
           });
@@ -596,6 +681,7 @@ class _MainScreenState extends State<MainScreen> {
         case 1:
           print(val);
           _amateursNews.currentState.popUntil((route) => route.isFirst);
+          _title=getTranslated(context, 'lost');
           setState(() {
 
           });
@@ -603,6 +689,7 @@ class _MainScreenState extends State<MainScreen> {
         case 0:
           print(val);
           _vediosScreen.currentState.popUntil((route) => route.isFirst);
+          _title=getTranslated(context, 'auction');
           setState(() {
 
           });
@@ -611,21 +698,27 @@ class _MainScreenState extends State<MainScreen> {
         default:
       }
     } else {
-      if (mounted) {
-        setState(() {
-          index = val;
-          if(index ==0){
-            title=getTranslated(context, 'auction').toUpperCase();
-          }else if(index == 1){
-            title=getTranslated(context, 'lost').toUpperCase();
-          }else if(index == 2){
-            title=getTranslated(context, 'adaption').toUpperCase();
-          }else if(index == 3){
-            title=getTranslated(context, 'home').toUpperCase();
-          }
-          print('index ${index}');
-        });
+      index = val;
+      if(index ==0){
+        _vediosScreen.currentState.pushReplacementNamed(AuctionScreen.id);
+        _title=getTranslated(context, 'auction');
+      }else if(index == 1){
+        _amateursNews.currentState.pushReplacementNamed(LostScreen.id);
+        _title=getTranslated(context, 'lost');
+      }else if(index == 2){
+        _competitionNewsScreen.currentState.pushReplacementNamed(AdaptionScreen.id);
+        _title=getTranslated(context, 'adaption');
+      }else if(index == 3){
+        _homeScreen.currentState.pushReplacementNamed(HomeScreen.id);
+        _title=getTranslated(context, 'home');
       }
+      index = val;
+      print('index ${index}');
+      print(_title);
+        setState(() {
+
+        });
+
     }
   }
   Future<void> ShowLanguageDialog(BuildContext context) async{
@@ -827,7 +920,7 @@ class _MainScreenState extends State<MainScreen> {
 
         DialogButton(
           child: Text(
-           getTranslated(context, 'ok'),
+            getTranslated(context, 'reg_now'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -841,18 +934,7 @@ class _MainScreenState extends State<MainScreen> {
           color: Color(0xFFFFC300),
           radius: BorderRadius.circular(6.w),
         ),
-        DialogButton(
-          child: Text(
-            getTranslated(context, 'no'),
-            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
-          ),
-          onPressed: ()async {
-            await alert.dismiss();
 
-          },
-          color: Color(0xFFFFC300),
-          radius: BorderRadius.circular(6.w),
-        ),
       ],
     );
     alert.show();
@@ -872,4 +954,8 @@ class _MainScreenState extends State<MainScreen> {
     }
 
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

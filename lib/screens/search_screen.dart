@@ -50,7 +50,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
   List<String> selectedSubCategoriesId = List();
   List<Category> _categoryList = List();
   String  categoryId ="";
-  bool forSaleSelected = false;
+  bool forSaleSelected = true;
   String type="sell";
   @override
   void initState() {
@@ -98,6 +98,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
 
     PetMartService petMartService = PetMartService();
     subCategory = await petMartService.category(map);
+    print('subCategory --> ${subCategory}');
     selectedSubList.clear();
     for(int i =0;i<subCategory.data.category[0].childcategory.length;i++){
 
@@ -114,18 +115,20 @@ class _SearcgScreenState extends State<SearcgScreen> {
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String loginData = sharedPreferences.getString(kUserModel);
-    final body = json.decode(loginData);
-    LoginModel   loginModel = LoginModel.fromJson(body);
+    print('loginData ---> ${loginData}');
     Map map ;
-    if(loginModel == null){
-      map = {'id': "",
-        "language":languageCode
-      };
-    }else{
+    if(loginData != null){
+      final body = json.decode(loginData);
+      LoginModel   loginModel = LoginModel.fromJson(body);
       map = {'id': loginModel.data.customerId,
         "language":languageCode
       };
+    }else{
+      map = {'id': "",
+        "language":languageCode
+      };
     }
+
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
@@ -192,7 +195,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
                   for(int i =0;i<selectedSubList.length;i++){
                     bool isSelect =selectedSubList[i];
                     if(isSelect){
-                      mSubCatId =   subCategory.data.category[0].childcategory[i].categoryId+",";
+                      mSubCatId = mSubCatId+subCategory.data.category[0].childcategory[i].categoryId+",";
                     }
 
                   }
@@ -517,7 +520,9 @@ category();
                   borderRadius: BorderRadius.circular(6.h),
                   color: Color(0xFFdcdcdc)
               ),
-              child: Row(
+              child:
+
+              Row(
                 children: <Widget>[
 
                   Expanded(
@@ -747,7 +752,7 @@ category();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     PetMartService petMartService = PetMartService();
     Map map = {
-      'id': mSelectCategory,
+      'id': mSelectCategory.toString(),
       'sub_category_id': mSubCatId,
       'language': languageCode,
       'min_price': mStartPrice,
@@ -755,6 +760,7 @@ category();
       'search_keyword': searchText,
       'type':type
     };
+    print(map);
     SearchModel searchModel = await petMartService.search(map);
     modelHud.changeIsLoading(false);
 String status = searchModel.status;

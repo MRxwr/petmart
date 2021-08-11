@@ -57,136 +57,142 @@ class _LoginScreenState extends State<LoginScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return  ModalProgressHUD(
-      inAsyncCall: Provider.of<ModelHud>(context).isLoading,
-      child: Scaffold(
-          resizeToAvoidBottomInset: false,
+    return  GestureDetector(
+      onTap: (){
+        FocusManager.instance.primaryFocus?.unfocus();
 
-        key: _scaffoldKey,
-        backgroundColor: Color(0xFFFFFFFF),
-        body: Form(
-          key: widget._globalKey,
-          child: Container(
-            margin: EdgeInsets.all(10.h),
-            child: Column(
-              children: [
-                SizedBox(height: 10.h,),
+      },
+      child: ModalProgressHUD(
+        inAsyncCall: Provider.of<ModelHud>(context).isLoading,
+        child: Scaffold(
+            resizeToAvoidBottomInset: false,
+
+          key: _scaffoldKey,
+          backgroundColor: Color(0xFFFFFFFF),
+          body: Form(
+            key: widget._globalKey,
+            child: Container(
+              margin: EdgeInsets.all(10.h),
+              child: Column(
+                children: [
+                  SizedBox(height: 10.h,),
 
 
-                Expanded(flex: 2,
-                    child: Center(
-                      child: Container(
-                        alignment: AlignmentDirectional.topEnd,
-                        child: GestureDetector(
-                          onTap: (){
-                            Navigator.pushReplacementNamed(context, MainScreen.id);
-                          },
+                  Expanded(flex: 2,
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.pushReplacementNamed(context, MainScreen.id);
+
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10.w),
+                          alignment: AlignmentDirectional.topEnd,
                           child: Text(getTranslated(context, 'skip'),
                           style: TextStyle(
                             color:Color(0xFF000000),
                             fontSize: screenUtil.setSp(16)
                           ),),
                         ),
-                      ),
-                    )),
-                Expanded(flex:4,child: Container(
-                  child: Center(
-                    child:Image.asset('assets/images/img_language_logo.png',height: 150.h,width: 150.w) ,
-                  ),
+                      )),
+                  Expanded(flex:4,child: Container(
+                    child: Center(
+                      child:Image.asset('assets/images/img_language_logo.png',height: 150.h,width: 150.w) ,
+                    ),
 
-                )),
-                Expanded(flex: 2,
-                    child:  Center(
-                      child:
-                      NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
-                        print(value);
-                        _fullName= value;
-                        setState(() {
+                  )),
+                  Expanded(flex: 2,
+                      child:  Center(
+                        child:
+                        NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
+                          print(value);
+                          _fullName= value;
+                          setState(() {
 
-                        });
-                      },
+                          });
+                        },
 
-                      ),
-                    )),
-                Expanded(flex: 2,
-                    child:  Container(
-                      alignment: AlignmentDirectional.center,
-                      child:
-                      PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
-                        print(value);
-                        setState(() {
-
-                        });
-                        _password= value;
-
-                      },
-                        mText: _password,
-                      ),
-                    )),
-                Expanded(flex: 1,
-                    child:  GestureDetector(
-                      onTap: (){
-                        Navigator.pushNamed(context, ForgetPasswordScreen.id);
-                      },
-                      child: Container(
-                        alignment: AlignmentDirectional.centerEnd,
-                        child: Text(
-                          getTranslated(context, 'forget_password_string'),
-                          style: TextStyle(
-                            color: Color(0xFF0000000),
-                            fontSize: screenUtil.setSp(16),
-                            fontWeight: FontWeight.bold
-                          ),
                         ),
-                      ),
-                    )
-                ),
-                Expanded(flex: 1,
-                    child:  Container(
-                      alignment: AlignmentDirectional.center,
-                      child:
-                      LoginButton(getTranslated(context, 'login'),context)
-                    )
-                ),
-                Expanded(flex: 4,
-                    child:  Container(
-                      alignment: AlignmentDirectional.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                         getTranslated(context, 'dont_have_account'),
+                      )),
+                  Expanded(flex: 2,
+                      child:  Container(
+                        alignment: AlignmentDirectional.center,
+                        child:
+                        PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
+                          print(value);
+                          setState(() {
+
+                          });
+                          _password= value;
+
+                        },
+                          mText: _password,
+                        ),
+                      )),
+                  Expanded(flex: 1,
+                      child:  GestureDetector(
+                        onTap: (){
+                          Navigator.pushNamed(context, ForgetPasswordScreen.id);
+                        },
+                        child: Container(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: Text(
+                            getTranslated(context, 'forget_password_string'),
                             style: TextStyle(
-                                color: Color(0xFF0000000),
-                                fontSize: screenUtil.setSp(16),
-                                fontWeight: FontWeight.normal
+                              color: Color(0xFF0000000),
+                              fontSize: screenUtil.setSp(16),
+                              fontWeight: FontWeight.bold
                             ),
                           ),
-                          SizedBox(width: 4.w,),
-                          GestureDetector(
-                            onTap: (){
-                              Navigator.of(context).pushNamed(RegisterScreen.id);
-                            },
-                            child:
+                        ),
+                      )
+                  ),
+                  Expanded(flex: 1,
+                      child:  Container(
+                        alignment: AlignmentDirectional.center,
+                        child:
+                        LoginButton(getTranslated(context, 'login'),context)
+                      )
+                  ),
+                  Expanded(flex: 4,
+                      child:  Container(
+                        alignment: AlignmentDirectional.center,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                             Text(
-                              getTranslated(context, 'register_now'),
+                           getTranslated(context, 'dont_have_account'),
                               style: TextStyle(
                                   color: Color(0xFF0000000),
                                   fontSize: screenUtil.setSp(16),
-                                  fontWeight: FontWeight.bold
+                                  fontWeight: FontWeight.normal
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                ),
-                Expanded(
-                  flex: 2,
-                    child: Container())
+                            SizedBox(width: 4.w,),
+                            GestureDetector(
+                              onTap: (){
+                                Navigator.of(context).pushNamed(RegisterScreen.id);
+                              },
+                              child:
+                              Text(
+                                getTranslated(context, 'register_now'),
+                                style: TextStyle(
+                                    color: Color(0xFF0000000),
+                                    fontSize: screenUtil.setSp(16),
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                  ),
+                  Expanded(
+                    flex: 2,
+                      child: Container())
 
 
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -248,6 +254,7 @@ uniqueId = await UniqueIdentifier.serial;
 
 
       };
+      print(map);
       LoginModel loginModel = await petMartService.loginModel(map);
       String mStatus = loginModel.status;
       if(mStatus.trim() == 'success'){

@@ -137,7 +137,7 @@ class PhoneTextField extends StatelessWidget {
 
   }
   String validateName(String value) {
-    String patttern = r'(^(?:[+0]9)?[0-9]{8}$)';
+    String patttern = r'(^[0-9]{8}$)';
     RegExp regExp = new RegExp(patttern);
     if (value.length == 0) {
       return getTranslated(context, 'mobile_error');

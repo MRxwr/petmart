@@ -35,7 +35,16 @@ class _LostScreenState extends State<LostScreen> {
 
     final body = json.decode(homeString);
     homeModel = HomeModel.fromJson(body);
+    List<Images> images = null;
+    String categoryId = "";
+    Category category = Category(categoryId:categoryId,categoryName:"All",images: images);
+    categories.add(category);
+    selectedList.add(true);
 
+    for(int i =0;i<homeModel.data.category.length;i++){
+      categories.add(homeModel.data.category[i]);
+      selectedList.add(false);
+    }
 
 
     return homeModel;
@@ -76,26 +85,16 @@ class _LostScreenState extends State<LostScreen> {
 
     // TODO: implement initState
     super.initState();
-    getHomeModel().then((value){
-      homeModel = value;
-      List<Images> images = null;
-      String categoryId = "";
-      Category category = Category(categoryId:categoryId,categoryName:"All",images: images);
-      categories.add(category);
-      selectedList.add(true);
-
-      for(int i =0;i<homeModel.data.category.length;i++){
-        categories.add(homeModel.data.category[i]);
-        selectedList.add(false);
-      }
-      print('cat lenght --> ${categories.length}');
-      print('select lenght --> ${selectedList.length}');
-    }).then((value){
+    getHomeModel().whenComplete((){
       post(categories[0].categoryId).then((value) {
         postModel = value;
-      });
+        setState(() {
 
+        });
+      });
     });
+
+
   }
   @override
   Widget build(BuildContext context) {
@@ -176,6 +175,20 @@ class _LostScreenState extends State<LostScreen> {
                   ),
                   alignment: AlignmentDirectional.center,
                 ):
+                postModel.data.isEmpty?
+
+                Container(
+                  child: Text(
+                    postModel.message,
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: screenUtil.setSp(16),
+                        fontWeight: FontWeight.w600
+                    ),
+                  ),
+                  alignment: AlignmentDirectional.center,
+                )
+                    :
 
                 GridView.builder(scrollDirection: Axis.vertical,
 

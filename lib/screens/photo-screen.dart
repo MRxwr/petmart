@@ -22,9 +22,17 @@ class PhotoScreen extends StatefulWidget {
 
 class _PhotoScreenState extends State<PhotoScreen> {
   ScreenUtil screenUtil = ScreenUtil();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       floatingActionButton:  FloatingActionButton(
@@ -40,22 +48,31 @@ class _PhotoScreenState extends State<PhotoScreen> {
       ),
       body:
       Container(
+
         color: Color(0xFFFFFFFF),
         child: Stack(
           fit: StackFit.expand,
 
           children: [
             Container(
+              height: height,
+              width: 200,
               color: Color(0xFFFFFFFF),
-              constraints: BoxConstraints.expand(
-                height: MediaQuery.of(context).size.height,
-              ),
-              child: PhotoView(
-                imageProvider: widget.imageProvider,
-                backgroundDecoration: widget.backgroundDecoration,
-                minScale: widget.minScale,
-                maxScale: widget.maxScale,
-                heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
+
+              child: Container(
+                height: height,
+                width: 200,
+                child: PhotoView(
+
+                  imageProvider: widget.imageProvider,
+
+                  backgroundDecoration: widget.backgroundDecoration,
+                  minScale: 0.3,
+
+
+                  maxScale:2.0,
+                  heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
+                ),
               ),
             ),
 

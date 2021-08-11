@@ -129,6 +129,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
         ),
 
         actions: [
+          SizedBox(width: 30.h,)
 
         ],
 
@@ -216,6 +217,20 @@ class _MyPostScreenState extends State<MyPostScreen> {
                 ),
                 alignment: AlignmentDirectional.center,
               ):
+              postModel.data.isEmpty?
+
+              Container(
+                child: Text(
+                  postModel.message,
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: screenUtil.setSp(16),
+                      fontWeight: FontWeight.w600
+                  ),
+                ),
+                alignment: AlignmentDirectional.center,
+              )
+                  :
               GridView.builder(scrollDirection: Axis.vertical,
 
 

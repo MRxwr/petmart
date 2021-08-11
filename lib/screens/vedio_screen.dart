@@ -73,9 +73,10 @@ class _VideoScreenState extends State<VideoScreen> {
       ),
 
 
-      actions: [
+     actions: [
+       SizedBox(width: 30.h,)
 
-      ],
+     ],
 
     ),
       backgroundColor: Color(0xFFFFFFFF),
@@ -230,7 +231,7 @@ class _PlayerVideoAndPopPageState extends State<_PlayerVideoAndPopPage> {
           builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
             if (snapshot.data == true) {
               return Container(
-                height: height,
+
                 width: width,
                 child: VideoPlayer(_videoPlayerController),
               );

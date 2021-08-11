@@ -85,7 +85,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       style: flatButtonStyle,
       onPressed: ()async {
         if (await canLaunch('tel://+${phone}')) {
-          await launch('tel://+${phone}');
+          await launch('tel://${phone}');
         } else {
           print(' could not launch ');
         }
@@ -154,31 +154,15 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
     PetMartService petMartService = PetMartService();
     ShareModel petsModel = await petMartService.sharePet(map);
-    var imageId =
-    await ImageDownloader.downloadImage(postDetailsModel.data.gallery[0].image);
-    if (imageId == null) {
-      return;
-    }
-    // Below is a method of obtaining saved image information.
-    print('imageId-->${imageId}');
-    var fileName = await ImageDownloader.findName(imageId);
-    var path = await ImageDownloader.findPath(imageId);
-    var size = await ImageDownloader.findByteSize(imageId);
-    var mimeType = await ImageDownloader.findMimeType(imageId);
     modelHud.changeIsLoading(false);
-    // setState(() {
-    //   noOfShares = petsModel.data.shareCount;
-    // });
-    List<String> paths = List();
-    paths.add(path);
-    print('paths --> ${paths}');
-    List<String> mimeTypes = List();
-    mimeTypes.add(mimeType);
-    print('mimeType --> ${mimeType}');
-    Share.shareFiles(paths,mimeTypes: mimeTypes,subject:'${postDetailsModel.data.postName} \\n ${postDetailsModel.data.postDescription}' );
+    //
+    if(Platform.isIOS){
+      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n market://details?id=com.createq8.petMart');
 
+    }else{
+      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
 
-
+    }
 
 
   }
@@ -264,6 +248,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
 
           actions: [
+            SizedBox(width: 30.h,)
 
           ],
 
@@ -291,16 +276,15 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
                       carouselController: _controller,
                       options: CarouselOptions(
-                          autoPlay: true,
-                          autoPlayInterval: Duration(seconds: 10),
 
+                          enableInfiniteScroll: false,
 
                           height: double.infinity,
                           viewportFraction: 1.0,
                           enlargeCenterPage: false,
                           disableCenter: true,
-                          pauseAutoPlayOnTouch: true
-                          ,
+
+
 
 
 
@@ -433,17 +417,9 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                       ),
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text(
-                          '${postDetailsModel.data.postPrice}',
-                          style: TextStyle(
-                              color: kMainColor,
-                              fontSize: screenUtil.setSp(14),
-                              fontWeight: FontWeight.normal
 
-                          ),
-                        ),
                         previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.contactDetail)
                       ],
                     ),
@@ -872,7 +848,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile)
+                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -911,13 +887,80 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      SharePets();
+      ShareDialog(context);
 
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
   }
+  Future<void> ShareDialog(BuildContext context ) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: getTranslated(context, 'share_message'),
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            Navigator.pop(context);
+            SharePets();
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            Navigator.pop(context);
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+      ],
+    );
+    alert.show();
+
+  }
+
   message(BuildContext context) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
