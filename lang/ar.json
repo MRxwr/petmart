@@ -74,8 +74,9 @@
   "enter_email_address": "أدخل عنوان بريدك الإلكتروني وسنرسل لك رسالة بريد إلكتروني تحتوي على رابط جديد لاستعادة كلمة المرور.",
   "confirm": "تأكيد",
   "view_all": "مشاهدة الكل",
-  "hospital": "مستشفى",
-  "shop": "محل",
+  "hospital": "عيادات طبية",
+  "shop": "محلات تجارية",
+  "prefex": "-965+",
   "details": "تفاصيل",
   "shares": "مشاركات",
   "select_language": "اختار اللغة",
@@ -160,7 +161,17 @@
   "payment_fail": "فشلت عملية الدفع",
   "success": "نجاح",
   "fail": "فشل",
-  "go_to_main": "الذهاب الي الرئيسية"
+  "go_to_main": "الذهاب الي الرئيسية",
+  "auction_owner": "صاحب المزاد",
+  "category": "فئة",
+  "sub_category": "تصنيف فرعي",
+  "start_date_string": "تاريخ البدء",
+  "end_date_string": "تاريخ الانتهاء",
+  "highest_bidder": "أعلى مزايد",
+  "highest_price": "أعلى سعر",
+  "rate_auction_awner": "قيم مالك المزاد",
+  "rate_highest_bidder": "قيم أعلى مزايد",
+  "sumbit_rating": "إرسال تقييمي "
 
 
 

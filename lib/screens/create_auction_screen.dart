@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:flutter/material.dart';
 import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,6 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pet_mart/model/category_model.dart' as SubCategory;
 
 import 'package:pet_mart/model/home_model.dart' as CategoryParent;
+import 'package:video_compress/video_compress.dart';
+
 
 import 'main_sceen.dart';
 class CreateAuctionScreen extends StatefulWidget {
@@ -158,46 +162,70 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     Navigator.pop(context);
 
   }
+
   Future _getVedioFromGallery(BuildContext context) async {
     var pickedFile = null;
-    pickedFile = await picker.getVideo(source: ImageSource.gallery);
+    pickedFile = await picker.getVideo(source: ImageSource.gallery,maxDuration:Duration(seconds: 15));
+    Navigator.pop(context);
     if (pickedFile != null) {
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      await VideoCompress.setLogLevel(0);
+      final MediaInfo  info = await VideoCompress.compressVideo(
+        pickedFile.path,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false,
+        includeAudio: true,
+      );
+      print(info.path);
 
 
 
 
 
       isSelected = true;
-      File _image = File(pickedFile.path);
+      File _image = File(info.path);
 
       vedios.add(_image) ;
 
       // updateImage(context);
-
+      modelHud.changeIsLoading(false);
 
 
     } else {
       mChooseImage = 'لم يتم اختيار الصورة';
     }
+    Navigator.pop(context);
     setState(() {
 
 
     });
 
 
-    Navigator.pop(context);
+
   }
   Future _getVedioFromCamera(BuildContext context) async {
-    var pickedFile = await picker.getVideo(source: ImageSource.camera);
+    var pickedFile = await picker.getVideo(source: ImageSource.camera,maxDuration:Duration(seconds: 15));
+    Navigator.pop(context);
     if (pickedFile != null) {
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      await VideoCompress.setLogLevel(0);
+      final MediaInfo  info = await VideoCompress.compressVideo(
+        pickedFile.path,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false,
+        includeAudio: true,
+      );
+      print(info.path);
 
-      isSelected = true;
+
       File _image = File(pickedFile.path);
 
       vedios.add(_image) ;
-
+      isSelected = true;
       mChooseImage="تم اختيار الصورة";
-
+      modelHud.changeIsLoading(false);
 
       // updateImage(context);
 
@@ -213,7 +241,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     });
 
 
-    Navigator.pop(context);
+
 
   }
 
@@ -852,12 +880,20 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'bid_price_error'))));
 
     }else{
+      List<File> mCompressedImages  = List();
+
+
       String userId = loginModel.data.customerId;
       String phoneNumber = loginModel.data.mobile;
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
+      for(int i =0;i<mImages.length;i++){
+        File compressImage = await  CompressFile(mImages[i]);
+        mCompressedImages.add(compressImage);
+
+      }
       PetMartService petMartService = PetMartService();
-      dynamic response = await petMartService.addAuction(postTitle, postTitle, postDescription, postDescription, mStartDate,mEndDate, price,"running",categoryId, userId, subCategoryId, mLanguage, mImages, vedios);
+      dynamic response = await petMartService.addAuction(postTitle, postTitle, postDescription, postDescription, mStartDate,mEndDate, price,"running",categoryId, userId, subCategoryId, mLanguage, mCompressedImages, vedios);
       modelHud.changeIsLoading(false);
       String status = response['status'];
       if(status == 'success'){
@@ -924,6 +960,22 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     );
     alert.show();
 
+  }
+  Future<File> CompressFile(File file) async {
+    final dir = await path_provider.getTemporaryDirectory();
+    String targetPath = "${dir.absolute.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+
+
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 70,
+
+
+    );
+
+    return result;
   }
 
 }

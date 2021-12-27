@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/screens/main_sceen.dart';

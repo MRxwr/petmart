@@ -37,6 +37,49 @@
             {
               "client_id": "373898644060-sllkren115u097pgu1t388uic0jsujur.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "373898644060-fsl5eugr5rccrl8hpovuik8d2umaovv4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.createq8.petMart"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373898644060:android:7d1858e500cb4ac48bf499",
+        "android_client_info": {
+          "package_name": "com.createq8.petmart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373898644060-sllkren115u097pgu1t388uic0jsujur.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDMUBqHZ0SharXP6Bv0Wf0GGWcH-peUvQk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "373898644060-sllkren115u097pgu1t388uic0jsujur.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "373898644060-fsl5eugr5rccrl8hpovuik8d2umaovv4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.createq8.petMart"
+              }
             }
           ]
         }

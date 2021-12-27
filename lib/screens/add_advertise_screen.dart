@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart' as path_provider;
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dropdown/flutter_dropdown.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -20,6 +24,7 @@ import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/create_auction_screen.dart';
 import 'package:pet_mart/screens/splash_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:pet_mart/utilities/shared_prefs.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -216,7 +221,10 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
 
-
+    PetMartService petMartService = PetMartService();
+    InitModel initModel = await petMartService.init();
+    SharedPref sharedPref = SharedPref();
+    await sharedPref.save('initModel', initModel);
     String loginData = _preferences.getString(kUserModel);
     final body = json.decode(loginData);
        loginModel = LoginModel.fromJson(body);
@@ -982,14 +990,19 @@ hidePrice = true;
     }else if(postDescription==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'description_error'))));
 
-    }else if(age==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'age_error'))));
-
     }else if(genderId==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'gender_error'))));
 
     }else {
+      List<File> mCompressedImages  = List();
+
+      for(int i =0;i<mImages.length;i++){
+        File compressImage = await  CompressFile(mImages[i]);
+        mCompressedImages.add(compressImage);
+
+      }
       if (key == 'sell') {
+        
         if (price == "") {
           _scaffoldKey.currentState.showSnackBar(
               SnackBar(content: Text(getTranslated(context, 'price_error'))));
@@ -1014,7 +1027,7 @@ hidePrice = true;
               subCategoryId,
               phoneNumber,
               mLanguage,
-              mImages,
+              mCompressedImages,
               null);
           modelHud.changeIsLoading(false);
           String status = response['status'];
@@ -1045,7 +1058,7 @@ hidePrice = true;
             subCategoryId,
             phoneNumber,
             mLanguage,
-            mImages,
+            mCompressedImages,
             null);
         modelHud.changeIsLoading(false);
         String status = response['status'];
@@ -1058,6 +1071,31 @@ hidePrice = true;
     }
 
   }
+  Future<File> CompressFile(File file) async {
+    final dir = await path_provider.getTemporaryDirectory();
+    String targetPath = "${dir.absolute.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
+
+
+
+    final result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 70,
+
+
+    );
+
+    return result;
+  }
+  File createFile(String path) {
+    final file = File(path);
+    if (!file.existsSync()) {
+      file.createSync(recursive: true);
+    }
+
+    return file;
+  }
+  
   Future<void> ShowAlertDialog(BuildContext context ,String title) async{
     var alert;
     var alertStyle = AlertStyle(

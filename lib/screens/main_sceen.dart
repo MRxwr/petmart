@@ -6,6 +6,8 @@ import 'dart:io';
 
 import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
@@ -14,7 +16,9 @@ import 'package:pet_mart/model/check_credit_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/init_model.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/model/notification_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/providers/notification_count.dart';
 import 'package:pet_mart/screens/search_screen.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
@@ -33,6 +37,7 @@ import 'package:pet_mart/screens/push_notification_screen.dart';
 import 'package:pet_mart/screens/terms_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/utilities/shared_prefs.dart';
+import 'package:pet_mart/widgets/action_icon.dart';
 import 'package:pet_mart/widgets/fab_bottom_app_bar.dart';
 import 'package:pet_mart/widgets/fab_with_icons.dart';
 import 'package:pet_mart/widgets/layout.dart';
@@ -45,6 +50,9 @@ import '../main.dart';
 import 'auction_screen.dart';
 class MainScreen extends StatefulWidget {
   static String id = 'MainScreen';
+  String title;
+  MainScreen({Key key,this.title}): super(key: key);
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -62,6 +70,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
   LoginModel loginModel;
   int index =3;
   final navigatorKey = GlobalKey<NavigatorState>();
+  bool isStart = true;
 
   void _selectedTab(int index) {
     setState(() {
@@ -74,17 +83,23 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
       _lastSelected = 'FAB: $index';
     });
   }
+  int notificationCount = 0;
+  BuildContext context;
   @override
-  void initState() {
+  void initState()  {
     // TODO: implement initState
     super.initState();
+
+
+
     isLoggedIn().then((value){
       isLogIn = value;
     }).whenComplete(() {
       getLoginModel().then((value){
         setState(() {
+
           loginModel = value;
-          _title = getTranslated(context, 'home');
+
         });
 
       });
@@ -103,6 +118,32 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
 
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    int count = _preferences.getInt("notificationCount")??0;
+    String appBadgeSupported;
+    Map mapped = {
+      "id":loginModel.data.customerId,
+      "language":languageCode
+    };
+    PetMartService petMartService = PetMartService();
+    NotificationModel notificationModel =await petMartService.notification(mapped);
+    int  notificationNumber = notificationModel.data.length;
+
+    notificationCount = notificationNumber-count;
+    // try {
+    //   bool res = await FlutterAppBadger.isAppBadgeSupported();
+    //   if (res) {
+    //     FlutterAppBadger.updateBadgeCount(notificationCount);
+    //     appBadgeSupported = 'Supported';
+    //   } else {
+    //     appBadgeSupported = 'Not supported';
+    //   }
+    // } on PlatformException {
+    //   appBadgeSupported = 'Failed to get badge support.';
+    // }
+    Provider.of<NotificationNotifier>(context,listen: false).addCount(notificationCount);
+    print("notificationCount ---->${notificationCount}");
     return loginModel;
   }
   Future<HomeModel> home() async{
@@ -115,12 +156,15 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     bool isLoggedIn =  sharedPreferences.getBool(kIsLogin)??false;
     String uniqueId;
     if(isLoggedIn){
+
       String token =deviceToken;
       final body = json.decode(loginData);
       String fullName = sharedPreferences.getString('email');
       String password= sharedPreferences.getString('password');
       SharedPreferences _preferences = await SharedPreferences.getInstance();
       String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+
 
       PetMartService petMartService = PetMartService();
       String deviceType="";
@@ -153,6 +197,13 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
         await sharedPref.saveString("emil", fullName);
         await sharedPref.saveString("password", password);
       }
+
+
+
+
+
+
+
     }
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -176,11 +227,16 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     HomeModel home = await petMartService.home(map);
     return home;
   }
-  String _title = 'Home' ;
+  String _title = '' ;
 
   @override
   Widget build(BuildContext context) {
-
+    this.context = context;
+    if(isStart){
+      _title = getTranslated(context, 'home');
+      isStart = false;
+    }
+    // _title = getTranslated(context, 'home');
     return
       ModalProgressHUD(
         inAsyncCall: Provider.of<ModelHud>(context).isLoading,
@@ -227,26 +283,37 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
                 ),
               ),
             ),
-            GestureDetector(
-              onTap: (){
-                myMessages(context);
+            Consumer<NotificationNotifier>(
+              builder: (context, count, child){
+                return   GestureDetector(
+                  onTap: ()async{
+
+                    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+                    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+                    if(isLoggedIn){
+                      Navigator.pushNamed(context, PushNotificationScreen.id);
+                    }else{
+                      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+                    }
+
+                  },
+                  child: Padding(
+                      padding: EdgeInsets.all(4.h),
+                      child: NamedIcon(notificationCount: count.notifcationCount,)
+                  ),
+                );
               },
-              child: Padding(
-                padding: EdgeInsets.all(4.h),
-                child: ImageIcon(
-                  AssetImage('assets/images/img_msg.png'
-                  ),size: 20.h,
-                  color: Colors.white,
-                ),
-              ),
             )
+
 
 
           ],
 
         ),
         drawer: isLogIn?
-        loggedDrawer(context,loginModel):visitorDrawer(context),
+            loginModel!= null?loggedDrawer(context,loginModel):
+
+        Container():visitorDrawer(context),
 
         body:
          IndexedStack(
@@ -303,6 +370,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           notchedShape: CircularNotchedRectangle(),
 
           onTabSelected: (val) {
+
             return  _onTap(val, context);
           },
           items: [
@@ -454,7 +522,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
                           children: [
                             Padding(
 
-                              
+
                               padding: EdgeInsetsDirectional.only(start: 4.h),
                               child: Text('${getTranslated(context, 'current_credit')}${loginModel.data.availableCredit}',
 
@@ -519,19 +587,19 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
                     fontWeight: FontWeight.normal
                 ),),
             ),
-            ListTile(
-              onTap: (){
-                Navigator.pop(context);
-                Navigator.pushNamed(context, OrdersScreen.id);
-              },
-
-              title: Text(getTranslated(context, 'order'),
-                style: TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontSize: screenUtil.setSp(17),
-                    fontWeight: FontWeight.normal
-                ),),
-            ),
+            // ListTile(
+            //   onTap: (){
+            //     Navigator.pop(context);
+            //     Navigator.pushNamed(context, OrdersScreen.id);
+            //   },
+            //
+            //   title: Text(getTranslated(context, 'order'),
+            //     style: TextStyle(
+            //         color: Color(0xFFFFFFFF),
+            //         fontSize: screenUtil.setSp(17),
+            //         fontWeight: FontWeight.normal
+            //     ),),
+            // ),
             ListTile(
               onTap: (){
                 Navigator.pop(context);
@@ -661,9 +729,9 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
       switch (val) {
         case 3:
           print(val);
-
-          _homeScreen.currentState.popUntil((route) => route.isFirst);
           _title=getTranslated(context, 'home');
+          _homeScreen.currentState.popUntil((route) => route.isFirst);
+
           setState(() {
 
           });
@@ -671,28 +739,32 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           break;
         case 2:
           print(val);
-          _competitionNewsScreen.currentState.popUntil((route) => route.isFirst);
           _title=getTranslated(context, 'adaption');
-          setState(() {
+          _competitionNewsScreen.currentState.popUntil((route) => route.isFirst);
 
-          });
+          WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {
+
+          }));
 
           break;
         case 1:
           print(val);
-          _amateursNews.currentState.popUntil((route) => route.isFirst);
           _title=getTranslated(context, 'lost');
-          setState(() {
+          _amateursNews.currentState.popUntil((route) => route.isFirst);
+
+           setState(() {
 
           });
           break;
         case 0:
           print(val);
-          _vediosScreen.currentState.popUntil((route) => route.isFirst);
           _title=getTranslated(context, 'auction');
           setState(() {
 
           });
+          _vediosScreen.currentState.popUntil((route) => route.isFirst);
+
+
           break;
 
         default:
@@ -700,24 +772,38 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     } else {
       index = val;
       if(index ==0){
-        _vediosScreen.currentState.pushReplacementNamed(AuctionScreen.id);
         _title=getTranslated(context, 'auction');
+        _vediosScreen.currentState.pushReplacementNamed(AuctionScreen.id);
+        setState(() {
+
+        });
+
       }else if(index == 1){
-        _amateursNews.currentState.pushReplacementNamed(LostScreen.id);
         _title=getTranslated(context, 'lost');
+        _amateursNews.currentState.pushReplacementNamed(LostScreen.id);
+         setState(() {
+
+        });
+
       }else if(index == 2){
-        _competitionNewsScreen.currentState.pushReplacementNamed(AdaptionScreen.id);
         _title=getTranslated(context, 'adaption');
+        _competitionNewsScreen.currentState.pushReplacementNamed(AdaptionScreen.id);
+         setState(() {
+
+        });
+
       }else if(index == 3){
-        _homeScreen.currentState.pushReplacementNamed(HomeScreen.id);
         _title=getTranslated(context, 'home');
+        _homeScreen.currentState.pushReplacementNamed(HomeScreen.id);
+         setState(() {
+
+        });
+
       }
       index = val;
       print('index ${index}');
       print(_title);
-        setState(() {
 
-        });
 
     }
   }

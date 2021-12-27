@@ -68,7 +68,7 @@ class PhoneTextField extends StatelessWidget {
 
               decoration:
               InputDecoration(
-                prefixText: '+965- ',
+                prefixText: getTranslated(context, 'prefex'),
 
 
 

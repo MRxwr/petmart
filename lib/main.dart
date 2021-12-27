@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:firebase_core/firebase_core.dart';
@@ -15,6 +16,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/model/token_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/providers/notification_count.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
 import 'package:pet_mart/screens/auction_details_screen.dart';
@@ -58,7 +60,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 const AndroidNotificationChannel channel = AndroidNotificationChannel(
   'high_importance_channel', // id
   'High Importance Notifications', // title
-  'This channel is used for important notifications.', // description
+  // description
   importance: Importance.high,
 );
 
@@ -69,6 +71,8 @@ void main() async{
   setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+
 
   // Set the background messaging handler early on, as a named top-level function
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -211,6 +215,7 @@ Future<void> init() async{
   void initState() {
     // TODO: implement initState
     super.initState();
+
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage message) {
@@ -222,7 +227,7 @@ Future<void> init() async{
       String type = dataObject['push_type'];
 
       print('type ---> ${type}');
-      if (type == 'chatuser'){
+      if (type .contains('chatuser')){
 
           Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
             return new MyMessagesScreen();
@@ -230,7 +235,7 @@ Future<void> init() async{
 
 
 
-      }else if(type == 'rateonuser'){
+      }else if(type .contains('rateonuser')){
         String auctionId = dataObject['auction_id'];
         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
           return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
@@ -245,6 +250,7 @@ Future<void> init() async{
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification notification = message.notification;
+
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
         flutterLocalNotificationsPlugin.show(
@@ -255,7 +261,7 @@ Future<void> init() async{
               android: AndroidNotificationDetails(
                 channel.id,
                 channel.name,
-                channel.description,
+
                 // TODO add a proper drawable resource to android, for now using
                 //      one that already exists in example app.
                 icon: 'launch_background',
@@ -270,11 +276,11 @@ Future<void> init() async{
       dynamic dataObject=  message.data;
       print('dataObject ---> ${dataObject.toString()}');
       String type = dataObject['push_type'];
-      if (type == 'chatuser'){
+      if (type .contains('chatuser') ){
         Navigator.of(navigatorKey.currentContext,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
           return new MyMessagesScreen();
         }));
-      }else if(type == 'rateonuser'){
+      }else if(type .contains('rateonuser') ){
         String auctionId = dataObject['auction_id'];
         Navigator.of(navigatorKey.currentContext,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
           return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
@@ -352,7 +358,7 @@ Future<void> init() async{
                   MultiProvider(
                     providers: [
                       ChangeNotifierProvider<ModelHud>(create: (context) => ModelHud()),
-
+                      ChangeNotifierProvider<NotificationNotifier>(create: (context) => NotificationNotifier()),
                     ],
                     child:
 

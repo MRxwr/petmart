@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -10,6 +12,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/notification_model.dart';
 import 'package:pet_mart/model/notify_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/providers/notification_count.dart';
 import 'package:pet_mart/screens/notification_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +41,23 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
       "language":languageCode
     };
     NotificationModel notificationModel =await petMartService.notification(map);
+    int  notificationNumber = notificationModel.data.length;
+    SharedPreferences sharedPreferenc = await SharedPreferences.getInstance();
+    sharedPreferenc.setInt("notificationCount", notificationNumber);
+    String appBadgeSupported;
+    Provider.of<NotificationNotifier>(context,listen: false).addCount(0);
+    // try {
+    //   bool res = await FlutterAppBadger.isAppBadgeSupported();
+    //   if (res) {
+    //     FlutterAppBadger.updateBadgeCount(0);
+    //     FlutterAppBadger.removeBadge();
+    //     appBadgeSupported = 'Supported';
+    //   } else {
+    //     appBadgeSupported = 'Not supported';
+    //   }
+    // } on PlatformException {
+    //   appBadgeSupported = 'Failed to get badge support.';
+    // }
     return notificationModel;
   }
   NotificationModel notificationModel;
@@ -46,6 +66,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     // TODO: implement initState
     super.initState();
     getNotificationList().then((value){
+
       setState(() {
         notificationModel = value;
       });
@@ -154,6 +175,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                       return
                         GestureDetector(
                           onTap: (){
+                            print("tap");
                             String type = notificationModel.data[index].type;
                             if(type == "auction"){
                               String id = notificationModel.data[index].details[0].auctionId;

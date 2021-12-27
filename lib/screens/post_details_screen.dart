@@ -7,7 +7,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart';
-import 'package:image_downloader/image_downloader.dart';
+
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 import 'package:pet_mart/api/pet_mart_service.dart';
@@ -538,10 +538,10 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Opacity(
-                          opacity: postDetailsModel.data.postType == 'sell'?1.0:0.0,
-                          child: Expanded(
-                            flex:1,
+                        Expanded(
+                          flex:1,
+                          child: Opacity(
+                            opacity:  postDetailsModel.data.postType == 'sell'?1.0:0.0,
                             child: Text(
                               '${postDetailsModel.data.postPrice}',
                               style: TextStyle(
@@ -630,30 +630,19 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     ),
                     GestureDetector(
                       onTap: ()async{
-                        SharedPreferences _preferences = await SharedPreferences.getInstance();
-                        String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-                        String loginData = _preferences.getString(kUserModel);
-                        Map map;
+                        print('mobile --> ${postDetailsModel.data.contactDetail.mobile}');
+                        _openUrl(url(postDetailsModel.data.contactDetail.mobile, ""));
 
-                        final body = json.decode(loginData);
-                        LoginModel   loginModel = LoginModel.fromJson(body);
-                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
-                            contactImage:postDetailsModel.data.contactDetail.profileImage ,
-                            contactId:postDetailsModel.data.contactDetail.customerId,
-                            postId: postDetailsModel.data.postId,
-                            userId: loginModel.data.customerId,);
-                        }));
                       },
                       child: Column(
 
                         children: [
-                          Image.asset('assets/images/img_contact.png',
-                            height: 30.h,width: 30.w,
+                          Image.asset('assets/images/whatsapp.png',
+                            height: 30.h,width: 30.w,color: Color(0xAA1E1F20),
                           )
                           ,
                           Text(
-                            "${postDetailsModel.data.contactCount} ${getTranslated(context, 'send_messages')}" ,
+                            "${getTranslated(context, "send_messages")}" ,
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(14),
@@ -1111,4 +1100,22 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       },
     );
   }
+
+  String url(String phone,String message) {
+    if (Platform.isAndroid) {
+      // add the [https]
+      return "https://wa.me/$phone/?text=+965${Uri.parse(message)}"; // new line
+    } else {
+      // add the [https]
+      return "https://api.whatsapp.com/send?phone=+965$phone=${Uri.parse(message)}"; // new line
+    }
+  }
+  Future<void> _openUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
 }

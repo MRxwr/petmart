@@ -4,7 +4,7 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:imei_plugin/imei_plugin.dart';
+
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -270,10 +270,10 @@ uniqueId = await UniqueIdentifier.serial;
 
       }else{
         modelHud.changeIsLoading(false);
-        if(loginModel.message.contains("OTP")){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: loginModel.data.mobile,otp: loginModel.data.otp.toString(),userId: loginModel.data.customerId,)));
-
-        }
+        // if(loginModel.message.contains("OTP")){
+        //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: loginModel.data.mobile,otp: loginModel.data.otp.toString(),userId: loginModel.data.customerId,)));
+        //
+        // }
         _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(loginModel.message)));
       }
     }

@@ -12,6 +12,7 @@
   "reg_now": "LogIn Now",
   "ok": "Ok",
   "no": "No",
+  "prefex": "+965-",
   "select_image": "Select Image",
   "camera": "Camera",
   "gallery": "Gallery",
@@ -160,12 +161,17 @@
   "payment_fail": "Payment failed",
   "success": "Success",
   "fail": "Fail",
-  "go_to_main": "Go To Main"
-
-
-
-
-
+  "go_to_main": "Go To Main",
+  "auction_owner": "Auction Owner",
+  "category": "Category",
+  "sub_category": "SubCategory",
+  "start_date_string": "Start Date",
+  "end_date_string": "End Date",
+  "highest_bidder": "Highest Bidder",
+  "highest_price": "Highest Price",
+  "rate_auction_awner": "Rate Auction Owner",
+  "rate_highest_bidder": "Rate Highest Bidder",
+  "sumbit_rating": "Submit My Rating "
 
 
 }

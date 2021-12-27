@@ -7,7 +7,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart';
-import 'package:image_downloader/image_downloader.dart';
+
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 import 'package:pet_mart/api/pet_mart_service.dart';

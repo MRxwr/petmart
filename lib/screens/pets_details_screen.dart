@@ -7,7 +7,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart';
-import 'package:image_downloader/image_downloader.dart';
+
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 import 'package:pet_mart/api/pet_mart_service.dart';
@@ -521,17 +521,19 @@ contact(context, contactDetail);
                     ),
                     GestureDetector(
                       onTap: ()async{
-                        message(context);
+                        print('mobile --> ${postDetailsModel.data.contactDetail.mobile}');
+                        _openUrl(url(postDetailsModel.data.contactDetail.mobile, ""));
+
                       },
                       child: Column(
 
                         children: [
-                          Image.asset('assets/images/img_contact.png',
-                            height: 30.h,width: 30.w,
+                          Image.asset('assets/images/whatsapp.png',
+                            height: 30.h,width: 30.w,color: Color(0xAA1E1F20),
                           )
-                         ,
+                          ,
                           Text(
-                            "${postDetailsModel.data.postMessageCount} ${getTranslated(context,'send_messages')}" ,
+                            "${getTranslated(context, "send_messages")}" ,
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(14),
@@ -1079,6 +1081,26 @@ contact(context, contactDetail);
     );
     alert.show();
 
+  }
+  String url(String phone,String message) {
+
+    if (Platform.isAndroid) {
+      phone = "+965$phone";
+      // add the [https]
+      // print("https://api.whatsapp.com/send?phone=+965$phone&text=${Uri.parse(message)}");
+      return "https://wa.me/$phone/?text=${Uri.parse(message)}";
+      return "https://wa.me/$phone/?text=+965${Uri.parse(message)}"; // new line
+    } else {
+      // add the [https]
+      return "https://api.whatsapp.com/send?phone=+965$phone=${Uri.parse(message)}"; // new line
+    }
+  }
+  Future<void> _openUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
 }

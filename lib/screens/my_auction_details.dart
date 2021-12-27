@@ -313,17 +313,28 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                             bottom: 0,
                                             child: item.type =='video' ?
                                             Center(
-                                              child: Container(
-                                                height: 60.h,
-                                                width: 60.h,
+                                              child: GestureDetector(
+                                                onTap: (){
+                                                  String type = item.type;
+                                                  String url = item.image.trim();
+                                                  if(type == 'video'){
+                                                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                                      return new VideoScreen(vedioUrl:url,auctionName: mAuctionDetailsModel.data.auctionName,);
+                                                    }));
+                                                  }
+                                                },
+                                                child: Container(
+                                                  height: 60.h,
+                                                  width: 60.h,
 
-                                                decoration: BoxDecoration(
-                                                    image: DecorationImage(
-                                                        image: AssetImage('assets/images/youtube_icon.png'),
-                                                        fit: BoxFit.fill
-                                                    )
+                                                  decoration: BoxDecoration(
+                                                      image: DecorationImage(
+                                                          image: AssetImage('assets/images/youtube_icon.png'),
+                                                          fit: BoxFit.fill
+                                                      )
+                                                  ),
+                                                  child: Icon(Icons.video_collection,color: kMainColor,size: 50.h),
                                                 ),
-                                                child: Icon(Icons.video_collection,color: kMainColor,size: 50.h),
                                               ),
                                             ):
                                             Container())

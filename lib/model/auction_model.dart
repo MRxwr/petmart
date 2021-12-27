@@ -23,7 +23,8 @@ class AuctionModel {
   AuctionModel.fromJson(dynamic json) {
     _status = json["status"];
     _message = json["message"];
-    if (json["data"] != null) {
+
+    if (json["data"]!= null) {
       _data = [];
       json["data"].forEach((v) {
         _data.add(Data.fromJson(v));

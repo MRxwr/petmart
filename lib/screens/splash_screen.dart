@@ -212,7 +212,7 @@ class _SplashScreenState extends State<SplashScreen> {
         color: Color(0xFFFFFFFF),
         child: Center(
 
-          child: Image.asset('assets/images/img_language_logo.png',height: 400.h,width: 400.w,fit: BoxFit.fill,),
+          child: Image.asset('assets/images/img_language_logo.png',height: 200.h,width: 200.w,fit: BoxFit.fill,),
         ),
       ),
     );

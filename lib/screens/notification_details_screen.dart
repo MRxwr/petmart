@@ -140,7 +140,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Auction Owner',
+                            Text(getTranslated(context, 'auction_owner'),
                             style: TextStyle(
                               color: kMainColor,
                               fontSize: screenUtil.setSp(16),
@@ -152,7 +152,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                                   fontSize: screenUtil.setSp(16),
                                   fontWeight: FontWeight.w600
                               ),),
-                            Text('Category',
+                            Text(getTranslated(context, 'category'),
                               style: TextStyle(
                                   color: kMainColor,
                                   fontSize: screenUtil.setSp(16),
@@ -219,7 +219,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
 
                       ],
                     ),
-                    Text('SubCategory',
+                    Text(getTranslated(context, 'sub_category'),
                       style: TextStyle(
                           color: kMainColor,
                           fontSize: screenUtil.setSp(16),
@@ -231,7 +231,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           fontSize: screenUtil.setSp(16),
                           fontWeight: FontWeight.w600
                       ),),
-                    Text('Auction Description',
+                    Text(getTranslated(context, 'auction_description'),
                       style: TextStyle(
                           color: kMainColor,
                           fontSize: screenUtil.setSp(16),
@@ -248,7 +248,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                       children: [
                         Column(
                           children: [
-                            Text('Start Date',
+                            Text(getTranslated(context, 'start_date_string'),
                               style: TextStyle(
                                   color: kMainColor,
                                   fontSize: screenUtil.setSp(16),
@@ -264,7 +264,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                         ),
                         Column(
                           children: [
-                            Text('End Date',
+                            Text(getTranslated(context, 'end_date_string'),
                               style: TextStyle(
                                   color: kMainColor,
                                   fontSize: screenUtil.setSp(16),
@@ -284,7 +284,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                     height: 1,
                     color: Color(0x44000000),),
                     SizedBox(height: 10.w,),
-                    Text('Highest Bidder',
+                    Text(getTranslated(context, 'highest_bidder'),
                       style: TextStyle(
                           color: kMainColor,
                           fontSize: screenUtil.setSp(16),
@@ -296,7 +296,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           fontSize: screenUtil.setSp(16),
                           fontWeight: FontWeight.w600
                       ),),
-                    Text('Highest Price',
+                    Text(getTranslated(context, 'highest_price'),
                       style: TextStyle(
                           color: kMainColor,
                           fontSize: screenUtil.setSp(16),
@@ -319,7 +319,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                       :Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text('Rate Auction Owner',
+                          Text(getTranslated(context, 'rate_auction_awner'),
                             style: TextStyle(
                                 color: kMainColor,
                                 fontSize: screenUtil.setSp(16),
@@ -366,7 +366,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                         Container():
                       Column(
                         children: [
-                          Text('Rate Highest Bidder',
+                          Text(getTranslated(context, 'rate_highest_bidder'),
                             style: TextStyle(
                                 color: kMainColor,
                                 fontSize: screenUtil.setSp(16),
@@ -429,7 +429,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text('Auction Owner',
+                              Text(getTranslated(context, 'auction_owner'),
                                 style: TextStyle(
                                     color: Color(0xFFFFFFFF),
                                     fontSize: screenUtil.setSp(16),
@@ -463,7 +463,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text('Highest Bidder',
+                              Text(getTranslated(context, 'highest_bidder'),
                                 style: TextStyle(
                                     color: Color(0xFFFFFFFF),
                                     fontSize: screenUtil.setSp(16),
@@ -498,7 +498,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text('Submit My Rating ',
+                              Text(getTranslated(context, 'sumbit_rating'),
                                 style: TextStyle(
                                     color: Color(0xFFFFFFFF),
                                     fontSize: screenUtil.setSp(16),

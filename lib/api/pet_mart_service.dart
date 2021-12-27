@@ -92,6 +92,7 @@ map['language'] = languageCode;
 
 
     if (response.statusCode == 200) {
+      print(response.body);
 
 
 
@@ -283,7 +284,10 @@ map['language'] = languageCode;
     String body = json.encode(map);
 
     final response = await http.post(Uri.parse("${TAG_BASE_URL}auction/auctionrunning"),headers: {"Content-Type": "application/json"},body: body);
-    print(response);
+    print('Running AuctionModel ---> ${response.body}');
+    // Map  mapResponse = jsonDecode(response.body);
+    // print('mapResponse --> ${mapResponse}');
+
     AuctionModel auctionModel;
     if(response.statusCode == 200){
       auctionModel = AuctionModel.fromJson(jsonDecode(response.body));
@@ -1132,7 +1136,7 @@ map['language'] = languageCode;
     String body = json.encode(map);
 
     final response = await http.post(Uri.parse("${TAG_BASE_URL}notification/list"),headers: {"Content-Type": "application/json"},body: body);
-    print(' PostModel ${response}');
+    print(' PostModel ${response.body}');
     NotificationModel notificationModel;
     if(response.statusCode == 200){
       notificationModel = NotificationModel.fromJson(jsonDecode(response.body));

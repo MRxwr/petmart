@@ -5,7 +5,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
+
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/init_model.dart';
@@ -23,23 +24,7 @@ class ContactUsScreen extends StatefulWidget {
 class _ContactUsScreenState extends State<ContactUsScreen> {
   String _platformVersion = 'Unknown';
   final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await FlutterOpenWhatsapp.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
-    _platformVersion = platformVersion;
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-
-  }
   Future<InitModel> init() async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
@@ -54,13 +39,11 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    initPlatformState().whenComplete(() {
-      init().then((value) {
-        setState(() {
-          initModel = value;
-        });
-
+    init().then((value) {
+      setState(() {
+        initModel = value;
       });
+
     });
   }
   @override
