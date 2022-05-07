@@ -5,6 +5,7 @@ import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class PrivacyScreen extends StatefulWidget {
   static String id = 'PrivacyScreen';
   CmsModel cmsModel;
@@ -14,6 +15,7 @@ class PrivacyScreen extends StatefulWidget {
 
 class _PrivacyScreenState extends State<PrivacyScreen> {
   CmsModel cmsModel;
+  String languageCode ="";
   @override
   void initState() {
     // TODO: implement initState
@@ -25,8 +27,10 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
     });
   }
   Future<CmsModel> privacyPolicy() async{
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     PetMartService petMartService = PetMartService();
-    CmsModel  cmsModel = await petMartService.cms('privacy-policy');
+    CmsModel  cmsModel = await petMartService.cms();
     return cmsModel;
     
   }
@@ -78,7 +82,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
               child: HtmlWidget(
 
 
-                cmsModel.data.pageContent,
+                languageCode == "en"? cmsModel.data.enPolicy:cmsModel.data.arPolicy,
                 textStyle: TextStyle(
                     color: Color(0xFF000000),
                     fontWeight: FontWeight.w500,

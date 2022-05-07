@@ -8,6 +8,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/error_model.dart';
+import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/register_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/login_screen.dart';
@@ -21,6 +23,9 @@ import 'package:pet_mart/widgets/user_name_textfield.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unique_identifier/unique_identifier.dart';
+
+import '../utilities/shared_prefs.dart';
+import 'main_sceen.dart';
 class RegisterScreen extends StatefulWidget {
   static String id = 'RegisterScreen';
   GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
@@ -271,34 +276,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
           uniqueId = data.identifierForVendor;
         }
         PetMartService petMartService = PetMartService();
-        Map map = {
-          'firstname': firstName,
-          'lastname': lastName,
-          'email': email,
-          'password': password,
-          're_type_password': confirmPassword,
-          'mobile': mobileNumber,
-          "date_of_birth": "17-12-1990",
-          "country": "Kuwait",
-          "device_token": deviceToken,
-          "imei_number": uniqueId,
-          "device_type": deviceType,
-          "language": languageCode
-        };
+        Map<String, String> map = Map();
+        map['name']=firstName +" "+lastName;
+        map['email']= email;
+        map['password']= password;
+        map['confirmPassword']= confirmPassword;
+        map['mobile']= mobileNumber;
+        map['firebase']= deviceToken;
+
         print(map);
 
-        RegisterModel registerModel = await petMartService.register(map);
-        String mStatus = registerModel.status;
-        if (mStatus.trim() == 'success') {
-          modelHud.changeIsLoading(false);
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: registerModel.data.mobile,otp: registerModel.data.otp.toString(),userId: registerModel.data.customerId,)));
+        Map<String, dynamic>   response = await petMartService.register(map);
+        modelHud.changeIsLoading(false);
+        bool  isOk  = response['ok'];
+        if (isOk) {
+          LoginModel registerModel = LoginModel.fromJson(response);
+
+          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: registerModel.data.mobile,otp: registerModel.data.otp.toString(),userId: registerModel.data.customerId,)));
 
           _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text(registerModel.message)));
+              SnackBar(content: Text("success")));
+          SharedPref sharedPref = SharedPref();
+          await sharedPref.save(kUserModel, registerModel);
+          await sharedPref.saveBool(kIsLogin, true);
+          await sharedPref.saveString("email", email);
+          await sharedPref.saveString("password", password);
+          Navigator.pushReplacementNamed(context,MainScreen.id);
         } else {
-          modelHud.changeIsLoading(false);
+          ErrorModel errorModel = ErrorModel.fromJson(response);
           _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text(registerModel.message)));
+              SnackBar(content: Text(errorModel.data.msg)));
         }
       }
     }else{

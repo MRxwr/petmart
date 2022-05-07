@@ -50,9 +50,9 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
     }else{
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
-      userId = loginModel.data.customerId;
+      userId = loginModel.data.id;
       map = {"auction_id":widget.id,
-        "user_id":loginModel.data.customerId,
+        "user_id":loginModel.data.id,
         "language":languageCode};
       print(map);
     }

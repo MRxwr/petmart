@@ -8,6 +8,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/post_model.dart' as PostModel;
 import 'package:pet_mart/screens/lost_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 class LostScreen extends StatefulWidget {
@@ -20,29 +21,29 @@ class _LostScreenState extends State<LostScreen> {
   HomeModel homeModel;
   List<bool> selectedList = List();
   PostModel.PostModel postModel;
-  List<Category> categories = List();
+  List<Categories> categories = List();
   ScreenUtil screenUtil = ScreenUtil();
   double itemWidth;
   double itemHeight;
   int selectedIndex =0;
-
+  String  languageCode ="";
   Future<HomeModel> getHomeModel() async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String homeString = sharedPreferences.getString("home");
-
+    languageCode = sharedPreferences.getString(LANG_CODE) ?? ENGLISH;
     HomeModel  homeModel ;
 
 
     final body = json.decode(homeString);
     homeModel = HomeModel.fromJson(body);
-    List<Images> images = null;
-    String categoryId = "";
-    Category category = Category(categoryId:categoryId,categoryName:"All",images: images);
+
+    String categoryId = "0";
+    Categories category = Categories(id:categoryId,arTitle:getTranslated(context, 'all'),enTitle:getTranslated(context, 'all'),logo: "");
     categories.add(category);
     selectedList.add(true);
 
-    for(int i =0;i<homeModel.data.category.length;i++){
-      categories.add(homeModel.data.category[i]);
+    for(int i =0;i<homeModel.data.categories.length;i++){
+      categories.add(homeModel.data.categories[i]);
       selectedList.add(false);
     }
 
@@ -60,7 +61,7 @@ class _LostScreenState extends State<LostScreen> {
       "language":languageCode};
     print(' PostModel --> ${map}');
     PetMartService petMartService = PetMartService();
-    PostModel.PostModel postModel = await petMartService.post(map);
+    PostModel.PostModel postModel = await petMartService.post("lost",catId);
     return postModel;
   }
   void getList(String catId) async{
@@ -74,7 +75,7 @@ class _LostScreenState extends State<LostScreen> {
       "language":languageCode};
     print(' PostModel --> ${map}');
     PetMartService petMartService = PetMartService();
-    postModel = await petMartService.post(map);
+    postModel = await petMartService.post("lost",catId);
     setState(() {
 
     });
@@ -86,7 +87,7 @@ class _LostScreenState extends State<LostScreen> {
     // TODO: implement initState
     super.initState();
     getHomeModel().whenComplete((){
-      post(categories[0].categoryId).then((value) {
+      post(categories[0].id).then((value) {
         postModel = value;
         setState(() {
 
@@ -139,7 +140,7 @@ class _LostScreenState extends State<LostScreen> {
                               setState(() {
 
                               });
-                              getList(categories[index].categoryId);
+                              getList(categories[index].id);
 
 
                             }
@@ -175,11 +176,11 @@ class _LostScreenState extends State<LostScreen> {
                   ),
                   alignment: AlignmentDirectional.center,
                 ):
-                postModel.data.isEmpty?
+                postModel.data.items.isEmpty?
 
                 Container(
                   child: Text(
-                    postModel.message,
+                    getTranslated(context, 'no_product_available'),
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: screenUtil.setSp(16),
@@ -197,13 +198,13 @@ class _LostScreenState extends State<LostScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                       childAspectRatio:itemWidth/itemHeight),
-                  itemCount: postModel.data.length,
+                  itemCount: postModel.data.items.length,
 
                   itemBuilder: (context,index){
                     return GestureDetector(
                       onTap: (){
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new LostDetailScreen(postId:postModel.data[index].postId,postName:postModel.data[index].postName);
+                          return new LostDetailScreen(postId:postModel.data.items[index].id,postName:languageCode =="en"? postModel.data.items[index].enTitle:postModel.data.items[index].arTitle);
                         }));
                       },
                       child: Container(
@@ -216,7 +217,7 @@ class _LostScreenState extends State<LostScreen> {
                                 borderRadius: BorderRadius.circular(10.0.h),
                               ),
                               color: Color(0xFFFFFFFF),
-                              child: buildItem(postModel.data[index],context))),
+                              child: buildItem(postModel.data.items[index],context))),
                     );
                   },
                 ),
@@ -229,7 +230,7 @@ class _LostScreenState extends State<LostScreen> {
 
     );
   }
-  TextButton previewButton(Category category,BuildContext context){
+  TextButton previewButton(Categories category,BuildContext context){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFFFFF),
       minimumSize: Size(50.w, 35.h),
@@ -245,14 +246,14 @@ class _LostScreenState extends State<LostScreen> {
       onPressed: () {
 
       },
-      child: Text(category.categoryName,style: TextStyle(
+      child: Text(languageCode == "en"?category.enTitle:category.arTitle,style: TextStyle(
           color: Color(0xFFFFFFFF),
           fontSize: screenUtil.setSp(14),
           fontWeight: FontWeight.w500
       ),),
     );
   }
-  Container selectRow(Category category,BuildContext context,int selectedIndex){
+  Container selectRow(Categories category,BuildContext context,int selectedIndex){
 
     return
       Container(
@@ -265,7 +266,7 @@ class _LostScreenState extends State<LostScreen> {
               color: kMainColor
           ),
           child: Text(
-            category.categoryName,
+            languageCode == "en"?category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -285,7 +286,7 @@ class _LostScreenState extends State<LostScreen> {
               )
           ),
           child: Text(
-            category.categoryName,
+            languageCode == "en"?category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -297,7 +298,7 @@ class _LostScreenState extends State<LostScreen> {
       );
   }
 
-  Widget buildItem(PostModel.Data data, BuildContext context) {
+  Widget buildItem(PostModel.Items data, BuildContext context) {
     return Container(
       child: Column(
         children: [
@@ -307,7 +308,7 @@ class _LostScreenState extends State<LostScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.gallery[0].image,
+                  imageUrl:kImagePath+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -336,7 +337,7 @@ class _LostScreenState extends State<LostScreen> {
                       ),
 
 
-                  errorWidget: (context, url, error) => ClipRRect(    borderRadius: BorderRadius.circular(30.0.w),
+                  errorWidget: (context, url, error) => ClipRRect(
                       child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
                         fit: BoxFit.fill,
                         colorBlendMode: BlendMode.difference,)),
@@ -347,7 +348,7 @@ class _LostScreenState extends State<LostScreen> {
                   bottom: 2.h,
                   start: 10.w,
                   child: Text(
-                    data.postDate,
+                    "17-12-2022",
                     style: TextStyle(
                         color: Color(0xFFFFFFFF)
 
@@ -364,7 +365,7 @@ class _LostScreenState extends State<LostScreen> {
                 Container(
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    data.postName,
+                    languageCode =="en"? data.enTitle:data.arTitle,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -373,24 +374,7 @@ class _LostScreenState extends State<LostScreen> {
 
                   ),
                 )),
-                Expanded(flex:1,child:
-                Row(
-                  children: [
-                    Image.asset('assets/images/placeholder_image_count.png'),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5.w),
-                      child: Text(
-                        data.imageCount.toString(),
-                        style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontWeight: FontWeight.normal,
-                            fontSize: screenUtil.setSp(14)
-                        ),
 
-                      ),
-                    ),
-                  ],
-                ))
               ],
             ),
           ))

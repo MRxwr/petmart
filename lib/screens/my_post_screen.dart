@@ -11,6 +11,7 @@ import 'package:pet_mart/model/post_model.dart' as Model;
 import 'package:pet_mart/model/type_model.dart';
 import 'package:pet_mart/screens/post_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class MyPostScreen extends StatefulWidget {
   static String id = 'MyPostScreen';
@@ -50,16 +51,17 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
 
   }
+  String languageCode;
   Future<Map> map() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
     String loginData = _preferences.getString(kUserModel);
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
     Map map ;
     map = {"language":languageCode,
-    "userId":loginModel.data.customerId};
+    "userId":loginModel.data.id};
     return map;
   }
   Future<Model.PostModel> posts(String type) async{
@@ -217,11 +219,11 @@ class _MyPostScreenState extends State<MyPostScreen> {
                 ),
                 alignment: AlignmentDirectional.center,
               ):
-              postModel.data.isEmpty?
+              postModel.data.items.isEmpty?
 
               Container(
                 child: Text(
-                  postModel.message,
+                  getTranslated(context, 'no_product_available'),
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: screenUtil.setSp(16),
@@ -238,13 +240,13 @@ class _MyPostScreenState extends State<MyPostScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                     childAspectRatio:itemWidth/itemHeight),
-                itemCount: postModel.data.length,
+                itemCount: postModel.data.items.length,
 
                 itemBuilder: (context,index){
                   return GestureDetector(
                     onTap: (){
                       Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new PostDetailsScreen(postId:postModel.data[index].postId,postName:postModel.data[index].postName ,);
+                        return new PostDetailsScreen(postId:postModel.data.items[index].id,postName:languageCode =="en"? postModel.data.items[index].enTitle:postModel.data.items[index].arTitle ,);
                       }));
                     },
                     child: Container(
@@ -258,7 +260,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
                               borderRadius: BorderRadius.circular(10.0.h),
                             ),
                             color: Color(0xFFFFFFFF),
-                            child: buildItem(postModel.data[index],context))),
+                            child: buildItem(postModel.data.items[index],context))),
                   );
                 },
               ),
@@ -314,7 +316,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
         ),
       );
   }
-  Widget buildItem(Model.Data data, BuildContext context) {
+  Widget buildItem(Model.Items data, BuildContext context) {
     return Container(
       child: Column(
         children: [
@@ -324,7 +326,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.postImage,
+                  imageUrl:kImagePath+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -364,7 +366,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
                   bottom: 2.h,
                   start: 10.w,
                   child: Text(
-                    data.postDate,
+                    "17-12-2022",
                     style: TextStyle(
                         color: Color(0xFF000000)
 
@@ -383,7 +385,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    data.postName,
+                    languageCode =="en"? data.enTitle:data.arTitle,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -392,63 +394,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
                   ),
                 )),
-                Expanded(flex:1,child:
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5.w,vertical: 2.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Image.asset('assets/images/placeholder_image_count.png'),
-                  Container(
-                    padding: EdgeInsetsDirectional.only( start: 2.w),
-                    child:
-                    Container(
 
-
-                      child: Text(
-
-                        data.imageCount.toString(),
-
-                        style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontWeight: FontWeight.normal,
-                            fontSize: screenUtil.setSp(14)
-                        ),
-
-                      ),
-                    ),
-                  ),
-                        ],
-                      ),
-
-                      Row(
-                        children: [
-                          Container(
-                            padding: EdgeInsetsDirectional.only( start: 2.w),
-                            child:
-                            Container(
-
-
-                              child: Text(
-
-                                data.postType.toString(),
-
-                                style: TextStyle(
-                                    color: kMainColor,
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: screenUtil.setSp(14)
-                                ),
-
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ))
               ],
             ),
           ))

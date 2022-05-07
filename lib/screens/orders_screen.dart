@@ -297,7 +297,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {
 
-        'user_id': loginModel.data.customerId,
+        'user_id': loginModel.data.id,
 
         'language': languageCode
       };

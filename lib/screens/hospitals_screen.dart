@@ -5,6 +5,7 @@ import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/hospitals_model.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'hospital_details_screen.dart';
@@ -96,10 +97,10 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
               childAspectRatio:itemWidth/itemHeight),
-          itemCount: hospitalModel.data.length,
+          itemCount: hospitalModel.data.hospital.length,
           itemBuilder: (context,index){
             return GestureDetector(child:
-            Card(child: buildItem(hospitalModel.data[index],context),
+            Card(child: buildItem(hospitalModel.data.hospital[index],context),
               margin: EdgeInsets.all(4.h),
               clipBehavior: Clip.antiAliasWithSaveLayer,
               elevation: 1.w,
@@ -108,9 +109,9 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
               ),
               color: Color(0xFFFFFFFF),)
               ,onTap: (){
-              String mHospitalName = mLanguage=="ar"?hospitalModel.data[index].nameArabic:hospitalModel.data[index].nameEnglish;
+              String mHospitalName = mLanguage=="ar"?hospitalModel.data.hospital[index].arTitle:hospitalModel.data.hospital[index].enTitle;
                 Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
-                  return new HospitalDetailsScreen(id:hospitalModel.data[index].id,name: mHospitalName);
+                  return new HospitalDetailsScreen(id:hospitalModel.data.hospital[index].id,name: mHospitalName);
                 }));
               },);
           },
@@ -120,7 +121,7 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
       ),
     );
   }
-  Widget buildItem(Data data, BuildContext context) {
+  Widget buildItem(Hospital data, BuildContext context) {
     return Container(
       child: Column(
         children: [
@@ -130,7 +131,7 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.logoImage,
+                  imageUrl:kImagePath+data.logo,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -176,7 +177,7 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
                   margin: EdgeInsets.symmetric(horizontal: 4.h),
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    mLanguage== "en"?data.nameEnglish:data.nameArabic,
+                    mLanguage== "en"?data.enTitle:data.arTitle,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -206,7 +207,7 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
                               alignment: Alignment.center,
                             ),
                             Text(
-                              data.shared,
+                              data.shares,
                               style: TextStyle(
                                   color: Color(0xFFB7B7B7),
                                   fontSize: screenUtil.setSp(18),
@@ -230,7 +231,7 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
                               alignment: Alignment.center,
                             ),
                             Text(
-                              data.mostView,
+                              data.views,
                               style: TextStyle(
                                   color: Color(0xFFB7B7B7),
                                   fontSize: screenUtil.setSp(18),

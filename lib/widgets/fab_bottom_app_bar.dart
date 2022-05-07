@@ -96,7 +96,8 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
     ScreenUtil screenUtil = ScreenUtil();
     Color color = _selectedIndex == index ? widget.selectedColor : widget.color;
     return Expanded(
-      child: SizedBox(
+      child:
+      SizedBox(
         height: 55.h,
         child: Material(
           type: MaterialType.transparency,
@@ -115,7 +116,7 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
                 Text(
                   item.text,
                   style: TextStyle(color: color,
-                  fontSize: screenUtil.setSp(10)),
+                  fontSize: screenUtil.setSp(8)),
                 )
               ],
             ),

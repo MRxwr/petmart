@@ -44,7 +44,8 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
   double itemHeight;
   String noOfViews ="";
   String noOfShares = "";
-  TextButton previewButton(String text,BuildContext context,ContactDetail contactDetail){
+  String mLanguage ="";
+  TextButton previewButton(String text,BuildContext context,String mobile){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -58,8 +59,8 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     return TextButton(
       style: flatButtonStyle,
       onPressed: () {
-        contact(context, contactDetail);
 
+        contact(context, mobile);
 
       },
       child: Text(text,style: TextStyle(
@@ -71,6 +72,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
   }
   PostDetailsModel postDetailsModel;
   TextButton callButton(String text,BuildContext context,String phone) {
+    print('phone ---> ${phone}');
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -107,6 +109,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    mLanguage = languageCode;
     String loginData = _preferences.getString(kUserModel);
     Map map;
     if(loginData == null) {
@@ -121,7 +124,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {
         'post_id': widget.postId,
-        'user_id': loginModel.data.customerId,
+        'user_id': loginModel.data.id,
 
         'language': languageCode
       };
@@ -129,7 +132,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    PostDetailsModel petsModel = await petMartService.petDetails(map);
+    PostDetailsModel petsModel = await petMartService.petDetails(widget.postId);
 
     return petsModel;
   }
@@ -147,23 +150,31 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     LoginModel   loginModel = LoginModel.fromJson(body);
     map = {
       'post_id': widget.postId,
-      'user_id': loginModel.data.customerId
+      'user_id': loginModel.data.id
     };
 
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    ShareModel petsModel = await petMartService.sharePet(map);
+
+    ShareModel petsModel = await petMartService.sharePet("share","item",widget.postId);
     modelHud.changeIsLoading(false);
+    String title="";
+    title = languageCode == "en"?postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle;
+    String description="";
+    description = languageCode== "en"?postDetailsModel.data.items[0].enDetails:postDetailsModel.data.items[0].arDetails;
     //
     if(Platform.isIOS){
-      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n market://details?id=com.createq8.petMart');
+      Share.share('${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
 
     }else{
-      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
+      Share.share('${title}' '\n ${description}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
 
     }
+    setState(() {
+      noOfShares = "${int.parse(noOfShares)+1}";
 
+    });
 
   }
   Future<void> petView() async{
@@ -177,7 +188,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       LoginModel loginModel = LoginModel.fromJson(body);
       map = {
         'post_id': widget.postId,
-        'user_id': loginModel.data.customerId,
+        'user_id': loginModel.data.id,
 
         'language': languageCode
       };
@@ -185,9 +196,9 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       print('map --> ${map}');
 
       PetMartService petMartService = PetMartService();
-      ViewModel petsModel = await petMartService.viewPet(map);
+      ShareModel petsModel = await petMartService.sharePet("view","item",widget.postId);
       setState(() {
-        noOfViews = petsModel.data.postCount.toString();
+        noOfViews = "${int.parse(noOfViews)+1}";
 
       });
     }
@@ -200,14 +211,15 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     pets().then((value) {
       setState(() {
         postDetailsModel = value;
-        noOfViews = value.data.views;
-        noOfShares = value.data.shared;
+        noOfViews = value.data.items[0].views;
+        noOfShares = value.data.items[0].shares;
       });
 
     }).whenComplete(() {
       petView();
     });
   }
+  int _current =0;
   @override
   Widget build(BuildContext context) {
 
@@ -215,7 +227,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     itemWidth = width / 2;
     itemHeight = 200.h;
     double height = MediaQuery.of(context).size.height;
-    int _current =0;
+
     return ModalProgressHUD(
       inAsyncCall: Provider.of<ModelHud>(context).isLoading,
       child: Scaffold(
@@ -251,7 +263,6 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
             SizedBox(width: 30.h,)
 
           ],
-
         ),
 
         body: Container(
@@ -295,13 +306,13 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             });
                           }
                       ),
-                      items: postDetailsModel.data.gallery.map((item) =>
+                      items: postDetailsModel.data.items[0].image.map((item) =>
                           Stack(
 
                             children: [
                               GestureDetector(
                                 onTap: (){
-                                  String url = item.image.trim();
+                                  String url = item.trim();
                                   if(url.isNotEmpty) {
                                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                       return new PhotoScreen(imageProvider: NetworkImage(
@@ -322,7 +333,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                                     width: width,
 
                                     fit: BoxFit.fill,
-                                    imageUrl:'${item.image}',
+                                    imageUrl:'${kImagePath+item}',
                                     imageBuilder: (context, imageProvider) {
 
                                       return Card(
@@ -382,6 +393,32 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                           )).toList(),
 
                     ),
+                    Positioned.directional(
+                      textDirection: Directionality.of(context),
+                      bottom: 10.w,
+                      start: 0,
+                      end:0,
+                      child: Opacity(
+                        opacity: postDetailsModel.data.items[0].image.length>1?1.0:0.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: postDetailsModel.data.items[0].image.map((item) {
+                            int index =postDetailsModel.data.items[0].image.indexOf(item);
+                            return Container(
+                              width: 8.0.w,
+                              height: 8.0.h,
+                              margin: EdgeInsets.symmetric(vertical: 10.0.w, horizontal: 2.0.h),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _current == index
+                                    ? kMainColor
+                                    : Color(0xFF707070),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
 
 
 
@@ -399,7 +436,8 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      postDetailsModel.data.postName,
+                      mLanguage =="en"?
+                      postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -408,7 +446,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                       ),
                     ),
                     Text(
-                      '${postDetailsModel.data.categoryName}  ${postDetailsModel.data.subCategoryName}',
+                      '',
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -417,10 +455,18 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                       ),
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        Text(
+                          '${postDetailsModel.data.items[0].price}',
+                          style: TextStyle(
+                              color: kMainColor,
+                              fontSize: screenUtil.setSp(14),
+                              fontWeight: FontWeight.normal
 
-                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.contactDetail)
+                          ),
+                        ),
+                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].mobile)
                       ],
                     ),
                   ],
@@ -441,7 +487,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                       children: [
 
                         Image.asset('assets/images/img_view.png',
-                          height: 30.h,width: 30.w,
+                          height: 30.w,width: 30.w,fit: BoxFit.fill,
                         )
 
                         ,
@@ -460,7 +506,6 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                     GestureDetector(
                       onTap: (){
                         share(context);
-
                       },
                       child: Column(
 
@@ -484,8 +529,8 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                     ),
                     GestureDetector(
                       onTap: ()async{
-                        print('mobile --> ${postDetailsModel.data.contactDetail.mobile}');
-                        _openUrl(url(postDetailsModel.data.contactDetail.mobile, ""));
+
+                        _openUrl(url(postDetailsModel.data.items[0].mobile, ""));
 
                       },
                       child: Column(
@@ -523,7 +568,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${getTranslated(context, 'gender')}${postDetailsModel.data.gender}  " ,
+                      "${getTranslated(context, 'gender')}${postDetailsModel.data.items[0].gender}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -532,7 +577,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                       ),
                     ),
                     Text(
-                      "${getTranslated(context, 'age')} ${postDetailsModel.data.ageLabel}  " ,
+                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -551,7 +596,8 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
-                  "${postDetailsModel.data.postDescription}  " ,
+                  mLanguage == "en"?
+                  "${postDetailsModel.data.items[0].enDetails}  ":"${postDetailsModel.data.items[0].arDetails}  " ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -568,7 +614,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
-                 getTranslated(context, 'similar_ads') ,
+                  getTranslated(context, 'similar_ads') ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -582,45 +628,45 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                 child: Container(
                   color: Color(0x88000000),
                 ),),
-              Container(
-
-                child:  GridView.builder(scrollDirection: Axis.vertical,
-                  padding: EdgeInsets.zero,
-
-
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                      childAspectRatio:itemWidth/itemHeight),
-                  itemCount: postDetailsModel.data.relatePost.length,
-
-                  itemBuilder: (context,index){
-                    return GestureDetector(
-                      onTap: (){
-                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new LostDetailScreen(postId:postDetailsModel.data.relatePost[index].postId,postName:postDetailsModel.data.relatePost[index].postName ,);
-                        }));
-                        // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
-                        // }));
-                      },
-                      child: Container(
-                          margin: EdgeInsets.all(6.w),
-
-                          child:
-                          Card(
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              elevation: 1.w,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0.h),
-                              ),
-                              color: Color(0xFFFFFFFF),
-                              child: buildItem(postDetailsModel.data.relatePost[index],context))),
-                    );
-                  },
-                ),
-
-              )
+              // Container(
+              //
+              //   child:  GridView.builder(scrollDirection: Axis.vertical,
+              //     padding: EdgeInsets.zero,
+              //
+              //
+              //     shrinkWrap: true,
+              //     physics: const NeverScrollableScrollPhysics(),
+              //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+              //         childAspectRatio:itemWidth/itemHeight),
+              //     itemCount: postDetailsModel.data.relatePost.length,
+              //
+              //     itemBuilder: (context,index){
+              //       return GestureDetector(
+              //         onTap: (){
+              //           Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+              //             return new PetsDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId,postName: postDetailsModel.data.relatePost[index].postName);
+              //           }));
+              //           // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+              //           //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
+              //           // }));
+              //         },
+              //         child: Container(
+              //             margin: EdgeInsets.all(6.w),
+              //
+              //             child:
+              //             Card(
+              //                 clipBehavior: Clip.antiAliasWithSaveLayer,
+              //                 elevation: 1.w,
+              //                 shape: RoundedRectangleBorder(
+              //                   borderRadius: BorderRadius.circular(10.0.h),
+              //                 ),
+              //                 color: Color(0xFFFFFFFF),
+              //                 child: buildItem(postDetailsModel.data.relatePost[index],context))),
+              //       );
+              //     },
+              //   ),
+              //
+              // )
             ],
           ),
         ),
@@ -628,113 +674,113 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     );
 
   }
-  Widget buildItem(RelatePost data, BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Stack(
-              children: [
-                CachedNetworkImage(
-                  width: itemWidth,
-                  imageUrl:data.postImage,
-                  imageBuilder: (context, imageProvider) => Stack(
-                    children: [
-                      ClipRRect(
-
-                        child: Container(
-                            width: itemWidth,
-
-                            decoration: BoxDecoration(
-
-                              shape: BoxShape.rectangle,
-
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-
-                                  image: imageProvider),
-                            )
-                        ),
-                      ),
-                    ],
-                  ),
-                  placeholder: (context, url) =>
-                      Center(
-                        child: SizedBox(
-                            height: 50.h,
-                            width: 50.h,
-                            child: new CircularProgressIndicator()),
-                      ),
-
-
-                  errorWidget: (context, url, error) => ClipRRect(
-                      child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
-                        colorBlendMode: BlendMode.difference,)),
-
-                ),
-                Positioned.directional(
-                  textDirection:  Directionality.of(context),
-                  bottom: 2.h,
-                  start: 4.w,
-                  child:
-                  Text(
-                    data.postDate,
-                    style: TextStyle(
-                        color: Color(0xFFFFFFFF)
-
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(flex:1,child: Container(
-            child: Column(
-              children: [
-                Expanded(flex:1,child:
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5.w),
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    data.postName,
-                    style: TextStyle(
-                        color: Color(0xFF000000),
-                        fontWeight: FontWeight.normal,
-                        fontSize: screenUtil.setSp(12)
-                    ),
-
-                  ),
-                )),
-                Expanded(flex:1,child:
-                Row(
-                  children: [
-
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5.w),
-                      child:
-                      Text(
-                        '${data.postPrice}',
-                        style: TextStyle(
-                            color: kMainColor,
-                            fontWeight: FontWeight.normal,
-                            fontSize: screenUtil.setSp(14)
-                        ),
-
-                      ),
-                    ),
-                  ],
-                ))
-              ],
-            ),
-          ))
-
-        ],
-      ),
-    );
-
-  }
-  void showDialog(ContactDetail contactDetail) {
+  // Widget buildItem(RelatePost data, BuildContext context) {
+  //   return Container(
+  //     child: Column(
+  //       children: [
+  //         Expanded(
+  //           flex: 3,
+  //           child: Stack(
+  //             children: [
+  //               CachedNetworkImage(
+  //                 width: itemWidth,
+  //                 imageUrl:data.postImage,
+  //                 imageBuilder: (context, imageProvider) => Stack(
+  //                   children: [
+  //                     ClipRRect(
+  //
+  //                       child: Container(
+  //                           width: itemWidth,
+  //
+  //                           decoration: BoxDecoration(
+  //
+  //                             shape: BoxShape.rectangle,
+  //
+  //                             image: DecorationImage(
+  //                                 fit: BoxFit.fill,
+  //
+  //                                 image: imageProvider),
+  //                           )
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 placeholder: (context, url) =>
+  //                     Center(
+  //                       child: SizedBox(
+  //                           height: 50.h,
+  //                           width: 50.h,
+  //                           child: new CircularProgressIndicator()),
+  //                     ),
+  //
+  //
+  //                 errorWidget: (context, url, error) => ClipRRect(
+  //                     child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
+  //                       colorBlendMode: BlendMode.difference,)),
+  //
+  //               ),
+  //               Positioned.directional(
+  //                 textDirection:  Directionality.of(context),
+  //                 bottom: 2.h,
+  //                 start: 4.w,
+  //                 child:
+  //                 Text(
+  //                   data.postDate,
+  //                   style: TextStyle(
+  //                       color: Color(0xFFFFFFFF)
+  //
+  //                   ),
+  //                 ),
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //         Expanded(flex:1,child: Container(
+  //           child: Column(
+  //             children: [
+  //               Expanded(flex:1,child:
+  //               Container(
+  //                 margin: EdgeInsets.symmetric(horizontal: 5.w),
+  //                 alignment: AlignmentDirectional.centerStart,
+  //                 child: Text(
+  //                   data.postName,
+  //                   style: TextStyle(
+  //                       color: Color(0xFF000000),
+  //                       fontWeight: FontWeight.normal,
+  //                       fontSize: screenUtil.setSp(12)
+  //                   ),
+  //
+  //                 ),
+  //               )),
+  //               Expanded(flex:1,child:
+  //               Row(
+  //                 children: [
+  //
+  //                   Container(
+  //                     padding: EdgeInsets.symmetric(horizontal: 5.w),
+  //                     child:
+  //                     Text(
+  //                       '${data.postPrice}',
+  //                       style: TextStyle(
+  //                           color: kMainColor,
+  //                           fontWeight: FontWeight.normal,
+  //                           fontSize: screenUtil.setSp(14)
+  //                       ),
+  //
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ))
+  //             ],
+  //           ),
+  //         ))
+  //
+  //       ],
+  //     ),
+  //   );
+  //
+  // }
+  void showDialog(String mobile) {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -771,7 +817,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                         CachedNetworkImage(
                           width: 80.w,
                           height: 80.h,
-                          imageUrl:contactDetail.profileImage,
+                          imageUrl:"",
                           imageBuilder: (context, imageProvider) => Stack(
                             children: [
                               ClipRRect(
@@ -812,7 +858,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                '${getTranslated(context, 'by')} ${contactDetail.customerName}',
+                                '${getTranslated(context, 'by')} ',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -825,7 +871,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                contactDetail.postCreatedDate,
+                                "17-12-2022",
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -838,7 +884,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                contactDetail.mobile,
+                                mobile,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -850,7 +896,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile.replaceAll('+', ''))
+                        callButton(getTranslated(context, 'call_now'), context, mobile.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -874,11 +920,11 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       },
     );
   }
-  contact(BuildContext context,ContactDetail contactDetail) async {
+  contact(BuildContext context,String phone) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      showDialog(contactDetail);
+      showDialog(phone);
 
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
@@ -890,6 +936,32 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
       ShareDialog(context);
+
+    }else{
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+    }
+
+
+
+  }
+  message(BuildContext context) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
+      String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+      String loginData = _preferences.getString(kUserModel);
+      Map map;
+
+      final body = json.decode(loginData);
+      LoginModel   loginModel = LoginModel.fromJson(body);
+      // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      //   return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
+      //     contactImage:postDetailsModel.data.contactDetail.profileImage ,
+      //     contactId:postDetailsModel.data.contactDetail.customerId,
+      //     postId: postDetailsModel.data.postId,
+      //     userId: loginModel.data.customerId,);
+      // }));
 
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
@@ -963,30 +1035,6 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
   }
 
-  message(BuildContext context) async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
-    if(isLoggedIn){
-      SharedPreferences _preferences = await SharedPreferences.getInstance();
-      String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-      String loginData = _preferences.getString(kUserModel);
-      Map map;
-
-      final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
-      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-        return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
-          contactImage:postDetailsModel.data.contactDetail.profileImage ,
-          contactId:postDetailsModel.data.contactDetail.customerId,
-          postId: postDetailsModel.data.postId,
-          userId: loginModel.data.customerId,);
-      }));
-
-    }else{
-      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
-    }
-
-  }
   Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
     var alert;
     var alertStyle = AlertStyle(
@@ -1023,7 +1071,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'reg_now'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1037,26 +1085,19 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
           color: Color(0xFFFFC300),
           radius: BorderRadius.circular(6.w),
         ),
-        DialogButton(
-          child: Text(
-            getTranslated(context, 'no'),
-            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
-          ),
-          onPressed: ()async {
-            await alert.dismiss();
 
-          },
-          color: Color(0xFFFFC300),
-          radius: BorderRadius.circular(6.w),
-        ),
       ],
     );
     alert.show();
 
   }
   String url(String phone,String message) {
+
     if (Platform.isAndroid) {
+      phone = "+965$phone";
       // add the [https]
+      // print("https://api.whatsapp.com/send?phone=+965$phone&text=${Uri.parse(message)}");
+      return "https://wa.me/$phone/?text=${Uri.parse(message)}";
       return "https://wa.me/$phone/?text=+965${Uri.parse(message)}"; // new line
     } else {
       // add the [https]
@@ -1070,5 +1111,4 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       throw 'Could not launch $url';
     }
   }
-
 }

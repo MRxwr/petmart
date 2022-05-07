@@ -75,21 +75,21 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
                 onTap: (){
                   Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                     return new PhotoScreen(imageProvider: NetworkImage(
-                      widget.homeModel.data.banner[index].image,
+                      widget.homeModel.data.banners[index].image,
                     ),);
                   }));
                 },
-                  child: buildItem(widget.homeModel.data.banner[index],context))
+                  child: buildItem(widget.homeModel.data.banners[index],context))
           );
         },
             separatorBuilder: (context,index){
           return Container(height: 10.h,
             color: Color(0xFFefeef3),);
-        }, itemCount: widget.homeModel.data.banner.length),
+        }, itemCount: widget.homeModel.data.banners.length),
       ),
     );
   }
-  Widget buildItem(Home.Banner data, BuildContext context) {
+  Widget buildItem(Home.Banners data, BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Container(
       child: Column(
@@ -99,7 +99,7 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
               CachedNetworkImage(
                 width:width ,
                 height: 120.h,
-                imageUrl:data.image,
+                imageUrl:KImageUrl+data.image,
                 imageBuilder: (context, imageProvider) => Stack(
                   children: [
                     ClipRRect(

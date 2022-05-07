@@ -191,7 +191,7 @@ class _SplashScreenState extends State<SplashScreen> {
         "language":languageCode
       };
     }else{
-      map = {'id': loginModel.data.customerId,
+      map = {'id': loginModel.data.id,
         "language":languageCode
       };
     }

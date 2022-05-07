@@ -53,7 +53,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     LoginModel   loginModel = LoginModel.fromJson(body);
    Map map = {
       'package_id': widget.packageModel.packageId,
-      'user_id': loginModel.data.customerId,
+      'user_id': loginModel.data.id,
      'language':languageCode,
      'address':''
 

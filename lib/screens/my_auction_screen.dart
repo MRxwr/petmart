@@ -38,7 +38,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
     LoginModel   loginModel = LoginModel.fromJson(body);
     Map map ;
     map = {"language":languageCode,
-      "userId":loginModel.data.customerId};
+      "userId":loginModel.data.id};
     return map;
   }
   @override

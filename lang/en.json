@@ -81,7 +81,7 @@
   "shares": "Shares",
   "select_language": "Select Language",
   "english": "English",
-  "arabic": "Arabic",
+  "arabic": "عربي",
   "skip": "Skip",
   "password": "Password",
   "forget_password_string": "Forget Password?",
@@ -171,7 +171,11 @@
   "highest_price": "Highest Price",
   "rate_auction_awner": "Rate Auction Owner",
   "rate_highest_bidder": "Rate Highest Bidder",
-  "sumbit_rating": "Submit My Rating "
+  "sumbit_rating": "Submit My Rating ",
+  "all": "ALL",
+  "no_product_available": "No Products Available",
+  "no_categories": "No Categories Available",
+  "no_products": "No Products Available"
 
 
 }

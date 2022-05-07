@@ -19,6 +19,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/notification_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/providers/notification_count.dart';
+import 'package:pet_mart/screens/privacy_main_screen.dart';
 import 'package:pet_mart/screens/search_screen.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
@@ -123,14 +124,15 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     int count = _preferences.getInt("notificationCount")??0;
     String appBadgeSupported;
     Map mapped = {
-      "id":loginModel.data.customerId,
+      "id":loginModel.data.id,
       "language":languageCode
     };
-    PetMartService petMartService = PetMartService();
-    NotificationModel notificationModel =await petMartService.notification(mapped);
-    int  notificationNumber = notificationModel.data.length;
+    // PetMartService petMartService = PetMartService();
+    // NotificationModel notificationModel =await petMartService.notification(mapped);
+    // int  notificationNumber = notificationModel.data.length;
 
-    notificationCount = notificationNumber-count;
+    // notificationCount = notificationNumber-count;
+    notificationCount =0;
     // try {
     //   bool res = await FlutterAppBadger.isAppBadgeSupported();
     //   if (res) {
@@ -214,7 +216,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
         "language":languageCode
       };
     }else{
-      map = {'id': loginModel.data.customerId,
+      map = {'id': loginModel.data.id,
         "language":languageCode
       };
     }
@@ -319,14 +321,16 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
          IndexedStack(
           index: index,
           children: [
-            Navigator(
-              key: _vediosScreen,
-              onGenerateRoute: (route) => MaterialPageRoute(
-                settings: route,
-                maintainState: false,
-                builder: (context) => AuctionScreen(),
+
+               Navigator(
+                key: _vediosScreen,
+                onGenerateRoute: (route) => MaterialPageRoute(
+                  settings: route,
+                  maintainState: false,
+                  builder: (context) => PrivacyMainScreen(),
+                ),
               ),
-            ),
+
             Navigator(
               key: _amateursNews,
               onGenerateRoute: (route) => MaterialPageRoute(
@@ -376,7 +380,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           items: [
 
             FABBottomAppBarItem(iconPath:
-            'assets/images/img_auction.png', text: getTranslated(context, 'auction')),
+            'assets/images/hospital_pets.png', text: getTranslated(context, 'hospital')),
             FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: getTranslated(context, 'lost')),
 
             FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: getTranslated(context, 'adaption')),
@@ -513,37 +517,37 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
                             child: Image.asset('assets/images/img_language_logo.png')),
                       ),
                     ),
-                    Positioned.directional(   textDirection:  Directionality.of(context),
-                        bottom: 0,
-                        start: 0,
-
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-
-
-                              padding: EdgeInsetsDirectional.only(start: 4.h),
-                              child: Text('${getTranslated(context, 'current_credit')}${loginModel.data.availableCredit}',
-
-                              style: TextStyle(
-                                color: Color(0xFF000000),
-                                fontSize: screenUtil.setSp(16),
-                                fontWeight: FontWeight.bold
-                              ),),
-                            ),
-                            Padding(
-                              padding: EdgeInsetsDirectional.only(start: 4.h),
-                              child: Text('${getTranslated(context, 'credit_expiry')}${loginModel.data.expiryDate}',
-
-                                style: TextStyle(
-                                    color: Color(0xFF000000),
-                                    fontSize: screenUtil.setSp(16),
-                                    fontWeight: FontWeight.bold
-                                ),),
-                            ),
-                          ],
-                        ))
+                    // Positioned.directional(   textDirection:  Directionality.of(context),
+                    //     bottom: 0,
+                    //     start: 0,
+                    //
+                    //     child: Column(
+                    //       crossAxisAlignment: CrossAxisAlignment.start,
+                    //       children: [
+                    //         Padding(
+                    //
+                    //
+                    //           padding: EdgeInsetsDirectional.only(start: 4.h),
+                    //           child: Text('${getTranslated(context, 'current_credit')}${loginModel.data.availableCredit}',
+                    //
+                    //           style: TextStyle(
+                    //             color: Color(0xFF000000),
+                    //             fontSize: screenUtil.setSp(16),
+                    //             fontWeight: FontWeight.bold
+                    //           ),),
+                    //         ),
+                    //         Padding(
+                    //           padding: EdgeInsetsDirectional.only(start: 4.h),
+                    //           child: Text('${getTranslated(context, 'credit_expiry')}${loginModel.data.expiryDate}',
+                    //
+                    //             style: TextStyle(
+                    //                 color: Color(0xFF000000),
+                    //                 fontSize: screenUtil.setSp(16),
+                    //                 fontWeight: FontWeight.bold
+                    //             ),),
+                    //         ),
+                    //       ],
+                    //     ))
                   ],
                 )
             ),
@@ -574,19 +578,19 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
                     fontWeight: FontWeight.normal
                 ),),
             ),
-            ListTile(
-              onTap: (){
-                Navigator.pop(context);
-                Navigator.pushNamed(context, MyAuctionScreen.id);
-              },
-
-              title: Text(getTranslated(context, 'my_auction'),
-                style: TextStyle(
-                    color: Color(0xFFFFFFFF),
-                    fontSize: screenUtil.setSp(17),
-                    fontWeight: FontWeight.normal
-                ),),
-            ),
+            // ListTile(
+            //   onTap: (){
+            //     Navigator.pop(context);
+            //     Navigator.pushNamed(context, MyAuctionScreen.id);
+            //   },
+            //
+            //   title: Text(getTranslated(context, 'my_auction'),
+            //     style: TextStyle(
+            //         color: Color(0xFFFFFFFF),
+            //         fontSize: screenUtil.setSp(17),
+            //         fontWeight: FontWeight.normal
+            //     ),),
+            // ),
             // ListTile(
             //   onTap: (){
             //     Navigator.pop(context);
@@ -758,7 +762,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           break;
         case 0:
           print(val);
-          _title=getTranslated(context, 'auction');
+          _title=getTranslated(context, 'hospital');
           setState(() {
 
           });
@@ -772,8 +776,8 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     } else {
       index = val;
       if(index ==0){
-        _title=getTranslated(context, 'auction');
-        _vediosScreen.currentState.pushReplacementNamed(AuctionScreen.id);
+        _title=getTranslated(context, 'hospital');
+        _vediosScreen.currentState.pushReplacementNamed(PrivacyMainScreen.id);
         setState(() {
 
         });
@@ -899,7 +903,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     Map map ;
 
 
-    map = {"user_id":loginModel.data.customerId};
+    map = {"user_id":loginModel.data.id};
 
 
 

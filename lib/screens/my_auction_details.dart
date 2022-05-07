@@ -59,7 +59,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {"auction_id":widget.id,
-        "user_id":loginModel.data.customerId,
+        "user_id":loginModel.data.id,
         "language":languageCode};
       print(map);
 
@@ -86,7 +86,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {"auction_id":widget.id,
-        "user_id":loginModel.data.customerId,
+        "user_id":loginModel.data.id,
         "language":languageCode};
 
 

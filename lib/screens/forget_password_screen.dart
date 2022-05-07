@@ -133,10 +133,10 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
       if(mStatus.trim() == 'success'){
         modelHud.changeIsLoading(false);
         // _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(resetModel.message)));
-        successAlertDialog(context,resetModel.message);
+        successAlertDialog(context,resetModel.data.msg);
       }else{
         modelHud.changeIsLoading(false);
-        failAlertDialog(context,resetModel.message);
+        failAlertDialog(context,resetModel.data.msg);
 
               }
 

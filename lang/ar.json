@@ -80,7 +80,7 @@
   "details": "تفاصيل",
   "shares": "مشاركات",
   "select_language": "اختار اللغة",
-  "english": "الإنجليزية",
+  "english": "Englishِ",
   "arabic": "عربى",
   "skip": "تخطي",
   "password": "كلمه السر",
@@ -171,7 +171,11 @@
   "highest_price": "أعلى سعر",
   "rate_auction_awner": "قيم مالك المزاد",
   "rate_highest_bidder": "قيم أعلى مزايد",
-  "sumbit_rating": "إرسال تقييمي "
+  "sumbit_rating": "إرسال تقييمي ",
+  "all": "الكل",
+  "no_product_available": "لا يوجد منتجات متاحة",
+  "no_categories": "لا يوجد تصنيفات متاحة",
+  "no_products": "لا يوجد منتجات متاحة"
 
 
 

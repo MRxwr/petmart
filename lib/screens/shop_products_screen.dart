@@ -32,7 +32,7 @@ class _ShopProductsScreenState extends State<ShopProductsScreen> {
     Map map = {
       "shop_id":widget.id
     };
-    ShopdetailsModel shopdetailsModel =await petMartService.shopDetails(map);
+    ShopdetailsModel shopdetailsModel =await petMartService.shopDetails(widget.id);
     return shopdetailsModel;
   }
   @override
@@ -145,6 +145,7 @@ class _ShopProductsScreenState extends State<ShopProductsScreen> {
     );
   }
   Widget buildItem(ShopProducts data, BuildContext context) {
+    print('image --> ${data.postImage}');
     return Container(
       child: Column(
         children: [

@@ -19,6 +19,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/share_model.dart';
 import 'login_screen.dart';
 class HospitalDetailsScreen extends StatefulWidget {
   String id;
@@ -40,8 +41,11 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
     mLanguage = languageCode;
     PetMartService petMartService = PetMartService();
     HospitalDetailsModel hospitalModel =await petMartService.hospitalDetails(widget.id);
+    ShareModel petsModel = await petMartService.sharePet("view","hospital",widget.id);
     return hospitalModel;
   }
+  String noOfShares="";
+  String noOfViews ="";
   @override
   void initState() {
     // TODO: implement initState
@@ -49,6 +53,9 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
     getHospitals().then((value) {
       setState(() {
         hospitalDetailsModel = value;
+        noOfShares = hospitalDetailsModel.data.hospital[0].shares;
+        noOfViews = hospitalDetailsModel.data.hospital[0].views;
+        noOfViews = "${int.parse(noOfViews)+1}";
       });
     });
   }
@@ -106,11 +113,11 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
               children: [
                 GestureDetector(
                   onTap: (){
-                    String url = hospitalDetailsModel.data.logoImage;
+                    String url = KImageUrl+hospitalDetailsModel.data.hospital[0].logo;
                     if(url.isNotEmpty) {
                       Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                         return new PhotoScreen(imageProvider: NetworkImage(
-                            'http://petmart.createkwservers.com/media/images/hospital/${hospitalDetailsModel.data.logoImage}'
+                            '${KImageUrl+hospitalDetailsModel.data.hospital[0].logo}'
                         ),);
                       }));
                     }
@@ -123,7 +130,7 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                       height: 150.h,
 
                       fit: BoxFit.fill,
-                      imageUrl:'http://petmart.createkwservers.com/media/images/hospital/${hospitalDetailsModel.data.logoImage}',
+                      imageUrl:'${KImageUrl+hospitalDetailsModel.data.hospital[0].logo}',
                       imageBuilder: (context, imageProvider) => Container(
                           width: screenUtil.screenWidth,
 
@@ -196,8 +203,8 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                 ),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10.h),
-                  child: Text(mLanguage=="en"?hospitalDetailsModel.data.detailsEnglish:
-                    hospitalDetailsModel.data.detailsArabic,
+                  child: Text(mLanguage=="en"?hospitalDetailsModel.data.hospital[0].enDetails:
+                  hospitalDetailsModel.data.hospital[0].arDetails,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(18),
@@ -231,7 +238,7 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                               alignment: Alignment.center,
                             ),
                             Text(
-                              '${hospitalDetailsModel.data.shared} ${getTranslated(context, 'shares')}',
+                              '${noOfShares} ${getTranslated(context, 'shares')}',
                               style: TextStyle(
                                   color: Color(0xFF000000),
                                   fontSize: screenUtil.setSp(18),
@@ -252,7 +259,7 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                             alignment: Alignment.center,
                           ),
                           Text(
-                            "${hospitalDetailsModel.data.mostView} ${getTranslated(context, 'views')}",
+                            "${noOfViews} ${getTranslated(context, 'views')}",
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(18),
@@ -290,7 +297,7 @@ TextButton callButton(String text,BuildContext context){
   return TextButton(
     style: flatButtonStyle,
     onPressed: () {
-      _service.call(hospitalDetailsModel.data.phoneNumber.replaceAll('+', ''));
+      _service.call(hospitalDetailsModel.data.hospital[0].mobile.replaceAll('+', ''));
 
 
     },
@@ -410,18 +417,22 @@ Future<void> ShareHospital() async{
     String description;
     String title;
     if (mLanguage == 'ar') {
-      description = hospitalDetailsModel.data.detailsArabic;
-      title = hospitalDetailsModel.data.nameArabic;
+      description = hospitalDetailsModel.data.hospital[0].arDetails;
+      title = hospitalDetailsModel.data.hospital[0].arTitle;
     } else {
-      description = hospitalDetailsModel.data.detailsEnglish;
-      title = hospitalDetailsModel.data.nameEnglish;
+      description = hospitalDetailsModel.data.hospital[0].enDetails;;
+      title = hospitalDetailsModel.data.hospital[0].enTitle;
     }
     final modelHud = Provider.of<ModelHud>(context, listen: false);
     modelHud.changeIsLoading(true);
 
 
     PetMartService petMartService = PetMartService();
-    HospitalShareModel petsModel = await petMartService.hospitalShare(hospitalDetailsModel.data.hospitalId);
+    ShareModel petsModel = await petMartService.sharePet("share","hospital",hospitalDetailsModel.data.hospital[0].id);
+    setState(() {
+      noOfShares = "${int.parse(noOfShares)+1}";
+
+    });
     modelHud.changeIsLoading(false);
     if (Platform.isIOS) {
       Share.share(

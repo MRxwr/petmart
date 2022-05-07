@@ -5,6 +5,7 @@ import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/cms_model.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class TermsScreen extends StatefulWidget {
   static String id = 'TermsScreen';
   @override
@@ -23,9 +24,12 @@ class _TermsScreenState extends State<TermsScreen> {
       });
     });
   }
+  String languageCode ="";
   Future<CmsModel> privacyPolicy() async{
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     PetMartService petMartService = PetMartService();
-    CmsModel  cmsModel = await petMartService.cms('terms-and-condition');
+    CmsModel  cmsModel = await petMartService.cms();
     return cmsModel;
 
   }
@@ -73,11 +77,14 @@ class _TermsScreenState extends State<TermsScreen> {
           child: cmsModel != null?
           SingleChildScrollView(
             child: Padding(
+
                 padding: EdgeInsets.all(20.w),
                 child: HtmlWidget(
 
+                  languageCode == "en"?
 
-                  cmsModel.data.pageContent,
+
+                  cmsModel.data.enTerms: cmsModel.data.arTerms,
                   textStyle: TextStyle(
                       color: Color(0xFF000000),
                       fontWeight: FontWeight.w500,

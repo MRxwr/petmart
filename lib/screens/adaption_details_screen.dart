@@ -45,7 +45,8 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
   double itemHeight;
   String noOfViews ="";
   String noOfShares = "";
-  TextButton previewButton(String text,BuildContext context,ContactDetail contactDetail){
+  String mLanguage ="";
+  TextButton previewButton(String text,BuildContext context,String mobile){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -59,7 +60,8 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
     return TextButton(
       style: flatButtonStyle,
       onPressed: () {
-        contact(context,contactDetail);
+
+        contact(context, mobile);
 
       },
       child: Text(text,style: TextStyle(
@@ -71,6 +73,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
   }
   PostDetailsModel postDetailsModel;
   TextButton callButton(String text,BuildContext context,String phone) {
+    print('phone ---> ${phone}');
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -107,6 +110,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    mLanguage = languageCode;
     String loginData = _preferences.getString(kUserModel);
     Map map;
     if(loginData == null) {
@@ -121,7 +125,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {
         'post_id': widget.postId,
-        'user_id': loginModel.data.customerId,
+        'user_id': loginModel.data.id,
 
         'language': languageCode
       };
@@ -129,7 +133,16 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    PostDetailsModel petsModel = await petMartService.petDetails(map);
+    PostDetailsModel petsModel = await petMartService.petDetails(widget.postId);
+    try {
+      ShareModel petsModelss = await petMartService.sharePet(
+          "view", "item", widget.postId);
+    }on Exception catch (_) {
+
+    }
+    noOfViews = petsModel.data.items[0].views;
+      noOfViews = "${int.parse(noOfViews)+1}";
+
 
     return petsModel;
   }
@@ -140,6 +153,8 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
     List<String> imagePaths = [];
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+    mLanguage = languageCode;
     String loginData = _preferences.getString(kUserModel);
     Map map;
 
@@ -147,57 +162,34 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
     LoginModel   loginModel = LoginModel.fromJson(body);
     map = {
       'post_id': widget.postId,
-      'user_id': loginModel.data.customerId
+      'user_id': loginModel.data.id
     };
 
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    ShareModel petsModel = await petMartService.sharePet(map);
+
+    ShareModel petsModel = await petMartService.sharePet("share","item",widget.postId);
     modelHud.changeIsLoading(false);
+    String title="";
+    title = languageCode == "en"?postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle;
+    String description="";
+    description = languageCode== "en"?postDetailsModel.data.items[0].enDetails:postDetailsModel.data.items[0].arDetails;
     //
     if(Platform.isIOS){
-      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n market://details?id=com.createq8.petMart');
+      Share.share('${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
 
     }else{
-      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
+      Share.share('${title}' '\n ${description}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
 
     }
+    setState(() {
+      noOfShares = "${int.parse(noOfShares)+1}";
 
-
-
-
-
-
+    });
 
   }
-  Future<void> petView() async{
 
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    String loginData = _preferences.getString(kUserModel);
-    Map map;
-    if(loginData != null) {
-      final body = json.decode(loginData);
-      LoginModel loginModel = LoginModel.fromJson(body);
-      map = {
-        'post_id': widget.postId,
-        'user_id': loginModel.data.customerId,
-
-        'language': languageCode
-      };
-
-      print('map --> ${map}');
-
-      PetMartService petMartService = PetMartService();
-      ViewModel petsModel = await petMartService.viewPet(map);
-      setState(() {
-        noOfViews = petsModel.data.postCount.toString();
-
-      });
-    }
-
-  }
   @override
   void initState() {
     // TODO: implement initState
@@ -205,12 +197,10 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
     pets().then((value) {
       setState(() {
         postDetailsModel = value;
-        noOfViews = value.data.views;
-        noOfShares = value.data.shared;
+
+        noOfShares = value.data.items[0].shares;
       });
 
-    }).whenComplete(() {
-      petView();
     });
   }
   int _current =0;
@@ -257,12 +247,10 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
             SizedBox(width: 30.h,)
 
           ],
-
         ),
 
         body: Container(
-          child: postDetailsModel == null?
-          Container(
+          child: postDetailsModel == null?Container(
             child: CircularProgressIndicator(
 
 
@@ -272,6 +260,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
           ListView(
             padding: EdgeInsets.zero,
             children: [
+
               Container(
                 height: 250.h,
                 width: width,
@@ -283,6 +272,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
 
                       carouselController: _controller,
                       options: CarouselOptions(
+
                           enableInfiniteScroll: false,
 
                           height: double.infinity,
@@ -294,19 +284,21 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
 
 
 
+
                           onPageChanged: (index, reason) {
                             setState(() {
                               _current = index;
                             });
                           }
                       ),
-                      items: postDetailsModel.data.gallery.map((item) =>
+                      items:
+                     postDetailsModel.data.items[0].image.map((item) =>
                           Stack(
 
                             children: [
                               GestureDetector(
                                 onTap: (){
-                                  String url = item.image.trim();
+                                  String url = item.trim();
                                   if(url.isNotEmpty) {
                                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                       return new PhotoScreen(imageProvider: NetworkImage(
@@ -327,7 +319,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                                     width: width,
 
                                     fit: BoxFit.fill,
-                                    imageUrl:'${item.image}',
+                                    imageUrl:'${kImagePath+item}',
                                     imageBuilder: (context, imageProvider) {
 
                                       return Card(
@@ -393,11 +385,11 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                       start: 0,
                       end:0,
                       child: Opacity(
-                        opacity: postDetailsModel.data.gallery.length>1?1.0:0.0,
+                        opacity: postDetailsModel.data.items[0].image.length>1?1.0:0.0,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: postDetailsModel.data.gallery.map((item) {
-                            int index =postDetailsModel.data.gallery.indexOf(item);
+                          children: postDetailsModel.data.items[0].image.map((item) {
+                            int index =postDetailsModel.data.items[0].image.indexOf(item);
                             return Container(
                               width: 8.0.w,
                               height: 8.0.h,
@@ -416,7 +408,6 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
 
 
 
-
                   ],
                 ),
               ),
@@ -431,7 +422,8 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      postDetailsModel.data.postName,
+                      mLanguage =="en"?
+                      postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -440,7 +432,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                       ),
                     ),
                     Text(
-                      '${postDetailsModel.data.categoryName}  ${postDetailsModel.data.subCategoryName}',
+                      '',
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -449,10 +441,18 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                       ),
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        Text(
+                          '${postDetailsModel.data.items[0].price}',
+                          style: TextStyle(
+                              color: kMainColor,
+                              fontSize: screenUtil.setSp(14),
+                              fontWeight: FontWeight.normal
 
-                        previewButton( getTranslated(context, 'contact_name'), context,postDetailsModel.data.contactDetail)
+                          ),
+                        ),
+                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].mobile)
                       ],
                     ),
                   ],
@@ -473,12 +473,12 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                       children: [
 
                         Image.asset('assets/images/img_view.png',
-                          height: 30.h,width: 30.w,
+                          height: 30.w,width: 30.w,fit: BoxFit.fill,
                         )
 
                         ,
                         Text(
-                          "${noOfViews} ${getTranslated(context, "views")}" ,
+                          "${noOfViews} ${getTranslated(context, 'views')}" ,
                           style: TextStyle(
                               color: Color(0xFF000000),
                               fontSize: screenUtil.setSp(14),
@@ -491,7 +491,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                     ),
                     GestureDetector(
                       onTap: (){
-                       share(context);
+                        share(context);
                       },
                       child: Column(
 
@@ -501,7 +501,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                           )
                           ,
                           Text(
-                            "${noOfShares} ${getTranslated(context, "shared")}" ,
+                            "${noOfShares} ${getTranslated(context, 'shared')}" ,
                             style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontSize: screenUtil.setSp(14),
@@ -515,8 +515,8 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                     ),
                     GestureDetector(
                       onTap: ()async{
-                        print('mobile --> ${postDetailsModel.data.contactDetail.mobile}');
-                        _openUrl(url(postDetailsModel.data.contactDetail.mobile, ""));
+
+                        _openUrl(url(postDetailsModel.data.items[0].mobile, ""));
 
                       },
                       child: Column(
@@ -554,7 +554,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${getTranslated(context, "gender")} ${postDetailsModel.data.gender}  " ,
+                      "${getTranslated(context, 'gender')}${postDetailsModel.data.items[0].gender}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -563,7 +563,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                       ),
                     ),
                     Text(
-                      "${getTranslated(context, "age")}  ${postDetailsModel.data.ageLabel}  " ,
+                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -582,7 +582,8 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
-                  "${postDetailsModel.data.postDescription}  " ,
+                  mLanguage == "en"?
+                  "${postDetailsModel.data.items[0].enDetails}  ":"${postDetailsModel.data.items[0].arDetails}  " ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -599,7 +600,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
-                  "${getTranslated(context, "similar_ads")} " ,
+                  getTranslated(context, 'similar_ads') ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -613,45 +614,45 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                 child: Container(
                   color: Color(0x88000000),
                 ),),
-              Container(
-
-                child:  GridView.builder(scrollDirection: Axis.vertical,
-                  padding: EdgeInsets.zero,
-
-
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                      childAspectRatio:itemWidth/itemHeight),
-                  itemCount: postDetailsModel.data.relatePost.length,
-
-                  itemBuilder: (context,index){
-                    return GestureDetector(
-                      onTap: (){
-                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new AdaptionDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId,postName: postDetailsModel.data.relatePost[index].postName,);
-                        }));
-                        // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
-                        // }));
-                      },
-                      child: Container(
-                          margin: EdgeInsets.all(6.w),
-
-                          child:
-                          Card(
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              elevation: 1.w,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0.h),
-                              ),
-                              color: Color(0xFFFFFFFF),
-                              child: buildItem(postDetailsModel.data.relatePost[index],context))),
-                    );
-                  },
-                ),
-
-              )
+              // Container(
+              //
+              //   child:  GridView.builder(scrollDirection: Axis.vertical,
+              //     padding: EdgeInsets.zero,
+              //
+              //
+              //     shrinkWrap: true,
+              //     physics: const NeverScrollableScrollPhysics(),
+              //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+              //         childAspectRatio:itemWidth/itemHeight),
+              //     itemCount: postDetailsModel.data.relatePost.length,
+              //
+              //     itemBuilder: (context,index){
+              //       return GestureDetector(
+              //         onTap: (){
+              //           Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+              //             return new PetsDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId,postName: postDetailsModel.data.relatePost[index].postName);
+              //           }));
+              //           // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+              //           //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
+              //           // }));
+              //         },
+              //         child: Container(
+              //             margin: EdgeInsets.all(6.w),
+              //
+              //             child:
+              //             Card(
+              //                 clipBehavior: Clip.antiAliasWithSaveLayer,
+              //                 elevation: 1.w,
+              //                 shape: RoundedRectangleBorder(
+              //                   borderRadius: BorderRadius.circular(10.0.h),
+              //                 ),
+              //                 color: Color(0xFFFFFFFF),
+              //                 child: buildItem(postDetailsModel.data.relatePost[index],context))),
+              //       );
+              //     },
+              //   ),
+              //
+              // )
             ],
           ),
         ),
@@ -659,113 +660,113 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
     );
 
   }
-  Widget buildItem(RelatePost data, BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Stack(
-              children: [
-                CachedNetworkImage(
-                  width: itemWidth,
-                  imageUrl:data.postImage,
-                  imageBuilder: (context, imageProvider) => Stack(
-                    children: [
-                      ClipRRect(
-
-                        child: Container(
-                            width: itemWidth,
-
-                            decoration: BoxDecoration(
-
-                              shape: BoxShape.rectangle,
-
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-
-                                  image: imageProvider),
-                            )
-                        ),
-                      ),
-                    ],
-                  ),
-                  placeholder: (context, url) =>
-                      Center(
-                        child: SizedBox(
-                            height: 50.h,
-                            width: 50.h,
-                            child: new CircularProgressIndicator()),
-                      ),
-
-
-                  errorWidget: (context, url, error) => ClipRRect(
-                      child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
-                        colorBlendMode: BlendMode.difference,)),
-
-                ),
-                Positioned.directional(
-                  textDirection:  Directionality.of(context),
-                  bottom: 2.h,
-                  start: 4.w,
-                  child:
-                  Text(
-                    data.postDate,
-                    style: TextStyle(
-                        color: Color(0xFFFFFFFF)
-
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(flex:1,child: Container(
-            child: Column(
-              children: [
-                Expanded(flex:1,child:
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5.w),
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    data.postName,
-                    style: TextStyle(
-                        color: Color(0xFF000000),
-                        fontWeight: FontWeight.normal,
-                        fontSize: screenUtil.setSp(12)
-                    ),
-
-                  ),
-                )),
-                Expanded(flex:1,child:
-                Row(
-                  children: [
-
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5.w),
-                      child:
-                      Text(
-                        '${data.postPrice}',
-                        style: TextStyle(
-                            color: kMainColor,
-                            fontWeight: FontWeight.normal,
-                            fontSize: screenUtil.setSp(14)
-                        ),
-
-                      ),
-                    ),
-                  ],
-                ))
-              ],
-            ),
-          ))
-
-        ],
-      ),
-    );
-
-  }
-  void showDialog(ContactDetail contactDetail) {
+  // Widget buildItem(RelatePost data, BuildContext context) {
+  //   return Container(
+  //     child: Column(
+  //       children: [
+  //         Expanded(
+  //           flex: 3,
+  //           child: Stack(
+  //             children: [
+  //               CachedNetworkImage(
+  //                 width: itemWidth,
+  //                 imageUrl:data.postImage,
+  //                 imageBuilder: (context, imageProvider) => Stack(
+  //                   children: [
+  //                     ClipRRect(
+  //
+  //                       child: Container(
+  //                           width: itemWidth,
+  //
+  //                           decoration: BoxDecoration(
+  //
+  //                             shape: BoxShape.rectangle,
+  //
+  //                             image: DecorationImage(
+  //                                 fit: BoxFit.fill,
+  //
+  //                                 image: imageProvider),
+  //                           )
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 placeholder: (context, url) =>
+  //                     Center(
+  //                       child: SizedBox(
+  //                           height: 50.h,
+  //                           width: 50.h,
+  //                           child: new CircularProgressIndicator()),
+  //                     ),
+  //
+  //
+  //                 errorWidget: (context, url, error) => ClipRRect(
+  //                     child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
+  //                       colorBlendMode: BlendMode.difference,)),
+  //
+  //               ),
+  //               Positioned.directional(
+  //                 textDirection:  Directionality.of(context),
+  //                 bottom: 2.h,
+  //                 start: 4.w,
+  //                 child:
+  //                 Text(
+  //                   data.postDate,
+  //                   style: TextStyle(
+  //                       color: Color(0xFFFFFFFF)
+  //
+  //                   ),
+  //                 ),
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //         Expanded(flex:1,child: Container(
+  //           child: Column(
+  //             children: [
+  //               Expanded(flex:1,child:
+  //               Container(
+  //                 margin: EdgeInsets.symmetric(horizontal: 5.w),
+  //                 alignment: AlignmentDirectional.centerStart,
+  //                 child: Text(
+  //                   data.postName,
+  //                   style: TextStyle(
+  //                       color: Color(0xFF000000),
+  //                       fontWeight: FontWeight.normal,
+  //                       fontSize: screenUtil.setSp(12)
+  //                   ),
+  //
+  //                 ),
+  //               )),
+  //               Expanded(flex:1,child:
+  //               Row(
+  //                 children: [
+  //
+  //                   Container(
+  //                     padding: EdgeInsets.symmetric(horizontal: 5.w),
+  //                     child:
+  //                     Text(
+  //                       '${data.postPrice}',
+  //                       style: TextStyle(
+  //                           color: kMainColor,
+  //                           fontWeight: FontWeight.normal,
+  //                           fontSize: screenUtil.setSp(14)
+  //                       ),
+  //
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ))
+  //             ],
+  //           ),
+  //         ))
+  //
+  //       ],
+  //     ),
+  //   );
+  //
+  // }
+  void showDialog(String mobile) {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -786,7 +787,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                     Align(
                       alignment: AlignmentDirectional.topStart,
                       child: Text(
-                        getTranslated(context, "contact_for_sell"),
+                        getTranslated(context, 'contact_for_sell'),
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Color(0xFF000000),
@@ -802,7 +803,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                         CachedNetworkImage(
                           width: 80.w,
                           height: 80.h,
-                          imageUrl:contactDetail.profileImage,
+                          imageUrl:"",
                           imageBuilder: (context, imageProvider) => Stack(
                             children: [
                               ClipRRect(
@@ -843,7 +844,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                '${ getTranslated(context, "by")} ${contactDetail.customerName}',
+                                '${getTranslated(context, 'by')} ',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -856,7 +857,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                contactDetail.postCreatedDate,
+                                "17-12-2022",
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -869,7 +870,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                contactDetail.mobile,
+                                mobile,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -881,7 +882,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, "call_now"), context, contactDetail.mobile.replaceAll('+', ''))
+                        callButton(getTranslated(context, 'call_now'), context, mobile.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -905,14 +906,14 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
       },
     );
   }
-  contact(BuildContext context,ContactDetail contactDetail) async {
+  contact(BuildContext context,String phone) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      showDialog(contactDetail);
+      showDialog(phone);
 
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, "not_login"));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
   }
@@ -923,12 +924,12 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
       ShareDialog(context);
 
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, "not_login"));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
 
 
-  }
 
+  }
   message(BuildContext context) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
@@ -940,73 +941,17 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
 
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
-      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-        return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
-          contactImage:postDetailsModel.data.contactDetail.profileImage ,
-          contactId:postDetailsModel.data.contactDetail.customerId,
-          postId: postDetailsModel.data.postId,
-          userId: loginModel.data.customerId,);
-      }));
+      // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      //   return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
+      //     contactImage:postDetailsModel.data.contactDetail.profileImage ,
+      //     contactId:postDetailsModel.data.contactDetail.customerId,
+      //     postId: postDetailsModel.data.postId,
+      //     userId: loginModel.data.customerId,);
+      // }));
 
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, "not_login"));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
     }
-
-  }
-  Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
-    var alert;
-    var alertStyle = AlertStyle(
-
-      animationType: AnimationType.fromBottom,
-      isCloseButton: true,
-      isOverlayTapDismiss: true,
-      descStyle: TextStyle(fontWeight: FontWeight.normal,
-          color: Color(0xFF0000000),
-          fontSize: screenUtil.setSp(18)),
-      descTextAlign: TextAlign.start,
-      animationDuration: Duration(milliseconds: 400),
-      alertBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
-        side: BorderSide(
-          color: Colors.grey,
-        ),
-      ),
-      titleStyle: TextStyle(
-          color: Color(0xFF000000),
-          fontWeight: FontWeight.normal,
-          fontSize: screenUtil.setSp(16)
-      ),
-      alertAlignment: AlignmentDirectional.center,
-    );
-    alert =   Alert(
-      context: context,
-      style: alertStyle,
-
-      title: title,
-
-
-      buttons: [
-
-        DialogButton(
-          child: Text(
-            getTranslated(context, 'reg_now'),
-            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
-          ),
-          onPressed: ()async {
-            await alert.dismiss();
-            Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
-              return new LoginScreen();
-            }));
-            // Navigator.pushReplacementNamed(context,LoginScreen.id);
-
-          },
-          color: Color(0xFFFFC300),
-          radius: BorderRadius.circular(6.w),
-        ),
-
-      ],
-    );
-    alert.show();
 
   }
   Future<void> ShareDialog(BuildContext context ) async{
@@ -1063,7 +1008,7 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
-           Navigator.pop(context);
+            Navigator.pop(context);
             // Navigator.pushReplacementNamed(context,LoginScreen.id);
 
           },
@@ -1075,9 +1020,70 @@ class _AdaptionDetailsScreenState extends State<AdaptionDetailsScreen> {
     alert.show();
 
   }
+
+  Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'reg_now'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+              return new LoginScreen();
+            }));
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+
+      ],
+    );
+    alert.show();
+
+  }
   String url(String phone,String message) {
+
     if (Platform.isAndroid) {
+      phone = "+965$phone";
       // add the [https]
+      // print("https://api.whatsapp.com/send?phone=+965$phone&text=${Uri.parse(message)}");
+      return "https://wa.me/$phone/?text=${Uri.parse(message)}";
       return "https://wa.me/$phone/?text=+965${Uri.parse(message)}"; // new line
     } else {
       // add the [https]

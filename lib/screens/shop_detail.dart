@@ -45,7 +45,8 @@ class _ShopDetailState extends State<ShopDetail> {
   double itemHeight;
   String noOfViews ="";
   String noOfShares = "";
-  TextButton previewButton(String text,BuildContext context,ContactDetail contactDetail){
+  String mLanguage ="";
+  TextButton previewButton(String text,BuildContext context,String mobile){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -60,7 +61,7 @@ class _ShopDetailState extends State<ShopDetail> {
       style: flatButtonStyle,
       onPressed: () {
 
-        contact(context, contactDetail);
+        contact(context, mobile);
 
       },
       child: Text(text,style: TextStyle(
@@ -109,25 +110,30 @@ class _ShopDetailState extends State<ShopDetail> {
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    mLanguage = languageCode;
     String loginData = _preferences.getString(kUserModel);
     Map map;
     if(loginData == null) {
       map = {
         'post_id': widget.postId,
+        'user_id': "",
 
+        'language': languageCode
       };
     }else{
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {
         'post_id': widget.postId,
+        'user_id': loginModel.data.id,
 
+        'language': languageCode
       };
     }
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    PostDetailsModel petsModel = await petMartService.shopProductDetails(map);
+    PostDetailsModel petsModel = await petMartService.petDetails(widget.postId);
 
     return petsModel;
   }
@@ -145,22 +151,31 @@ class _ShopDetailState extends State<ShopDetail> {
     LoginModel   loginModel = LoginModel.fromJson(body);
     map = {
       'post_id': widget.postId,
-      'user_id': loginModel.data.customerId
+      'user_id': loginModel.data.id
     };
 
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    ShareModel petsModel = await petMartService.sharePet(map);
+
+    ShareModel petsModel = await petMartService.sharePet("share","shop",widget.postId);
     modelHud.changeIsLoading(false);
+    String title="";
+    title = languageCode == "en"?postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle;
+    String description="";
+    description = languageCode== "en"?postDetailsModel.data.items[0].enDetails:postDetailsModel.data.items[0].arDetails;
     //
     if(Platform.isIOS){
-      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n market://details?id=com.createq8.petMart');
+      Share.share('${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
 
     }else{
-      Share.share('${postDetailsModel.data.postName}' '\n ${postDetailsModel.data.postDescription}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
+      Share.share('${title}' '\n ${description}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
 
     }
+    setState(() {
+      noOfShares = "${int.parse(noOfShares)+1}";
+
+    });
 
   }
   Future<void> petView() async{
@@ -174,7 +189,7 @@ class _ShopDetailState extends State<ShopDetail> {
       LoginModel loginModel = LoginModel.fromJson(body);
       map = {
         'post_id': widget.postId,
-        'user_id': loginModel.data.customerId,
+        'user_id': loginModel.data.id,
 
         'language': languageCode
       };
@@ -182,9 +197,9 @@ class _ShopDetailState extends State<ShopDetail> {
       print('map --> ${map}');
 
       PetMartService petMartService = PetMartService();
-      ViewModel petsModel = await petMartService.viewPet(map);
+      ShareModel petsModel = await petMartService.sharePet("view","shop",widget.postId);
       setState(() {
-        noOfViews = petsModel.data.postCount.toString();
+        noOfViews = "${int.parse(noOfViews)+1}";
 
       });
     }
@@ -197,8 +212,8 @@ class _ShopDetailState extends State<ShopDetail> {
     pets().then((value) {
       setState(() {
         postDetailsModel = value;
-        noOfViews = value.data.views;
-        noOfShares = value.data.shared;
+        noOfViews = value.data.items[0].views;
+        noOfShares = value.data.items[0].shares;
       });
 
     }).whenComplete(() {
@@ -292,13 +307,13 @@ class _ShopDetailState extends State<ShopDetail> {
                             });
                           }
                       ),
-                      items: postDetailsModel.data.gallery.map((item) =>
+                      items: postDetailsModel.data.items[0].image.map((item) =>
                           Stack(
 
                             children: [
                               GestureDetector(
                                 onTap: (){
-                                  String url = item.image.trim();
+                                  String url = item.trim();
                                   if(url.isNotEmpty) {
                                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                       return new PhotoScreen(imageProvider: NetworkImage(
@@ -319,7 +334,7 @@ class _ShopDetailState extends State<ShopDetail> {
                                     width: width,
 
                                     fit: BoxFit.fill,
-                                    imageUrl:'${item.image}',
+                                    imageUrl:'${kImagePath+item}',
                                     imageBuilder: (context, imageProvider) {
 
                                       return Card(
@@ -385,11 +400,11 @@ class _ShopDetailState extends State<ShopDetail> {
                       start: 0,
                       end:0,
                       child: Opacity(
-                        opacity: postDetailsModel.data.gallery.length>1?1.0:0.0,
+                        opacity: postDetailsModel.data.items[0].image.length>1?1.0:0.0,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: postDetailsModel.data.gallery.map((item) {
-                            int index =postDetailsModel.data.gallery.indexOf(item);
+                          children: postDetailsModel.data.items[0].image.map((item) {
+                            int index =postDetailsModel.data.items[0].image.indexOf(item);
                             return Container(
                               width: 8.0.w,
                               height: 8.0.h,
@@ -422,7 +437,8 @@ class _ShopDetailState extends State<ShopDetail> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      postDetailsModel.data.postName,
+                      mLanguage =="en"?
+                      postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -430,20 +446,20 @@ class _ShopDetailState extends State<ShopDetail> {
 
                       ),
                     ),
-                    // Text(
-                    //   '${postDetailsModel.data.categoryName}  ${postDetailsModel.data.subCategoryName}',
-                    //   style: TextStyle(
-                    //       color: Color(0xFF000000),
-                    //       fontSize: screenUtil.setSp(14),
-                    //       fontWeight: FontWeight.normal
-                    //
-                    //   ),
-                    // ),
+                    Text(
+                      '',
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(14),
+                          fontWeight: FontWeight.normal
+
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${postDetailsModel.data.postPrice}',
+                          '${postDetailsModel.data.items[0].price}',
                           style: TextStyle(
                               color: kMainColor,
                               fontSize: screenUtil.setSp(14),
@@ -451,7 +467,7 @@ class _ShopDetailState extends State<ShopDetail> {
 
                           ),
                         ),
-                        // previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.contactDetail)
+                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].mobile)
                       ],
                     ),
                   ],
@@ -465,7 +481,7 @@ class _ShopDetailState extends State<ShopDetail> {
               Container(
                 margin: EdgeInsets.all(10.w),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
 
@@ -512,30 +528,32 @@ class _ShopDetailState extends State<ShopDetail> {
 
                       ),
                     ),
-                    // GestureDetector(
-                    //   onTap: ()async{
-                    //     message(context);
-                    //   },
-                    //   child: Column(
-                    //
-                    //     children: [
-                    //       Image.asset('assets/images/img_contact.png',
-                    //         height: 30.h,width: 30.w,
-                    //       )
-                    //       ,
-                    //       Text(
-                    //         "${postDetailsModel.data.contactCount} ${getTranslated(context,'send_messages')}" ,
-                    //         style: TextStyle(
-                    //             color: Color(0xFF000000),
-                    //             fontSize: screenUtil.setSp(14),
-                    //             fontWeight: FontWeight.normal
-                    //
-                    //         ),
-                    //       ),
-                    //     ],
-                    //
-                    //   ),
-                    // ),
+                    GestureDetector(
+                      onTap: ()async{
+
+                        _openUrl(url(postDetailsModel.data.items[0].mobile, ""));
+
+                      },
+                      child: Column(
+
+                        children: [
+                          Image.asset('assets/images/whatsapp.png',
+                            height: 30.h,width: 30.w,color: Color(0xAA1E1F20),
+                          )
+                          ,
+                          Text(
+                            "${getTranslated(context, "send_messages")}" ,
+                            style: TextStyle(
+                                color: Color(0xFF000000),
+                                fontSize: screenUtil.setSp(14),
+                                fontWeight: FontWeight.normal
+
+                            ),
+                          ),
+                        ],
+
+                      ),
+                    ),
 
                   ],
                 ),
@@ -545,41 +563,42 @@ class _ShopDetailState extends State<ShopDetail> {
                 child: Container(
                   color: Color(0x88000000),
                 ),),
-              // Container(
-              //   margin: EdgeInsets.all(10.w),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       Text(
-              //         "${getTranslated(context, 'gender')}${postDetailsModel.data.gender}  " ,
-              //         style: TextStyle(
-              //             color: Color(0xFF000000),
-              //             fontSize: screenUtil.setSp(14),
-              //             fontWeight: FontWeight.normal
-              //
-              //         ),
-              //       ),
-              //       Text(
-              //         "${getTranslated(context, 'age')} ${postDetailsModel.data.ageLabel}  " ,
-              //         style: TextStyle(
-              //             color: Color(0xFF000000),
-              //             fontSize: screenUtil.setSp(14),
-              //             fontWeight: FontWeight.normal
-              //
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              // SizedBox(height: 1.h,
-              //   width: width,
-              //   child: Container(
-              //     color: Color(0x88000000),
-              //   ),),
+              Container(
+                margin: EdgeInsets.all(10.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${getTranslated(context, 'gender')}${postDetailsModel.data.items[0].gender}  " ,
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(14),
+                          fontWeight: FontWeight.normal
+
+                      ),
+                    ),
+                    Text(
+                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age}  " ,
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(14),
+                          fontWeight: FontWeight.normal
+
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 1.h,
+                width: width,
+                child: Container(
+                  color: Color(0x88000000),
+                ),),
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
-                  "${postDetailsModel.data.postDescription}  " ,
+                  mLanguage == "en"?
+                  "${postDetailsModel.data.items[0].enDetails}  ":"${postDetailsModel.data.items[0].arDetails}  " ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -610,45 +629,45 @@ class _ShopDetailState extends State<ShopDetail> {
                 child: Container(
                   color: Color(0x88000000),
                 ),),
-              Container(
-
-                child:  GridView.builder(scrollDirection: Axis.vertical,
-                  padding: EdgeInsets.zero,
-
-
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                      childAspectRatio:itemWidth/itemHeight),
-                  itemCount: postDetailsModel.data.relatePost.length,
-
-                  itemBuilder: (context,index){
-                    return GestureDetector(
-                      onTap: (){
-                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new ShopDetail(postId:postDetailsModel.data.relatePost[index].postId,postName: postDetailsModel.data.relatePost[index].postName);
-                        }));
-                        // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
-                        // }));
-                      },
-                      child: Container(
-                          margin: EdgeInsets.all(6.w),
-
-                          child:
-                          Card(
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              elevation: 1.w,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0.h),
-                              ),
-                              color: Color(0xFFFFFFFF),
-                              child: buildItem(postDetailsModel.data.relatePost[index],context))),
-                    );
-                  },
-                ),
-
-              )
+              // Container(
+              //
+              //   child:  GridView.builder(scrollDirection: Axis.vertical,
+              //     padding: EdgeInsets.zero,
+              //
+              //
+              //     shrinkWrap: true,
+              //     physics: const NeverScrollableScrollPhysics(),
+              //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+              //         childAspectRatio:itemWidth/itemHeight),
+              //     itemCount: postDetailsModel.data.relatePost.length,
+              //
+              //     itemBuilder: (context,index){
+              //       return GestureDetector(
+              //         onTap: (){
+              //           Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+              //             return new PetsDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId,postName: postDetailsModel.data.relatePost[index].postName);
+              //           }));
+              //           // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+              //           //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
+              //           // }));
+              //         },
+              //         child: Container(
+              //             margin: EdgeInsets.all(6.w),
+              //
+              //             child:
+              //             Card(
+              //                 clipBehavior: Clip.antiAliasWithSaveLayer,
+              //                 elevation: 1.w,
+              //                 shape: RoundedRectangleBorder(
+              //                   borderRadius: BorderRadius.circular(10.0.h),
+              //                 ),
+              //                 color: Color(0xFFFFFFFF),
+              //                 child: buildItem(postDetailsModel.data.relatePost[index],context))),
+              //       );
+              //     },
+              //   ),
+              //
+              // )
             ],
           ),
         ),
@@ -656,113 +675,113 @@ class _ShopDetailState extends State<ShopDetail> {
     );
 
   }
-  Widget buildItem(RelatePost data, BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Stack(
-              children: [
-                CachedNetworkImage(
-                  width: itemWidth,
-                  imageUrl:data.postImage,
-                  imageBuilder: (context, imageProvider) => Stack(
-                    children: [
-                      ClipRRect(
-
-                        child: Container(
-                            width: itemWidth,
-
-                            decoration: BoxDecoration(
-
-                              shape: BoxShape.rectangle,
-
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-
-                                  image: imageProvider),
-                            )
-                        ),
-                      ),
-                    ],
-                  ),
-                  placeholder: (context, url) =>
-                      Center(
-                        child: SizedBox(
-                            height: 50.h,
-                            width: 50.h,
-                            child: new CircularProgressIndicator()),
-                      ),
-
-
-                  errorWidget: (context, url, error) => ClipRRect(
-                      child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
-                        colorBlendMode: BlendMode.difference,)),
-
-                ),
-                Positioned.directional(
-                  textDirection:  Directionality.of(context),
-                  bottom: 2.h,
-                  start: 4.w,
-                  child:
-                  Text(
-                    data.postDate,
-                    style: TextStyle(
-                        color: Color(0xFFFFFFFF)
-
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(flex:1,child: Container(
-            child: Column(
-              children: [
-                Expanded(flex:1,child:
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 5.w),
-                  alignment: AlignmentDirectional.centerStart,
-                  child: Text(
-                    data.postName,
-                    style: TextStyle(
-                        color: Color(0xFF000000),
-                        fontWeight: FontWeight.normal,
-                        fontSize: screenUtil.setSp(12)
-                    ),
-
-                  ),
-                )),
-                Expanded(flex:1,child:
-                Row(
-                  children: [
-
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5.w),
-                      child:
-                      Text(
-                        '${data.postPrice}',
-                        style: TextStyle(
-                            color: kMainColor,
-                            fontWeight: FontWeight.normal,
-                            fontSize: screenUtil.setSp(14)
-                        ),
-
-                      ),
-                    ),
-                  ],
-                ))
-              ],
-            ),
-          ))
-
-        ],
-      ),
-    );
-
-  }
-  void showDialog(ContactDetail contactDetail) {
+  // Widget buildItem(RelatePost data, BuildContext context) {
+  //   return Container(
+  //     child: Column(
+  //       children: [
+  //         Expanded(
+  //           flex: 3,
+  //           child: Stack(
+  //             children: [
+  //               CachedNetworkImage(
+  //                 width: itemWidth,
+  //                 imageUrl:data.postImage,
+  //                 imageBuilder: (context, imageProvider) => Stack(
+  //                   children: [
+  //                     ClipRRect(
+  //
+  //                       child: Container(
+  //                           width: itemWidth,
+  //
+  //                           decoration: BoxDecoration(
+  //
+  //                             shape: BoxShape.rectangle,
+  //
+  //                             image: DecorationImage(
+  //                                 fit: BoxFit.fill,
+  //
+  //                                 image: imageProvider),
+  //                           )
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 placeholder: (context, url) =>
+  //                     Center(
+  //                       child: SizedBox(
+  //                           height: 50.h,
+  //                           width: 50.h,
+  //                           child: new CircularProgressIndicator()),
+  //                     ),
+  //
+  //
+  //                 errorWidget: (context, url, error) => ClipRRect(
+  //                     child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
+  //                       colorBlendMode: BlendMode.difference,)),
+  //
+  //               ),
+  //               Positioned.directional(
+  //                 textDirection:  Directionality.of(context),
+  //                 bottom: 2.h,
+  //                 start: 4.w,
+  //                 child:
+  //                 Text(
+  //                   data.postDate,
+  //                   style: TextStyle(
+  //                       color: Color(0xFFFFFFFF)
+  //
+  //                   ),
+  //                 ),
+  //               )
+  //             ],
+  //           ),
+  //         ),
+  //         Expanded(flex:1,child: Container(
+  //           child: Column(
+  //             children: [
+  //               Expanded(flex:1,child:
+  //               Container(
+  //                 margin: EdgeInsets.symmetric(horizontal: 5.w),
+  //                 alignment: AlignmentDirectional.centerStart,
+  //                 child: Text(
+  //                   data.postName,
+  //                   style: TextStyle(
+  //                       color: Color(0xFF000000),
+  //                       fontWeight: FontWeight.normal,
+  //                       fontSize: screenUtil.setSp(12)
+  //                   ),
+  //
+  //                 ),
+  //               )),
+  //               Expanded(flex:1,child:
+  //               Row(
+  //                 children: [
+  //
+  //                   Container(
+  //                     padding: EdgeInsets.symmetric(horizontal: 5.w),
+  //                     child:
+  //                     Text(
+  //                       '${data.postPrice}',
+  //                       style: TextStyle(
+  //                           color: kMainColor,
+  //                           fontWeight: FontWeight.normal,
+  //                           fontSize: screenUtil.setSp(14)
+  //                       ),
+  //
+  //                     ),
+  //                   ),
+  //                 ],
+  //               ))
+  //             ],
+  //           ),
+  //         ))
+  //
+  //       ],
+  //     ),
+  //   );
+  //
+  // }
+  void showDialog(String mobile) {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -799,7 +818,7 @@ class _ShopDetailState extends State<ShopDetail> {
                         CachedNetworkImage(
                           width: 80.w,
                           height: 80.h,
-                          imageUrl:contactDetail.profileImage,
+                          imageUrl:"",
                           imageBuilder: (context, imageProvider) => Stack(
                             children: [
                               ClipRRect(
@@ -840,7 +859,7 @@ class _ShopDetailState extends State<ShopDetail> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                '${getTranslated(context, 'by')} ${widget.postName}',
+                                '${getTranslated(context, 'by')} ',
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -853,7 +872,7 @@ class _ShopDetailState extends State<ShopDetail> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                contactDetail.postCreatedDate.toString(),
+                                "17-12-2022",
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -866,7 +885,7 @@ class _ShopDetailState extends State<ShopDetail> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                contactDetail.mobile,
+                                mobile,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -878,7 +897,7 @@ class _ShopDetailState extends State<ShopDetail> {
                             ),
                           ],
                         ),
-                         callButton(getTranslated(context, 'call_now'), context, contactDetail.mobile.replaceAll('+', ''))
+                        callButton(getTranslated(context, 'call_now'), context, mobile.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -902,11 +921,11 @@ class _ShopDetailState extends State<ShopDetail> {
       },
     );
   }
-  contact(BuildContext context,ContactDetail contactDetail) async {
+  contact(BuildContext context,String phone) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      showDialog(contactDetail);
+      showDialog(phone);
 
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
@@ -937,13 +956,13 @@ class _ShopDetailState extends State<ShopDetail> {
 
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
-      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-        return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
-          contactImage:postDetailsModel.data.contactDetail.profileImage ,
-          contactId:postDetailsModel.data.contactDetail.customerId,
-          postId: postDetailsModel.data.postId,
-          userId: loginModel.data.customerId,);
-      }));
+      // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      //   return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
+      //     contactImage:postDetailsModel.data.contactDetail.profileImage ,
+      //     contactId:postDetailsModel.data.contactDetail.customerId,
+      //     postId: postDetailsModel.data.postId,
+      //     userId: loginModel.data.customerId,);
+      // }));
 
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
@@ -1072,6 +1091,26 @@ class _ShopDetailState extends State<ShopDetail> {
     );
     alert.show();
 
+  }
+  String url(String phone,String message) {
+
+    if (Platform.isAndroid) {
+      phone = "+965$phone";
+      // add the [https]
+      // print("https://api.whatsapp.com/send?phone=+965$phone&text=${Uri.parse(message)}");
+      return "https://wa.me/$phone/?text=${Uri.parse(message)}";
+      return "https://wa.me/$phone/?text=+965${Uri.parse(message)}"; // new line
+    } else {
+      // add the [https]
+      return "https://api.whatsapp.com/send?phone=+965$phone=${Uri.parse(message)}"; // new line
+    }
+  }
+  Future<void> _openUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
 }

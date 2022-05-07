@@ -28,7 +28,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
     Map map = {
       "shop_id":widget.id
     };
-    ShopdetailsModel shopdetailsModel =await petMartService.shopDetails(map);
+    ShopdetailsModel shopdetailsModel =await petMartService.shopDetails(widget.id);
     return shopdetailsModel;
   }
   @override

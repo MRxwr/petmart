@@ -50,7 +50,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   String categoryId ="";
   String subCategoryId ="";
   CategoryParent.HomeModel homeModel;
-  List<CategoryParent.Category> categoryList;
+  List<CategoryParent.Categories> categoryList;
   SubCategory.CategoryModel mSubCategoryModel;
   String path =null;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -97,8 +97,13 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     return nAlertDialog;
   }
   String ageId ="";
+  String languageCode = "";
   Future<CategoryParent.HomeModel> home() async{
+
+
+
     SharedPreferences _preferences = await SharedPreferences.getInstance();
+    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     String homeString = _preferences.getString('home');
     final body = json.decode(homeString);
     CategoryParent.HomeModel   homeModel =CategoryParent.HomeModel.fromJson(body);
@@ -261,7 +266,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
     Map map ;
     map = {"language":languageCode,
-      "userId":loginModel.data.customerId};
+      "userId":loginModel.data.id};
     return map;
   }
   String mStartDate;
@@ -288,7 +293,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       home().then((value) {
         setState(() {
           homeModel = value;
-          categoryList = value.data.category;
+          categoryList = value.data.categories;
         });
       });
     });
@@ -487,7 +492,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                     SizedBox(
                       height: 50.h,
                       width: screenUtil.screenWidth,
-                      child: DropDown<CategoryParent.Category>(
+                      child: DropDown<CategoryParent.Categories>(
 
 
 
@@ -503,16 +508,16 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                               fontWeight: FontWeight.w600,
                               fontSize: screenUtil.setSp(15)
                           ),),
-                        onChanged: (CategoryParent.Category category){
+                        onChanged: (CategoryParent.Categories category){
                           mSubCategoryModel = null;
-                          categoryId = category.categoryId;
+                          categoryId = category.id;
                           print('CategoryId -->${categoryId}');
                           final modelHud = Provider.of<ModelHud>(context,listen: false);
                           modelHud.changeIsLoading(true);
                           subCategory(categoryId).then((value){
                             modelHud.changeIsLoading(false);
                             setState(() {
-                              subCategoryId = value.data.category[0].childcategory[0].categoryId;
+                              subCategoryId = value.data.categories[0].id;
                               mSubCategoryModel = value;
                               print('subCategoryId -->${subCategoryId}');
                             });
@@ -548,15 +553,15 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                       ):  SizedBox(
                         height: 50.h,
                         width: screenUtil.screenWidth,
-                        child: DropDown<SubCategory.Childcategory>(
+                        child: DropDown<SubCategory.Categories>(
 
 
 
 
 
-                          items: mSubCategoryModel.data.category[0].childcategory,
+                          items: mSubCategoryModel.data.categories,
 
-                          hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                          hint:  Text(mLanguage == "en"?mSubCategoryModel.data.categories[0].enTitle: mSubCategoryModel.data.categories[0].arTitle,
                             textAlign: TextAlign.start,
                             style: TextStyle(
 
@@ -564,13 +569,13 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                                 fontWeight: FontWeight.w600,
                                 fontSize: screenUtil.setSp(15)
                             ),),
-                          onChanged: (SubCategory.Childcategory category){
-                            subCategoryId = category.categoryId;
+                          onChanged: (SubCategory.Categories category){
+                            subCategoryId = category.id;
 
 
 
                           },
-                          customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                          customWidgets: mSubCategoryModel.data.categories.map((p) => buildSubCategoryRow(p)).toList(),
                           isExpanded: true,
                           showUnderline: false,
                         ),
@@ -793,10 +798,10 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(map);
+    SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(categoryId);
     return auctionDetailsModel;
   }
-  Widget buildDropDownRow(CategoryParent.Category category) {
+  Widget buildDropDownRow(CategoryParent.Categories category) {
     return Container(
 
 
@@ -806,14 +811,14 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(category.categoryName ,
+        child: Text(mLanguage =="en"?category.enTitle:category.arTitle ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
               fontSize: screenUtil.setSp(15)
           ),));
   }
-  Widget buildSubCategoryRow(SubCategory.Childcategory category) {
+  Widget buildSubCategoryRow(SubCategory.Categories category) {
     return Container(
 
 
@@ -824,7 +829,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(category.categoryName ,
+        child: Text(mLanguage == "en"?category.enTitle:category.arTitle ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
@@ -883,8 +888,8 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       List<File> mCompressedImages  = List();
 
 
-      String userId = loginModel.data.customerId;
-      String phoneNumber = loginModel.data.mobile;
+      String userId = loginModel.data.id;
+
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
       for(int i =0;i<mImages.length;i++){

@@ -31,7 +31,7 @@ class _MyMessagesScreenState extends State<MyMessagesScreen> {
     PetMartService petMartService = PetMartService();
 
     Map map ;
-    map ={"user_id":loginModel.data.customerId,
+    map ={"user_id":loginModel.data.id,
     "language":languageCode};
     MyMessageModel messageModel =await petMartService.myMessages(map);
     return messageModel;
@@ -137,7 +137,7 @@ Container(
                     contactImage:messageModel.data[index].senderImage ,
                     contactId:messageModel.data[index].receiverId,
                     postId: messageModel.data[index].postId,
-                    userId: loginModel.data.customerId);
+                    userId: loginModel.data.id);
                 }));
 
               },

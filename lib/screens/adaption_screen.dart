@@ -11,6 +11,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/post_model.dart' as PostModel;
 import 'package:pet_mart/screens/adaption_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class AdaptionScreen extends StatefulWidget {
   static String id = 'AdaptionScreen';
@@ -22,9 +23,10 @@ class _AdaptionScreenState extends State<AdaptionScreen> {
   HomeModel homeModel;
   List<bool> selectedList = List();
   PostModel.PostModel postModel;
-  List<Category> categories = List();
+  List<Categories> categories = List();
   ScreenUtil screenUtil = ScreenUtil();
   double itemWidth;
+  String languageCode;
   double itemHeight;
   int selectedIndex =0;
 
@@ -32,20 +34,21 @@ class _AdaptionScreenState extends State<AdaptionScreen> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String homeString = sharedPreferences.getString("home");
 
-
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
 
       final body = json.decode(homeString);
     homeModel = HomeModel.fromJson(body);
 
-    List<Images> images = null;
-    String categoryId = "";
-    Category category = Category(categoryId:categoryId,categoryName:"All",images: images);
+
+    String categoryId = "0";
+    Categories category = Categories(id:categoryId,enTitle:getTranslated(context, 'all'),arTitle:getTranslated(context, 'all'),logo: "");
     categories.add(category);
     selectedList.add(true);
 
-    for(int i =0;i<homeModel.data.category.length;i++){
-      categories.add(homeModel.data.category[i]);
+    for(int i =0;i<homeModel.data.categories.length;i++){
+      categories.add(homeModel.data.categories[i]);
       selectedList.add(false);
     }
 
@@ -57,13 +60,9 @@ class _AdaptionScreenState extends State<AdaptionScreen> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-    Map map ;
-    map = {"id":catId,
-    "type":"adoption",
-    "language":languageCode};
-    print(' PostModel --> ${map}');
+
     PetMartService petMartService = PetMartService();
-   PostModel.PostModel postModel = await petMartService.post(map);
+   PostModel.PostModel postModel = await petMartService.post("adoption",catId);
     return postModel;
   }
   void getList(String catId) async{
@@ -77,7 +76,7 @@ postModel = null;
       "language":languageCode};
     print(' PostModel --> ${map}');
     PetMartService petMartService = PetMartService();
-     postModel = await petMartService.post(map);
+     postModel = await petMartService.post("adoption",catId);
      setState(() {
 
      });
@@ -89,7 +88,7 @@ postModel = null;
     // TODO: implement initState
     super.initState();
     getHomeModel().whenComplete(() {
-      post(categories[0].categoryId).then((value) {
+      post(categories[0].id).then((value) {
         postModel = value;
         setState(() {
 
@@ -134,7 +133,7 @@ postModel = null;
                                   setState(() {
 
                                   });
-                                   getList(categories[index].categoryId);
+                                   getList(categories[index].id);
 
 
                                 }
@@ -161,6 +160,7 @@ postModel = null;
                   SizedBox(height: 5.h,width: width,
                   ),
                   Container(
+                    alignment: AlignmentDirectional.center,
                     child:
                     postModel== null?
                     Container(
@@ -170,11 +170,11 @@ postModel = null;
                       ),
                       alignment: AlignmentDirectional.center,
                     ):
-                        postModel.data.isEmpty?
+                        postModel.data.items.isEmpty?
 
                         Container(
                           child: Text(
-                            postModel.message,
+                            getTranslated(context, 'no_product_available'),
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: screenUtil.setSp(16),
@@ -192,14 +192,14 @@ postModel = null;
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                           childAspectRatio:itemWidth/itemHeight),
-                      itemCount: postModel.data.length,
+                      itemCount: postModel.data.items.length,
 
                       itemBuilder: (context,index){
                         return
                           GestureDetector(
                             onTap: (){
                               Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                return new AdaptionDetailsScreen(postId:postModel.data[index].postId,postName: postModel.data[index].postName,);
+                                return new AdaptionDetailsScreen(postId:postModel.data.items[index].id,postName:languageCode =="en"? postModel.data.items[index].enTitle:postModel.data.items[index].arTitle);
                               }));
                             },
                             child: Container(
@@ -213,7 +213,7 @@ postModel = null;
                                     borderRadius: BorderRadius.circular(10.0.h),
                                   ),
                                   color: Color(0xFFFFFFFF),
-                                  child: buildItem(postModel.data[index],context))),
+                                  child: buildItem(postModel.data.items[index],context))),
                           );
                       },
                     ),
@@ -226,7 +226,7 @@ postModel = null;
 
     );
   }
-  TextButton previewButton(Category category,BuildContext context){
+  TextButton previewButton(Categories category,BuildContext context){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFFFFF),
       minimumSize: Size(50.w, 35.h),
@@ -242,14 +242,14 @@ postModel = null;
       onPressed: () {
 
       },
-      child: Text(category.categoryName,style: TextStyle(
+      child: Text(languageCode == "en"?category.enTitle:category.arTitle,style: TextStyle(
           color: Color(0xFFFFFFFF),
           fontSize: screenUtil.setSp(14),
           fontWeight: FontWeight.w500
       ),),
     );
   }
-  Container selectRow(Category category,BuildContext context,int selectedIndex){
+  Container selectRow(Categories category,BuildContext context,int selectedIndex){
 
     return
       Container(
@@ -262,7 +262,7 @@ postModel = null;
               color: kMainColor
           ),
           child: Text(
-            category.categoryName,
+            languageCode == "en"?category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -282,7 +282,7 @@ postModel = null;
               )
           ),
         child: Text(
-          category.categoryName,
+          languageCode == "en"?category.enTitle:category.arTitle,
           style: TextStyle(
             color: Color(0xCC000000),
               fontSize: screenUtil.setSp(14),
@@ -294,7 +294,7 @@ postModel = null;
       );
   }
 
-  Widget buildItem(PostModel.Data data, BuildContext context) {
+  Widget buildItem(PostModel.Items data, BuildContext context) {
     return Container(
       child: Column(
 children: [
@@ -304,7 +304,7 @@ children: [
       children: [
         CachedNetworkImage(
           width: itemWidth,
-          imageUrl:data.gallery[0].image,
+          imageUrl:kImagePath+data.image,
           imageBuilder: (context, imageProvider) => Stack(
             children: [
               ClipRRect(
@@ -343,7 +343,7 @@ children: [
       bottom: 2.h,
       start: 10.w,
       child: Text(
-        data.postDate,
+        "17-12-2022",
         style: TextStyle(
           color: Color(0xFFFFFFFF)
 
@@ -360,7 +360,7 @@ children: [
         Container(
           alignment: AlignmentDirectional.centerStart,
           child: Text(
-            data.postName,
+           languageCode =="en"? data.enTitle:data.arTitle,
             style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.normal,
@@ -369,24 +369,7 @@ children: [
 
           ),
         )),
-        Expanded(flex:1,child:
-        Row(
-          children: [
-            Image.asset('assets/images/placeholder_image_count.png'),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 5.w),
-              child: Text(
-                data.imageCount.toString(),
-                style: TextStyle(
-                    color: Color(0xFF000000),
-                    fontWeight: FontWeight.normal,
-                    fontSize: screenUtil.setSp(14)
-                ),
 
-              ),
-            ),
-          ],
-        ))
       ],
     ),
   ))

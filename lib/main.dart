@@ -33,6 +33,7 @@ import 'package:pet_mart/screens/my_message_screen.dart';
 import 'package:pet_mart/screens/my_post_screen.dart';
 import 'package:pet_mart/screens/notification_details_screen.dart';
 import 'package:pet_mart/screens/orders_screen.dart';
+import 'package:pet_mart/screens/privacy_main_screen.dart';
 import 'package:pet_mart/screens/privacy_screen.dart';
 import 'package:pet_mart/screens/push_notification_screen.dart';
 import 'package:pet_mart/screens/register_screen.dart';
@@ -70,9 +71,8 @@ FlutterLocalNotificationsPlugin();
 void main() async{
   setupLocator();
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-
-
+  await Firebase.initializeApp(
+  );
 
   // Set the background messaging handler early on, as a named top-level function
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -179,7 +179,7 @@ Future <void> getToken() async{
   SharedPreferences _preferences = await SharedPreferences.getInstance();
   String mToken =_preferences.getString("token")??"";
   if(mToken ==""){
-    String toke = await FirebaseMessaging.instance.getToken();
+    String toke = await FirebaseMessaging.instance.getToken(vapidKey: "BEp83hChFvm1ckxAt291kepX_T43rkk1e6j3ltN_tyxmk6CICMvnGN0BISLDX6VWjR46QaYuX0OJ51VS7Wy1b6M");
     print('token --> ${toke}');
     SharedPreferences _preferences = await SharedPreferences.getInstance();
 
@@ -219,28 +219,32 @@ Future<void> init() async{
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage message) {
+          if(message != null){
+            print('remoteMessgae sss${message.toString()}');
+            dynamic dataObject=  message.data;
+
+            print('dataObject ---> ${dataObject.toString()}');
+            String type = dataObject['push_type'];
+
+            print('type ---> ${type}');
+            if (type .contains('chatuser')){
+
+              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                return new MyMessagesScreen();
+              }));
 
 
-      print('remoteMessgae sss${message.toString()}');
-      dynamic dataObject=  message.data;
-      print('dataObject ---> ${dataObject.toString()}');
-      String type = dataObject['push_type'];
 
-      print('type ---> ${type}');
-      if (type .contains('chatuser')){
-
-          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-            return new MyMessagesScreen();
-          }));
+            }else if(type .contains('rateonuser')){
+              String auctionId = dataObject['auction_id'];
+              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
+              }));
+            }
+          }
 
 
 
-      }else if(type .contains('rateonuser')){
-        String auctionId = dataObject['auction_id'];
-        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-          return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
-        }));
-      }
 
     });
     getToken().then((value) {
@@ -379,6 +383,7 @@ Future<void> init() async{
 
                         ) ,
                         builder: (context, child) {
+                          ScreenUtil.setContext(context);
                           return MediaQuery(
                             child: child,
                             data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
@@ -433,6 +438,7 @@ Future<void> init() async{
                           ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
                           AdaptionScreen.id: (context) => AdaptionScreen(),
                           LostScreen.id: (context) => LostScreen(),
+                          PrivacyMainScreen.id: (context) => PrivacyMainScreen(),
                         },
 
                       ),

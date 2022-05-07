@@ -37,7 +37,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     LoginModel   loginModel = LoginModel.fromJson(body);
     PetMartService petMartService = PetMartService();
     Map map = {
-      "id":loginModel.data.customerId,
+      "id":loginModel.data.id,
       "language":languageCode
     };
     NotificationModel notificationModel =await petMartService.notification(map);
@@ -251,7 +251,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
       state = "0";
     }
     Map map = {
-      "user_id":loginModel.data.customerId,
+      "user_id":loginModel.data.id,
       "is_notify":state,
       "language":languageCode
     };

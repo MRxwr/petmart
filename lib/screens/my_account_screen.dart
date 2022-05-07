@@ -134,16 +134,16 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
     String loginData = _preferences.getString(kUserModel);
-    Map map ;
+
 
 
       final body = json.decode(loginData);
          loginModel = LoginModel.fromJson(body);
-      userId = loginModel.data.customerId;
-      map = {
-        "id":loginModel.data.customerId,
-        "language":languageCode};
+      userId = loginModel.data.id;
 
+    Map<String, String> map = Map();
+    map['id']=userId;
+    map['email']= email;
 
 
 
@@ -171,7 +171,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
     map = {
-      "user_id":loginModel.data.customerId,
+      "user_id":loginModel.data.id,
       "language":languageCode};
 
 
@@ -189,7 +189,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     user().then((value){
       setState(() {
         userModel = value;
-        imageUrl = value.data.profileImage;
+        imageUrl = "";
       });
     });
 
@@ -266,7 +266,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('${getTranslated(context, 'your_credit')} ${ loginModel.data.availableCredit}',
+                              Text('${getTranslated(context, 'your_credit')} ${ loginModel.data.points}',
                               style: TextStyle(
                                 color: Color(0xFFFFFFFF),
                                 fontWeight: FontWeight.normal,
@@ -483,7 +483,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         child: UserNameTextField(hint:getTranslated(context,'first_name'),onClick: (value){
                           firstName = value;
 
-                        },mText: userModel.data.firstname,
+                        },mText: userModel.data.name.split(" ")[0],
 
                         ),
                       ),
@@ -493,7 +493,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         child: UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
                           lastName = value;
 
-                        },mText: userModel.data.lastname,
+                        },mText: userModel.data.name.split(" ")[1],
 
                         ),
                       ),
@@ -580,14 +580,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           var data = await deviceInfoPlugin.iosInfo;
           uniqueId = data.identifierForVendor;
         }
-        response =await petMartService.updateProfile(userId, firstName, lastName, email, phone, "", "kuwait", "sfsfsf", uniqueId, deviceType, mLanguage, _image);
-        String status = response['status'];
+        Map<String, String> map = Map();
+        map['id']=userId;
+        map['name']= firstName+" "+lastName;
+        map['email']=email;
+        map['mobile']=phone;
+
+
+        UserModel userModel  =await petMartService.updateProfile(map);
+        bool  status = userModel.ok;
         modelHud.changeIsLoading(false);
-        if(status == 'success'){
-          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(response['message'])));
+        if(status ){
+          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(userModel.status)));
           Navigator.pushReplacementNamed(context,MainScreen.id);
         }else{
-          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(response['message'])));
+          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(userModel.status)));
 
         }
 
@@ -595,8 +602,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
 
       }else {
-        if (firstName == userModel.data.firstname &&
-            lastName == userModel.data.lastname &&
+        if (firstName == userModel.data.name.split(" ")[0] &&
+            lastName == userModel.data.name.split(" ")[1] &&
             email == userModel.data.email && phone == userModel.data.mobile) {
           _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'update_data'))));
 
@@ -607,7 +614,11 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           PetMartService petMartService = PetMartService();
           String deviceType="";
           String uniqueId="";
-
+          Map<String, String> map = Map();
+          map['id']=userId;
+          map['name']= firstName+" "+lastName;
+          map['email']=email;
+          map['mobile']=phone;
           if(Platform.isAndroid){
             deviceType = "a";
             uniqueId = await UniqueIdentifier.serial;
@@ -617,14 +628,14 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             var data = await deviceInfoPlugin.iosInfo;
             uniqueId = data.identifierForVendor;
           }
-          response =await petMartService.updateProfile(userId, firstName, lastName, email, phone, "", "kuwait", "sfsfsf", uniqueId, deviceType, mLanguage, _image);
+          UserModel userModel =await petMartService.updateProfile(map);
           modelHud.changeIsLoading(false);
-          String status = response['status'];
-          if(status == 'success'){
-            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(response['message'])));
+          bool status = userModel.ok;
+          if(status){
+            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(userModel.status)));
             Navigator.pushReplacementNamed(context,MainScreen.id);
           }else{
-            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(response['message'])));
+            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(userModel.status)));
 
           }
 

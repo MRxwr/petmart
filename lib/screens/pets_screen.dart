@@ -8,15 +8,17 @@ import 'package:pet_mart/model/category_model.dart';
 import 'package:pet_mart/model/pets_model.dart' as Model;
 import 'package:pet_mart/screens/pets_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class PetsScreen extends StatefulWidget {
   static String id = 'PetsScreen';
-  Childcategory childcategory;
+  Categories childcategory;
   String parentCategoryId;
 
   CategoryModel categoryModel;
   int selectCategory;
   String categryName;
+
    PetsScreen({Key key,@required this.childcategory,@required this.categoryModel,@required this.parentCategoryId,@required this.selectCategory,@required this.categryName}) : super(key: key);
 
   @override
@@ -24,23 +26,25 @@ class PetsScreen extends StatefulWidget {
 }
 
 class _PetsScreenState extends State<PetsScreen> {
-  List<Childcategory> categoryList= List();
+  List<Categories> categoryList= List();
   List<bool> selectedList = List();
   ScreenUtil screenUtil = ScreenUtil();
   Model.PetsModel petsModel;
   String catId ="";
   double itemWidth;
   double itemHeight;
-
+  String mLanguage ="";
   Future<Model.PetsModel> pets() async{
+
     for(int i =0;i<categoryList.length;i++){
       if(i == widget.selectCategory){
 
-        catId =categoryList[i].categoryId;
+        catId =categoryList[i].id;
       }
     }
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    mLanguage = languageCode;
     Map map = {
       'id':widget.parentCategoryId,
       'sub_category_id':catId,
@@ -53,13 +57,14 @@ class _PetsScreenState extends State<PetsScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    Model.PetsModel petsModel = await petMartService.pets(map);
+    Model.PetsModel petsModel = await petMartService.pets(catId);
     return petsModel;
   }
   Future<void> petsList() async{
+    petsModel = null;
     for(int i =0;i<selectedList.length;i++){
       if(selectedList[i]){
-        catId = categoryList[i].categoryId;
+        catId = categoryList[i].id;
 
 
       }
@@ -78,7 +83,7 @@ class _PetsScreenState extends State<PetsScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    petsModel = await petMartService.pets(map);
+    petsModel = await petMartService.pets(catId);
     setState(() {
 
     });
@@ -88,12 +93,12 @@ class _PetsScreenState extends State<PetsScreen> {
     // TODO: implement initState
     super.initState();
 
-    String catId ="";
-    Childcategory cat = Childcategory(categoryId:catId,categoryName:"الكل",categoryImage:"");
+    String catId ="0";
+    Categories cat = Categories(id:catId,arTitle:"الكل",enTitle:"ALL",image:"");
 
     categoryList.add(cat);
-    for(int i =0;i<widget.categoryModel.data.category[0].childcategory.length;i++){
-      categoryList.add(widget.categoryModel.data.category[0].childcategory[i]);
+    for(int i =0;i<widget.categoryModel.data.categories.length;i++){
+      categoryList.add(widget.categoryModel.data.categories[i]);
 
 
     }
@@ -101,7 +106,7 @@ class _PetsScreenState extends State<PetsScreen> {
     for(int i =0;i<categoryList.length;i++){
       if(i == widget.selectCategory){
         selectedList.add(true);
-         catId =categoryList[i].categoryId;
+         catId =categoryList[i].id;
       }else{
         selectedList.add(false);
       }
@@ -128,8 +133,18 @@ class _PetsScreenState extends State<PetsScreen> {
           alignment: AlignmentDirectional.center,
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
-            child: Text(
+            child: mLanguage != ""?Text(
               widget.categryName,
+              style: TextStyle(
+                  color: Color(0xFFFFFFFF),
+                  fontSize: screenUtil.setSp(16),
+                  fontWeight: FontWeight.bold
+
+              ),
+
+
+            ):Text(
+              "",
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -161,7 +176,8 @@ class _PetsScreenState extends State<PetsScreen> {
           Container(
             margin: EdgeInsets.all(10.h),
             height: 35.h,
-            child: ListView.separated(
+            child: mLanguage == ""?
+            Container():ListView.separated(
 
                 scrollDirection: Axis.horizontal,
 
@@ -175,7 +191,7 @@ class _PetsScreenState extends State<PetsScreen> {
 
                           for(int i =0;i<selectedList.length;i++){
                             if(i == index){
-                              catId = categoryList[i].categoryId;
+                              catId = categoryList[i].id;
                               selectedList[i]= true;
 
                             }else{
@@ -216,11 +232,11 @@ class _PetsScreenState extends State<PetsScreen> {
     ),
     alignment: AlignmentDirectional.center,
     ):
-    petsModel.data.isEmpty?
+    petsModel.data.items == null?
 
     Container(
     child: Text(
-    petsModel.message,
+   getTranslated(context, "no_products"),
     style: TextStyle(
     color: Colors.black,
     fontSize: screenUtil.setSp(16),
@@ -239,13 +255,15 @@ class _PetsScreenState extends State<PetsScreen> {
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                   childAspectRatio:itemWidth/itemHeight),
-              itemCount: petsModel.data.length,
+              itemCount: petsModel.data.items.length,
 
               itemBuilder: (context,index){
+              print(index);
                 return GestureDetector(
                   onTap: (){
                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      return new PetsDetailsScreen(postId:petsModel.data[index].postId,postName: petsModel.data[index].postName,);
+                      return new PetsDetailsScreen(postId:petsModel.data.items[index].id,postName: mLanguage == "en"?petsModel.data.items[index].enTitle:
+                      petsModel.data.items[index].arTitle);
                     }));
                   },
                   child: Container(
@@ -259,7 +277,7 @@ class _PetsScreenState extends State<PetsScreen> {
                             borderRadius: BorderRadius.circular(10.0.h),
                           ),
                           color: Color(0xFFFFFFFF),
-                          child: buildItem(petsModel.data[index],context))),
+                          child: buildItem(petsModel.data.items[index],context))),
                 );
               },
             ),
@@ -268,7 +286,7 @@ class _PetsScreenState extends State<PetsScreen> {
       ),
     );
   }
-  Widget buildItem(Model.Data data, BuildContext context) {
+  Widget buildItem(Model.Items data, BuildContext context) {
     return Container(
       child: Column(
         children: [
@@ -278,7 +296,7 @@ class _PetsScreenState extends State<PetsScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.postImage,
+                  imageUrl:kImagePath+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -319,7 +337,7 @@ class _PetsScreenState extends State<PetsScreen> {
                   start: 4.w,
                   child:
                   Text(
-                    data.postDate,
+                    data.date,
                     style: TextStyle(
                         color: Color(0xFFFFFFFF)
 
@@ -337,7 +355,8 @@ class _PetsScreenState extends State<PetsScreen> {
                   margin: EdgeInsets.symmetric(horizontal: 5.w),
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    data.postName,
+                    mLanguage == "en"?
+                    data.enTitle:data.arTitle,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -353,7 +372,7 @@ class _PetsScreenState extends State<PetsScreen> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 5.w),
                       child: Text(
-                        '${data.postPrice}',
+                        '${data.price}',
                         style: TextStyle(
                             color: kMainColor,
                             fontWeight: FontWeight.normal,
@@ -373,7 +392,7 @@ class _PetsScreenState extends State<PetsScreen> {
     );
 
   }
-  Container selectRow(Childcategory category,BuildContext context,int selectedIndex){
+  Container selectRow(Categories category,BuildContext context,int selectedIndex){
 
     return
       Container(
@@ -386,7 +405,8 @@ class _PetsScreenState extends State<PetsScreen> {
               color: kMainColor
           ),
           child: Text(
-            category.categoryName,
+            mLanguage == "en"?
+            category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -406,7 +426,8 @@ class _PetsScreenState extends State<PetsScreen> {
               )
           ),
           child: Text(
-            category.categoryName,
+            mLanguage == "en"?
+            category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),

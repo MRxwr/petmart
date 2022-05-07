@@ -142,21 +142,25 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     String loginData = _preferences.getString(kUserModel);
-    Map map;
+
 
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
-     map = {
-      'id': loginModel.data.customerId,
-      'password': oldPassword,
-      'new_password': newPassword,
-      'language': languageCode};
+    Map<String, String> map = Map();
+
+    map['id']= loginModel.data.id;
+    map['oldPassword']= oldPassword;
+
+    map['newPassword']= newPassword;
+    map['confirmPassword']= newPassword;
+
+
      ChangePasswordModel changePasswordModel = await petMartService.changePassword(map);
 
     modelHud.changeIsLoading(false);
      String status = changePasswordModel.status;
     _scaffoldKey.currentState.showSnackBar(
-        SnackBar(content: Text(changePasswordModel.message)));
+        SnackBar(content: Text(changePasswordModel.data.msg)));
      if(status == 'success'){
        SharedPref sharedPref = SharedPref();
        await sharedPref.saveString("password", newPassword);

@@ -29,9 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   LoginModel loginModel = null;
   HomeModel homeModel = null;
-  InitModel initModel = null;
+
   int _current =0;
   final CarouselController _controller = CarouselController();
+  String languageCode;
   @override
   void initState() {
     // TODO: implement initState
@@ -51,9 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String loginData = sharedPreferences.getString(kUserModel);
-    String initData = sharedPreferences.getString("initModel");
-    final initBody = json.decode(initData);
-    initModel = InitModel.fromJson(initBody);
+
+
 
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
@@ -61,14 +61,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
   Future<HomeModel> home() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     Map map ;
     if(loginModel == null){
       map = {'id': "",
         "language":languageCode
       };
     }else{
-      map = {'id': loginModel.data.customerId,
+      map = {'id': loginModel.data.id,
         "language":languageCode
       };
     }
@@ -116,9 +116,10 @@ double height = MediaQuery.of(context).size.height;
 
                     carouselController: _controller,
                     options: CarouselOptions(
-                        autoPlay: false,
+                        autoPlay: true,
+                        autoPlayInterval: Duration(seconds: 2),
 
-                        enableInfiniteScroll: false,
+                        enableInfiniteScroll: true,
 
 
                         height: double.infinity,
@@ -137,7 +138,7 @@ double height = MediaQuery.of(context).size.height;
                           });
                         }
                     ),
-                    items: homeModel.data.banner.map((item) =>
+                    items: homeModel.data.banners.map((item) =>
                         Stack(
 
                           children: [
@@ -147,7 +148,7 @@ double height = MediaQuery.of(context).size.height;
                                 if(url.isNotEmpty) {
                                   Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                     return new PhotoScreen(imageProvider: NetworkImage(
-                                      url,
+                                      KImageUrl+url,
                                     ),);
                                   }));
 
@@ -165,7 +166,7 @@ double height = MediaQuery.of(context).size.height;
                                   width: width,
 
                                   fit: BoxFit.fill,
-                                  imageUrl:'${item.image}',
+                                  imageUrl:'${KImageUrl+item.image}',
                                   imageBuilder: (context, imageProvider) => Card(
                                     elevation: 1.h,
                                     child: Container(
@@ -231,11 +232,11 @@ double height = MediaQuery.of(context).size.height;
                     end: 0,
 
                     child:  Opacity(
-                      opacity: homeModel.data.banner.length>1?1.0:0.0,
+                      opacity: homeModel.data.banners.length>1?1.0:0.0,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: homeModel.data.banner.map((item) {
-                          int index = homeModel.data.banner.indexOf(item);
+                        children: homeModel.data.banners.map((item) {
+                          int index = homeModel.data.banners.indexOf(item);
                           return Container(
                             width: 8.0.w,
                             height: 8.0.h,
@@ -270,7 +271,7 @@ double height = MediaQuery.of(context).size.height;
                     GestureDetector(
                       onTap: (){
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new CategoriesScreen(category:homeModel.data.category[index]);
+                          return new CategoriesScreen(category:homeModel.data.categories[index]);
                         }));
                       },
 
@@ -288,7 +289,7 @@ double height = MediaQuery.of(context).size.height;
                             height: 120.h,
 
                             fit: BoxFit.fill,
-                            imageUrl:homeModel.data.category[index].images[0].image,
+                            imageUrl:KImageUrl+homeModel.data.categories[index].logo,
                             imageBuilder: (context, imageProvider) => Container(
                                 width: width,
 
@@ -343,8 +344,9 @@ double height = MediaQuery.of(context).size.height;
 
                                   Padding(
                                     padding:  EdgeInsetsDirectional.only(start: 10.h),
-                                    child: Text(
-                                      homeModel.data.category[index].categoryName,
+                                    child: Text(languageCode == "en"?
+                                      homeModel.data.categories[index].enTitle:
+                                    homeModel.data.categories[index].arTitle,
                                       style: TextStyle(
                                           color: Color(0xFFFFFFFF),
                                           fontSize: screenUtil.setSp(16),
@@ -367,86 +369,86 @@ double height = MediaQuery.of(context).size.height;
                 separatorBuilder: (context,index){
               return Container(height: 10.h,
                 color: Color(0xFFFFFFFF),);
-            }, itemCount: homeModel.data.category.length),
+            }, itemCount: homeModel.data.categories.length),
             SizedBox(height: 10.h,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                GestureDetector(
-                  onTap: (){
-                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      return new HospitalsScreen();
-                    }));
-                  },
-                  child: Container(
-                    height: 120.h,
-                    width: 120.w,
-                    decoration: BoxDecoration(
-                      color: kMainColor,
-                      borderRadius:BorderRadius.all(Radius.circular(10.w))
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(flex: 4,
-                            child:Center(
-                              child: Image.asset('assets/images/hospital_icon.png',width: 90.w,
-                              height: 90.w,
-                           ),
-                            )
-                        ),
-                        Expanded(child:   Text(
-                          getTranslated(context, 'hospital'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: screenUtil.setSp(16),
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),flex: 1,)
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: (){
-                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      return new HospitalScreen();
-                    }));
-                  },
-                  child: Container(
-                    height: 120.h,
-                    width: 120.w,
-                    decoration: BoxDecoration(
-                        color: kMainColor,
-                        borderRadius:BorderRadius.all(Radius.circular(10.w))
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(flex: 4,
-                            child: Center(
-                              child: Image.asset('assets/images/shop_icon.png',width: 90.w,
-                                height: 90.w,
-                              ),
-                            )
-                        ),
-                        Expanded(child:   Text(
-
-                          getTranslated(context, 'shop'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: Color(0xFFFFFFFF),
-                              fontSize: screenUtil.setSp(16),
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),flex: 1,)
-                      ],
-                    ),
-                  ),
-                ),
-
-
-              ],
-            )
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //   children: [
+            //     GestureDetector(
+            //       onTap: (){
+            //         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+            //           return new HospitalsScreen();
+            //         }));
+            //       },
+            //       child: Container(
+            //         height: 120.h,
+            //         width: width-24.w,
+            //         decoration: BoxDecoration(
+            //           color: kMainColor,
+            //           borderRadius:BorderRadius.all(Radius.circular(10.w))
+            //         ),
+            //         child: Column(
+            //           children: [
+            //             Expanded(flex: 4,
+            //                 child:Center(
+            //                   child: Image.asset('assets/images/hospital_icon.png',width: 90.w,
+            //                   height: 90.w,
+            //                ),
+            //                 )
+            //             ),
+            //             Expanded(child:   Text(
+            //               getTranslated(context, 'hospital'),
+            //               textAlign: TextAlign.center,
+            //               style: TextStyle(
+            //                   color: Color(0xFFFFFFFF),
+            //                   fontSize: screenUtil.setSp(16),
+            //                   fontWeight: FontWeight.bold
+            //               ),
+            //             ),flex: 1,)
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //     // GestureDetector(
+            //     //   onTap: (){
+            //     //     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+            //     //       return new HospitalScreen();
+            //     //     }));
+            //     //   },
+            //     //   child: Container(
+            //     //     height: 120.h,
+            //     //     width: 120.w,
+            //     //     decoration: BoxDecoration(
+            //     //         color: kMainColor,
+            //     //         borderRadius:BorderRadius.all(Radius.circular(10.w))
+            //     //     ),
+            //     //     child: Column(
+            //     //       children: [
+            //     //         Expanded(flex: 4,
+            //     //             child: Center(
+            //     //               child: Image.asset('assets/images/shop_icon.png',width: 90.w,
+            //     //                 height: 90.w,
+            //     //               ),
+            //     //             )
+            //     //         ),
+            //     //         Expanded(child:   Text(
+            //     //
+            //     //           getTranslated(context, 'shop'),
+            //     //           textAlign: TextAlign.center,
+            //     //           style: TextStyle(
+            //     //               color: Color(0xFFFFFFFF),
+            //     //               fontSize: screenUtil.setSp(16),
+            //     //               fontWeight: FontWeight.bold
+            //     //           ),
+            //     //         ),flex: 1,)
+            //     //       ],
+            //     //     ),
+            //     //   ),
+            //     // ),
+            //
+            //
+            //   ],
+            // )
 
 
 

@@ -8,10 +8,11 @@ import 'package:pet_mart/model/category_model.dart';
 import 'package:pet_mart/model/home_model.dart'as CategoryParent;
 import 'package:pet_mart/screens/pets_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class CategoriesScreen extends StatefulWidget {
   static String id = 'CategoriesScreen';
-  CategoryParent.Category category;
+  CategoryParent.Categories category;
   CategoriesScreen({Key key,@required this.category}): super(key: key);
 
 
@@ -24,15 +25,16 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
   CategoryModel categoryModel;
   double itemWidth;
   double itemHeight;
+  String languageCode="";
   Future<CategoryModel> category() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
 
     Map map ;
 
 
-      map = {"id":widget.category.categoryId,
+      map = {"id":widget.category.id,
 
         "language":languageCode};
 
@@ -41,7 +43,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    CategoryModel auctionDetailsModel = await petMartService.category(map);
+    CategoryModel auctionDetailsModel = await petMartService.category(widget.category.id);
     return auctionDetailsModel;
   }
   @override
@@ -67,8 +69,22 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           alignment: AlignmentDirectional.center,
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
-            child: Text(
-              widget.category.categoryName,
+            child:categoryModel != null?
+            Text(
+              languageCode == "en"?
+              widget.category.enTitle:widget.category.arTitle,
+
+              style: TextStyle(
+                  color: Color(0xFFFFFFFF),
+                  fontSize: screenUtil.setSp(16),
+                  fontWeight: FontWeight.bold
+
+              ),
+
+
+            ):Text(
+             "",
+
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -105,11 +121,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           ),
           alignment: AlignmentDirectional.center,
         ):
-        categoryModel.data.category.isEmpty?
+        categoryModel.data.categories.isEmpty?
 
         Container(
           child: Text(
-            categoryModel.message,
+            getTranslated(context, "no_categories"),
             style: TextStyle(
                 color: Colors.black,
                 fontSize: screenUtil.setSp(16),
@@ -126,13 +142,13 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           physics: const AlwaysScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
               childAspectRatio:itemWidth/itemHeight),
-          itemCount: categoryModel.data.category[0].childcategory.length,
+          itemCount: categoryModel.data.categories.length,
           itemBuilder: (context,index){
-            return GestureDetector(child: buildItem(categoryModel.data.category[0].childcategory[index],context)
+            return GestureDetector(child: buildItem(categoryModel.data.categories[index],context)
             ,onTap: (){
                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new PetsScreen(childcategory: categoryModel.data.category[0].childcategory[index],
-                          categoryModel : categoryModel,parentCategoryId: widget.category.categoryId,selectCategory: index+1,categryName: widget.category.categoryName,);
+                          return new PetsScreen(childcategory: categoryModel.data.categories[index],
+                          categoryModel : categoryModel,parentCategoryId: widget.category.id,selectCategory: index+1,categryName: languageCode == "en"?widget.category.enTitle:widget.category.arTitle,);
                         }));
               },);
           },
@@ -142,7 +158,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  Container buildItem(Childcategory childcategory, BuildContext context) {
+  Container buildItem(Categories childcategory, BuildContext context) {
     return Container(
       margin: EdgeInsets.all(5.h),
       child: Column(
@@ -151,7 +167,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           CachedNetworkImage(
             width: 150.w,
             height: 150.h,
-            imageUrl:'${childcategory.categoryImage}',
+            imageUrl:'${kImagePath+childcategory.image}',
             imageBuilder: (context, imageProvider) =>
                 Container(
                     width: 150.w,
@@ -192,7 +208,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           Expanded(child: Container(
             alignment: AlignmentDirectional.center,
             child: Text(
-                childcategory.categoryName,
+              languageCode == "en"?
+                childcategory.enTitle:childcategory.arTitle,
               style: TextStyle(
                 color: Color(0xFF000000),
                 fontSize: screenUtil.setSp(12),

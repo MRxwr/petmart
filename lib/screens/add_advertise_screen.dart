@@ -14,10 +14,12 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/age_model.dart';
 import 'package:pet_mart/model/category_model.dart' as SubCategory;
 import 'package:pet_mart/model/check_credit_model.dart';
+import 'package:pet_mart/model/gender_model.dart';
 import 'package:pet_mart/model/home_model.dart' as CategoryParent;
-import 'package:pet_mart/model/init_model.dart';
+
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/type_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
@@ -50,9 +52,9 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   String mChooseImage="اختار الصورة";
   String categoryId ="";
   String subCategoryId ="";
-  InitModel initModel;
-  List<Age> agesList;
-  List<Gender_list> genderList;
+
+  List<AgeModel> agesList = [];
+  List<GenderModel> genderList = [];
   String genderId ="";
   String ageName="";
   String key ="sell";
@@ -145,7 +147,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   }
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
    CategoryParent.HomeModel homeModel;
-  List<CategoryParent.Category> categoryList;
+  List<CategoryParent.Categories> categoryList;
   @override
   void initState() {
     // TODO: implement initState
@@ -153,8 +155,15 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     typesList.add(TypeModel(typeNameAr: 'للبيع',typeNameEn: 'For Sale',key: 'sell',selected: true));
     typesList.add(TypeModel(typeNameAr: 'تبني',typeNameEn: 'Adaption',key: 'adoption',selected: false));
     typesList.add(TypeModel(typeNameAr: 'مفقود',typeNameEn: 'Lost',key: 'lost-animal',selected: false));
-    typesList.add(TypeModel(typeNameAr: 'إنشاء مزاد',typeNameEn: 'Create Auction',key: '',selected: false));
-
+    // typesList.add(TypeModel(typeNameAr: 'إنشاء مزاد',typeNameEn: 'Create Auction',key: '',selected: false));
+    genderList.add(GenderModel("0", "زوج", "couple"));
+    genderList.add(GenderModel("1", "ذكر", "Male"));
+    genderList.add(GenderModel("2", "أنثى", "Female"));
+    genderList.add(GenderModel("3", "غير معروف", "Not Applicable"));
+    agesList.add(AgeModel("0", "يوم", "day"));
+    agesList.add(AgeModel("1", "أسبوع", "week"));
+    agesList.add(AgeModel("2", "شهر", "month"));
+    agesList.add(AgeModel("3", "عام", "year"));
     map().then((value) {
 
         userId = value["userId"];
@@ -164,7 +173,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
       home().then((value) {
         setState(() {
           homeModel = value;
-          categoryList = value.data.category;
+          categoryList = value.data.categories;
         });
       });
 
@@ -189,7 +198,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(map);
+    SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(categoryId);
     return auctionDetailsModel;
   }
   Future<CategoryParent.HomeModel> home() async{
@@ -206,7 +215,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     Map map ;
 
 
-    map = {"user_id":loginModel.data.customerId};
+    map = {"user_id":loginModel.data.id};
 
 
 
@@ -222,23 +231,21 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     mLanguage = languageCode;
 
     PetMartService petMartService = PetMartService();
-    InitModel initModel = await petMartService.init();
-    SharedPref sharedPref = SharedPref();
-    await sharedPref.save('initModel', initModel);
+
+
     String loginData = _preferences.getString(kUserModel);
     final body = json.decode(loginData);
        loginModel = LoginModel.fromJson(body);
     String initData = _preferences.getString("initModel");
     print('initData --> ${initData}');
-    final initBody = json.decode(initData);
-     initModel = InitModel.fromJson(initBody);
-    agesList = initModel.data.age;
+
+    // agesList = initModel.data.age;
     ageId = agesList[0].id;
-    ageName = agesList[0].name;
-    genderList = initModel.data.genderList;
+    ageName =mLanguage == "en" ?agesList[0].ageEn:agesList[0].ageAr;
+    // genderList = initModel.data.genderList;
     Map map ;
     map = {"language":languageCode,
-      "userId":loginModel.data.customerId};
+      "userId":loginModel.data.id};
     return map;
   }
   @override
@@ -444,7 +451,7 @@ hidePrice = true;
                   SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child: DropDown<CategoryParent.Category>(
+                    child: DropDown<CategoryParent.Categories>(
 
 
 
@@ -460,18 +467,19 @@ hidePrice = true;
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (CategoryParent.Category category){
+                      onChanged: (CategoryParent.Categories category){
                         mSubCategoryModel = null;
-                        categoryId = category.categoryId;
+                        categoryId = category.id;
                         print('CategoryId -->${categoryId}');
                         final modelHud = Provider.of<ModelHud>(context,listen: false);
                         modelHud.changeIsLoading(true);
                         subCategory(categoryId).then((value){
                           modelHud.changeIsLoading(false);
                           setState(() {
-                            subCategoryId = value.data.category[0].childcategory[0].categoryId;
+                            categoryId = value.data.categories[0].id;
+                            print("subCategoryId ---> ${categoryId}");
                             mSubCategoryModel = value;
-                            print('subCategoryId -->${subCategoryId}');
+
                           });
                         });
 
@@ -507,15 +515,16 @@ hidePrice = true;
                       height: 50.h,
                       width: screenUtil.screenWidth,
                       child:
-                      DropDown<SubCategory.Childcategory>(
+                      DropDown<SubCategory.Categories>(
 
 
 
 
 
-                        items: mSubCategoryModel.data.category[0].childcategory,
+                        items: mSubCategoryModel.data.categories,
 
-                        hint:  Text(mSubCategoryModel.data.category[0].childcategory[0].categoryName ,
+                        hint:  Text( mLanguage == "en"?mSubCategoryModel.data.categories[0].enTitle:
+                        mSubCategoryModel.data.categories[0].arTitle,
                           textAlign: TextAlign.start,
                           style: TextStyle(
 
@@ -523,13 +532,14 @@ hidePrice = true;
                               fontWeight: FontWeight.w600,
                               fontSize: screenUtil.setSp(15)
                           ),),
-                        onChanged: (SubCategory.Childcategory category){
-                          subCategoryId = category.categoryId;
+                        onChanged: (SubCategory.Categories category){
+                          categoryId = category.id;
+                          print("subCategoryId ---> ${categoryId}");
 
 
 
                         },
-                        customWidgets: mSubCategoryModel.data.category[0].childcategory.map((p) => buildSubCategoryRow(p)).toList(),
+                        customWidgets: mSubCategoryModel.data.categories.map((p) => buildSubCategoryRow(p)).toList(),
                         isExpanded: true,
                         showUnderline: false,
                       ),
@@ -618,7 +628,7 @@ hidePrice = true;
                         Expanded(
                           flex:1,
                           child: TextField(
-                            inputFormatters: [new WhitelistingTextInputFormatter(RegExp("[0-9]"))],
+
 
                             keyboardType: TextInputType.number,
                             minLines: 1,
@@ -652,7 +662,7 @@ hidePrice = true;
                         Expanded(
                           flex: 1,
                           child:
-                          DropDown<Age>(
+                          DropDown<AgeModel>(
 
 
 
@@ -660,7 +670,7 @@ hidePrice = true;
 
                             items: agesList,
 
-                            hint:  Text(agesList[0].name,
+                            hint:  Text(mLanguage == "en" ?agesList[0].ageEn:agesList[0].ageAr,
                               textAlign: TextAlign.start,
                               style: TextStyle(
 
@@ -668,9 +678,9 @@ hidePrice = true;
                                   fontWeight: FontWeight.w600,
                                   fontSize: screenUtil.setSp(15)
                               ),),
-                            onChanged: (Age age){
+                            onChanged: (AgeModel age){
                               ageId = age.id;
-                              ageName = age.name;
+                              ageName = mLanguage == "en" ?age.ageEn:age.ageAr;
 
 
 
@@ -703,7 +713,7 @@ hidePrice = true;
                   SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child: DropDown<Gender_list>(
+                    child: DropDown<GenderModel>(
 
 
 
@@ -719,7 +729,7 @@ hidePrice = true;
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (Gender_list gender){
+                      onChanged: (GenderModel gender){
                         genderId = gender.id;
 
 
@@ -747,7 +757,7 @@ hidePrice = true;
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         TextField(
-                          inputFormatters: [new WhitelistingTextInputFormatter(RegExp("[0-9]"))],
+
 
                           keyboardType: TextInputType.number,
                           minLines: 1,
@@ -822,7 +832,7 @@ hidePrice = true;
       ),),
     );
   }
-  Widget builGenderRow(Gender_list gender) {
+  Widget builGenderRow(GenderModel gender) {
     return Container(
 
 
@@ -832,14 +842,14 @@ hidePrice = true;
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(gender.name ,
+        child: Text(mLanguage == "en"?gender.genderEn:gender.genderAr ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
               fontSize: screenUtil.setSp(15)
           ),));
   }
-  Widget buildSubCategoryRow(SubCategory.Childcategory category) {
+  Widget buildSubCategoryRow(SubCategory.Categories category) {
     return Container(
 
 
@@ -849,14 +859,14 @@ hidePrice = true;
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(category.categoryName ,
+        child: Text(mLanguage == "en"?category.enTitle:category.arTitle ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
               fontSize: screenUtil.setSp(15)
           ),));
   }
-  Widget buildAgeRow(Age age) {
+  Widget buildAgeRow(AgeModel age) {
     return Container(
 
 
@@ -866,14 +876,14 @@ hidePrice = true;
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(age.name ,
+        child: Text(mLanguage == "en"?age.ageEn:age.ageAr ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
               fontSize: screenUtil.setSp(15)
           ),));
   }
-  Widget buildDropDownRow(CategoryParent.Category category) {
+  Widget buildDropDownRow(CategoryParent.Categories category) {
   return Container(
 
 
@@ -883,7 +893,7 @@ hidePrice = true;
 
       alignment: AlignmentDirectional.centerStart,
 
-      child: Text(category.categoryName ,
+      child: Text(mLanguage=="en"?category.enTitle:category.arTitle ,
         style: TextStyle(
             color: Color(0xFF000000),
             fontWeight: FontWeight.w600,
@@ -970,15 +980,13 @@ hidePrice = true;
   }
 
   void validate(BuildContext context) async {
+    print("subCategoryId ---> ${categoryId}");
     String postTitle = _titleController.text;
     String postDescription =_descriptionController.text;
     String age = _ageController.text;
     String price = _priceController.text;
     if(mImages.isEmpty){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
-
-    }else if(subCategoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'category_error'))));
 
     }else if(categoryId==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'sub_category_error'))));
@@ -1007,8 +1015,8 @@ hidePrice = true;
           _scaffoldKey.currentState.showSnackBar(
               SnackBar(content: Text(getTranslated(context, 'price_error'))));
         }else{
-          String userId = loginModel.data.customerId;
-          String phoneNumber = loginModel.data.mobile;
+          String userId = loginModel.data.id;
+          String phoneNumber ="";
           final modelHud = Provider.of<ModelHud>(context, listen: false);
           modelHud.changeIsLoading(true);
           PetMartService petMartService = PetMartService();
@@ -1024,22 +1032,22 @@ hidePrice = true;
               ageId,
               genderId,
               userId,
-              subCategoryId,
+              categoryId,
               phoneNumber,
               mLanguage,
               mCompressedImages,
               null);
           modelHud.changeIsLoading(false);
-          String status = response['status'];
-          if (status == 'success') {
-            ShowPostAlertDialog(context, response['message'], true);
+          bool status = response['ok'];
+          if (status) {
+            ShowPostAlertDialog(context, response['data']['msg'], true);
           } else {
-            ShowPostAlertDialog(context, response['message'], false);
+            ShowPostAlertDialog(context, response['data']['msg'], false);
           }
         }
       } else {
-        String userId = loginModel.data.customerId;
-        String phoneNumber = loginModel.data.mobile;
+        String userId = loginModel.data.id;
+        String phoneNumber ="";
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
         PetMartService petMartService = PetMartService();
@@ -1055,17 +1063,17 @@ hidePrice = true;
             ageId,
             genderId,
             userId,
-            subCategoryId,
+            categoryId,
             phoneNumber,
             mLanguage,
             mCompressedImages,
             null);
         modelHud.changeIsLoading(false);
-        String status = response['status'];
-        if (status == 'success') {
-          ShowPostAlertDialog(context, response['message'], true);
+        bool status = response['ok'];
+        if (status) {
+          ShowPostAlertDialog(context, response['data']['msg'], true);
         } else {
-          ShowPostAlertDialog(context, response['message'], false);
+          ShowPostAlertDialog(context, response['data']['msg'], false);
         }
       }
     }

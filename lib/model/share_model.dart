@@ -1,70 +1,42 @@
-/// status : "success"
-/// message : "Post share count retrived."
-/// data : {"post_id":"34","share_count":"40"}
-
 class ShareModel {
-  String _status;
-  String _message;
-  Data _data;
+  bool ok;
+  String error;
+  String status;
+  Data data;
 
-  String get status => _status;
-  String get message => _message;
-  Data get data => _data;
+  ShareModel({this.ok, this.error, this.status, this.data});
 
-  ShareModel({
-      String status, 
-      String message, 
-      Data data}){
-    _status = status;
-    _message = message;
-    _data = data;
-}
-
-  ShareModel.fromJson(dynamic json) {
-    _status = json["status"];
-    _message = json["message"];
-    _data = json["data"] != null ? Data.fromJson(json["data"]) : null;
+  ShareModel.fromJson(Map<String, dynamic> json) {
+    ok = json['ok'];
+    error = json['error'];
+    status = json['status'];
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    var map = <String, dynamic>{};
-    map["status"] = _status;
-    map["message"] = _message;
-    if (_data != null) {
-      map["data"] = _data.toJson();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['ok'] = this.ok;
+    data['error'] = this.error;
+    data['status'] = this.status;
+    if (this.data != null) {
+      data['data'] = this.data.toJson();
     }
-    return map;
+    return data;
   }
-
 }
-
-/// post_id : "34"
-/// share_count : "40"
 
 class Data {
-  String _postId;
-  String _shareCount;
+  String msg;
 
-  String get postId => _postId;
-  String get shareCount => _shareCount;
+  Data({this.msg});
 
-  Data({
-      String postId, 
-      String shareCount}){
-    _postId = postId;
-    _shareCount = shareCount;
-}
-
-  Data.fromJson(dynamic json) {
-    _postId = json["post_id"];
-    _shareCount = json["share_count"];
+  Data.fromJson(Map<String, dynamic> json) {
+    msg = json['msg'];
   }
 
   Map<String, dynamic> toJson() {
-    var map = <String, dynamic>{};
-    map["post_id"] = _postId;
-    map["share_count"] = _shareCount;
-    return map;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['msg'] = this.msg;
+    return data;
   }
-
 }

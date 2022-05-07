@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.createq8.pet_mart",
+  "applicationId": "com.createq8.petmart",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 15,
-      "versionName": "1.5.0",
+      "versionCode": 4,
+      "versionName": "1.0.3",
       "outputFile": "app-release.apk"
     }
   ],

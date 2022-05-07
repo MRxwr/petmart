@@ -48,7 +48,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
   double itemHeight;
   int _groupValue = -1;
   List<String> selectedSubCategoriesId = List();
-  List<Category> _categoryList = List();
+  List<Categories> _categoryList = List();
   String  categoryId ="";
   bool forSaleSelected = true;
   String type="sell";
@@ -67,7 +67,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
     }).whenComplete(() {
       getHome().then((value){
         setState(() {
-          _categoryList = value.data.category;
+          _categoryList = value.data.categories;
           for(int i =0;i<_categoryList.length;i++){
 
             selectedList.add(false);
@@ -97,10 +97,10 @@ class _SearcgScreenState extends State<SearcgScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    subCategory = await petMartService.category(map);
+    subCategory = await petMartService.category(categoryId);
     print('subCategory --> ${subCategory}');
     selectedSubList.clear();
-    for(int i =0;i<subCategory.data.category[0].childcategory.length;i++){
+    for(int i =0;i<subCategory.data.categories.length;i++){
 
       selectedSubList.add(false);
     }
@@ -120,7 +120,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
     if(loginData != null){
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
-      map = {'id': loginModel.data.customerId,
+      map = {'id': loginModel.data.id,
         "language":languageCode
       };
     }else{
@@ -195,7 +195,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
                   for(int i =0;i<selectedSubList.length;i++){
                     bool isSelect =selectedSubList[i];
                     if(isSelect){
-                      mSubCatId = mSubCatId+subCategory.data.category[0].childcategory[i].categoryId+",";
+                      mSubCatId = mSubCatId+subCategory.data.categories[i].id+",";
                     }
 
                   }
@@ -344,7 +344,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
                         for(int i =0;i<selectedList.length;i++){
                           if(i == index){
                             selectedList[i]= true;
-                            categoryId = _categoryList[i].categoryId;
+                            categoryId = _categoryList[i].id;
                           }else{
                             selectedList[i]= false;
                           }
@@ -400,7 +400,7 @@ category();
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,
                           childAspectRatio:itemWidth/itemHeight),
-                      itemCount: subCategory.data.category[0].childcategory.length,
+                      itemCount: subCategory.data.categories.length,
 
                       itemBuilder: (context,index){
                         return GestureDetector(
@@ -437,7 +437,7 @@ category();
                           child: Container(
                               margin: EdgeInsets.all(6.w),
 
-                              child:_buildSubCategory(subCategory.data.category[0].childcategory[index],context,index)
+                              child:_buildSubCategory(subCategory.data.categories[index],context,index)
                           ),
                         );
                       },
@@ -689,7 +689,7 @@ category();
       ),
     );
   }
-  _buildCategory(Category typeModel,BuildContext context,int index,){
+  _buildCategory(Categories typeModel,BuildContext context,int index,){
     return  Container(
 
       child: Row(
@@ -702,7 +702,7 @@ category();
 
           Expanded(
             flex: 1,
-            child: Text(typeModel.categoryName,
+            child: Text(mLanguage == "en"?typeModel.enTitle:typeModel.arTitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
 
@@ -716,7 +716,7 @@ category();
       ),
     );
   }
-  _buildSubCategory(SubCategory.Childcategory typeModel,BuildContext context,int index,){
+  _buildSubCategory(SubCategory.Categories typeModel,BuildContext context,int index,){
     return  Container(
 
       child: Row(
@@ -729,7 +729,7 @@ category();
 
           Expanded(
             flex: 1,
-            child: Text(typeModel.categoryName,
+            child: Text(mLanguage == "en"?typeModel.enTitle:typeModel.arTitle,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
 

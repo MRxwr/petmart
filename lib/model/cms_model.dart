@@ -1,50 +1,55 @@
-/// status : "success"
-/// message : "Page data retrived."
-/// data : {"page_id":"10","page_content":"jsjsdjsjjsddj"}
-
 class CmsModel {
+  bool ok;
+  String error;
   String status;
-  String message;
   Data data;
 
-  CmsModel({this.status, this.message, this.data});
+  CmsModel({this.ok, this.error, this.status, this.data});
 
   CmsModel.fromJson(Map<String, dynamic> json) {
+    ok = json['ok'];
+    error = json['error'];
     status = json['status'];
-    message = json['message'];
     data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['ok'] = this.ok;
+    data['error'] = this.error;
     data['status'] = this.status;
-    data['message'] = this.message;
     if (this.data != null) {
       data['data'] = this.data.toJson();
     }
     return data;
   }
-
 }
 
-/// page_id : "10"
-/// page_content : "jsjsdjsjjsddj"
-
 class Data {
-  String pageId;
-  String pageContent;
+  String version;
+  String enTerms;
+  String arTerms;
+  String enPolicy;
+  String arPolicy;
 
-  Data({this.pageId, this.pageContent});
+  Data(
+      {this.version, this.enTerms, this.arTerms, this.enPolicy, this.arPolicy});
 
   Data.fromJson(Map<String, dynamic> json) {
-    pageId = json['page_id'];
-    pageContent = json['page_content'];
+    version = json['version'];
+    enTerms = json['enTerms'];
+    arTerms = json['arTerms'];
+    enPolicy = json['enPolicy'];
+    arPolicy = json['arPolicy'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['page_id'] = this.pageId;
-    data['page_content'] = this.pageContent;
+    data['version'] = this.version;
+    data['enTerms'] = this.enTerms;
+    data['arTerms'] = this.arTerms;
+    data['enPolicy'] = this.enPolicy;
+    data['arPolicy'] = this.arPolicy;
     return data;
   }
 }

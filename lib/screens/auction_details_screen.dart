@@ -67,7 +67,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {"auction_id":widget.mAuctionModel.auctionId,
-        "user_id":loginModel.data.customerId,
+        "user_id":loginModel.data.id,
         "language":languageCode};
       print(map);
     }
@@ -101,7 +101,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {"auction_id":widget.mAuctionModel.auctionId,
-        "user_id":loginModel.data.customerId,
+        "user_id":loginModel.data.id,
         "language":languageCode};
     }
 
@@ -831,7 +831,7 @@ children: [
         modelHud.changeIsLoading(true);
         Map map = {
           'auction_id': mAuctionDetailsModel.data.auctionId,
-          'user_id': loginModel.data.customerId,
+          'user_id': loginModel.data.id,
           'bid_value': '${double.parse(mAuctionDetailsModel.data.highestBidderValue)+currentBid}',
           'rating': _rating.toString(),
 

@@ -31,17 +31,18 @@ class AuctionScreen extends StatefulWidget {
 
 class _AuctionScreenState extends State<AuctionScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  List<Category> categories = List();
+  List<Categories> categories = List();
   List<bool> selectedList = List();
   Model.MyAuctionsModel myAuctionModel = null;
   HomeModel homeModel;
   AuctionModel.AuctionModel auctionModel;
   double itemWidth;
   double itemHeight;
+  String languageCode;
   Future<AuctionModel.AuctionModel> auction(String catId) async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
     String loginData = _preferences.getString(kUserModel);
     Map map ;
@@ -54,7 +55,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {"category_id":catId,
-        "id":loginModel.data.customerId,
+        "id":loginModel.data.id,
         "language":languageCode};
 
     }
@@ -86,10 +87,10 @@ class _AuctionScreenState extends State<AuctionScreen> {
 
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
-      userId = loginModel.data.customerId;
+      userId = loginModel.data.id;
       print('userId --> ${userId}');
       map = {"category_id":catId,
-        "id":loginModel.data.customerId,
+        "id":loginModel.data.id,
         "language":languageCode};
     }
 
@@ -124,9 +125,9 @@ print('homeString --> ${homeString}');
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
       Map myAuctionMap;
-      userId = loginModel.data.customerId;
+      userId = loginModel.data.id;
       myAuctionMap = {
-        "id": loginModel.data.customerId,
+        "id": loginModel.data.id,
         "language": languageCode,
         "auction_type": "all"};
 
@@ -148,16 +149,16 @@ print('homeString --> ${homeString}');
 homeModel = value;
 
 
-        List<Images> images = null;
+        // List<Images> images = null;
         String categoryId = "";
-        Category category = Category(categoryId:categoryId,categoryName:"All",images: images);
+        Categories category = Categories(id:categoryId,arTitle:getTranslated(context, 'all'),enTitle:getTranslated(context, 'all'),logo: "");
         categories.add(category);
         selectedList.add(true);
 
-        for(int i =0;i<homeModel.data.category.length;i++){
-          categories.add(homeModel.data.category[i]);
+        for(int i =0;i<homeModel.data.categories.length;i++){
+          categories.add(homeModel.data.categories[i]);
           selectedList.add(false);
-          print("CatId-->${homeModel.data.category[i].categoryId}");
+          print("CatId-->${homeModel.data.categories[i].id}");
         }
 
 
@@ -302,7 +303,7 @@ homeModel = value;
                             setState(() {
 
                             });
-                            getList(categories[index].categoryId);
+                            getList(categories[index].id);
 
                           }
 
@@ -386,7 +387,7 @@ homeModel = value;
       ),
     );
   }
-  Container selectRow(Category category,BuildContext context,int selectedIndex){
+  Container selectRow(Categories category,BuildContext context,int selectedIndex){
 
     return
       Container(
@@ -399,7 +400,8 @@ homeModel = value;
               color: kMainColor
           ),
           child: Text(
-            category.categoryName,
+            languageCode == "en"?
+            category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -419,7 +421,8 @@ homeModel = value;
               )
           ),
           child: Text(
-            category.categoryName,
+            languageCode == "en"?
+            category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -744,7 +747,7 @@ homeModel = value;
     Map map ;
 
 
-    map = {"user_id":loginModel.data.customerId};
+    map = {"user_id":loginModel.data.id};
 
 
 

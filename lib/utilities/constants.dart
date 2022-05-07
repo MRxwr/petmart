@@ -9,6 +9,7 @@ const kKeepMeLoggedIn = 'KeepMeLoggedIn';
 const kUserName='userName';
 const kPhoneNumber='phoneNumber';
 const kBirthDate='birthDate';
+const KImageUrl="https://createkwservers.com/petmart2/admin/logos/";
 const kGender='gender';
 const kUserId ='userId';
 const kEmail='email';

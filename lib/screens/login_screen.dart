@@ -9,6 +9,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/model/register_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/forget_password_screen.dart';
 import 'package:pet_mart/screens/register_screen.dart';
@@ -22,6 +23,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unique_identifier/unique_identifier.dart';
 
+import '../model/error_model.dart';
 import 'main_sceen.dart';
 class LoginScreen extends StatefulWidget {
   static String id = 'LoginScreen';
@@ -244,38 +246,38 @@ uniqueId = await UniqueIdentifier.serial;
         var data = await deviceInfoPlugin.iosInfo;
         uniqueId = data.identifierForVendor;
       }
-      Map map = {
-        'email':_fullName,
-        'password':_password,
-        'device_token':token,
-        'imei_number': uniqueId,
-        'device_type': deviceType,
-        'language':languageCode
 
+      Map<String, String> map = Map();
 
-      };
+      map['email']= _fullName;
+      map['password']= _password;
+
+      map['firebase']= token;
+
       print(map);
-      LoginModel loginModel = await petMartService.loginModel(map);
-      String mStatus = loginModel.status;
-      if(mStatus.trim() == 'success'){
+
+      Map<String, dynamic>   response = await petMartService.loginModel(map);
+      modelHud.changeIsLoading(false);
+      bool  isOk  = response['ok'];
+      if (isOk) {
+        RegisterModel registerModel = RegisterModel.fromJson(response);
+
+        // Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: registerModel.data.mobile,otp: registerModel.data.otp.toString(),userId: registerModel.data.customerId,)));
+
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text("success")));
         SharedPref sharedPref = SharedPref();
-        await sharedPref.save(kUserModel, loginModel);
+        await sharedPref.save(kUserModel, registerModel);
         await sharedPref.saveBool(kIsLogin, true);
         await sharedPref.saveString("email", _fullName);
         await sharedPref.saveString("password", _password);
-        modelHud.changeIsLoading(false);
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(loginModel.message)));
         Navigator.pushReplacementNamed(context,MainScreen.id);
-
-
-      }else{
-        modelHud.changeIsLoading(false);
-        // if(loginModel.message.contains("OTP")){
-        //   Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: loginModel.data.mobile,otp: loginModel.data.otp.toString(),userId: loginModel.data.customerId,)));
-        //
-        // }
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(loginModel.message)));
+      } else {
+        ErrorModel errorModel = ErrorModel.fromJson(response);
+        _scaffoldKey.currentState.showSnackBar(
+            SnackBar(content: Text(errorModel.data.msg)));
       }
+
     }
 
   }

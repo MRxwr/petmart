@@ -111,64 +111,70 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
               child:
               Column(
                 children: [
-                  PinCodeTextField(
-                    appContext: context,
-                    pastedTextStyle: TextStyle(
-                      color: Color(0xFFFFFFFF),
-                      fontWeight: FontWeight.bold,
-                    ),
-                    length: 6,
-                    obscureText: true,
-                    obscuringCharacter: '*',
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: PinCodeTextField(
 
-                    blinkWhenObscuring: true,
-                    animationType: AnimationType.fade,
-                    validator: (v) {
-                      otpEntered = v;
-                     if(v == 6){
-                       sendotp(context);
-                     }
-                    },
-                    pinTheme: PinTheme(
-
-                      shape: PinCodeFieldShape.box,
-                      borderRadius: BorderRadius.circular(5),
-                      fieldHeight: 50,
-                      fieldWidth: 40,
-                      activeFillColor:
-                      hasError ? Color(0xFFFFFFFF) : Color(0xFFFFFFFF),
-                    ),
-                    cursorColor: Colors.black,
-                    animationDuration: Duration(milliseconds: 300),
-                    enableActiveFill: true,
-                    errorAnimationController: errorController,
-                    controller: textEditingController,
-                    keyboardType: TextInputType.number,
-                    boxShadows: [
-                      BoxShadow(
-                        offset: Offset(0, 1),
+                      appContext: context,
+                      pastedTextStyle: TextStyle(
+                        locale: Locale("en"),
                         color: Color(0xFFFFFFFF),
-                        blurRadius: 10,
-                      )
-                    ],
-                    onCompleted: (v) {
-                      print("Completed");
-                    },
-                    // onTap: () {
-                    //   print("Pressed");
-                    // },
-                    onChanged: (value) {
-                      print(value);
-                      setState(() {
-                        currentText = value;
-                      });
-                    },
-                    beforeTextPaste: (text) {
-                      print("Allowing to paste $text");
-                      //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
-                      //but you can show anything you want here, like your pop up saying wrong paste format or etc
-                      return true;
-                    },
+                        fontWeight: FontWeight.bold,
+                      ),
+                      length: 6,
+                      obscureText: true,
+                      obscuringCharacter: '*',
+
+                      blinkWhenObscuring: true,
+                      animationType: AnimationType.fade,
+                      validator: (v) {
+                        otpEntered = v;
+                        if(v == 6){
+                          sendotp(context);
+                        }
+                      },
+
+                      pinTheme: PinTheme(
+
+                        shape: PinCodeFieldShape.box,
+                        borderRadius: BorderRadius.circular(5),
+                        fieldHeight: 50,
+                        fieldWidth: 40,
+                        activeFillColor:
+                        hasError ? Color(0xFFFFFFFF) : Color(0xFFFFFFFF),
+                      ),
+                      cursorColor: Colors.black,
+                      animationDuration: Duration(milliseconds: 300),
+                      enableActiveFill: true,
+                      errorAnimationController: errorController,
+                      controller: textEditingController,
+                      keyboardType: TextInputType.number,
+                      boxShadows: [
+                        BoxShadow(
+                          offset: Offset(0, 1),
+                          color: Color(0xFFFFFFFF),
+                          blurRadius: 10,
+                        )
+                      ],
+                      onCompleted: (v) {
+                        print("Completed");
+                      },
+                      // onTap: () {
+                      //   print("Pressed");
+                      // },
+                      onChanged: (value) {
+                        print(value);
+                        setState(() {
+                          currentText = value;
+                        });
+                      },
+                      beforeTextPaste: (text) {
+                        print("Allowing to paste $text");
+                        //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
+                        //but you can show anything you want here, like your pop up saying wrong paste format or etc
+                        return true;
+                      },
+                    ),
                   ),
                   SizedBox(height: 20.h,),
                   Center(child: confirmButton(getTranslated(context, 'submit'),context)),
