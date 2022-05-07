@@ -19,9 +19,9 @@ class LostScreen extends StatefulWidget {
 
 class _LostScreenState extends State<LostScreen> {
   HomeModel homeModel;
-  List<bool> selectedList = List();
+  List<bool> selectedList = [];
   PostModel.PostModel postModel;
-  List<Categories> categories = List();
+  List<PostModel.Categories> categories = [];
   ScreenUtil screenUtil = ScreenUtil();
   double itemWidth;
   double itemHeight;
@@ -37,15 +37,7 @@ class _LostScreenState extends State<LostScreen> {
     final body = json.decode(homeString);
     homeModel = HomeModel.fromJson(body);
 
-    String categoryId = "0";
-    Categories category = Categories(id:categoryId,arTitle:getTranslated(context, 'all'),enTitle:getTranslated(context, 'all'),logo: "");
-    categories.add(category);
-    selectedList.add(true);
 
-    for(int i =0;i<homeModel.data.categories.length;i++){
-      categories.add(homeModel.data.categories[i]);
-      selectedList.add(false);
-    }
 
 
     return homeModel;
@@ -62,6 +54,15 @@ class _LostScreenState extends State<LostScreen> {
     print(' PostModel --> ${map}');
     PetMartService petMartService = PetMartService();
     PostModel.PostModel postModel = await petMartService.post("lost",catId);
+    String categoryId = "0";
+    PostModel.Categories category =PostModel. Categories(id:categoryId,arTitle:getTranslated(context, 'all'),enTitle:getTranslated(context, 'all'));
+    categories.add(category);
+    selectedList.add(true);
+
+    for(int i =0;i<postModel.data.categories.length;i++){
+      categories.add(postModel.data.categories[i]);
+      selectedList.add(false);
+    }
     return postModel;
   }
   void getList(String catId) async{
@@ -87,7 +88,7 @@ class _LostScreenState extends State<LostScreen> {
     // TODO: implement initState
     super.initState();
     getHomeModel().whenComplete((){
-      post(categories[0].id).then((value) {
+      post("0").then((value) {
         postModel = value;
         setState(() {
 
@@ -118,7 +119,7 @@ class _LostScreenState extends State<LostScreen> {
             children: [
               Container(
                 height: 35.h,
-                child: ListView.separated(
+                child: categories.isEmpty?Container():ListView.separated(
 
                     scrollDirection: Axis.horizontal,
 
@@ -253,7 +254,7 @@ class _LostScreenState extends State<LostScreen> {
       ),),
     );
   }
-  Container selectRow(Categories category,BuildContext context,int selectedIndex){
+  Container selectRow(PostModel.Categories category,BuildContext context,int selectedIndex){
 
     return
       Container(

@@ -6,13 +6,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
-import 'package:pet_mart/model/home_model.dart';
+
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/post_model.dart' as PostModel;
 import 'package:pet_mart/screens/adaption_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../model/home_model.dart';
 class AdaptionScreen extends StatefulWidget {
   static String id = 'AdaptionScreen';
   @override
@@ -20,15 +22,16 @@ class AdaptionScreen extends StatefulWidget {
 }
 
 class _AdaptionScreenState extends State<AdaptionScreen> {
-  HomeModel homeModel;
+
   List<bool> selectedList = List();
   PostModel.PostModel postModel;
-  List<Categories> categories = List();
+  List<PostModel.Categories> categories = [];
   ScreenUtil screenUtil = ScreenUtil();
   double itemWidth;
   String languageCode;
   double itemHeight;
   int selectedIndex =0;
+  HomeModel homeModel;
 
   Future<HomeModel> getHomeModel() async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -43,14 +46,7 @@ class _AdaptionScreenState extends State<AdaptionScreen> {
 
 
     String categoryId = "0";
-    Categories category = Categories(id:categoryId,enTitle:getTranslated(context, 'all'),arTitle:getTranslated(context, 'all'),logo: "");
-    categories.add(category);
-    selectedList.add(true);
 
-    for(int i =0;i<homeModel.data.categories.length;i++){
-      categories.add(homeModel.data.categories[i]);
-      selectedList.add(false);
-    }
 
 
     return homeModel;
@@ -63,6 +59,14 @@ class _AdaptionScreenState extends State<AdaptionScreen> {
 
     PetMartService petMartService = PetMartService();
    PostModel.PostModel postModel = await petMartService.post("adoption",catId);
+    PostModel.Categories category = PostModel.Categories(id:"0",enTitle:getTranslated(context, 'all'),arTitle:getTranslated(context, 'all'));
+    categories.add(category);
+    selectedList.add(true);
+
+    for(int i =0;i<postModel.data.categories.length;i++){
+      categories.add(postModel.data.categories[i]);
+      selectedList.add(false);
+    }
     return postModel;
   }
   void getList(String catId) async{
@@ -88,7 +92,7 @@ postModel = null;
     // TODO: implement initState
     super.initState();
     getHomeModel().whenComplete(() {
-      post(categories[0].id).then((value) {
+      post("0").then((value) {
         postModel = value;
         setState(() {
 
@@ -111,7 +115,8 @@ postModel = null;
                 children: [
                   Container(
                     height: 35.h,
-                    child: ListView.separated(
+                    child: categories.isEmpty?Container():
+                    ListView.separated(
 
                         scrollDirection: Axis.horizontal,
 
@@ -249,7 +254,7 @@ postModel = null;
       ),),
     );
   }
-  Container selectRow(Categories category,BuildContext context,int selectedIndex){
+  Container selectRow(PostModel.Categories category,BuildContext context,int selectedIndex){
 
     return
       Container(
