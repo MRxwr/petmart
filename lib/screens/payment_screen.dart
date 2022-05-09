@@ -29,7 +29,7 @@ const kAndroidUserAgent =
 
 
 class PaymentScreen extends StatefulWidget {
-  Model.Data  packageModel;
+  Model.Package  packageModel;
   PaymentScreen({Key key,@required this.packageModel}) : super(key: key);
 
   @override
@@ -52,7 +52,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
    Map map = {
-      'package_id': widget.packageModel.packageId,
+      'package_id': widget.packageModel.id,
       'user_id': loginModel.data.id,
      'language':languageCode,
      'address':''

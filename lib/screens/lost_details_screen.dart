@@ -19,6 +19,7 @@ import 'package:pet_mart/model/share_model.dart';
 import 'package:pet_mart/model/view_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/message_screen.dart';
+import 'package:pet_mart/screens/pets_details_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
@@ -45,7 +46,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
   String noOfViews ="";
   String noOfShares = "";
   String mLanguage ="";
-  TextButton previewButton(String text,BuildContext context,String mobile){
+  TextButton previewButton(String text,BuildContext context,Customer customer){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -60,7 +61,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       style: flatButtonStyle,
       onPressed: () {
 
-        contact(context, mobile);
+        contact(context, customer);
 
       },
       child: Text(text,style: TextStyle(
@@ -316,7 +317,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                                   if(url.isNotEmpty) {
                                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                       return new PhotoScreen(imageProvider: NetworkImage(
-                                          url
+                                          KImageUrl+url
                                       ),);
                                     }));
                                   }
@@ -466,7 +467,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
 
                           ),
                         ),
-                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].mobile)
+                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].customer)
                       ],
                     ),
                   ],
@@ -628,45 +629,45 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                 child: Container(
                   color: Color(0x88000000),
                 ),),
-              // Container(
-              //
-              //   child:  GridView.builder(scrollDirection: Axis.vertical,
-              //     padding: EdgeInsets.zero,
-              //
-              //
-              //     shrinkWrap: true,
-              //     physics: const NeverScrollableScrollPhysics(),
-              //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-              //         childAspectRatio:itemWidth/itemHeight),
-              //     itemCount: postDetailsModel.data.relatePost.length,
-              //
-              //     itemBuilder: (context,index){
-              //       return GestureDetector(
-              //         onTap: (){
-              //           Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-              //             return new PetsDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId,postName: postDetailsModel.data.relatePost[index].postName);
-              //           }));
-              //           // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-              //           //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
-              //           // }));
-              //         },
-              //         child: Container(
-              //             margin: EdgeInsets.all(6.w),
-              //
-              //             child:
-              //             Card(
-              //                 clipBehavior: Clip.antiAliasWithSaveLayer,
-              //                 elevation: 1.w,
-              //                 shape: RoundedRectangleBorder(
-              //                   borderRadius: BorderRadius.circular(10.0.h),
-              //                 ),
-              //                 color: Color(0xFFFFFFFF),
-              //                 child: buildItem(postDetailsModel.data.relatePost[index],context))),
-              //       );
-              //     },
-              //   ),
-              //
-              // )
+              Container(
+
+                child:  GridView.builder(scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.zero,
+
+
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+                      childAspectRatio:itemWidth/itemHeight),
+                  itemCount: postDetailsModel.data.items[0].similar.length,
+
+                  itemBuilder: (context,index){
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                          return new PetsDetailsScreen(postId:postDetailsModel.data.items[0].similar[index].id,postName: mLanguage == "en"?postDetailsModel.data.items[0].similar[index].enTitle:postDetailsModel.data.items[0].similar[index].arTitle);
+                        }));
+                        // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                        //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
+                        // }));
+                      },
+                      child: Container(
+                          margin: EdgeInsets.all(6.w),
+
+                          child:
+                          Card(
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              elevation: 1.w,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0.h),
+                              ),
+                              color: Color(0xFFFFFFFF),
+                              child: buildItem(postDetailsModel.data.items[0].similar[index],context))),
+                    );
+                  },
+                ),
+
+              )
             ],
           ),
         ),
@@ -674,113 +675,114 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
     );
 
   }
-  // Widget buildItem(RelatePost data, BuildContext context) {
-  //   return Container(
-  //     child: Column(
-  //       children: [
-  //         Expanded(
-  //           flex: 3,
-  //           child: Stack(
-  //             children: [
-  //               CachedNetworkImage(
-  //                 width: itemWidth,
-  //                 imageUrl:data.postImage,
-  //                 imageBuilder: (context, imageProvider) => Stack(
-  //                   children: [
-  //                     ClipRRect(
-  //
-  //                       child: Container(
-  //                           width: itemWidth,
-  //
-  //                           decoration: BoxDecoration(
-  //
-  //                             shape: BoxShape.rectangle,
-  //
-  //                             image: DecorationImage(
-  //                                 fit: BoxFit.fill,
-  //
-  //                                 image: imageProvider),
-  //                           )
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 placeholder: (context, url) =>
-  //                     Center(
-  //                       child: SizedBox(
-  //                           height: 50.h,
-  //                           width: 50.h,
-  //                           child: new CircularProgressIndicator()),
-  //                     ),
-  //
-  //
-  //                 errorWidget: (context, url, error) => ClipRRect(
-  //                     child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
-  //                       colorBlendMode: BlendMode.difference,)),
-  //
-  //               ),
-  //               Positioned.directional(
-  //                 textDirection:  Directionality.of(context),
-  //                 bottom: 2.h,
-  //                 start: 4.w,
-  //                 child:
-  //                 Text(
-  //                   data.postDate,
-  //                   style: TextStyle(
-  //                       color: Color(0xFFFFFFFF)
-  //
-  //                   ),
-  //                 ),
-  //               )
-  //             ],
-  //           ),
-  //         ),
-  //         Expanded(flex:1,child: Container(
-  //           child: Column(
-  //             children: [
-  //               Expanded(flex:1,child:
-  //               Container(
-  //                 margin: EdgeInsets.symmetric(horizontal: 5.w),
-  //                 alignment: AlignmentDirectional.centerStart,
-  //                 child: Text(
-  //                   data.postName,
-  //                   style: TextStyle(
-  //                       color: Color(0xFF000000),
-  //                       fontWeight: FontWeight.normal,
-  //                       fontSize: screenUtil.setSp(12)
-  //                   ),
-  //
-  //                 ),
-  //               )),
-  //               Expanded(flex:1,child:
-  //               Row(
-  //                 children: [
-  //
-  //                   Container(
-  //                     padding: EdgeInsets.symmetric(horizontal: 5.w),
-  //                     child:
-  //                     Text(
-  //                       '${data.postPrice}',
-  //                       style: TextStyle(
-  //                           color: kMainColor,
-  //                           fontWeight: FontWeight.normal,
-  //                           fontSize: screenUtil.setSp(14)
-  //                       ),
-  //
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ))
-  //             ],
-  //           ),
-  //         ))
-  //
-  //       ],
-  //     ),
-  //   );
-  //
-  // }
-  void showDialog(String mobile) {
+  Widget buildItem(Similar data, BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Stack(
+              children: [
+                CachedNetworkImage(
+                  width: itemWidth,
+                  imageUrl:kImagePath+data.image,
+                  imageBuilder: (context, imageProvider) => Stack(
+                    children: [
+                      ClipRRect(
+
+                        child: Container(
+                            width: itemWidth,
+
+                            decoration: BoxDecoration(
+
+                              shape: BoxShape.rectangle,
+
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+
+                                  image: imageProvider),
+                            )
+                        ),
+                      ),
+                    ],
+                  ),
+                  placeholder: (context, url) =>
+                      Center(
+                        child: SizedBox(
+                            height: 50.h,
+                            width: 50.h,
+                            child: new CircularProgressIndicator()),
+                      ),
+
+
+                  errorWidget: (context, url, error) => ClipRRect(
+                      child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
+                        colorBlendMode: BlendMode.difference,)),
+
+                ),
+                Positioned.directional(
+                  textDirection:  Directionality.of(context),
+                  bottom: 2.h,
+                  start: 4.w,
+                  child:
+                  Text(
+                    data.date.split(" ")[0],
+                    style: TextStyle(
+                        color: Color(0xFFFFFFFF)
+
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(flex:1,child: Container(
+            child: Column(
+              children: [
+                Expanded(flex:1,child:
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5.w),
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    mLanguage == "en"?data.enTitle:
+                    data.arTitle,
+                    style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontWeight: FontWeight.normal,
+                        fontSize: screenUtil.setSp(12)
+                    ),
+
+                  ),
+                )),
+                Expanded(flex:1,child:
+                Row(
+                  children: [
+
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child:
+                      Text(
+                        '${data.price}',
+                        style: TextStyle(
+                            color: kMainColor,
+                            fontWeight: FontWeight.normal,
+                            fontSize: screenUtil.setSp(14)
+                        ),
+
+                      ),
+                    ),
+                  ],
+                ))
+              ],
+            ),
+          ))
+
+        ],
+      ),
+    );
+
+  }
+  void showDialog(Customer customer) {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -817,7 +819,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                         CachedNetworkImage(
                           width: 80.w,
                           height: 80.h,
-                          imageUrl:"",
+                          imageUrl:kImagePath+customer.logo,
                           imageBuilder: (context, imageProvider) => Stack(
                             children: [
                               ClipRRect(
@@ -871,7 +873,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                "17-12-2022",
+                                postDetailsModel.data.items[0].date.split(" ")[0],
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -884,7 +886,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                mobile,
+                                customer.phone,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -896,7 +898,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, 'call_now'), context, mobile.replaceAll('+', ''))
+                        callButton(getTranslated(context, 'call_now'), context, customer.phone.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -920,11 +922,11 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
       },
     );
   }
-  contact(BuildContext context,String phone) async {
+  contact(BuildContext context,Customer customer) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      showDialog(phone);
+      showDialog(customer);
 
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));

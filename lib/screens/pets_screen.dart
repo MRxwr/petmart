@@ -232,7 +232,7 @@ class _PetsScreenState extends State<PetsScreen> {
     ),
     alignment: AlignmentDirectional.center,
     ):
-    petsModel.data.items == null?
+    petsModel.data.items.isEmpty?
 
     Container(
     child: Text(

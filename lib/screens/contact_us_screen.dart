@@ -9,7 +9,7 @@ import 'package:flutter/services.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
-import 'package:pet_mart/model/init_model.dart';
+
 import 'package:pet_mart/utilities/call_services.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/utilities/service_locator.dart';
@@ -25,26 +25,13 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   String _platformVersion = 'Unknown';
   final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
 
-  Future<InitModel> init() async{
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
-    String initData = sharedPreferences.getString("initModel");
-    print('initData --> ${initData}');
-    final initBody = json.decode(initData);
-    InitModel initModel = InitModel.fromJson(initBody);
-    return initModel;
-  }
-  InitModel initModel;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    init().then((value) {
-      setState(() {
-        initModel = value;
-      });
 
-    });
   }
   @override
   Widget build(BuildContext context) {
@@ -85,14 +72,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         ],
 
       ),
-       body: initModel == null?
-       Container(
-         child: CircularProgressIndicator(
-
-
-         ),
-         alignment: AlignmentDirectional.center,
-       ):
+       body:
        Container(
          child: Column(
            children: [
@@ -122,7 +102,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _service.sendEmail(initModel.data.email);
+                         _service.sendEmail("Petmartkw@gmail.com");
                        },
                        child: Padding(
                          padding:  EdgeInsets.all(2.0.h),
@@ -136,7 +116,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text(initModel.data.email,
+                             Text("Petmartkw@gmail.com",
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -148,7 +128,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _service.call(initModel.data.mobile);
+                         _service.call("55175589");
 
 
                        },
@@ -165,7 +145,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text(initModel.data.mobile,
+                             Text("55175589",
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -177,7 +157,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _openUrl(url(initModel.data.mobile, ""));
+                         _openUrl(url("55175589", ""));
 
                        },
                        child: Padding(
@@ -192,7 +172,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text(initModel.data.mobile,
+                             Text("55175589",
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),

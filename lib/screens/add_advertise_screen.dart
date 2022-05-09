@@ -15,10 +15,11 @@ import 'package:ndialog/ndialog.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/age_model.dart';
-import 'package:pet_mart/model/category_model.dart' as SubCategory;
+
 import 'package:pet_mart/model/check_credit_model.dart';
 import 'package:pet_mart/model/gender_model.dart';
-import 'package:pet_mart/model/home_model.dart' as CategoryParent;
+
+
 
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/type_model.dart';
@@ -31,6 +32,7 @@ import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/InitModel.dart';
 import 'credit_screen.dart';
 import 'main_sceen.dart';
 class AddAdvertiseScreen extends StatefulWidget {
@@ -55,14 +57,18 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
 
   List<AgeModel> agesList = [];
   List<GenderModel> genderList = [];
+  List<Category> categories = null;
+  List<Sub> subCategory = null;
   String genderId ="";
   String ageName="";
   String key ="sell";
   LoginModel loginModel;
   bool hidePrice = false;
-  SubCategory.CategoryModel mSubCategoryModel;
+
   final TextEditingController _titleController = new TextEditingController();
   final TextEditingController _descriptionController = new TextEditingController();
+  final TextEditingController _titleArController = new TextEditingController();
+  final TextEditingController _descriptionArController = new TextEditingController();
   final TextEditingController _ageController = new TextEditingController();
   final TextEditingController _priceController = new TextEditingController();
   Future<NAlertDialog> showPickerDialog(BuildContext context)async {
@@ -146,8 +152,8 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
 
   }
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-   CategoryParent.HomeModel homeModel;
-  List<CategoryParent.Categories> categoryList;
+
+  InitModel initModel;
   @override
   void initState() {
     // TODO: implement initState
@@ -165,49 +171,21 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     agesList.add(AgeModel("2", "شهر", "month"));
     agesList.add(AgeModel("3", "عام", "year"));
     map().then((value) {
+      setState(() {
+        initModel = value;
+        categories = initModel.data.category;
+        subCategory = initModel.data.category[0].sub;
+        categoryId = initModel.data.category[0].sub[0].id;
 
-        userId = value["userId"];
-        mLanguage = value['language'];
-
-    }).whenComplete((){
-      home().then((value) {
-        setState(() {
-          homeModel = value;
-          categoryList = value.data.categories;
-        });
       });
 
-    }
-    );
+
+
+    });
 
   }
-  Future<SubCategory.CategoryModel> subCategory(String categoryId) async{
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
 
-    Map map ;
-
-
-    map = {"id":categoryId,
-
-      "language":languageCode};
-
-
-
-
-
-    PetMartService petMartService = PetMartService();
-    SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(categoryId);
-    return auctionDetailsModel;
-  }
-  Future<CategoryParent.HomeModel> home() async{
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String homeString = _preferences.getString('home');
-    final body = json.decode(homeString);
-    CategoryParent.HomeModel   homeModel =CategoryParent.HomeModel.fromJson(body);
-    return homeModel;
-  }
   Future<CheckCreditModel> checkCreditModel() async{
 
 
@@ -225,12 +203,13 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     CheckCreditModel creditModel = await petMartService.checkCredit(map);
     return creditModel;
   }
-  Future<Map> map() async{
+  Future<InitModel> map() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
 
     PetMartService petMartService = PetMartService();
+    InitModel initModel =  await petMartService.initModel();
 
 
     String loginData = _preferences.getString(kUserModel);
@@ -238,6 +217,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
        loginModel = LoginModel.fromJson(body);
     String initData = _preferences.getString("initModel");
     print('initData --> ${initData}');
+    userId = loginModel.data.id;
 
     // agesList = initModel.data.age;
     ageId = agesList[0].id;
@@ -246,7 +226,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     Map map ;
     map = {"language":languageCode,
       "userId":loginModel.data.id};
-    return map;
+    return initModel;
   }
   @override
   Widget build(BuildContext context) {
@@ -296,7 +276,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
           backgroundColor: Color(0xFFFFFFFF),
           body: Container(
             margin: EdgeInsets.all(10.h),
-            child: homeModel == null?
+            child: initModel == null?
             Container(
               child: CircularProgressIndicator(
 
@@ -366,11 +346,50 @@ setState(() {
                                     });
 
                                   }else if(key == 'adoption'){
+
 hidePrice = true;
+categories = null;
+subCategory = null;
+setState(() {
+
+});
+categories = initModel.data.adoption;
+print(categories);
+subCategory = initModel.data.adoption[0].sub;
+categoryId = initModel.data.adoption[0].sub[0].id;
+print(subCategory);
+setState(() {
+
+});
 
                                   }else if(key == 'lost-animal'){
                                     hidePrice = true;
-                                  }else{
+                                    categories = null;
+                                    subCategory = null;
+                                    setState(() {
+
+                                    });
+                                    categories = initModel.data.lost;
+                                    subCategory = initModel.data.lost[0].sub;
+                                    categoryId = initModel.data.lost[0].sub[0].id;
+                                    setState(() {
+
+                                    });
+                                  }if(key == 'sell'){
+                                    hidePrice = false;
+                                    categories = null;
+                                    subCategory = null;
+                                    setState(() {
+
+                                    });
+                                    categories = initModel.data.category;
+                                    subCategory = initModel.data.category[0].sub;
+                                    categoryId = initModel.data.category[0].sub[0].id;
+                                    setState(() {
+
+                                    });
+                                  }
+                                  else{
                                     hidePrice = false;
                                   }
 
@@ -451,41 +470,39 @@ hidePrice = true;
                   SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child: DropDown<CategoryParent.Categories>(
+                    child:categories == null?
+                    Container():
+                    DropDown<Category>(
 
 
 
+                   isCleared: true,
+
+                      items: categories,
+                      initialValue: categories[0],
 
 
-                      items: categoryList,
-
-                      hint:  Text(getTranslated(context, 'select_category') ,
+                      hint:  Text(mLanguage == "en"?categories[0].enTitle:categories[0].arTitle,
                         textAlign: TextAlign.start,
                         style: TextStyle(
 
-                            color: Color(0xFFc3c3c3),
+                            color: Color(0xFF000000),
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (CategoryParent.Categories category){
-                        mSubCategoryModel = null;
-                        categoryId = category.id;
-                        print('CategoryId -->${categoryId}');
-                        final modelHud = Provider.of<ModelHud>(context,listen: false);
-                        modelHud.changeIsLoading(true);
-                        subCategory(categoryId).then((value){
-                          modelHud.changeIsLoading(false);
-                          setState(() {
-                            categoryId = value.data.categories[0].id;
-                            print("subCategoryId ---> ${categoryId}");
-                            mSubCategoryModel = value;
+                      onChanged: (Category category){
+                        subCategory =[];
+                        categoryId = category.sub[0].id;
+                        print("categoryid ---> ${categoryId}");
+                        subCategory = category.sub;
+                        setState(() {
 
-                          });
                         });
 
 
+
                       },
-                      customWidgets: categoryList.map((p) => buildDropDownRow(p)).toList(),
+                      customWidgets: categories.map((p) => buildDropDownRow(p)).toList(),
                       isExpanded: true,
                       showUnderline: false,
                     ),
@@ -499,32 +516,22 @@ hidePrice = true;
                   SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child: mSubCategoryModel == null?
-                    Container(
-                      alignment: AlignmentDirectional.centerStart,
-
-                      child: Text(getTranslated(context,'select_sub_category'),
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-
-                            color: Color(0xFFc3c3c3),
-                            fontWeight: FontWeight.w600,
-                            fontSize: screenUtil.setSp(15)
-                        ),),
-                    ):  SizedBox(
+                    child:subCategory == null?
+                    Container():
+                    SizedBox(
                       height: 50.h,
                       width: screenUtil.screenWidth,
                       child:
-                      DropDown<SubCategory.Categories>(
+                      DropDown<Sub>(
 
 
 
+isCleared: true,
 
+                        items: subCategory,
 
-                        items: mSubCategoryModel.data.categories,
-
-                        hint:  Text( mLanguage == "en"?mSubCategoryModel.data.categories[0].enTitle:
-                        mSubCategoryModel.data.categories[0].arTitle,
+                        hint:  Text( mLanguage == "en"?subCategory[0].enTitle:
+                        subCategory[0].arTitle,
                           textAlign: TextAlign.start,
                           style: TextStyle(
 
@@ -532,14 +539,14 @@ hidePrice = true;
                               fontWeight: FontWeight.w600,
                               fontSize: screenUtil.setSp(15)
                           ),),
-                        onChanged: (SubCategory.Categories category){
+                        onChanged: (Sub category){
                           categoryId = category.id;
                           print("subCategoryId ---> ${categoryId}");
 
 
 
                         },
-                        customWidgets: mSubCategoryModel.data.categories.map((p) => buildSubCategoryRow(p)).toList(),
+                        customWidgets: subCategory.map((p) => buildSubCategoryRow(p)).toList(),
                         isExpanded: true,
                         showUnderline: false,
                       ),
@@ -588,6 +595,42 @@ hidePrice = true;
                     ),),  SizedBox(height: 10.h,),
                   TextField(
 
+                    keyboardType: TextInputType.text,
+                    minLines: 1,
+                    maxLines: 1,
+                    enableInteractiveSelection: true,
+                    controller: _titleArController,
+
+
+                    textInputAction: TextInputAction.next,
+                    textAlign: TextAlign.start,
+                    textAlignVertical: TextAlignVertical.center,
+
+
+
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(hintText: getTranslated(context, 'post_title_ar'),
+                        isCollapsed: true,
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        contentPadding: EdgeInsets.all(10.h),
+                        hintStyle: TextStyle(
+                          color: Color(0xFFa3a3a3),
+
+                        )
+                    ),
+                  ),
+                  SizedBox(height: 1.h,
+                    width: screenUtil.screenWidth,
+                    child: Container(
+                      color: Color(0xFFc3c3c3),
+                    ),),
+                  SizedBox(height: 10.h,),
+                  TextField(
+
                     keyboardType: TextInputType.multiline,
                     minLines: 1,
                     maxLines: 50,
@@ -619,6 +662,40 @@ hidePrice = true;
                     child: Container(
                       color: Color(0xFFc3c3c3),
                     ),),  SizedBox(height: 10.h,),
+                  TextField(
+
+                    keyboardType: TextInputType.multiline,
+                    minLines: 1,
+                    maxLines: 50,
+                    enableInteractiveSelection: true,
+                    controller: _descriptionArController,
+
+                    textInputAction: TextInputAction.newline,
+                    textAlign: TextAlign.start,
+                    textAlignVertical: TextAlignVertical.center,
+
+
+                    textCapitalization: TextCapitalization.sentences,
+                    decoration: InputDecoration(hintText: getTranslated(context, 'post_description_ar'),
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                        isCollapsed: true,
+                        contentPadding: EdgeInsets.all(10.h),
+                        hintStyle: TextStyle(
+                          color: Color(0xFFa3a3a3),
+
+                        )
+                    ),
+                  ),
+                  SizedBox(height: 1.h,
+                    width: screenUtil.screenWidth,
+                    child: Container(
+                      color: Color(0xFFc3c3c3),
+                    ),),  SizedBox(height: 10.h,),
+
                   Container(
                     height: 50.h,
                     width: screenUtil.screenWidth,
@@ -662,15 +739,15 @@ hidePrice = true;
                         Expanded(
                           flex: 1,
                           child:
-                          DropDown<AgeModel>(
+                          DropDown<String>(
 
 
 
 
 
-                            items: agesList,
+                            items: mLanguage == "en"?initModel.data.ageType.english:initModel.data.ageType.arabic,
 
-                            hint:  Text(mLanguage == "en" ?agesList[0].ageEn:agesList[0].ageAr,
+                            hint:  Text(mLanguage == "en" ?initModel.data.ageType.english[0]:initModel.data.ageType.arabic[0],
                               textAlign: TextAlign.start,
                               style: TextStyle(
 
@@ -678,14 +755,20 @@ hidePrice = true;
                                   fontWeight: FontWeight.w600,
                                   fontSize: screenUtil.setSp(15)
                               ),),
-                            onChanged: (AgeModel age){
-                              ageId = age.id;
-                              ageName = mLanguage == "en" ?age.ageEn:age.ageAr;
-
+                            onChanged: (String age){
+                              ageId = age;
+                              ageName = age;
+                              if(mLanguage == "en"){
+                                ageId = "${initModel.data.ageType.english.indexOf(age)}";
+                              }else {
+                                ageId = "${initModel.data.gender.arabic.indexOf(age)}";
+                              }
+                              print(ageId);
 
 
                             },
-                            customWidgets: agesList.map((p) => buildAgeRow(p)).toList(),
+                            customWidgets:mLanguage =="en"? initModel.data.ageType.english.map((p) => buildAgeRow(p)).toList():
+                            initModel.data.ageType.arabic.map((p) => buildAgeRow(p)).toList(),
                             isExpanded: true,
                             showUnderline: false,
                           ),
@@ -713,13 +796,13 @@ hidePrice = true;
                   SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child: DropDown<GenderModel>(
+                    child: DropDown<String>(
 
 
 
 
 
-                      items: genderList,
+                      items:mLanguage == "en"? initModel.data.gender.english:initModel.data.gender.arabic,
 
                       hint:  Text(getTranslated(context, 'select_gender') ,
                         textAlign: TextAlign.start,
@@ -729,13 +812,20 @@ hidePrice = true;
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (GenderModel gender){
-                        genderId = gender.id;
+                      onChanged: (String gender){
+                        if(mLanguage == "en"){
+                          genderId = "${initModel.data.gender.english.indexOf(gender)}";
+                        }else {
+                          genderId = "${initModel.data.gender.arabic.indexOf(gender)}";
+                        }
+                        print(genderId);
 
 
 
                       },
-                      customWidgets: genderList.map((p) => builGenderRow(p)).toList(),
+                      customWidgets:
+                      mLanguage == "en"? initModel.data.gender.english.map((p) => builGenderRow(p)).toList():initModel.data.gender.arabic.map((p) => builGenderRow(p)).toList(),
+
                       isExpanded: true,
                       showUnderline: false,
                     ),
@@ -832,7 +922,7 @@ hidePrice = true;
       ),),
     );
   }
-  Widget builGenderRow(GenderModel gender) {
+  Widget builGenderRow(String gender) {
     return Container(
 
 
@@ -842,14 +932,14 @@ hidePrice = true;
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(mLanguage == "en"?gender.genderEn:gender.genderAr ,
+        child: Text(gender ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
               fontSize: screenUtil.setSp(15)
           ),));
   }
-  Widget buildSubCategoryRow(SubCategory.Categories category) {
+  Widget buildSubCategoryRow(Sub category) {
     return Container(
 
 
@@ -866,7 +956,7 @@ hidePrice = true;
               fontSize: screenUtil.setSp(15)
           ),));
   }
-  Widget buildAgeRow(AgeModel age) {
+  Widget buildAgeRow(String age) {
     return Container(
 
 
@@ -876,14 +966,14 @@ hidePrice = true;
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(mLanguage == "en"?age.ageEn:age.ageAr ,
+        child: Text(age ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
               fontSize: screenUtil.setSp(15)
           ),));
   }
-  Widget buildDropDownRow(CategoryParent.Categories category) {
+  Widget buildDropDownRow(Category category) {
   return Container(
 
 
@@ -983,6 +1073,8 @@ hidePrice = true;
     print("subCategoryId ---> ${categoryId}");
     String postTitle = _titleController.text;
     String postDescription =_descriptionController.text;
+    String postTitleAr = _titleArController.text;
+    String postDescriptionAr = _descriptionArController.text;
     String age = _ageController.text;
     String price = _priceController.text;
     if(mImages.isEmpty){
@@ -992,10 +1084,10 @@ hidePrice = true;
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'sub_category_error'))));
 
     }
-    else if(postTitle==""){
+    else if(postTitle.trim()==""||postTitleAr.trim()==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'title_error'))));
 
-    }else if(postDescription==""){
+    }else if(postDescription==""||postDescriptionAr.trim()==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'description_error'))));
 
     }else if(genderId==""){
@@ -1010,7 +1102,7 @@ hidePrice = true;
 
       }
       if (key == 'sell') {
-        
+
         if (price == "") {
           _scaffoldKey.currentState.showSnackBar(
               SnackBar(content: Text(getTranslated(context, 'price_error'))));
@@ -1022,10 +1114,12 @@ hidePrice = true;
           PetMartService petMartService = PetMartService();
           dynamic response = await petMartService.addPost(
               postTitle,
-              postTitle,
+
+              postTitleAr,
+
               key,
               postDescription,
-              postDescription,
+              postDescriptionAr,
               price,
               categoryId,
               age,

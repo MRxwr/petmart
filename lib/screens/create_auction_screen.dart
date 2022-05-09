@@ -12,7 +12,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
-import 'package:pet_mart/model/init_model.dart';
+
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/splash_screen.dart';
@@ -41,7 +41,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   final TextEditingController _descriptionController = new TextEditingController();
   final TextEditingController _priceController = new TextEditingController();
 
-  InitModel initModel;
+
   LoginModel loginModel;
   List<File> mImages = List();
   NAlertDialog nAlertDialog;
@@ -262,7 +262,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     String initData = _preferences.getString("initModel");
     print('initData --> ${initData}');
     final initBody = json.decode(initData);
-    initModel = InitModel.fromJson(initBody);
+    // initModel = InitModel.fromJson(initBody);
 
     Map map ;
     map = {"language":languageCode,

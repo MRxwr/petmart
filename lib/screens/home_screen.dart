@@ -7,7 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart';
-import 'package:pet_mart/model/init_model.dart';
+
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/screens/advertise_screen.dart';
 import 'package:pet_mart/screens/categories_screen.dart';
@@ -484,7 +484,7 @@ double height = MediaQuery.of(context).size.height;
 
         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
 
-          return new AdvertiseScreen(homeModel:homeModel,langCode: languageCode,);
+          return new AdvertiseScreen(homeModel:homeModel, langCode: languageCode,);
         }));
       },
       child: Text(text,style: TextStyle(

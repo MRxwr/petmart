@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/MyPostsModel.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/post_model.dart' as Model;
 import 'package:pet_mart/model/type_model.dart';
@@ -27,7 +28,9 @@ class _MyPostScreenState extends State<MyPostScreen> {
   int selectedIndex =0;
   String mLanguage ="";
   String userId = "";
-  Model.PostModel postModel;
+  MyPostsModel postModel;
+  List<Sale> products =null;
+  bool isOk ;
 
   @override
   void initState() {
@@ -42,8 +45,31 @@ class _MyPostScreenState extends State<MyPostScreen> {
       mLanguage = value['language'];
     }).whenComplete(() {
       posts("all").then((value) {
+
+          isOk  = value['ok'];
+        products = [];
+        if(isOk){
+         postModel = MyPostsModel.fromJson(value);
+
+          products..addAll(postModel.data.items.lost);
+          products..addAll(postModel.data.items.adoption);
+          products..addAll(postModel.data.items.sale);
+        }
+
+        // for(int i =0;i< postModel.data.items.lost.length;i++){
+        //   products.add(postModel.data.items.lost[i]);
+        //
+        // }
+        // for(int i =0;i< postModel.data.items.adoption.length;i++){
+        //   products.add(postModel.data.items.adoption[i]);
+        //
+        // }
+        // for(int i =0;i< postModel.data.items.sale.length;i++){
+        //   products.add(postModel.data.items.sale[i]);
+        //
+        // }
         setState(() {
-          postModel = value;
+
         });
 
       });
@@ -64,7 +90,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
     "userId":loginModel.data.id};
     return map;
   }
-  Future<Model.PostModel> posts(String type) async{
+  Future<Map<String, dynamic>> posts(String type) async{
     Map map;
     map = {
       "user_id":userId,
@@ -76,25 +102,50 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    Model.PostModel postModel = await petMartService.myPosts(map);
-    return postModel;
+    Map<String, dynamic>   response  = await petMartService.myPosts(userId);
+    return response;
   }
   Future<void> postList(String type) async{
-    Map map;
-    map = {
-      "user_id":userId,
-      "language":mLanguage,
-      "post_type":type};
+    products = [];
+    if(isOk) {
+      if (type == "all") {
+        products = [];
+        // for(int i =0;i< postModel.data.items.lost.length;i++){
+        //   products.add(postModel.data.items.lost[i]);
+        //
+        // }
+        // for(int i =0;i< postModel.data.items.adoption.length;i++){
+        //   products.add(postModel.data.items.adoption[i]);
+        //
+        // }
+        // for(int i =0;i< postModel.data.items.sale.length;i++){
+        //   products.add(postModel.data.items.sale[i]);
+        //
+        // }
+        products..addAll(postModel.data.items.lost);
+        products..addAll(postModel.data.items.adoption);
+        products..addAll(postModel.data.items.sale);
+      } else if (type == "adoption") {
+        products = [];
+        products..addAll(postModel.data.items.adoption);
+      } else if (type == "lost-animal") {
+        products = [];
+        products..addAll(postModel.data.items.lost);
+        // for (int i = 0; i < postModel.data.items.lost.length; i++) {
+        //   products.add(postModel.data.items.lost[i]);
+        // }
+      } else if (type == "sell") {
+        products = [];
+        products..addAll(postModel.data.items.sale);
+        // for(int i =0;i< postModel.data.items.sale.length;i++){
+        //   products.add(postModel.data.items.sale[i]);
+        //
+        // }
+      }
+    }
+   setState(() {
 
-
-
-
-
-    PetMartService petMartService = PetMartService();
-   postModel = await petMartService.myPosts(map);
-    setState(() {
-
-    });
+   });
   }
   @override
   Widget build(BuildContext context) {
@@ -180,7 +231,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
                             }
 
-                            postModel = null;
+
                             setState(() {
 
                             });
@@ -211,7 +262,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
             SizedBox(height: 5.h,width: width,
             ),
             Container(
-              child:postModel == null?
+              child:products == null?
               Container(
                 child: CircularProgressIndicator(
 
@@ -219,7 +270,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
                 ),
                 alignment: AlignmentDirectional.center,
               ):
-              postModel.data.items.isEmpty?
+              products.isEmpty?
 
               Container(
                 child: Text(
@@ -240,13 +291,13 @@ class _MyPostScreenState extends State<MyPostScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                     childAspectRatio:itemWidth/itemHeight),
-                itemCount: postModel.data.items.length,
+                itemCount: products.length,
 
                 itemBuilder: (context,index){
                   return GestureDetector(
                     onTap: (){
                       Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new PostDetailsScreen(postId:postModel.data.items[index].id,postName:languageCode =="en"? postModel.data.items[index].enTitle:postModel.data.items[index].arTitle ,);
+                        return new PostDetailsScreen(postId:products[index].id,postName:languageCode =="en"? products[index].enTitle:products[index].arTitle ,);
                       }));
                     },
                     child: Container(
@@ -260,7 +311,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
                               borderRadius: BorderRadius.circular(10.0.h),
                             ),
                             color: Color(0xFFFFFFFF),
-                            child: buildItem(postModel.data.items[index],context))),
+                            child: buildItem(products[index],context))),
                   );
                 },
               ),
@@ -316,7 +367,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
         ),
       );
   }
-  Widget buildItem(Model.Items data, BuildContext context) {
+  Widget buildItem(Sale data, BuildContext context) {
     return Container(
       child: Column(
         children: [
@@ -366,7 +417,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
                   bottom: 2.h,
                   start: 10.w,
                   child: Text(
-                    "17-12-2022",
+                    data.date.split(" ")[0],
                     style: TextStyle(
                         color: Color(0xFF000000)
 

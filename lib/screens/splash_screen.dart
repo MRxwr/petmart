@@ -12,7 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart';
-import 'package:pet_mart/model/init_model.dart';
+
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/push_notification.dart';
 import 'package:pet_mart/screens/languagee_screen.dart';
@@ -198,9 +198,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
     print('map --> ${map}');
     PetMartService petMartService = PetMartService();
-    InitModel initModel = await petMartService.init();
-    SharedPref sharedPref = SharedPref();
-    await sharedPref.save('initModel', initModel);
+
     HomeModel home = await petMartService.home(map);
     return home;
   }

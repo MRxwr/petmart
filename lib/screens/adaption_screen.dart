@@ -348,7 +348,7 @@ children: [
       bottom: 2.h,
       start: 10.w,
       child: Text(
-        "17-12-2022",
+        data.date.split(" ")[0],
         style: TextStyle(
           color: Color(0xFFFFFFFF)
 

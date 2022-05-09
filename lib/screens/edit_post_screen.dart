@@ -15,7 +15,7 @@ import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/category_model.dart' as SubCategory;
 import 'package:pet_mart/model/check_credit_model.dart';
 import 'package:pet_mart/model/home_model.dart' as CategoryParent;
-import 'package:pet_mart/model/init_model.dart';
+
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/type_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';

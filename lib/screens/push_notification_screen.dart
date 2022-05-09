@@ -27,7 +27,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   bool status = false;
   String language = "";
-  Future<NotificationModel> getNotificationList()async{
+  Future<Map<String, dynamic>> getNotificationList()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     language = languageCode;
@@ -40,12 +40,17 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
       "id":loginModel.data.id,
       "language":languageCode
     };
-    NotificationModel notificationModel =await petMartService.notification(map);
-    int  notificationNumber = notificationModel.data.length;
-    SharedPreferences sharedPreferenc = await SharedPreferences.getInstance();
-    sharedPreferenc.setInt("notificationCount", notificationNumber);
-    String appBadgeSupported;
-    Provider.of<NotificationNotifier>(context,listen: false).addCount(0);
+    Map<String, dynamic> response =await petMartService.notification(loginModel.data.id);
+    bool  isOk  = response['ok'];
+    if (isOk) {
+      NotificationModel notificationModel = NotificationModel.fromJson(response);
+      int  notificationNumber = notificationModel.data.notification.length;
+      SharedPreferences sharedPreferenc = await SharedPreferences.getInstance();
+      sharedPreferenc.setInt("notificationCount", notificationNumber);
+      String appBadgeSupported;
+      Provider.of<NotificationNotifier>(context,listen: false).addCount(0);
+    }
+
     // try {
     //   bool res = await FlutterAppBadger.isAppBadgeSupported();
     //   if (res) {
@@ -58,9 +63,11 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     // } on PlatformException {
     //   appBadgeSupported = 'Failed to get badge support.';
     // }
-    return notificationModel;
+    return response;
   }
+  String isOkey="";
   NotificationModel notificationModel;
+  Map<String, dynamic>   response;
   @override
   void initState() {
     // TODO: implement initState
@@ -68,7 +75,14 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     getNotificationList().then((value){
 
       setState(() {
-        notificationModel = value;
+        response = value;
+        bool  isOk  = response['ok'];
+        if (isOk) {
+          isOkey = "1";
+           notificationModel = NotificationModel.fromJson(response);
+        }else{
+          isOkey = "0";
+        }
       });
     });
 
@@ -144,7 +158,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                       padding: 8.0,
                       showOnOff: false,
                       onToggle: (val)  {
-                        notify(val);
+                        // notify(val);
 
                       },
                     ),
@@ -158,73 +172,70 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                 color: Colors.grey[400],
               ),
               Container(
-                child:  notificationModel == null?
+                child:  isOkey == ""?
                 Container(
                   child: CircularProgressIndicator(
 
 
                   ),
                   alignment: AlignmentDirectional.center,
-                ): ListView.separated(
-                    scrollDirection: Axis.vertical,
-
-
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context,index){
-                      return
-                        GestureDetector(
-                          onTap: (){
-                            print("tap");
-                            String type = notificationModel.data[index].type;
-                            if(type == "auction"){
-                              String id = notificationModel.data[index].details[0].auctionId;
-                              String englishName= notificationModel.data[index].details[0].englishName;
-                              String arabicName= notificationModel.data[index].details[0].arabicName;
-                              String name = "";
-                              if(language == 'ar'){
-                                name = arabicName;
-                              }else{
-                                name = englishName;
-
-                              }
-                              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                return new NotificationDetailsScreen(id:id,name: name,);
-                              }));
-                            }
-
-                          },
-                          child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 6.h),
-                          height: 100.h,
-                          width: screenUtil.screenWidth,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  notificationModel.data[index].date,
-                                  style: TextStyle(
-                                      color: Color(0xFF000000),
-                                      fontSize: screenUtil.setSp(14),
-                                      fontWeight: FontWeight.bold
-
-                                  )),
-                              Text(
-                                  notificationModel.data[index].message,
-                                  style: TextStyle(
-                                      color: Color(0xFF000000),
-                                      fontSize: screenUtil.setSp(12),
-                                      fontWeight: FontWeight.normal
-
-                                  ))
-                            ],
-                          ),
+                ):
+                Container(
+                  child: isOkey == "0"?
+                  Container(
+                    child: Text(
+                      getTranslated(context, 'no_notification_available'),
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: screenUtil.setSp(16),
+                          fontWeight: FontWeight.w600
                       ),
-                        );
-                    }, separatorBuilder:  (context,index){
-                  return Container(height: 1.h,
-                    color: Colors.grey[400],);
-                }, itemCount: notificationModel.data.length),
+                    ),
+                    alignment: AlignmentDirectional.center,
+                  )
+                      :
+                  ListView.separated(
+                      scrollDirection: Axis.vertical,
+
+
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context,index){
+                        return
+                          GestureDetector(
+
+                            child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 6.h),
+                            height: 100.h,
+                            width: screenUtil.screenWidth,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    notificationModel.data.notification[index].date.split(" ")[0],
+                                    style: TextStyle(
+                                        color: Color(0xFF000000),
+                                        fontSize: screenUtil.setSp(14),
+                                        fontWeight: FontWeight.bold
+
+                                    )),
+                                Text(
+                                    notificationModel.data.notification[index].notification,
+                                    style: TextStyle(
+                                        color: Color(0xFF000000),
+                                        fontSize: screenUtil.setSp(12),
+                                        fontWeight: FontWeight.normal
+
+                                    ))
+                              ],
+                            ),
+                        ),
+                          );
+                      }, separatorBuilder:  (context,index){
+                    return Container(height: 1.h,
+                      color: Colors.grey[400],);
+                  }, itemCount: notificationModel.data.notification.length),
+                ),
               )
 
             ],
@@ -234,39 +245,5 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     ),
       );
   }
-  Future<void> notify(bool isNotify)async{
-    final modelHud = Provider.of<ModelHud>(context,listen: false);
-    modelHud.changeIsLoading(true);
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    status = _preferences.getBool("enable")??true;
-    String loginData = _preferences.getString(kUserModel);
-    final body = json.decode(loginData);
-    LoginModel   loginModel = LoginModel.fromJson(body);
-    PetMartService petMartService = PetMartService();
-    String state = "";
-    if(isNotify){
-      state = "1";
-    }else{
-      state = "0";
-    }
-    Map map = {
-      "user_id":loginModel.data.id,
-      "is_notify":state,
-      "language":languageCode
-    };
 
-    NotifyModel notifyModel =await petMartService.notify(map);
-    String  success = notifyModel.status;
-    modelHud.changeIsLoading(false);
-    if(success == 'success'){
-      SharedPreferences prefs =  await SharedPreferences.getInstance();
-      prefs.setBool("enable", isNotify);
-      setState(() {
-        status = isNotify;
-      });
-
-    }
-
-  }
 }

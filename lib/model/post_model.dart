@@ -84,15 +84,28 @@ class Items {
   String id;
   String arTitle;
   String enTitle;
+  String date;
+  String price;
   String image;
+  int images;
 
-  Items({this.id, this.arTitle, this.enTitle, this.image});
+  Items(
+      {this.id,
+        this.arTitle,
+        this.enTitle,
+        this.date,
+        this.price,
+        this.image,
+        this.images});
 
   Items.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     arTitle = json['arTitle'];
     enTitle = json['enTitle'];
+    date = json['date'];
+    price = json['price'];
     image = json['image'];
+    images = json['images'];
   }
 
   Map<String, dynamic> toJson() {
@@ -100,7 +113,10 @@ class Items {
     data['id'] = this.id;
     data['arTitle'] = this.arTitle;
     data['enTitle'] = this.enTitle;
+    data['date'] = this.date;
+    data['price'] = this.price;
     data['image'] = this.image;
+    data['images'] = this.images;
     return data;
   }
 }

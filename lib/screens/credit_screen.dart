@@ -17,11 +17,12 @@ class CreditScreen extends StatefulWidget {
 }
 
 class _CreditScreenState extends State<CreditScreen> {
+  String mLanguage ="";
   Future<Model.PackageModel> package() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-
+mLanguage = languageCode;
 
     Map map ;
 
@@ -32,7 +33,7 @@ class _CreditScreenState extends State<CreditScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    Model.PackageModel packageModel = await petMartService.package(map);
+    Model.PackageModel packageModel = await petMartService.package();
     return packageModel;
   }
   ScreenUtil screenUtil = ScreenUtil();
@@ -120,7 +121,7 @@ class _CreditScreenState extends State<CreditScreen> {
                               child: CachedNetworkImage(
                                 width: 50.w,
                                 height: 50.h,
-                                imageUrl: packageModel.data[index].image,
+                                imageUrl: KImageUrl+packageModel.data.package[index].image,
                                 imageBuilder: (context, imageProvider) =>
                                     Container(
 
@@ -156,7 +157,7 @@ class _CreditScreenState extends State<CreditScreen> {
                               ),
                             )
                             ), Expanded(flex:2,child:Container(
-                              child: Text(packageModel.data[index].packageDescription,
+                              child: Text(mLanguage == "en"?packageModel.data.package[index].enDetails:packageModel.data.package[index].arDetails,
                               style: TextStyle(
                                 color: Color(0xAAAAAAAA),
                                 fontSize: screenUtil.setSp(10),
@@ -173,13 +174,13 @@ class _CreditScreenState extends State<CreditScreen> {
                         children: [
                           Column(
                             children: [
-                              Text(packageModel.data[index].packageName,
+                              Text(mLanguage == "en"?packageModel.data.package[index].enTitle:packageModel.data.package[index].arTitle,
                                 style: TextStyle(
                                     color: kMainColor,
                                     fontSize: screenUtil.setSp(10),
                                     fontWeight: FontWeight.bold
                                 ),),
-                              Text(packageModel.data[index].credit,
+                              Text(packageModel.data.package[index].points,
                                 style: TextStyle(
                                     color: kMainColor,
                                     fontSize: screenUtil.setSp(10),
@@ -189,13 +190,13 @@ class _CreditScreenState extends State<CreditScreen> {
                           ),
                           Column(
                             children: [
-                              Text('${getTranslated(context, 'valid_for')} ${packageModel.data[index].duration}',
+                              Text('${getTranslated(context, 'valid_for')} ${packageModel.data.package[index].validity}',
                                 style: TextStyle(
                                     color: kMainColor,
                                     fontSize: screenUtil.setSp(10),
                                     fontWeight: FontWeight.normal
                                 ),),
-                              Text(packageModel.data[index].price,
+                              Text(packageModel.data.package[index].price,
                                 style: TextStyle(
                                     color: kMainColor,
                                     fontSize: screenUtil.setSp(10),
@@ -214,7 +215,7 @@ class _CreditScreenState extends State<CreditScreen> {
             }, separatorBuilder: (context,index){
     return Container(height: 10.h,
     color: Color(0xFFFFFFFF),);}
-    , itemCount:packageModel.data.length),
+    , itemCount:packageModel.data.package.length),
       ),
     );
   }
@@ -233,7 +234,7 @@ class _CreditScreenState extends State<CreditScreen> {
       style: flatButtonStyle,
       onPressed: () {
         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-          return new PaymentScreen(packageModel: packageModel.data[index]);
+          return new PaymentScreen(packageModel: packageModel.data.package[index]);
 
         }));
 

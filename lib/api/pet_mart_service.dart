@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/InitModel.dart';
 import 'package:pet_mart/model/add_post_model.dart';
 import 'package:pet_mart/model/auction_details_model.dart';
 import 'package:pet_mart/model/auction_model.dart';
@@ -21,7 +22,7 @@ import 'package:pet_mart/model/hospital_details_model.dart';
 import 'package:pet_mart/model/hospital_model.dart';
 import 'package:pet_mart/model/hospital_share_model.dart';
 import 'package:pet_mart/model/hospitals_model.dart';
-import 'package:pet_mart/model/init_model.dart';
+
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/message_model.dart';
 import 'package:pet_mart/model/my_auction_details_model.dart';
@@ -52,6 +53,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../model/MyPostsModel.dart';
+
 class PetMartService{
   static String TAG_BASE_URL= "https://createkwservers.com/petmart2/request/";
 
@@ -79,33 +82,7 @@ class PetMartService{
 
 
   }
-  Future<InitModel> init()async{
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-Map map = Map();
-map['language'] = languageCode;
-    InitModel initModel;
 
-    var dio = Dio();
-    String body = json.encode(map);
-    var response =  await http.post(Uri.parse("${TAG_BASE_URL}initialization/index"),headers: {"Content-Type": "application/json"},body: body);
-
-
-
-    if (response.statusCode == 200) {
-      print(response.body);
-
-
-
-
-      initModel =InitModel.fromJson(jsonDecode(response.body));
-
-    }
-
-    return initModel;
-
-
-  }
   Future<String> resendOtp(String url)async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
@@ -278,6 +255,35 @@ map['language'] = languageCode;
     ResetModel resetModel;
     if(response.statusCode == 200){
       resetModel = ResetModel.fromJson(Map<String, dynamic>.from(response.data));
+    }
+
+
+
+    print(response.data);
+    return resetModel;
+
+
+  }
+  Future<InitModel> initModel( )async{
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+
+
+    var response = await dio.post(
+      TAG_BASE_URL + "?action=addPost&add=0",
+    );
+
+    print(response);
+    InitModel resetModel;
+    if(response.statusCode == 200){
+      resetModel = InitModel.fromJson(Map<String, dynamic>.from(response.data));
     }
 
 
@@ -464,13 +470,13 @@ map['language'] = languageCode;
 
 
 
+print(TAG_BASE_URL + "?action=item&id=${petId}");
 
-
-    var response = await dio.post(
+    var response = await dio.get(
       TAG_BASE_URL + "?action=item&id=${petId}",
     );
 
-    print(response);
+
 
     PostDetailsModel postDetailsModel;
     if(response.statusCode == 200){
@@ -643,21 +649,39 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
     return creditModel;
 
   }
-  Future<PackageModel> package(Map map)async{
-    print(map);
+  Future<PackageModel> package()async{
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
 
-    String body = json.encode(map);
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
 
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}packages/list"),headers: {"Content-Type": "application/json"},body: body);
-    print(' response ${response}');
+
+
+    print(TAG_BASE_URL + "?action=packages");
     PackageModel packageModel;
-    if(response.statusCode == 200){
-      packageModel = PackageModel.fromJson(jsonDecode(response.body));
+    try {
+      var response = await dio.get(
+        TAG_BASE_URL +
+            "?action=packages",
+      );
+
+      print(response);
+
+
+      if (response.statusCode == 200) {
+        packageModel =
+            PackageModel.fromJson(Map<String, dynamic>.from(response.data));
+      }
+    }on Exception catch (_) {
+      packageModel = null;
     }
 
-    print(packageModel.message);
-    print(response.body);
-    return packageModel;
+
+
+
+    return packageModel;;
 
   }
   Future<PaymentModel> payment(Map map)async{
@@ -718,21 +742,28 @@ ChangePasswordModel changePasswordModel;
     return changePasswordModel;
 
   }
-  Future<PostModel> myPosts(Map map)async{
-    print(map);
+  Future<dynamic> myPosts(String id)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
 
-    String body = json.encode(map);
 
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/mypost"),headers: {"Content-Type": "application/json"},body: body);
-    print(' response ${response}');
-    PostModel changePasswordModel;
-    if(response.statusCode == 200){
-      changePasswordModel = PostModel.fromJson(jsonDecode(response.body));
+print(id);
+    var response = await dio.get(
+        TAG_BASE_URL + "?action=myPosts&id=${id}",
+        );
+    print(response.data);
+    MyPostsModel postModel;
+    if (response.statusCode == 200) {
+      resp =
+          response.data;
     }
-
-
-    print(response.body);
-    return changePasswordModel;
+    return resp;
 
   }
   Future<DeleteModel> deleteModel(Map map)async{
@@ -1216,38 +1247,34 @@ ChangePasswordModel changePasswordModel;
 
 
   }
-  Future<NotificationModel> notification(Map map) async {
-    print(map);
+  Future<dynamic> notification(String id) async {
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
 
-    String body = json.encode(map);
 
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}notification/list"),headers: {"Content-Type": "application/json"},body: body);
-    print(' PostModel ${response.body}');
+
+
+
+    var response = await dio.get(
+      TAG_BASE_URL + "?action=myPosts&id=${id}",
+    );
+
+    print(response);
     NotificationModel notificationModel;
     if(response.statusCode == 200){
-      notificationModel = NotificationModel.fromJson(jsonDecode(response.body));
+      resp = response.data;
     }
 
-    print(notificationModel.message);
-    print(response.body);
-    return notificationModel;
+
+
+    return resp;
   }
-  Future<NotifyModel> notify(Map map) async {
-    print(map);
 
-    String body = json.encode(map);
-
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}customer/notify"),headers: {"Content-Type": "application/json"},body: body);
-    print(' PostModel ${response}');
-    NotifyModel notificationModel;
-    if(response.statusCode == 200){
-      notificationModel = NotifyModel.fromJson(jsonDecode(response.body));
-    }
-
-    print(notificationModel.message);
-    print(response.body);
-    return notificationModel;
-  }
   Future<RatingModel> rating(Map map) async {
     print(map);
 

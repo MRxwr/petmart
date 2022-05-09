@@ -21,8 +21,8 @@
   "add_photo": "Add Photo",
   "select_category": "Select Category",
   "select_sub_category":"Select Sub Category",
-  "post_title": "Post Title",
-  "post_description": "Post Description",
+  "post_title": "Post Title in English",
+  "post_description": "Post Description in English",
   "age_string": "Age",
   "select_gender": "Select Gender",
   "post_price": "Post Price",
@@ -175,7 +175,10 @@
   "all": "ALL",
   "no_product_available": "No Products Available",
   "no_categories": "No Categories Available",
-  "no_products": "No Products Available"
+  "no_products": "No Products Available",
+  "post_title_ar": "Post Title in Arabic",
+  "post_description_ar": "Post Description in Arabic ",
+  "no_notification_available": "No Notification Available"
 
 
 }
