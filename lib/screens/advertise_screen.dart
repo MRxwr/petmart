@@ -4,10 +4,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart'as Home;
 import 'package:pet_mart/screens/photo-screen.dart';
+import 'package:pet_mart/screens/web_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 class AdvertiseScreen extends StatefulWidget {
   Home.HomeModel homeModel;
-  AdvertiseScreen({Key key,@required this.homeModel}): super(key: key);
+  String langCode ;
+  AdvertiseScreen({Key key,@required this.homeModel, @required this.langCode}): super(key: key);
 
   @override
   _AdvertiseScreenState createState() => _AdvertiseScreenState();
@@ -72,13 +74,25 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
               ),
               color: Color(0xFFFFFFFF),
               child: GestureDetector(
-                onTap: (){
-                  Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                    return new PhotoScreen(imageProvider: NetworkImage(
-                      widget.homeModel.data.banners[index].image,
-                    ),);
-                  }));
-                },
+                  onTap: (){
+                    Home.Banners item = widget.homeModel.data.banners[index];
+                    String url = item.image.trim();
+                    String link = item.url;
+                    String title = widget.langCode == "en"? item.enTitle:item.arTitle;
+                    if(link != null||link.trim() !=""){
+                      Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(
+                          builder: (BuildContext context) =>  WebScreen(url: link, name: title)));
+                    }else{
+                      if(url.isNotEmpty) {
+                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                          return new PhotoScreen(imageProvider: NetworkImage(
+                            KImageUrl+url,
+                          ),);
+                        }));
+
+                      }
+
+                    }},
                   child: buildItem(widget.homeModel.data.banners[index],context))
           );
         },

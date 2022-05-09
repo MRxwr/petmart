@@ -216,6 +216,7 @@ contact(context, mobile);
       setState(() {
         postDetailsModel = value;
         noOfViews = value.data.items[0].views;
+        print("noOfViews ---> ${noOfViews}");
         noOfShares = value.data.items[0].shares;
       });
 
@@ -320,7 +321,7 @@ contact(context, mobile);
                                   if(url.isNotEmpty) {
                                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                       return new PhotoScreen(imageProvider: NetworkImage(
-                                          url
+                                          kImagePath+url
                                       ),);
                                     }));
                                   }
@@ -581,7 +582,7 @@ contact(context, mobile);
                       ),
                     ),
                     Text(
-                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age}  " ,
+                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age} ${mLanguage == "en"?postDetailsModel.data.items[0].ageType:postDetailsModel.data.items[0].ageTypeAr}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),

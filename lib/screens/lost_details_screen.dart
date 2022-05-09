@@ -577,7 +577,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                       ),
                     ),
                     Text(
-                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age}  " ,
+                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age} ${mLanguage == "en"?postDetailsModel.data.items[0].ageType:postDetailsModel.data.items[0].ageTypeAr} " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),

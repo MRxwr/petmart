@@ -13,6 +13,7 @@ import 'package:pet_mart/screens/advertise_screen.dart';
 import 'package:pet_mart/screens/categories_screen.dart';
 import 'package:pet_mart/screens/hospitals_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
+import 'package:pet_mart/screens/web_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/widgets/arc_widget.dart';
 import 'package:shape_of_view/shape_of_view.dart';
@@ -145,6 +146,12 @@ double height = MediaQuery.of(context).size.height;
                             GestureDetector(
                               onTap: (){
                                 String url = item.image.trim();
+                                String link = item.url;
+                                String title = languageCode == "en"? item.enTitle:item.arTitle;
+                                if(link != null||link.trim() !=""){
+                                  Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>  WebScreen(url: link, name: title)));
+                                }else{
                                 if(url.isNotEmpty) {
                                   Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                     return new PhotoScreen(imageProvider: NetworkImage(
@@ -154,7 +161,7 @@ double height = MediaQuery.of(context).size.height;
 
                                 }
 
-                              },
+                              }},
 
 
                               child:
@@ -477,7 +484,7 @@ double height = MediaQuery.of(context).size.height;
 
         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
 
-          return new AdvertiseScreen(homeModel:homeModel);
+          return new AdvertiseScreen(homeModel:homeModel,langCode: languageCode,);
         }));
       },
       child: Text(text,style: TextStyle(
