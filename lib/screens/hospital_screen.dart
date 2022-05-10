@@ -99,13 +99,13 @@ Container(
     physics: const AlwaysScrollableScrollPhysics(),
     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
         childAspectRatio:itemWidth/itemHeight),
-    itemCount: hospitalModel.data.length,
+    itemCount: hospitalModel.data.shop.length,
     itemBuilder: (context,index){
-      return GestureDetector(child: buildItem(hospitalModel.data[index],context)
+      return GestureDetector(child: buildItem(hospitalModel.data.shop[index],context)
         ,onTap: (){
-          String mHospitalName = hospitalModel.data[index].shopName;
+          String mHospitalName =mLanguage == "en"? hospitalModel.data.shop[index].enTitle:hospitalModel.data.shop[index].arTitle;
           Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
-            return new ShopProductsScreen(id:hospitalModel.data[index].shopId,name: mHospitalName);
+            return new ShopDetailsScreen(id:hospitalModel.data.shop[index].id,name: mHospitalName);
           }));
 
         },);
@@ -115,7 +115,7 @@ Container(
       ),
     );
   }
-  Container buildItem(Data hospitalModel, BuildContext context) {
+  Container buildItem(Shop hospitalModel, BuildContext context) {
     return Container(
       margin: EdgeInsets.all(5.h),
       child: Column(
@@ -124,7 +124,7 @@ Container(
           CachedNetworkImage(
             width: 150.w,
             height: 150.h,
-            imageUrl:'${hospitalModel.shopImage}',
+            imageUrl:'${KImageUrl+hospitalModel.logo}',
             imageBuilder: (context, imageProvider) =>
                 Container(
                     width: 150.w,
@@ -168,7 +168,7 @@ Container(
           Expanded(child: Container(
             alignment: AlignmentDirectional.center,
             child: Text(
-              hospitalModel.shopName,
+    mLanguage == "en"? hospitalModel.enTitle:hospitalModel.arTitle,
               style: TextStyle(
                   color: Color(0xFF000000),
                   fontSize: screenUtil.setSp(12),

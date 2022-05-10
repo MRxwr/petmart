@@ -1,82 +1,98 @@
-/// status : "success"
-/// message : "Shop data retrived."
-/// data : [{"shop_id":"1","shop_name":"Pet Zone","shop_image":"http://petmart.createkwservers.com/media/images/shop/8949flourish_pet_products-dribble.png"},{"shop_id":"2","shop_name":"Pet House","shop_image":"http://petmart.createkwservers.com/media/images/shop/17790picture13916020272337.jpg"},{"shop_id":"3","shop_name":"Wow Shop ","shop_image":"http://petmart.createkwservers.com/media/images/no-image.jpg"},{"shop_id":"4","shop_name":"Wow Shop","shop_image":"http://petmart.createkwservers.com/media/images/no-image.jpg"},{"shop_id":"5","shop_name":"Wow Shop","shop_image":"http://petmart.createkwservers.com/media/images/no-image.jpg"},{"shop_id":"6","shop_name":"jio shop ","shop_image":"http://petmart.createkwservers.com/media/images/no-image.jpg"}]
-
 class HospitalModel {
-  String _status;
-  String _message;
-  List<Data> _data;
+  bool ok;
+  String error;
+  String status;
+  Data data;
 
-  String get status => _status;
-  String get message => _message;
-  List<Data> get data => _data;
+  HospitalModel({this.ok, this.error, this.status, this.data});
 
-  HospitalModel({
-      String status, 
-      String message, 
-      List<Data> data}){
-    _status = status;
-    _message = message;
-    _data = data;
+  HospitalModel.fromJson(Map<String, dynamic> json) {
+    ok = json['ok'];
+    error = json['error'];
+    status = json['status'];
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['ok'] = this.ok;
+    data['error'] = this.error;
+    data['status'] = this.status;
+    if (this.data != null) {
+      data['data'] = this.data.toJson();
+    }
+    return data;
+  }
 }
 
-  HospitalModel.fromJson(dynamic json) {
-    _status = json["status"];
-    _message = json["message"];
-    if (json["data"] != null) {
-      _data = [];
-      json["data"].forEach((v) {
-        _data.add(Data.fromJson(v));
+class Data {
+  List<Shop> shop;
+
+  Data({this.shop});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    if (json['shop'] != null) {
+      shop = <Shop>[];
+      json['shop'].forEach((v) {
+        shop.add(new Shop.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    var map = <String, dynamic>{};
-    map["status"] = _status;
-    map["message"] = _message;
-    if (_data != null) {
-      map["data"] = _data.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    if (this.shop != null) {
+      data['shop'] = this.shop.map((v) => v.toJson()).toList();
     }
-    return map;
+    return data;
   }
-
 }
 
-/// shop_id : "1"
-/// shop_name : "Pet Zone"
-/// shop_image : "http://petmart.createkwservers.com/media/images/shop/8949flourish_pet_products-dribble.png"
+class Shop {
+  String id;
+  String arTitle;
+  String enTitle;
+  String arDetails;
+  String enDetails;
+  String shares;
+  String views;
+  String mobile;
+  String logo;
 
-class Data {
-  String _shopId;
-  String _shopName;
-  String _shopImage;
+  Shop(
+      {this.id,
+        this.arTitle,
+        this.enTitle,
+        this.arDetails,
+        this.enDetails,
+        this.shares,
+        this.views,
+        this.mobile,
+        this.logo});
 
-  String get shopId => _shopId;
-  String get shopName => _shopName;
-  String get shopImage => _shopImage;
-
-  Data({
-      String shopId, 
-      String shopName, 
-      String shopImage}){
-    _shopId = shopId;
-    _shopName = shopName;
-    _shopImage = shopImage;
-}
-
-  Data.fromJson(dynamic json) {
-    _shopId = json["shop_id"];
-    _shopName = json["shop_name"];
-    _shopImage = json["shop_image"];
+  Shop.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    arTitle = json['arTitle'];
+    enTitle = json['enTitle'];
+    arDetails = json['arDetails'];
+    enDetails = json['enDetails'];
+    shares = json['shares'];
+    views = json['views'];
+    mobile = json['mobile'];
+    logo = json['logo'];
   }
 
   Map<String, dynamic> toJson() {
-    var map = <String, dynamic>{};
-    map["shop_id"] = _shopId;
-    map["shop_name"] = _shopName;
-    map["shop_image"] = _shopImage;
-    return map;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['arTitle'] = this.arTitle;
+    data['enTitle'] = this.enTitle;
+    data['arDetails'] = this.arDetails;
+    data['enDetails'] = this.enDetails;
+    data['shares'] = this.shares;
+    data['views'] = this.views;
+    data['mobile'] = this.mobile;
+    data['logo'] = this.logo;
+    return data;
   }
-
 }

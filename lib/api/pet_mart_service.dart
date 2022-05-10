@@ -879,20 +879,25 @@ print(id);
 
   }
   Future<HospitalModel> hospitals()async{
-    print("${TAG_BASE_URL}shop/list");
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
 
 
 
-
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}shop/list"),headers: {"Content-Type": "application/json"});
-    print(' response ${response}');
+    var response = await dio.post(
+        TAG_BASE_URL + "?action=shops",
+        );
     HospitalModel hospitalModel;
-    if(response.statusCode == 200){
-      hospitalModel = HospitalModel.fromJson(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      hospitalModel = HospitalModel.fromJson(Map<String, dynamic>.from(response.data));
+      print(resp);
     }
-
-
-    print(response.body);
     return hospitalModel;
 
   }
@@ -972,21 +977,32 @@ print(id);
 
   }
   Future<ShopdetailsModel> shopDetails(String id) async {
-    print('${TAG_BASE_URL}shop/detail?shop_id=${id}');
+
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
 
 
 
 
-    final response = await http.get(Uri.parse("${TAG_BASE_URL}shop/detail?shop_id=${id}"),headers: {"Content-Type": "application/json"});
-    print(' ساتتت ${response}');
+
+    var response = await dio.post(
+      TAG_BASE_URL + "?action=shopDetails&id=${id}",
+    );
+
+    print(response.data);
     ShopdetailsModel shopdetailsModel;
     if(response.statusCode == 200){
-      shopdetailsModel = ShopdetailsModel.fromJson(jsonDecode(response.body));
+      shopdetailsModel = ShopdetailsModel.fromJson(Map<String, dynamic>.from(response.data));
     }
 
-    print(shopdetailsModel.message);
-    print(response.body);
+
+
     return shopdetailsModel;
+
   }
   Future<UserModel> updateProfile(Map map)async{
     var resp;

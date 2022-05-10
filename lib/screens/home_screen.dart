@@ -343,7 +343,7 @@ double height = MediaQuery.of(context).size.height;
                             textDirection:  Directionality.of(context),
                             bottom: 0,
                             child: Container(
-                              color: Color(0x44AAAAAA),
+                              color: Color(0x88AAAAAA),
                               height: 30.h,
                               width: width,
                               child: Row(
@@ -378,84 +378,100 @@ double height = MediaQuery.of(context).size.height;
                 color: Color(0xFFFFFFFF),);
             }, itemCount: homeModel.data.categories.length),
             SizedBox(height: 10.h,),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //   children: [
-            //     GestureDetector(
-            //       onTap: (){
-            //         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-            //           return new HospitalsScreen();
-            //         }));
-            //       },
-            //       child: Container(
-            //         height: 120.h,
-            //         width: width-24.w,
-            //         decoration: BoxDecoration(
-            //           color: kMainColor,
-            //           borderRadius:BorderRadius.all(Radius.circular(10.w))
-            //         ),
-            //         child: Column(
-            //           children: [
-            //             Expanded(flex: 4,
-            //                 child:Center(
-            //                   child: Image.asset('assets/images/hospital_icon.png',width: 90.w,
-            //                   height: 90.w,
-            //                ),
-            //                 )
-            //             ),
-            //             Expanded(child:   Text(
-            //               getTranslated(context, 'hospital'),
-            //               textAlign: TextAlign.center,
-            //               style: TextStyle(
-            //                   color: Color(0xFFFFFFFF),
-            //                   fontSize: screenUtil.setSp(16),
-            //                   fontWeight: FontWeight.bold
-            //               ),
-            //             ),flex: 1,)
-            //           ],
-            //         ),
-            //       ),
-            //     ),
-            //     // GestureDetector(
-            //     //   onTap: (){
-            //     //     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-            //     //       return new HospitalScreen();
-            //     //     }));
-            //     //   },
-            //     //   child: Container(
-            //     //     height: 120.h,
-            //     //     width: 120.w,
-            //     //     decoration: BoxDecoration(
-            //     //         color: kMainColor,
-            //     //         borderRadius:BorderRadius.all(Radius.circular(10.w))
-            //     //     ),
-            //     //     child: Column(
-            //     //       children: [
-            //     //         Expanded(flex: 4,
-            //     //             child: Center(
-            //     //               child: Image.asset('assets/images/shop_icon.png',width: 90.w,
-            //     //                 height: 90.w,
-            //     //               ),
-            //     //             )
-            //     //         ),
-            //     //         Expanded(child:   Text(
-            //     //
-            //     //           getTranslated(context, 'shop'),
-            //     //           textAlign: TextAlign.center,
-            //     //           style: TextStyle(
-            //     //               color: Color(0xFFFFFFFF),
-            //     //               fontSize: screenUtil.setSp(16),
-            //     //               fontWeight: FontWeight.bold
-            //     //           ),
-            //     //         ),flex: 1,)
-            //     //       ],
-            //     //     ),
-            //     //   ),
-            //     // ),
-            //
-            //
-            //   ],
-            // )
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                      return new HospitalScreen();
+                    }));
+                  },
+                  child: Container(
+                    height: 120.h,
+                    width: width-24.w,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFFFFFFF),
+                      borderRadius:BorderRadius.all(Radius.circular(10.w))
+                    ),
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Image.asset('assets/images/hospital_icon.png',width: 90.w,
+                          height: 90.w,
+                            fit: BoxFit.fill,
+                           ),
+                        ),
+
+                        Positioned.directional(
+                          textDirection:  Directionality.of(context),
+                          bottom: 0,
+                          child: Container(
+                            color: Color(0x88AAAAAA),
+                            height: 30.h,
+                            width: width,
+                            child: Row(
+                              children: [
+
+                                Padding(
+                                  padding:  EdgeInsetsDirectional.only(start: 10.h),
+                                  child: Text( getTranslated(context, 'hospital'),
+                                    style: TextStyle(
+                                        color: Color(0xFFFFFFFF),
+                                        fontSize: screenUtil.setSp(16),
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                // GestureDetector(
+                //   onTap: (){
+                //     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                //       return new HospitalScreen();
+                //     }));
+                //   },
+                //   child: Container(
+                //     height: 120.h,
+                //     width: 120.w,
+                //     decoration: BoxDecoration(
+                //         color: kMainColor,
+                //         borderRadius:BorderRadius.all(Radius.circular(10.w))
+                //     ),
+                //     child: Column(
+                //       children: [
+                //         Expanded(flex: 4,
+                //             child: Center(
+                //               child: Image.asset('assets/images/shop_icon.png',width: 90.w,
+                //                 height: 90.w,
+                //               ),
+                //             )
+                //         ),
+                //         Expanded(child:   Text(
+                //
+                //           getTranslated(context, 'shop'),
+                //           textAlign: TextAlign.center,
+                //           style: TextStyle(
+                //               color: Color(0xFFFFFFFF),
+                //               fontSize: screenUtil.setSp(16),
+                //               fontWeight: FontWeight.bold
+                //           ),
+                //         ),flex: 1,)
+                //       ],
+                //     ),
+                //   ),
+                // ),
+
+
+              ],
+            )
 
 
 

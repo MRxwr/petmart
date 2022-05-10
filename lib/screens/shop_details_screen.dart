@@ -1,11 +1,25 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/shopdetails_model.dart';
+import 'package:pet_mart/screens/pets_details_screen.dart';
+import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
+import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../model/share_model.dart';
+import '../providers/model_hud.dart';
+import 'login_screen.dart';
 class ShopDetailsScreen extends StatefulWidget {
   String id;
   String name;
@@ -16,133 +30,883 @@ class ShopDetailsScreen extends StatefulWidget {
 }
 
 class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
-  String mLanguage="";
   ScreenUtil screenUtil = ScreenUtil();
-  ShopdetailsModel shopdetailsModel;
-  Future<ShopdetailsModel> getShopDetails()async{
+  var imageProvider = null;
+  double itemWidth;
+  double itemHeight;
+  String noOfViews ="";
+  String noOfShares = "";
+  String mLanguage ="";
+  TextButton previewButton(String text,BuildContext context,String mobile){
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      primary: Color(0xFFFFC300),
+      minimumSize: Size(88.w, 35.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+      shape:  RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+      ),
+      backgroundColor: Color(0xFFFFC300),
+    );
+
+    return TextButton(
+      style: flatButtonStyle,
+      onPressed: () {
+
+        contact(context, mobile);
+
+      },
+      child: Text(text,style: TextStyle(
+          color: Color(0xFF000000),
+          fontSize: screenUtil.setSp(14),
+          fontWeight: FontWeight.w500
+      ),),
+    );
+  }
+  ShopdetailsModel postDetailsModel;
+  TextButton callButton(String text,BuildContext context,String phone) {
+    print('phone ---> ${phone}');
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      primary: Color(0xFFFFC300),
+      minimumSize: Size(88.w, 35.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+      shape:  RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+      ),
+      backgroundColor: Color(0xFFFFC300),
+    );
+
+    return TextButton(
+      style: flatButtonStyle,
+      onPressed: ()async {
+        if (await canLaunch('tel://+${phone}')) {
+          await launch('tel://${phone}');
+        } else {
+          print(' could not launch ');
+        }
+
+
+        Navigator.pop(context);
+
+      },
+      child: Text(text,style: TextStyle(
+          color: Color(0xFF000000),
+          fontSize: screenUtil.setSp(14),
+          fontWeight: FontWeight.w500
+      ),),
+    );
+  }
+
+  final CarouselController _controller = CarouselController();
+  Future<ShopdetailsModel> pets() async{
+
+
+
+    PetMartService petMartService = PetMartService();
+    ShopdetailsModel petsModel = await petMartService.shopDetails(widget.id);
+
+    ShareModel petsModels = await petMartService.sharePet("view","item",widget.id);
+
+    return petsModel;
+  }
+  Future<void> SharePets() async{
+    final modelHud = Provider.of<ModelHud>(context,listen: false);
+    modelHud.changeIsLoading(true);
+
+    List<String> imagePaths = [];
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    mLanguage = languageCode;
+    String loginData = _preferences.getString(kUserModel);
+    Map map;
+
+
+
     PetMartService petMartService = PetMartService();
-    print(widget.id);
-    Map map = {
-      "shop_id":widget.id
-    };
-    ShopdetailsModel shopdetailsModel =await petMartService.shopDetails(widget.id);
-    return shopdetailsModel;
+    ShareModel petsModel = await petMartService.sharePet("share","shop",widget.id);
+    modelHud.changeIsLoading(false);
+    String title="";
+    title = languageCode == "en"?postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle;
+    String description="";
+    description = languageCode== "en"?postDetailsModel.data.items[0].enDetails:postDetailsModel.data.items[0].arDetails;
+    //
+    if(Platform.isIOS){
+      Share.share('${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
+
+    }else{
+      Share.share('${title}' '\n ${description}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
+
+    }
+    setState(() {
+      noOfShares = "${int.parse(noOfShares)+1}";
+
+    });
+
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getShopDetails().then((value) {
+    pets().then((value) {
       setState(() {
-        shopdetailsModel = value;
+        postDetailsModel = value;
+        noOfViews = value.data.items[0].views;
+        noOfViews = "${int.parse(noOfViews)+1}";
+        noOfShares = value.data.items[0].shares;
       });
+
     });
   }
+  int _current =0;
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    return Scaffold(
-appBar:     AppBar(
-  backgroundColor: kMainColor,
-  title: Container(
-    alignment: AlignmentDirectional.center,
-    child: Padding(
-      padding:  EdgeInsets.symmetric(horizontal: 10.h),
-      child: Text(
-        '${widget.name}',
-        style: TextStyle(
-            color: Color(0xFFFFFFFF),
-            fontSize: screenUtil.setSp(16),
-            fontWeight: FontWeight.bold
 
+    double width = MediaQuery.of(context).size.width;
+    itemWidth = width / 2;
+    itemHeight = 200.h;
+    double height = MediaQuery.of(context).size.height;
+
+    return ModalProgressHUD(
+      inAsyncCall: Provider.of<ModelHud>(context).isLoading,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: kMainColor,
+          title: Container(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding:  EdgeInsets.symmetric(horizontal: 10.h),
+              child: Text(
+                widget.name,
+                style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: screenUtil.setSp(16),
+                    fontWeight: FontWeight.bold
+
+                ),
+
+
+              ),
+            ),
+          ),
+          leading: GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+
+            },
+            child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+          ),
+
+
+          actions: [
+            SizedBox(width: 30.h,)
+
+          ],
         ),
 
-
-      ),
-    ),
-  ),
-  leading: GestureDetector(
-    onTap: (){
-      Navigator.pop(context);
-
-    },
-    child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
-  ),
-
-  actions: [
-    SizedBox(width: 30.h,)
-
-  ],
-
-),
-      backgroundColor: Color(0xFFFFFFFF),
-      body: Container(
-        margin: EdgeInsets.all(10.h),
-        child:shopdetailsModel == null?
-        Container(
-          child: CircularProgressIndicator(
+        body: Container(
+          child: postDetailsModel == null?Container(
+            child: CircularProgressIndicator(
 
 
-          ),
-          alignment: AlignmentDirectional.center,
-        ):  CachedNetworkImage(
-          width: screenUtil.screenWidth,
-          height: height,
+            ),
+            alignment: AlignmentDirectional.center,
+          ):
+          ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              Container(
+                height: 250.h,
+                width: width,
+                child:
+                GestureDetector(
+                  onTap: (){
+                    String url = postDetailsModel.data.shop[0].logo.trim();
+                    if(url.isNotEmpty) {
+                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                        return new PhotoScreen(imageProvider: NetworkImage(
+                            KImageUrl+url
+                        ),);
+                      }));
+                    }
 
-          fit: BoxFit.fill,
-          imageUrl:shopdetailsModel.data[0].shopImage,
-          imageBuilder: (context, imageProvider) {
-
-            return Container(
-                width: screenUtil.screenWidth,
-                height: height,
+                  },
 
 
-                decoration: BoxDecoration(
+                  child:
+                  Container(
+                    width: width,
 
-
-                  image: DecorationImage(
-
+                    child:
+                    CachedNetworkImage(
+                      width: width,
 
                       fit: BoxFit.fill,
-                      image: imageProvider),
-                )
-            );
-          }
-          ,
-          placeholder: (context, url) =>
-              Column(
-                children: [
-                  Expanded(
-                    flex: 9,
-                    child: Container(
-                      width: screenUtil.screenWidth,
-                      height: screenUtil.scaleHeight,
+                      imageUrl:'${KImageUrl+postDetailsModel.data.shop[0].logo.trim()}',
+                      imageBuilder: (context, imageProvider) {
+
+                        return Card(
+                          elevation: 1.h,
+                          child: Container(
+                              width: width,
 
 
-                      alignment: FractionalOffset.center,
-                      child: SizedBox(
-                          height: 100.h,
-                          width: 100.h,
-                          child: new CircularProgressIndicator()),
+                              decoration: BoxDecoration(
+
+
+                                image: DecorationImage(
+
+
+                                    fit: BoxFit.fill,
+                                    image: imageProvider),
+                              )
+                          ),
+                        );
+                      }
+                      ,
+                      placeholder: (context, url) =>
+                          Column(
+                            children: [
+                              Expanded(
+                                flex: 9,
+                                child: Container(
+                                  height: height,
+                                  width: width,
+
+
+                                  alignment: FractionalOffset.center,
+                                  child: SizedBox(
+                                      height: 50.h,
+                                      width: 50.h,
+                                      child: new CircularProgressIndicator()),
+                                ),
+                              ),
+                            ],
+                          ),
+
+
+                      errorWidget: (context, url, error) => ClipRRect(
+                          child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,
+                            colorBlendMode: BlendMode.difference,)),
+
                     ),
+                    // Image.network(
+                    //
+                    //
+                    // '${kBaseUrl}${mAdsPhoto}${item.photo}'  , fit: BoxFit.fitWidth,
+                    //   height: 600.h,),
                   ),
-                ],
+                ),
+              ),
+              SizedBox(height: 1.h,
+                width: width,
+                child: Container(
+                  color: Color(0x88000000),
+                ),),
+              Container(
+                margin: EdgeInsets.all(10.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      mLanguage =="en"?
+                      postDetailsModel.data.shop[0].enTitle:postDetailsModel.data.shop[0].arTitle,
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(14),
+                          fontWeight: FontWeight.normal
+
+                      ),
+                    ),
+                    Text(
+                      '',
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(14),
+                          fontWeight: FontWeight.normal
+
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+
+                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].mobile)
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 1.h,
+                width: width,
+                child: Container(
+                  color: Color(0x88000000),
+                ),),
+              Container(
+                margin: EdgeInsets.all(10.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+
+                      children: [
+
+                        Image.asset('assets/images/img_view.png',
+                          height: 30.w,width: 30.w,fit: BoxFit.fill,
+                        )
+
+                        ,
+                        Text(
+                          "${noOfViews} ${getTranslated(context, 'views')}" ,
+                          style: TextStyle(
+                              color: Color(0xFF000000),
+                              fontSize: screenUtil.setSp(14),
+                              fontWeight: FontWeight.normal
+
+                          ),
+                        ),
+                      ],
+
+                    ),
+                    GestureDetector(
+                      onTap: (){
+                        share(context);
+                      },
+                      child: Column(
+
+                        children: [
+                          Image.asset('assets/images/img_share.png',
+                            height: 30.h,width: 30.w,
+                          )
+                          ,
+                          Text(
+                            "${noOfShares} ${getTranslated(context, 'shared')}" ,
+                            style: TextStyle(
+                                color: Color(0xFF000000),
+                                fontSize: screenUtil.setSp(14),
+                                fontWeight: FontWeight.normal
+
+                            ),
+                          ),
+                        ],
+
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: ()async{
+
+                        _openUrl(url(postDetailsModel.data.items[0].mobile, ""));
+
+                      },
+                      child: Column(
+
+                        children: [
+                          Image.asset('assets/images/whatsapp.png',
+                            height: 30.h,width: 30.w,color: Color(0xAA1E1F20),
+                          )
+                          ,
+                          Text(
+                            "${getTranslated(context, "send_messages")}" ,
+                            style: TextStyle(
+                                color: Color(0xFF000000),
+                                fontSize: screenUtil.setSp(14),
+                                fontWeight: FontWeight.normal
+
+                            ),
+                          ),
+                        ],
+
+                      ),
+                    ),
+
+                  ],
+                ),
               ),
 
+              SizedBox(height: 1.h,
+                width: width,
+                child: Container(
+                  color: Color(0x88000000),
+                ),),
+              Container(
+                margin: EdgeInsets.all(10.w),
+                child:  Text(
+                  mLanguage == "en"?
+                  "${postDetailsModel.data.shop[0].enDetails}  ":"${postDetailsModel.data.shop[0].arDetails}  " ,
+                  style: TextStyle(
+                      color: Color(0xFF000000),
+                      fontSize: screenUtil.setSp(14),
+                      fontWeight: FontWeight.normal
 
-          errorWidget: (context, url, error) => ClipRRect(
-              child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,
-                colorBlendMode: BlendMode.difference,)),
+                  ),
+                ),
+              ),
+              SizedBox(height: 1.h,
+                width: width,
+                child: Container(
+                  color: Color(0x88000000),
+                ),),
+              Container(
+                margin: EdgeInsets.all(10.w),
+                child:  Text(
+                  getTranslated(context, 'products') ,
+                  style: TextStyle(
+                      color: Color(0xFF000000),
+                      fontSize: screenUtil.setSp(14),
+                      fontWeight: FontWeight.normal
 
+                  ),
+                ),
+              ),
+              SizedBox(height: 1.h,
+                width: width,
+                child: Container(
+                  color: Color(0x88000000),
+                ),),
+              Container(
+
+                child:  GridView.builder(scrollDirection: Axis.vertical,
+                  padding: EdgeInsets.zero,
+
+
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+                      childAspectRatio:itemWidth/itemHeight),
+                  itemCount: postDetailsModel.data.items.length,
+
+                  itemBuilder: (context,index){
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                          return new PetsDetailsScreen(postId:postDetailsModel.data.items[index].id,postName: mLanguage == "en"?postDetailsModel.data.items[index].enTitle:postDetailsModel.data.items[index].arTitle);
+                        }));
+                        // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                        //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
+                        // }));
+                      },
+                      child: Container(
+                          margin: EdgeInsets.all(6.w),
+
+                          child:
+                          Card(
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              elevation: 1.w,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0.h),
+                              ),
+                              color: Color(0xFFFFFFFF),
+                              child: buildItem(postDetailsModel.data.items[index],context))),
+                    );
+                  },
+                ),
+
+              )
+            ],
+          ),
         ),
-
-
       ),
     );
+
+  }
+  Widget buildItem(Items data, BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Stack(
+              children: [
+                CachedNetworkImage(
+                  width: itemWidth,
+                  imageUrl:KImageUrl+data.image[0],
+                  imageBuilder: (context, imageProvider) => Stack(
+                    children: [
+                      ClipRRect(
+
+                        child: Container(
+                            width: itemWidth,
+
+                            decoration: BoxDecoration(
+
+                              shape: BoxShape.rectangle,
+
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+
+                                  image: imageProvider),
+                            )
+                        ),
+                      ),
+                    ],
+                  ),
+                  placeholder: (context, url) =>
+                      Center(
+                        child: SizedBox(
+                            height: 50.h,
+                            width: 50.h,
+                            child: new CircularProgressIndicator()),
+                      ),
+
+
+                  errorWidget: (context, url, error) => ClipRRect(
+                      child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
+                        colorBlendMode: BlendMode.difference,)),
+
+                ),
+
+              ],
+            ),
+          ),
+          Expanded(flex:1,child: Container(
+            child: Column(
+              children: [
+                Expanded(flex:1,child:
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5.w),
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    mLanguage == "en"?
+                    data.enTitle:data.arTitle,
+                    style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontWeight: FontWeight.normal,
+                        fontSize: screenUtil.setSp(12)
+                    ),
+
+                  ),
+                )),
+                Expanded(flex:1,child:
+                Row(
+                  children: [
+
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child:
+                      Text(
+                        '${data.price}',
+                        style: TextStyle(
+                            color: kMainColor,
+                            fontWeight: FontWeight.normal,
+                            fontSize: screenUtil.setSp(14)
+                        ),
+
+                      ),
+                    ),
+                  ],
+                ))
+              ],
+            ),
+          ))
+
+        ],
+      ),
+    );
+
+  }
+  void showDialog(String mobile) {
+    showGeneralDialog(
+      barrierLabel: "Barrier",
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionDuration: Duration(milliseconds: 500),
+      context: context,
+      pageBuilder: (_, __, ___) {
+        return Material(
+          type: MaterialType.transparency,
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 180.h,
+              child: Container(
+                margin: EdgeInsets.all(20.w),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: AlignmentDirectional.topStart,
+                      child: Text(
+                        getTranslated(context, 'contact_for_sell'),
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontWeight: FontWeight.bold,
+                            fontSize: screenUtil.setSp(16)
+                        ),
+
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CachedNetworkImage(
+                          width: 80.w,
+                          height: 80.h,
+                          imageUrl:KImageUrl+postDetailsModel.data.shop[0].logo,
+                          imageBuilder: (context, imageProvider) => Stack(
+                            children: [
+                              ClipRRect(
+
+                                child: Container(
+
+
+                                    decoration: BoxDecoration(
+
+                                      shape: BoxShape.rectangle,
+
+                                      image: DecorationImage(
+                                          fit: BoxFit.fill,
+
+                                          image: imageProvider),
+                                    )
+                                ),
+                              ),
+                            ],
+                          ),
+                          placeholder: (context, url) =>
+                              Center(
+                                child: SizedBox(
+                                    height: 20.h,
+                                    width: 20.h,
+                                    child: new CircularProgressIndicator()),
+                              ),
+
+
+                          errorWidget: (context, url, error) => ClipRRect(
+                              child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
+                                colorBlendMode: BlendMode.difference,)),
+
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+
+
+                            Align(
+                              alignment: AlignmentDirectional.topStart,
+                              child: Text(
+                                mobile,
+                                textAlign: TextAlign.start,
+                                style: TextStyle(
+                                    color: Color(0xFF000000),
+                                    fontWeight: FontWeight.normal,
+                                    fontSize: screenUtil.setSp(12)
+                                ),
+
+                              ),
+                            ),
+                          ],
+                        ),
+                        callButton(getTranslated(context, 'call_now'), context, mobile.replaceAll('+', ''))
+                      ],
+                    )
+                  ],
+                ),
+              ),
+
+              margin: EdgeInsets.only(bottom: 20.h, left: 12.w, right: 12.w),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.h),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (_, anim, __, child) {
+        return SlideTransition(
+          position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+          child: child,
+        );
+      },
+    );
+  }
+  contact(BuildContext context,String phone) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      showDialog(phone);
+
+    }else{
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+    }
+
+  }
+  share(BuildContext context) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+    if(isLoggedIn){
+      ShareDialog(context);
+
+    }else{
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+    }
+
+
+
+  }
+  // message(BuildContext context) async {
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+  //   if(isLoggedIn){
+  //     SharedPreferences _preferences = await SharedPreferences.getInstance();
+  //     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+  //     String loginData = _preferences.getString(kUserModel);
+  //     Map map;
+  //
+  //     final body = json.decode(loginData);
+  //     LoginModel   loginModel = LoginModel.fromJson(body);
+  //     // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+  //     //   return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
+  //     //     contactImage:postDetailsModel.data.contactDetail.profileImage ,
+  //     //     contactId:postDetailsModel.data.contactDetail.customerId,
+  //     //     postId: postDetailsModel.data.postId,
+  //     //     userId: loginModel.data.customerId,);
+  //     // }));
+  //
+  //   }else{
+  //     ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+  //   }
+  //
+  // }
+  Future<void> ShareDialog(BuildContext context ) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: getTranslated(context, 'share_message'),
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            Navigator.pop(context);
+            SharePets();
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            Navigator.pop(context);
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+      ],
+    );
+    alert.show();
+
+  }
+
+  Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'reg_now'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+            Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+              return new LoginScreen();
+            }));
+            // Navigator.pushReplacementNamed(context,LoginScreen.id);
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+
+      ],
+    );
+    alert.show();
+
+  }
+  String url(String phone,String message) {
+
+    if (Platform.isAndroid) {
+      phone = "+965$phone";
+      // add the [https]
+      // print("https://api.whatsapp.com/send?phone=+965$phone&text=${Uri.parse(message)}");
+      return "https://wa.me/$phone/?text=${Uri.parse(message)}";
+      return "https://wa.me/$phone/?text=+965${Uri.parse(message)}"; // new line
+    } else {
+      // add the [https]
+      return "https://api.whatsapp.com/send?phone=+965$phone=${Uri.parse(message)}"; // new line
+    }
+  }
+  Future<void> _openUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
