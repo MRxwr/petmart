@@ -32,6 +32,7 @@ class HospitalDetailsScreen extends StatefulWidget {
 
 class _HospitalDetailsScreenState extends State<HospitalDetailsScreen> {
 String mLanguage;
+
 HospitalDetailsModel hospitalDetailsModel;
 final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
   ScreenUtil screenUtil = ScreenUtil();

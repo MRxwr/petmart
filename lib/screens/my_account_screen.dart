@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info/device_info.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -189,7 +190,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     user().then((value){
       setState(() {
         userModel = value;
-        imageUrl = "";
+        imageUrl = KImageUrl+value.data.logo;
       });
     });
 
@@ -331,7 +332,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                   )
                               :CachedNetworkImage(
                                 width: width,
-                                imageUrl:imageUrl,
+                                imageUrl:KImageUrl+imageUrl,
                                 imageBuilder: (context, imageProvider) => Stack(
                                   children: [
                                     ClipRRect(
@@ -425,7 +426,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                     CachedNetworkImage(
                                       width: 100.w,
                                       height: 100.h,
-                                      imageUrl:imageUrl,
+                                      imageUrl:KImageUrl+imageUrl,
                                       imageBuilder: (context, imageProvider) =>
                                           Container(
                                               width: 100.w,
@@ -580,14 +581,25 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           var data = await deviceInfoPlugin.iosInfo;
           uniqueId = data.identifierForVendor;
         }
-        Map<String, String> map = Map();
+        Map<String, dynamic> map = Map();
         map['id']=userId;
         map['name']= firstName+" "+lastName;
         map['email']=email;
         map['mobile']=phone;
 
+          String imagePath = File(path).absolute.path;
 
-        UserModel userModel  =await petMartService.updateProfile(map);
+
+          String childFileName = imagePath
+              .split('/')
+              .last;
+          print ('childFileName ${childFileName}');
+          map['image']=  await MultipartFile.fromFile(imagePath, filename: childFileName);
+
+
+
+
+        UserModel userModel  =await petMartService.updateProfile(userId,firstName+" "+lastName,email,phone,path);
         bool  status = userModel.ok;
         modelHud.changeIsLoading(false);
         if(status ){
@@ -628,7 +640,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             var data = await deviceInfoPlugin.iosInfo;
             uniqueId = data.identifierForVendor;
           }
-          UserModel userModel =await petMartService.updateProfile(map);
+          UserModel userModel  =await petMartService.updateProfile(userId,firstName+" "+lastName,email,phone,path);
           modelHud.changeIsLoading(false);
           bool status = userModel.ok;
           if(status){

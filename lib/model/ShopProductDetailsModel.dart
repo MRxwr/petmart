@@ -1,12 +1,12 @@
-class SearchModel {
+class ShopProductDetailsModel {
   bool ok;
   String error;
   String status;
   Data data;
 
-  SearchModel({this.ok, this.error, this.status, this.data});
+  ShopProductDetailsModel({this.ok, this.error, this.status, this.data});
 
-  SearchModel.fromJson(Map<String, dynamic> json) {
+  ShopProductDetailsModel.fromJson(Map<String, dynamic> json) {
     ok = json['ok'];
     error = json['error'];
     status = json['status'];
@@ -52,28 +52,40 @@ class Items {
   String id;
   String arTitle;
   String enTitle;
+  String arDetails;
+  String enDetails;
   String price;
-  String date;
-  String image;
-  int images;
+  String video;
+  String shares;
+  String views;
+  dynamic mobile;
+  List<String> image;
 
   Items(
       {this.id,
         this.arTitle,
         this.enTitle,
+        this.arDetails,
+        this.enDetails,
         this.price,
-        this.date,
-        this.image,
-        this.images});
+        this.video,
+        this.shares,
+        this.views,
+        this.mobile,
+        this.image});
 
   Items.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     arTitle = json['arTitle'];
     enTitle = json['enTitle'];
+    arDetails = json['arDetails'];
+    enDetails = json['enDetails'];
     price = json['price'];
-    date = json['date'];
-    image = json['image'];
-    images = json['images'];
+    video = json['video'];
+    shares = json['shares'];
+    views = json['views'];
+    mobile = json['mobile'];
+    image = json['image'].cast<String>();
   }
 
   Map<String, dynamic> toJson() {
@@ -81,10 +93,14 @@ class Items {
     data['id'] = this.id;
     data['arTitle'] = this.arTitle;
     data['enTitle'] = this.enTitle;
+    data['arDetails'] = this.arDetails;
+    data['enDetails'] = this.enDetails;
     data['price'] = this.price;
-    data['date'] = this.date;
+    data['video'] = this.video;
+    data['shares'] = this.shares;
+    data['views'] = this.views;
+    data['mobile'] = this.mobile;
     data['image'] = this.image;
-    data['images'] = this.images;
     return data;
   }
 }

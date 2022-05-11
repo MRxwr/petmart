@@ -131,7 +131,7 @@ class _HospitalsScreenState extends State<HospitalsScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:kImagePath+data.logo,
+                  imageUrl:KImageUrl+data.logo,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(

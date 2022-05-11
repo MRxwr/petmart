@@ -309,7 +309,7 @@ class _LostScreenState extends State<LostScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:kImagePath+data.image,
+                  imageUrl:KImageUrl+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(

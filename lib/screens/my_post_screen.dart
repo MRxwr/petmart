@@ -102,7 +102,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    Map<String, dynamic>   response  = await petMartService.myPosts(userId);
+    Map<String, dynamic>   response  = await petMartService.myPosts("1");
     return response;
   }
   Future<void> postList(String type) async{
@@ -377,7 +377,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:kImagePath+data.image,
+                  imageUrl:KImageUrl+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(

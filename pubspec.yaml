@@ -42,7 +42,7 @@ dependencies:
   flutter_switch: ^0.3.2
   flutter_screenutil: ^5.0.0+2
   device_info: ^2.0.3
-  cached_network_image: ^3.1.0+1
+  cached_network_image: ^3.2.0
   persistent_bottom_nav_bar: ^4.0.2
   easy_dialog: ^1.1.0
   container_tab_indicator: ^0.3.0

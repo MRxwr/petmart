@@ -397,8 +397,8 @@ double height = MediaQuery.of(context).size.height;
                     child: Stack(
                       children: [
                         Center(
-                          child: Image.asset('assets/images/hospital_icon.png',width: 90.w,
-                          height: 90.w,
+                          child: Image.asset('assets/images/shop_icon.png',width: 120.w,
+                          height: 120.w,
                             fit: BoxFit.fill,
                            ),
                         ),
@@ -415,7 +415,7 @@ double height = MediaQuery.of(context).size.height;
 
                                 Padding(
                                   padding:  EdgeInsetsDirectional.only(start: 10.h),
-                                  child: Text( getTranslated(context, 'hospital'),
+                                  child: Text( getTranslated(context, 'shop'),
                                     style: TextStyle(
                                         color: Color(0xFFFFFFFF),
                                         fontSize: screenUtil.setSp(16),

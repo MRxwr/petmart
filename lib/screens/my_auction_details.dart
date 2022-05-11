@@ -222,7 +222,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                                     builder: (BuildContext context) {
                                                       return new PhotoScreen(
                                                         imageProvider: NetworkImage(
-                                                            url
+                                                            KImageUrl+url
                                                         ),);
                                                     }));
                                               }
@@ -253,7 +253,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                                   width: width,
 
                                                   fit: BoxFit.fill,
-                                                  imageUrl:'${item.image}',
+                                                  imageUrl:'${KImageUrl+item.image}',
                                                   imageBuilder: (context, imageProvider) => Card(
                                                     elevation: 1.h,
                                                     child: Container(

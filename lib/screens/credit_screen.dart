@@ -232,13 +232,13 @@ mLanguage = languageCode;
 
     return TextButton(
       style: flatButtonStyle,
-      onPressed: () {
-        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-          return new PaymentScreen(packageModel: packageModel.data.package[index]);
-
-        }));
-
-      },
+      // onPressed: () {
+      //   Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      //     return new PaymentScreen(packageModel: packageModel.data.package[index]);
+      //
+      //   }));
+      //
+      // },
       child: Text(text,style: TextStyle(
           color: Color(0xFF000000),
           fontSize: screenUtil.setSp(10),

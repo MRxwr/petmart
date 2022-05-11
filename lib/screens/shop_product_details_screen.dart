@@ -1,47 +1,41 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:http/http.dart' as http;
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:http/http.dart';
-
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-
-import 'package:pet_mart/api/pet_mart_service.dart';
-import 'package:pet_mart/localization/localization_methods.dart';
-import 'package:pet_mart/model/delete_model.dart';
-import 'package:pet_mart/model/login_model.dart';
-import 'package:pet_mart/model/pets_model.dart' as Model;
-import 'package:pet_mart/model/post_details_model.dart';
-import 'package:pet_mart/model/share_model.dart';
-import 'package:pet_mart/model/view_model.dart';
-import 'package:pet_mart/providers/model_hud.dart';
-import 'package:pet_mart/screens/edit_post_screen.dart';
-import 'package:pet_mart/screens/message_screen.dart';
+import 'package:pet_mart/model/ShopProductDetailsModel.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
-import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../api/pet_mart_service.dart';
+import '../localization/localization_methods.dart';
+import '../model/login_model.dart';
+import '../model/share_model.dart';
+import '../providers/model_hud.dart';
+import '../utilities/constants.dart';
 import 'login_screen.dart';
-import 'main_sceen.dart';
-class PostDetailsScreen extends StatefulWidget {
-  static String id = 'PetsDetailsScreen';
+class ShopProductDetailsScreen extends StatefulWidget {
   String  postId;
   String postName;
 
-  PostDetailsScreen({Key key,@required this.postId,@required this.postName}) : super(key: key);
+  ShopProductDetailsScreen({Key key,@required this.postId,@required this.postName}) : super(key: key);
+
+
+
+
   @override
-  _PostDetailsScreenState createState() => _PostDetailsScreenState();
+  State<ShopProductDetailsScreen> createState() => _ShopProductDetailsScreenState();
 }
 
-class _PostDetailsScreenState extends State<PostDetailsScreen> {
+class _ShopProductDetailsScreenState extends State<ShopProductDetailsScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   var imageProvider = null;
   double itemWidth;
@@ -49,7 +43,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
   String noOfViews ="";
   String noOfShares = "";
   String mLanguage ="";
-  TextButton previewButton(String text,BuildContext context,Customer customer){
+  TextButton previewButton(String text,BuildContext context,String customer){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -74,9 +68,9 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       ),),
     );
   }
-  PostDetailsModel postDetailsModel;
+  ShopProductDetailsModel postDetailsModel;
   TextButton callButton(String text,BuildContext context,String phone) {
-
+    print('phone ---> ${phone}');
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -109,7 +103,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
   }
 
   final CarouselController _controller = CarouselController();
-  Future<PostDetailsModel> pets() async{
+  Future<ShopProductDetailsModel> pets() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
@@ -136,7 +130,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    PostDetailsModel petsModel = await petMartService.petDetails(widget.postId);
+    ShopProductDetailsModel petsModel = await petMartService.shopDetailsProduct(widget.postId);
 
     return petsModel;
   }
@@ -200,10 +194,17 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
       PetMartService petMartService = PetMartService();
       ShareModel petsModel = await petMartService.sharePet("view","item",widget.postId);
+      print('NoOfViews--->${noOfViews}');
       setState(() {
-        noOfViews = "${int.parse(noOfViews)+1}";
+        if(noOfViews == null || noOfViews.trim() == ""){
+          noOfViews = "1";
+        }else{
+          noOfViews ="${int.parse(noOfViews)+1}";
+        }
+
 
       });
+
     }
 
   }
@@ -215,6 +216,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       setState(() {
         postDetailsModel = value;
         noOfViews = value.data.items[0].views;
+
+        print("noOfViews ---> ${noOfViews}");
         noOfShares = value.data.items[0].shares;
       });
 
@@ -319,7 +322,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                                   if(url.isNotEmpty) {
                                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                       return new PhotoScreen(imageProvider: NetworkImage(
-                                         KImageUrl+ url
+                                          KImageUrl+url
                                       ),);
                                     }));
                                   }
@@ -469,7 +472,9 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
                           ),
                         ),
-                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].customer)
+                        Container(child:postDetailsModel.data.items[0].mobile.toString()== "null"?
+                            Container():
+                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].mobile))
                       ],
                     ),
                   ],
@@ -565,37 +570,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 child: Container(
                   color: Color(0x88000000),
                 ),),
-              Container(
-                margin: EdgeInsets.all(10.w),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "${getTranslated(context, 'gender')}${postDetailsModel.data.items[0].gender}  " ,
-                      style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: screenUtil.setSp(14),
-                          fontWeight: FontWeight.normal
 
-                      ),
-                    ),
-                    Text(
-                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age} ${mLanguage == "en"?postDetailsModel.data.items[0].ageType:postDetailsModel.data.items[0].ageTypeAr}   " ,
-                      style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: screenUtil.setSp(14),
-                          fontWeight: FontWeight.normal
-
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 1.h,
-                width: width,
-                child: Container(
-                  color: Color(0x88000000),
-                ),),
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
@@ -614,62 +589,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 child: Container(
                   color: Color(0x88000000),
                 ),),
-              Container(
-                margin: EdgeInsets.all(10.w),
-                child:  Text(
-                  getTranslated(context, 'similar_ads') ,
-                  style: TextStyle(
-                      color: Color(0xFF000000),
-                      fontSize: screenUtil.setSp(14),
-                      fontWeight: FontWeight.normal
 
-                  ),
-                ),
-              ),
-              SizedBox(height: 1.h,
-                width: width,
-                child: Container(
-                  color: Color(0x88000000),
-                ),),
-              // Container(
-              //
-              //   child:  GridView.builder(scrollDirection: Axis.vertical,
-              //     padding: EdgeInsets.zero,
-              //
-              //
-              //     shrinkWrap: true,
-              //     physics: const NeverScrollableScrollPhysics(),
-              //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-              //         childAspectRatio:itemWidth/itemHeight),
-              //     itemCount: postDetailsModel.data.relatePost.length,
-              //
-              //     itemBuilder: (context,index){
-              //       return GestureDetector(
-              //         onTap: (){
-              //           Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-              //             return new PetsDetailsScreen(postId:postDetailsModel.data.relatePost[index].postId,postName: postDetailsModel.data.relatePost[index].postName);
-              //           }));
-              //           // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-              //           //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);
-              //           // }));
-              //         },
-              //         child: Container(
-              //             margin: EdgeInsets.all(6.w),
-              //
-              //             child:
-              //             Card(
-              //                 clipBehavior: Clip.antiAliasWithSaveLayer,
-              //                 elevation: 1.w,
-              //                 shape: RoundedRectangleBorder(
-              //                   borderRadius: BorderRadius.circular(10.0.h),
-              //                 ),
-              //                 color: Color(0xFFFFFFFF),
-              //                 child: buildItem(postDetailsModel.data.relatePost[index],context))),
-              //       );
-              //     },
-              //   ),
-              //
-              // )
             ],
           ),
         ),
@@ -677,113 +597,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     );
 
   }
-  // Widget buildItem(RelatePost data, BuildContext context) {
-  //   return Container(
-  //     child: Column(
-  //       children: [
-  //         Expanded(
-  //           flex: 3,
-  //           child: Stack(
-  //             children: [
-  //               CachedNetworkImage(
-  //                 width: itemWidth,
-  //                 imageUrl:data.postImage,
-  //                 imageBuilder: (context, imageProvider) => Stack(
-  //                   children: [
-  //                     ClipRRect(
-  //
-  //                       child: Container(
-  //                           width: itemWidth,
-  //
-  //                           decoration: BoxDecoration(
-  //
-  //                             shape: BoxShape.rectangle,
-  //
-  //                             image: DecorationImage(
-  //                                 fit: BoxFit.fill,
-  //
-  //                                 image: imageProvider),
-  //                           )
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 placeholder: (context, url) =>
-  //                     Center(
-  //                       child: SizedBox(
-  //                           height: 50.h,
-  //                           width: 50.h,
-  //                           child: new CircularProgressIndicator()),
-  //                     ),
-  //
-  //
-  //                 errorWidget: (context, url, error) => ClipRRect(
-  //                     child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
-  //                       colorBlendMode: BlendMode.difference,)),
-  //
-  //               ),
-  //               Positioned.directional(
-  //                 textDirection:  Directionality.of(context),
-  //                 bottom: 2.h,
-  //                 start: 4.w,
-  //                 child:
-  //                 Text(
-  //                   data.postDate,
-  //                   style: TextStyle(
-  //                       color: Color(0xFFFFFFFF)
-  //
-  //                   ),
-  //                 ),
-  //               )
-  //             ],
-  //           ),
-  //         ),
-  //         Expanded(flex:1,child: Container(
-  //           child: Column(
-  //             children: [
-  //               Expanded(flex:1,child:
-  //               Container(
-  //                 margin: EdgeInsets.symmetric(horizontal: 5.w),
-  //                 alignment: AlignmentDirectional.centerStart,
-  //                 child: Text(
-  //                   data.postName,
-  //                   style: TextStyle(
-  //                       color: Color(0xFF000000),
-  //                       fontWeight: FontWeight.normal,
-  //                       fontSize: screenUtil.setSp(12)
-  //                   ),
-  //
-  //                 ),
-  //               )),
-  //               Expanded(flex:1,child:
-  //               Row(
-  //                 children: [
-  //
-  //                   Container(
-  //                     padding: EdgeInsets.symmetric(horizontal: 5.w),
-  //                     child:
-  //                     Text(
-  //                       '${data.postPrice}',
-  //                       style: TextStyle(
-  //                           color: kMainColor,
-  //                           fontWeight: FontWeight.normal,
-  //                           fontSize: screenUtil.setSp(14)
-  //                       ),
-  //
-  //                     ),
-  //                   ),
-  //                 ],
-  //               ))
-  //             ],
-  //           ),
-  //         ))
-  //
-  //       ],
-  //     ),
-  //   );
-  //
-  // }
-  void showDialog(Customer customer) {
+
+  void showDialog(String customer) {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -820,7 +635,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                         CachedNetworkImage(
                           width: 80.w,
                           height: 80.h,
-                          imageUrl:KImageUrl+customer.logo,
+                          imageUrl:KImageUrl+postDetailsModel.data.items[0].image.first,
                           imageBuilder: (context, imageProvider) => Stack(
                             children: [
                               ClipRRect(
@@ -871,23 +686,11 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
                               ),
                             ),
-                            Align(
-                              alignment: AlignmentDirectional.topStart,
-                              child: Text(
-                                "17-12-2022",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: Color(0xFF000000),
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: screenUtil.setSp(12)
-                                ),
 
-                              ),
-                            ),
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                customer.phone,
+                                customer,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -899,7 +702,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, 'call_now'), context, customer.phone.replaceAll('+', ''))
+                        callButton(getTranslated(context, 'call_now'), context, customer.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -923,7 +726,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       },
     );
   }
-  contact(BuildContext context,Customer customer) async {
+  contact(BuildContext context,String customer) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){

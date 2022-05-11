@@ -334,7 +334,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                                     width: width,
 
                                     fit: BoxFit.fill,
-                                    imageUrl:'${kImagePath+item}',
+                                    imageUrl:'${KImageUrl+item}',
                                     imageBuilder: (context, imageProvider) {
 
                                       return Card(
@@ -685,7 +685,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:kImagePath+data.image,
+                  imageUrl:KImageUrl+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -819,7 +819,7 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
                         CachedNetworkImage(
                           width: 80.w,
                           height: 80.h,
-                          imageUrl:kImagePath+customer.logo,
+                          imageUrl:KImageUrl+customer.logo,
                           imageBuilder: (context, imageProvider) => Stack(
                             children: [
                               ClipRRect(

@@ -10,6 +10,8 @@ import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/shopdetails_model.dart';
 import 'package:pet_mart/screens/pets_details_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
+import 'package:pet_mart/screens/shop_product_details_screen.dart';
+import 'package:pet_mart/screens/shop_products_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -477,7 +479,7 @@ class _ShopDetailsScreenState extends State<ShopDetailsScreen> {
                     return GestureDetector(
                       onTap: (){
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new PetsDetailsScreen(postId:postDetailsModel.data.items[index].id,postName: mLanguage == "en"?postDetailsModel.data.items[index].enTitle:postDetailsModel.data.items[index].arTitle);
+                          return new ShopProductDetailsScreen(postId:postDetailsModel.data.items[index].id,postName: mLanguage == "en"?postDetailsModel.data.items[index].enTitle:postDetailsModel.data.items[index].arTitle);
                         }));
                         // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                         //   return new PetsDetailsScreen(petsModel:petsModel.data[index]);

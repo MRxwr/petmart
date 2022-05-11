@@ -179,5 +179,6 @@
   "post_title_ar": "عنوان الإعلان باللغة العربية",
   "post_description_ar": "وصف الإعلان باللغة العربية ",
   "no_notification_available": "لا يوجد إشعارات",
-  "products": "المنتجات"
+  "products": "المنتجات",
+  "write_search_text": "أكتب كلمة البحث"
 }

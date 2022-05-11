@@ -46,7 +46,7 @@ class _ShopDetailState extends State<ShopDetail> {
   String noOfViews ="";
   String noOfShares = "";
   String mLanguage ="";
-  TextButton previewButton(String text,BuildContext context,String mobile){
+  TextButton previewButton(String text,BuildContext context,Customer customer){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
       primary: Color(0xFFFFC300),
       minimumSize: Size(88.w, 35.h),
@@ -61,7 +61,7 @@ class _ShopDetailState extends State<ShopDetail> {
       style: flatButtonStyle,
       onPressed: () {
 
-        contact(context, mobile);
+        contact(context, customer);
 
       },
       child: Text(text,style: TextStyle(
@@ -317,7 +317,7 @@ class _ShopDetailState extends State<ShopDetail> {
                                   if(url.isNotEmpty) {
                                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                                       return new PhotoScreen(imageProvider: NetworkImage(
-                                          url
+                                         KImageUrl+ url
                                       ),);
                                     }));
                                   }
@@ -334,7 +334,7 @@ class _ShopDetailState extends State<ShopDetail> {
                                     width: width,
 
                                     fit: BoxFit.fill,
-                                    imageUrl:'${kImagePath+item}',
+                                    imageUrl:'${KImageUrl+item}',
                                     imageBuilder: (context, imageProvider) {
 
                                       return Card(
@@ -467,7 +467,7 @@ class _ShopDetailState extends State<ShopDetail> {
 
                           ),
                         ),
-                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].mobile)
+                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].customer)
                       ],
                     ),
                   ],
@@ -781,7 +781,7 @@ class _ShopDetailState extends State<ShopDetail> {
   //   );
   //
   // }
-  void showDialog(String mobile) {
+  void showDialog(Customer customer) {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -818,7 +818,7 @@ class _ShopDetailState extends State<ShopDetail> {
                         CachedNetworkImage(
                           width: 80.w,
                           height: 80.h,
-                          imageUrl:"",
+                          imageUrl:KImageUrl+customer.logo,
                           imageBuilder: (context, imageProvider) => Stack(
                             children: [
                               ClipRRect(
@@ -869,23 +869,11 @@ class _ShopDetailState extends State<ShopDetail> {
 
                               ),
                             ),
-                            Align(
-                              alignment: AlignmentDirectional.topStart,
-                              child: Text(
-                                "17-12-2022",
-                                textAlign: TextAlign.start,
-                                style: TextStyle(
-                                    color: Color(0xFF000000),
-                                    fontWeight: FontWeight.normal,
-                                    fontSize: screenUtil.setSp(12)
-                                ),
 
-                              ),
-                            ),
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                mobile,
+                                customer.phone,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -897,7 +885,7 @@ class _ShopDetailState extends State<ShopDetail> {
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, 'call_now'), context, mobile.replaceAll('+', ''))
+                        callButton(getTranslated(context, 'call_now'), context, customer.phone.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -921,11 +909,11 @@ class _ShopDetailState extends State<ShopDetail> {
       },
     );
   }
-  contact(BuildContext context,String phone) async {
+  contact(BuildContext context,Customer customer) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      showDialog(phone);
+      showDialog(customer);
 
     }else{
       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));

@@ -7,7 +7,8 @@ import 'package:pet_mart/screens/pets_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 class SearchResultScreen extends StatefulWidget {
   SearchModel searchModel;
-  SearchResultScreen({Key key,@required this.searchModel}): super(key: key);
+  String mLanguage;
+  SearchResultScreen({Key key,@required this.searchModel,@required this.mLanguage}): super(key: key);
 
   @override
   _SearchResultScreenState createState() => _SearchResultScreenState();
@@ -60,16 +61,9 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
       ),
       backgroundColor: Color(0xFFFFFFFF),
       body: Container(
-    child:    widget.searchModel.data.isEmpty?
+    child:    widget.searchModel.data.items.isEmpty?
     Container(
-      child: Text(
-        widget.searchModel.message,
-        style: TextStyle(
-            color: Colors.black,
-            fontSize: screenUtil.setSp(16),
-            fontWeight: FontWeight.w600
-        ),
-      ),
+
       alignment: AlignmentDirectional.center,
     )
         :
@@ -80,13 +74,13 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
       physics: const AlwaysScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
           childAspectRatio:itemWidth/itemHeight),
-      itemCount: widget.searchModel.data.length,
+      itemCount: widget.searchModel.data.items.length,
 
       itemBuilder: (context,index){
         return GestureDetector(
           onTap: (){
             Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-              return new PetsDetailsScreen(postId:widget.searchModel.data[index].postId,postName: widget.searchModel.data[index].postName,);
+              return new PetsDetailsScreen(postId:widget.searchModel.data.items[index].id,postName: widget.mLanguage == "en"?widget.searchModel.data.items[index].enTitle:widget.searchModel.data.items[index].arTitle,);
             }));
           },
           child: Container(
@@ -100,14 +94,14 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     borderRadius: BorderRadius.circular(10.0.h),
                   ),
                   color: Color(0xFFFFFFFF),
-                  child: buildItem(widget.searchModel.data[index],context))),
+                  child: buildItem(widget.searchModel.data.items[index],context))),
         );
       },
     ),
       ),
     );
   }
-  Widget buildItem(Data data, BuildContext context) {
+  Widget buildItem(Items data, BuildContext context) {
     return Container(
       child: Column(
         children: [
@@ -117,7 +111,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.postImage,
+                  imageUrl:KImageUrl+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -158,7 +152,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   start: 4.w,
                   child:
                   Text(
-                    data.postDate,
+                    data.date.split(" ").first,
                     style: TextStyle(
                         color: Color(0xFFFFFFFF)
 
@@ -176,7 +170,8 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   margin: EdgeInsets.symmetric(horizontal: 5.w),
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    data.postName,
+                    widget.mLanguage == "en"?
+                    data.enTitle:data.arTitle,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -192,7 +187,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 5.w),
                       child: Text(
-                        '${data.postPrice}',
+                        '${data.price}',
                         style: TextStyle(
                             color: kMainColor,
                             fontWeight: FontWeight.normal,

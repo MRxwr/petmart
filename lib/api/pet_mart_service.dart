@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/InitModel.dart';
+import 'package:pet_mart/model/ShopProductDetailsModel.dart';
 import 'package:pet_mart/model/add_post_model.dart';
 import 'package:pet_mart/model/auction_details_model.dart';
 import 'package:pet_mart/model/auction_model.dart';
@@ -416,21 +417,35 @@ class PetMartService{
 
     return categoryModel;
   }
-  Future<SearchModel> search(Map map) async {
-    print(map);
+  Future<dynamic> search(String searchText) async {
 
-    String body = json.encode(map);
 
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/list"),headers: {"Content-Type": "application/json"},body: body);
-    print(' PostModel ${response}');
-    SearchModel categoryModel;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+
+
+    var response = await dio.post(
+      TAG_BASE_URL + "?action=search&search=${searchText}",
+    );
+
+    print(response);
+    dynamic resp;
+
+    SearchModel searchModel;
     if(response.statusCode == 200){
-      categoryModel = SearchModel.fromJson(jsonDecode(response.body));
+      resp = response.data;
+
     }
 
-    print(categoryModel.message);
-    print(response.body);
-    return categoryModel;
+
+    return resp;
   }
   Future<PetsModel> pets(String catId) async {
 
@@ -481,6 +496,31 @@ print(TAG_BASE_URL + "?action=item&id=${petId}");
     PostDetailsModel postDetailsModel;
     if(response.statusCode == 200){
       postDetailsModel = PostDetailsModel.fromJson(Map<String, dynamic>.from(response.data));
+    }
+
+    return postDetailsModel;
+  }
+  Future<ShopProductDetailsModel> shopDetailsProduct(String petId) async {
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+    print(TAG_BASE_URL + "?action=shopItemDetails&id=${petId}");
+
+    var response = await dio.get(
+      TAG_BASE_URL + "?action=item&id=${petId}",
+    );
+
+
+
+    ShopProductDetailsModel postDetailsModel;
+    if(response.statusCode == 200){
+      postDetailsModel = ShopProductDetailsModel.fromJson(Map<String, dynamic>.from(response.data));
     }
 
     return postDetailsModel;
@@ -1004,21 +1044,52 @@ print(id);
     return shopdetailsModel;
 
   }
-  Future<UserModel> updateProfile(Map map)async{
+  Future<UserModel> updateProfile(String userId,String fullName,String email,String phone,String path)async{
     var resp;
-    var dio = Dio();
+    Dio dio;
+    BaseOptions options = new BaseOptions(
+        baseUrl: TAG_BASE_URL,
+        receiveDataWhenStatusError: true,
+        connectTimeout: 600*1000, // 60 seconds
+        receiveTimeout: 600*1000 // 60 seconds
+    );
+
+    dio = new Dio(options);
     dio.options.headers['content-Type'] = 'multipart/form-data';
     dio.options.headers['petmartcreate'] = "PetMartCreateCo";
     // dio.options.headers["ezyocreate"] = "CreateEZYo";
     SharedPreferences sharedPreferences = await SharedPreferences
         .getInstance();
     String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+    Map<String, dynamic> map = Map();
+if(path == null){
 
+
+  map['id']=userId;
+  map['name']= fullName;
+  map['email']=email;
+  map['mobile']=phone;
+
+
+}else{
+  map['id']=userId;
+  map['name']= fullName;
+  map['email']=email;
+  map['mobile']=phone;
+
+
+
+  String childFileName = path
+      .split('/')
+      .last;
+  print ('childFileName ${childFileName}');
+  map['image']=  await MultipartFile.fromFile(path, filename: childFileName);
+}
 
     FormData formData = FormData.fromMap(map);
-    String body = json.encode(map);
+
     var response = await dio.post(
-        TAG_BASE_URL + "?action=user&type=profile&update=1",
+        "?action=user&type=profile&update=1",
         data: formData);
     UserModel userModel;
     if (response.statusCode == 200) {

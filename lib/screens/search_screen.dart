@@ -30,7 +30,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
   int _stackIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String subCategoryId ="";
-  SubCategory.CategoryModel subCategory = null;
+
 
   String _singleValue = "Text alignment right";
   String _verticalGroupValue = "Pending";
@@ -60,81 +60,17 @@ class _SearcgScreenState extends State<SearcgScreen> {
     typesList.add(TypeModel(typeNameAr: 'تبني',typeNameEn: 'Adaption',key: 'adoption',selected: false));
     typesList.add(TypeModel(typeNameAr: 'مفقود',typeNameEn: 'Lost',key: 'lost-animal',selected: false));
     getLanguage().then((value) {
-      _categoryList.clear();
 
-        mLanguage = value;
 
-    }).whenComplete(() {
-      getHome().then((value){
+
         setState(() {
-          _categoryList = value.data.categories;
-          for(int i =0;i<_categoryList.length;i++){
-
-            selectedList.add(false);
-          }
-          print('_categoryList${_categoryList.length}');
+          mLanguage = value;
         });
 
-
-      });
     });
 
   }
-  Future<void> category() async{
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-
-    Map map ;
-
-
-    map = {"id":categoryId,
-
-      "language":languageCode};
-
-
-
-
-
-    PetMartService petMartService = PetMartService();
-    subCategory = await petMartService.category(categoryId);
-    print('subCategory --> ${subCategory}');
-    selectedSubList.clear();
-    for(int i =0;i<subCategory.data.categories.length;i++){
-
-      selectedSubList.add(false);
-    }
-    selectedSubCategoriesId.clear();
-    setState(() {
-
-    });
-
-  }
-  Future<HomeModel> getHome() async{
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String loginData = sharedPreferences.getString(kUserModel);
-    print('loginData ---> ${loginData}');
-    Map map ;
-    if(loginData != null){
-      final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
-      map = {'id': loginModel.data.id,
-        "language":languageCode
-      };
-    }else{
-      map = {'id': "",
-        "language":languageCode
-      };
-    }
-
-    print('map --> ${map}');
-
-    PetMartService petMartService = PetMartService();
-    HomeModel home = await petMartService.home(map);
-    return home;
-  }
   Future<String> getLanguage() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
@@ -182,49 +118,16 @@ class _SearcgScreenState extends State<SearcgScreen> {
           ),
 
           actions: [
-            InkWell(
-              onTap: (){
-                String searchText=  _commentController.text;
-                String mSelectCategory = categoryId;
-                String mSubCatId = "";
-                String mStartPrice = _startPriceController.text;
-                String mEndPrice = _endPriceController.text;
-
-
-                if(selectedSubList.isNotEmpty){
-                  for(int i =0;i<selectedSubList.length;i++){
-                    bool isSelect =selectedSubList[i];
-                    if(isSelect){
-                      mSubCatId = mSubCatId+subCategory.data.categories[i].id+",";
-                    }
-
-                  }
-                  if (mSubCatId != null && mSubCatId.length > 0) {
-                    mSubCatId = mSubCatId.substring(0, mSubCatId.length - 1);
-                  }
-
-
-                }
-                search(searchText,mSelectCategory,mSubCatId,mStartPrice,mEndPrice,type);
-
-
-              },
-              child: Center(
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 10.w),
-                  child: Text(getTranslated(context, 'search'),
-                    style: TextStyle(color:Color(0xFFFFFFFF),
-                        fontSize: screenUtil.setSp(12),
-                        fontWeight: FontWeight.normal),),
-                ),
-              ),
+            Container(
+              height: 30.w,
+              width: 30.w,
             )
           ],
 
         ),
         backgroundColor: Color(0xFFFFFFFF),
         body: Container(
-          child:_categoryList.isEmpty?
+          child:mLanguage ==""?
           Container(
             child: CircularProgressIndicator(
 
@@ -234,267 +137,12 @@ class _SearcgScreenState extends State<SearcgScreen> {
           ): ListView(
             children: [
               _bulidSearchComposer(),
-              Container(
-                width: width,
-                color: Color(0xFFdcdcdc),
-                child:
-                Padding(
-                  padding:  EdgeInsets.all(5.h),
-                  child: Text(
-                    getTranslated(context, 'select_post_type'),
-                    style: TextStyle(
-                      color: Color(0xFF000000),
-                      fontWeight: FontWeight.normal,
-                      fontSize: screenUtil.setSp(12)
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 5.h,width: width,
-              ),
-              Container(
-                height: 35.h,
-                child: ListView.separated(
-
-                    scrollDirection: Axis.horizontal,
-
-                    itemBuilder: (context,index){
-                      return
-                        GestureDetector(
-                          onTap: (){
-                            type = typesList[index].key;
-                            selectedSubList.clear();
-                            subCategory = null;
-
-                            bool selectedIndex = typesList[index].selected;
-                            print('selectedIndex ${selectedIndex}');
-
-                            if(!selectedIndex){
-                              if(index == 0){
-                                forSaleSelected = true;
-                              }else{
-                                forSaleSelected = false;
-                              }
-                              for(int i =0;i<typesList.length;i++){
-                                if(i == index){
-                                  typesList[i].selected= true;
-                                }else{
-                                  typesList[i].selected= false;
-                                }
-
-                              }
-                              selectedList.clear();
-                              for(int i =0;i<_categoryList.length;i++){
-
-                                selectedList.add(false);
-                              }
-                              setState(() {
-
-                              });
+              SizedBox(height: 30.h,),
+              Container(child: confirmButton(getTranslated(context, 'search'),context),
+              margin: EdgeInsets.symmetric(horizontal: 10.w),),
+              SizedBox(height: 30.h,),
 
 
-
-
-                            }
-
-                          },
-                          child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10.w),
-                              child: _buildAdType(typesList[index],context,index)),
-                        );
-                    }
-                    ,
-                    separatorBuilder: (context,index) {
-                      return Container(height: 10.h,
-                        color: Color(0xFFFFFFFF),);
-                    }
-                    ,itemCount: typesList.length),
-              ),
-              Container(
-                width: width,
-                color: Color(0xFFdcdcdc),
-                child:
-                Padding(
-                  padding:  EdgeInsets.all(5.h),
-                  child: Text(
-                   getTranslated(context, 'select_category'),
-                    style: TextStyle(
-                        color: Color(0xFF000000),
-                        fontWeight: FontWeight.normal,
-                        fontSize: screenUtil.setSp(12)
-                    ),
-                  ),
-                ),
-              ),
-              GridView.builder(scrollDirection: Axis.vertical,
-
-
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,
-                    childAspectRatio:itemWidth/itemHeight),
-                itemCount: _categoryList.length,
-
-                itemBuilder: (context,index){
-                  return GestureDetector(
-                    onTap: (){
-                      selectedSubList.clear();
-                      bool selectedIndex = selectedList[index];
-                      if(!selectedIndex){
-                        for(int i =0;i<selectedList.length;i++){
-                          if(i == index){
-                            selectedList[i]= true;
-                            categoryId = _categoryList[i].id;
-                          }else{
-                            selectedList[i]= false;
-                          }
-                        }
-                        print(selectedList);
-
-                        setState(() {
-
-
-                        });
-                        subCategory = null;
-category();
-
-
-                      }
-                      // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      //   return new AuctionDetailsScreen(mAuctionModel:auctionModel.data[index]);
-                      // }));
-                    },
-                    child: Container(
-                        margin: EdgeInsets.all(6.w),
-
-                        child:_buildCategory(_categoryList[index],context,index)
-                        ),
-                  );
-                },
-              ),
-              Container(
-                child: subCategory == null?
-                Container():
-                Column(
-                  children: [
-                    Container(
-                      width: width,
-                      color: Color(0xFFdcdcdc),
-                      child:
-                      Padding(
-                        padding:  EdgeInsets.all(5.h),
-                        child: Text(
-                          getTranslated(context, 'select_sub_category'),
-                          style: TextStyle(
-                              color: Color(0xFF000000),
-                              fontWeight: FontWeight.normal,
-                              fontSize: screenUtil.setSp(12)
-                          ),
-                        ),
-                      ),
-                    ),
-                    GridView.builder(scrollDirection: Axis.vertical,
-
-
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3,
-                          childAspectRatio:itemWidth/itemHeight),
-                      itemCount: subCategory.data.categories.length,
-
-                      itemBuilder: (context,index){
-                        return GestureDetector(
-                          onTap: (){
-                            bool selectedIndex = selectedSubList[index];
-                            selectedSubList[index]=!selectedIndex;
-                            setState(() {
-
-                            });
-                            print(selectedSubList);
-
-                            // if(!selectedIndex){
-                            //   for(int i =0;i<selectedSubList.length;i++){
-                            //     if(i == index){
-                            //       selectedSubList[i]= true;
-                            //       subCategoryId =  subCategory.data.category[0].childcategory[i].categoryId;
-                            //     }else{
-                            //       selectedSubList[i]= false;
-                            //     }
-                            //   }
-                            //   print(selectedSubList);
-                            //
-                            //   setState(() {
-                            //
-                            //   });
-                            //
-                            //
-                            //
-                            // }
-                            // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                            //   return new AuctionDetailsScreen(mAuctionModel:auctionModel.data[index]);
-                            // }));
-                          },
-                          child: Container(
-                              margin: EdgeInsets.all(6.w),
-
-                              child:_buildSubCategory(subCategory.data.categories[index],context,index)
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                child: !forSaleSelected?
-                Container():
-                Column(
-                  children: [
-                    Container(
-                      width: width,
-                      color: Color(0xFFdcdcdc),
-                      child:
-                      Padding(
-                        padding:  EdgeInsets.all(5.h),
-                        child: Text(
-                          getTranslated(context, 'basic'),
-                          style: TextStyle(
-                              color: Color(0xFF000000),
-                              fontWeight: FontWeight.normal,
-                              fontSize: screenUtil.setSp(12)
-                          ),
-                        ),
-                      ),
-                    ),Container(
-                      width: width,
-
-                      child:
-                      Padding(
-                        padding:  EdgeInsets.all(5.h),
-                        child: Text(
-                          getTranslated(context, 'price'),
-                          style: TextStyle(
-                              color: Color(0xFF000000),
-                              fontWeight: FontWeight.normal,
-                              fontSize: screenUtil.setSp(12)
-                          ),
-                        ),
-                      ),
-
-                    ),
-
-                    Row(
-                      children: [
-                        Expanded(flex:1,child: _bulidStartPrice()),
-                        Expanded(flex:1,child: _bulidEndPrice()),
-
-                      ],
-                    )
-
-                  ],
-                ),
-
-              )
 
             ],
           ),
@@ -557,222 +205,63 @@ category();
         ],
       );
   }
-  _bulidStartPrice (){
-    return
-      Column(
 
-        children: [
-
-          Container(
-            child:
-            Container(
-              margin: EdgeInsets.all(10.h),
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              height: 60.0,
-
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Color(0xFF000000),
-                  ),
-                  borderRadius: BorderRadius.circular(6.h),
-                  color: Color(0xFFFFFFFF)
-              ),
-              child: Row(
-                children: <Widget>[
-
-                  Expanded(
-                    child:
-                    TextField(
-
-                      keyboardType: TextInputType.number,
-                      minLines: 1,
-                      maxLines: 1,
-                      enableInteractiveSelection: true,
-                      controller: _startPriceController,
-
-                      textInputAction: TextInputAction.done,
-                      textAlign: TextAlign.start,
-                      textAlignVertical: TextAlignVertical.center,
-
-
-                      textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration.collapsed(hintText: '0.000 ${getTranslated(context, 'kwd')}',hintStyle: TextStyle(
-                          color: Color(0xFFa3a3a3)
-                      )
-                      ),
-                    ),
-                  ),
-
-
-
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 10.h,)
-        ],
-      );
-  }
-  _bulidEndPrice (){
-    return
-      Column(
-
-        children: [
-
-          Container(
-            child:
-            Container(
-              margin: EdgeInsets.all(10.h),
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              height: 60.0,
-
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Color(0xFF000000),
-                  ),
-                  borderRadius: BorderRadius.circular(6.h),
-                  color: Color(0xFFFFFFFF)
-              ),
-              child: Row(
-                children: <Widget>[
-
-                  Expanded(
-                    child: TextField(
-
-                      keyboardType: TextInputType.number,
-                      minLines: 1,
-                      maxLines: 1,
-                      enableInteractiveSelection: true,
-                      controller: _endPriceController,
-
-                      textInputAction: TextInputAction.done,
-                      textAlign: TextAlign.start,
-                      textAlignVertical: TextAlignVertical.center,
-
-
-                      textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration.collapsed(hintText: '1000.000 ${getTranslated(context, 'kwd')}',hintStyle: TextStyle(
-                          color: Color(0xFFa3a3a3)
-                      )
-                      ),
-                    ),
-                  ),
-
-
-
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 10.h,)
-        ],
-      );
-  }
-  _buildAdType(TypeModel typeModel,BuildContext context,int index,){
-    return  Container(
-
-      child: Row(
-        children: [
-          Container(
-            child: typeModel.selected ?
-            Icon(Icons.radio_button_checked_outlined,color: kMainColor,size: 20.h,):
-            Icon(Icons.radio_button_off,color: Color(0xFF000000),size: 20.h,)
-
-          ),
-
-      Text(mLanguage =="ar"?typeModel.typeNameAr:typeModel.typeNameEn,
-        style: TextStyle(color:Color(0xFF000000),
-            fontSize: screenUtil.setSp(12),
-            fontWeight: FontWeight.normal),),
-
-        ],
-      ),
-    );
-  }
-  _buildCategory(Categories typeModel,BuildContext context,int index,){
-    return  Container(
-
-      child: Row(
-        children: [
-          Container(
-              child: selectedList[index]? Icon(Icons.radio_button_checked_outlined,color: kMainColor,size: 20.h,)
-                  :
-              Icon(Icons.radio_button_off,color: Color(0xFF000000),size: 20.h,)
-          ),
-
-          Expanded(
-            flex: 1,
-            child: Text(mLanguage == "en"?typeModel.enTitle:typeModel.arTitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-
-              style: TextStyle(color:Color(0xFF000000),
-                  fontSize: screenUtil.setSp(12),
-
-                  fontWeight: FontWeight.normal),),
-          ),
-
-        ],
-      ),
-    );
-  }
-  _buildSubCategory(SubCategory.Categories typeModel,BuildContext context,int index,){
-    return  Container(
-
-      child: Row(
-        children: [
-          Container(
-              child: selectedSubList[index]? Icon(Icons.radio_button_checked_outlined,color: kMainColor,size: 20.h,)
-                  :
-              Icon(Icons.radio_button_off,color: Color(0xFF000000),size: 20.h,)
-          ),
-
-          Expanded(
-            flex: 1,
-            child: Text(mLanguage == "en"?typeModel.enTitle:typeModel.arTitle,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-
-              style: TextStyle(color:Color(0xFF000000),
-                  fontSize: screenUtil.setSp(12),
-
-                  fontWeight: FontWeight.normal),),
-          ),
-
-        ],
-      ),
-    );
-  }
-
-  void search(String searchText, String mSelectCategory, String mSubCatId, String mStartPrice, String mEndPrice,String type) async{
+  void search(String searchText) async{
 
     final modelHud = Provider.of<ModelHud>(context, listen: false);
     modelHud.changeIsLoading(true);
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     PetMartService petMartService = PetMartService();
-    Map map = {
-      'id': mSelectCategory.toString(),
-      'sub_category_id': mSubCatId,
-      'language': languageCode,
-      'min_price': mStartPrice,
-      'max_price': mEndPrice,
-      'search_keyword': searchText,
-      'type':type
-    };
-    print(map);
-    SearchModel searchModel = await petMartService.search(map);
-    modelHud.changeIsLoading(false);
-String status = searchModel.status;
-if(status == "success"){
-  Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-    return new SearchResultScreen(searchModel:searchModel);
-  }));
 
-}else{
-  _scaffoldKey.currentState.showSnackBar(
-      SnackBar(content: Text(searchModel.message)));
-}
+
+    dynamic response = await petMartService.search(searchText);
+    modelHud.changeIsLoading(false);
+    bool  isOk  = response['ok'];
+    if(isOk){
+      SearchModel searchModel = SearchModel.fromJson(response);
+      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+        return new SearchResultScreen(searchModel:searchModel,mLanguage: mLanguage,);
+      }));
+    }else{
+      _scaffoldKey.currentState.showSnackBar(
+          SnackBar(content: Text(response['data'])));
+    }
+
+
 
   }
+  TextButton confirmButton(String text,BuildContext context){
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      primary: Color(0xFF000000),
+      minimumSize: Size(screenUtil.screenWidth, 35.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+      shape:  RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+      ),
+      backgroundColor: Color(0xFFFFC300),
+    );
+
+    return TextButton(
+      style: flatButtonStyle,
+      onPressed: () {
+
+        String searchText=  _commentController.text;
+        if(searchText.trim() != ""){
+          search(searchText);
+
+
+        }else{
+          _scaffoldKey.currentState.showSnackBar(
+              SnackBar(content: Text(getTranslated(context, "write_search_text"))));
+        }
+      },
+      child: Text(text,style: TextStyle(
+          color: Color(0xFF000000),
+          fontSize: screenUtil.setSp(16),
+          fontWeight: FontWeight.w500
+      ),),
+    );
+  }
+
 }

@@ -32,6 +32,7 @@ class Data {
   String mobile;
   String points;
   String validity;
+  String logo;
 
   Data(
       {this.id,
@@ -39,7 +40,8 @@ class Data {
         this.email,
         this.mobile,
         this.points,
-        this.validity});
+        this.validity,
+        this.logo});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -48,6 +50,7 @@ class Data {
     mobile = json['mobile'];
     points = json['points'];
     validity = json['validity'];
+    logo = json['logo'];
   }
 
   Map<String, dynamic> toJson() {
@@ -58,6 +61,7 @@ class Data {
     data['mobile'] = this.mobile;
     data['points'] = this.points;
     data['validity'] = this.validity;
+    data['logo'] = this.logo;
     return data;
   }
 }
