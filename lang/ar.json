@@ -20,8 +20,8 @@
   "add_photo": "إضافة صورة",
   "select_category": "اختر الفئة",
   "select_sub_category":"حدد الفئة الفرعية",
-  "post_title": "عنوان الإعلان باللغة الانجليزيه",
-  "post_description": "وصف الإعلان باللغة الانجليزيه",
+  "post_title": "عنوان الإعلان",
+  "post_description": "وصف الإعلان",
   "age_string": "العمر",
   "select_gender": "حدد النوع",
   "post_price": "سعر الإعلان",
@@ -76,7 +76,7 @@
   "view_all": "مشاهدة الكل",
   "hospital": "عيادات طبية",
   "shop": "محلات تجارية",
-  "prefex": "-965+",
+  "prefex": "+965-",
   "details": "تفاصيل",
   "shares": "مشاركات",
   "select_language": "اختار اللغة",
@@ -180,5 +180,11 @@
   "post_description_ar": "وصف الإعلان باللغة العربية ",
   "no_notification_available": "لا يوجد إشعارات",
   "products": "المنتجات",
-  "write_search_text": "أكتب كلمة البحث"
+  "write_search_text": "أكتب كلمة البحث",
+  "service": "الخدمات",
+  "select_payment_method": "أختر طريقة الدفع",
+  "knet": "كي نت",
+  "master": "ماستر كارد",
+  "go_to_myaccount": " الذهاب الي حسابي",
+  "go_to_credit": "الذهاب إلي العروض"
 }

@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:group_radio_button/group_radio_button.dart';
@@ -11,6 +12,7 @@ import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/search_model.dart';
 import 'package:pet_mart/model/type_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
+import 'package:pet_mart/screens/pets_details_screen.dart';
 import 'package:pet_mart/screens/search_result_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +32,9 @@ class _SearcgScreenState extends State<SearcgScreen> {
   int _stackIndex = 0;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String subCategoryId ="";
+  bool isLoading = false;
+  String errorMessage = "";
+  SearchModel searchModel;
 
 
   String _singleValue = "Text alignment right";
@@ -82,8 +87,8 @@ class _SearcgScreenState extends State<SearcgScreen> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    itemWidth = width / 3;
-    itemHeight = 60.h;
+    itemWidth = width / 2;
+    itemHeight = 200.h;
     return
       ModalProgressHUD(
         inAsyncCall: Provider.of<ModelHud>(context).isLoading,
@@ -135,12 +140,65 @@ class _SearcgScreenState extends State<SearcgScreen> {
             ),
             alignment: AlignmentDirectional.center,
           ): ListView(
+            shrinkWrap: true,
+            physics: const AlwaysScrollableScrollPhysics(),
             children: [
               _bulidSearchComposer(),
-              SizedBox(height: 30.h,),
-              Container(child: confirmButton(getTranslated(context, 'search'),context),
-              margin: EdgeInsets.symmetric(horizontal: 10.w),),
-              SizedBox(height: 30.h,),
+
+              Container(
+                child: !isLoading? Container():
+                errorMessage != ""?
+                    Container(
+                      alignment: AlignmentDirectional.center,
+                      child:  Text(
+
+                        errorMessage,
+                        style: TextStyle(
+                            color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(18),
+                          fontWeight: FontWeight.bold
+
+
+                        ),
+                      ),
+                    ):
+                Container(
+                  child: searchModel == null?
+                      Container():
+                  GridView.builder(scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+                        childAspectRatio:itemWidth/itemHeight),
+                    itemCount: searchModel.data.items.length,
+
+                    itemBuilder: (context,index){
+                      return GestureDetector(
+                        onTap: (){
+                          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                            return new PetsDetailsScreen(postId:searchModel.data.items[index].id,postName: mLanguage == "en"?searchModel.data.items[index].enTitle:searchModel.data.items[index].arTitle,);
+                          }));
+                        },
+                        child: Container(
+                            margin: EdgeInsets.all(6.w),
+
+                            child:
+                            Card(
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                elevation: 1.w,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0.h),
+                                ),
+                                color: Color(0xFFFFFFFF),
+                                child: buildItem(searchModel.data.items[index],context))),
+                      );
+                    },
+                  ),
+                ),
+
+              ),
+              SizedBox(height: 30.w,)
 
 
 
@@ -161,7 +219,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
             Container(
               margin: EdgeInsets.all(10.h),
               padding: EdgeInsets.symmetric(horizontal: 8.0),
-              height: 60.0,
+              height: 50.0,
 
               decoration: BoxDecoration(
 
@@ -170,34 +228,73 @@ class _SearcgScreenState extends State<SearcgScreen> {
               ),
               child:
 
-              Row(
-                children: <Widget>[
+              SizedBox(
+             
+                child: Stack(
+                  children: <Widget>[
 
-                  Expanded(
-                    child: TextField(
+                    SizedBox(
+                      height: 50.w,
 
-                      keyboardType: TextInputType.text,
-                      minLines: 1,
-                      maxLines: 1,
-                      enableInteractiveSelection: true,
-                      controller: _commentController,
-
-                      textInputAction: TextInputAction.done,
-                      textAlign: TextAlign.start,
-                      textAlignVertical: TextAlignVertical.center,
+                      child: TextField(
 
 
-                      textCapitalization: TextCapitalization.sentences,
-                      decoration: InputDecoration.collapsed(hintText: getTranslated(context, 'type_text_here'),hintStyle: TextStyle(
-                        color: Color(0xFFa3a3a3)
-                      )
+
+                        keyboardType: TextInputType.text,
+                        minLines: 1,
+                        maxLines: 1,
+
+                        enableInteractiveSelection: true,
+                        controller: _commentController,
+
+
+                        textInputAction: TextInputAction.done,
+                        textAlign: TextAlign.start,
+                        textAlignVertical: TextAlignVertical.center,
+
+
+                        textCapitalization: TextCapitalization.sentences,
+                        decoration: InputDecoration(hintText: getTranslated(context, 'type_text_here'),hintStyle: TextStyle(
+                          color: Color(0xFFa3a3a3),
+
+
+
+                        ),
+                            border: InputBorder.none,
+                           focusedBorder: InputBorder.none,
+                          enabledBorder :InputBorder.none
+
+
+                        ),
                       ),
                     ),
-                  ),
+
+                    Positioned.directional(
+                      textDirection: Directionality.of(context),
+                        top: 0,
+                        bottom: 0,
+                        end: 10.w,
+                        child: Padding(
+                          padding:  EdgeInsets.all(8.0),
+                          child: GestureDetector(
+                            onTap: (){
+                              String searchText=  _commentController.text;
+                              if(searchText.trim() != ""){
+                                search(searchText);
+
+
+                              }else{
+                                _scaffoldKey.currentState.showSnackBar(
+                                    SnackBar(content: Text(getTranslated(context, "write_search_text"))));
+                              }
+                            },
+                              child: Icon(Icons.search,size: 30.w,color: Colors.white,)),
+                        ))
 
 
 
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -213,21 +310,24 @@ class _SearcgScreenState extends State<SearcgScreen> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     PetMartService petMartService = PetMartService();
-
+    isLoading = true;
 
     dynamic response = await petMartService.search(searchText);
     modelHud.changeIsLoading(false);
     bool  isOk  = response['ok'];
+    errorMessage ="";
     if(isOk){
-      SearchModel searchModel = SearchModel.fromJson(response);
-      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-        return new SearchResultScreen(searchModel:searchModel,mLanguage: mLanguage,);
-      }));
+       searchModel = SearchModel.fromJson(response);
+
     }else{
+      errorMessage = response['data'];
       _scaffoldKey.currentState.showSnackBar(
           SnackBar(content: Text(response['data'])));
-    }
 
+    }
+setState(() {
+
+});
 
 
   }
@@ -246,15 +346,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
       style: flatButtonStyle,
       onPressed: () {
 
-        String searchText=  _commentController.text;
-        if(searchText.trim() != ""){
-          search(searchText);
 
-
-        }else{
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text(getTranslated(context, "write_search_text"))));
-        }
       },
       child: Text(text,style: TextStyle(
           color: Color(0xFF000000),
@@ -263,5 +355,110 @@ class _SearcgScreenState extends State<SearcgScreen> {
       ),),
     );
   }
+  Widget buildItem(Items data, BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Stack(
+              children: [
+                CachedNetworkImage(
+                  width: itemWidth,
+                  imageUrl:KImageUrl+data.image,
+                  imageBuilder: (context, imageProvider) => Stack(
+                    children: [
+                      ClipRRect(
 
+                        child: Container(
+                            width: itemWidth,
+
+                            decoration: BoxDecoration(
+
+                              shape: BoxShape.rectangle,
+
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+
+                                  image: imageProvider),
+                            )
+                        ),
+                      ),
+                    ],
+                  ),
+                  placeholder: (context, url) =>
+                      Center(
+                        child: SizedBox(
+                            height: 50.h,
+                            width: 50.h,
+                            child: new CircularProgressIndicator()),
+                      ),
+
+
+                  errorWidget: (context, url, error) => ClipRRect(
+                      child: Image.asset('assets/images/placeholder_error.png',  fit: BoxFit.fill,color: Color(0x80757575).withOpacity(0.5),
+                        colorBlendMode: BlendMode.difference,)),
+
+                ),
+                Positioned.directional(
+                  textDirection:  Directionality.of(context),
+                  bottom: 2.h,
+                  start: 4.w,
+                  child:
+                  Text(
+                    data.date.split(" ").first,
+                    style: TextStyle(
+                        color: Color(0xFFFFFFFF)
+
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Expanded(flex:1,child: Container(
+            child: Column(
+              children: [
+                Expanded(flex:1,child:
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5.w),
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                   mLanguage == "en"?
+                    data.enTitle:data.arTitle,
+                    style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontWeight: FontWeight.normal,
+                        fontSize: screenUtil.setSp(12)
+                    ),
+
+                  ),
+                )),
+                Expanded(flex:1,child:
+                Row(
+                  children: [
+
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child: Text(
+                        '${data.price}',
+                        style: TextStyle(
+                            color: kMainColor,
+                            fontWeight: FontWeight.normal,
+                            fontSize: screenUtil.setSp(14)
+                        ),
+
+                      ),
+                    ),
+                  ],
+                ))
+              ],
+            ),
+          ))
+
+        ],
+      ),
+    );
+
+  }
 }

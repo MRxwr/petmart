@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:images_picker/images_picker.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 
@@ -31,6 +32,7 @@ import 'package:pet_mart/utilities/shared_prefs.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_compress/video_compress.dart';
 
 import '../model/InitModel.dart';
 import 'credit_screen.dart';
@@ -49,11 +51,15 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   List<File> mImages = List();
   NAlertDialog nAlertDialog;
   List<String> Paths= List();
+  String vedioUrl ="";
   String path =null;
   bool isSelected = false;
   String mChooseImage="اختار الصورة";
   String categoryId ="";
   String subCategoryId ="";
+  Category category;
+  Sub mSubCategory;
+  List<File> vedios =[];
 
   List<AgeModel> agesList = [];
   List<GenderModel> genderList = [];
@@ -67,8 +73,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
 
   final TextEditingController _titleController = new TextEditingController();
   final TextEditingController _descriptionController = new TextEditingController();
-  final TextEditingController _titleArController = new TextEditingController();
-  final TextEditingController _descriptionArController = new TextEditingController();
+
   final TextEditingController _ageController = new TextEditingController();
   final TextEditingController _priceController = new TextEditingController();
   Future<NAlertDialog> showPickerDialog(BuildContext context)async {
@@ -90,40 +95,54 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     );
     return nAlertDialog;
   }
-  final picker = ImagePicker();
+
   String ageId ="";
   Future _getImageFromGallery(BuildContext context) async {
-    var pickedFile = null;
-    pickedFile = await picker.getImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+    List<XFile> pickedFile = [];
+    ImagePicker picker = ImagePicker();
+    try {
+      List<Media> res = await ImagesPicker.pick(
+        count: 10,
+        pickType: PickType.all,
+        language: Language.System,
+        maxTime: 30,
+        // maxSize: 500,
+        cropOpt: CropOption(
+          // aspectRatio: CropAspectRatio.wh16x9,
+          cropType: CropType.rect,
+        ),
+      );
+
+      if (res!= null || res.isNotEmpty) {
+        isSelected = true;
+        for (int i = 0; i < res.length; i++) {
+          File _image = File(res[i].path);
+          mImages.add(_image);
+          Paths.add(_image.path);
+        }
 
 
+        // updateImage(context);
 
 
+      } else {
+        mChooseImage = 'لم يتم اختيار الصورة';
+      }
 
-      isSelected = true;
-      File _image = File(pickedFile.path);
-      print('Path --->${_image.absolute.path}');
-
-      mImages.add(_image) ;
-    Paths.add(_image.path);
-      // updateImage(context);
+      setState(() {
 
 
+      });
 
-    } else {
-      mChooseImage = 'لم يتم اختيار الصورة';
+
+      Navigator.pop(context);
+    }catch(e){
+      print(e.toString());
     }
-    setState(() {
-
-
-    });
-
-
-    Navigator.pop(context);
   }
   Future _getImageFromCamera(BuildContext context) async {
-    var pickedFile = await picker.getImage(source: ImageSource.camera);
+    ImagePicker picker = ImagePicker();
+    var pickedFile = await picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
 
       isSelected = true;
@@ -173,8 +192,13 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     map().then((value) {
       setState(() {
         initModel = value;
+        categories =[];
+        subCategory =[];
+
         categories = initModel.data.category;
+        category = categories[0];
         subCategory = initModel.data.category[0].sub;
+        mSubCategory = subCategory[0];
         categoryId = initModel.data.category[0].sub[0].id;
 
       });
@@ -314,9 +338,14 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
                               onTap: (){
                                 bool selectedIndex = typesList[index].selected;
                                 print('selectedIndex ${selectedIndex}');
+                                category = null;
+                                mSubCategory = null;
+                                setState(() {
 
+                                });
                                 if(!selectedIndex){
                                   key = typesList[index].key;
+
                                   for(int i =0;i<typesList.length;i++){
                                     if(i == index){
                                       typesList[i].selected= true;
@@ -325,9 +354,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
                                     }
 
                                   }
-setState(() {
 
-});
                                   if(key ==''){
                                     final modelHud = Provider.of<ModelHud>(context,listen: false);
                                     modelHud.changeIsLoading(true);
@@ -346,52 +373,55 @@ setState(() {
                                     });
 
                                   }else if(key == 'adoption'){
-
-hidePrice = true;
-categories = null;
-subCategory = null;
 setState(() {
+  hidePrice = true;
+  categories = null;
+  subCategory = null;
 
-});
-categories = initModel.data.adoption;
-print(categories);
-subCategory = initModel.data.adoption[0].sub;
-categoryId = initModel.data.adoption[0].sub[0].id;
-print(subCategory);
-setState(() {
+  categories = initModel.data.adoption;
+
+  print(categories.length);
+  subCategory = initModel.data.adoption[0].sub;
+
+
+  categoryId = initModel.data.adoption[0].sub[0].id;
+  print(subCategory);
 
 });
 
                                   }else if(key == 'lost-animal'){
-                                    hidePrice = true;
-                                    categories = null;
-                                    subCategory = null;
-                                    setState(() {
 
-                                    });
-                                    categories = initModel.data.lost;
-                                    subCategory = initModel.data.lost[0].sub;
-                                    categoryId = initModel.data.lost[0].sub[0].id;
                                     setState(() {
+                                      hidePrice = true;
+                                      categories = null;
+                                      subCategory = null;
 
+
+
+                                      categories=initModel.data.lost;
+                                      print(categories.length);
+                                      subCategory = categories[0].sub;
+
+
+                                      print("enTitlte--->"+category.enTitle);
+                                      subCategory = initModel.data.lost[0].sub;
+                                      categoryId = initModel.data.lost[0].sub[0].id;
                                     });
                                   }if(key == 'sell'){
-                                    hidePrice = false;
-                                    categories = null;
-                                    subCategory = null;
-                                    setState(() {
 
-                                    });
-                                    categories = initModel.data.category;
-                                    subCategory = initModel.data.category[0].sub;
-                                    categoryId = initModel.data.category[0].sub[0].id;
                                     setState(() {
+                                      hidePrice = false;
+                                      categories = null;
+                                      subCategory = null;
+
+                                      categories = initModel.data.category;
+                                      subCategory = initModel.data.category[0].sub;
+                                      categoryId = initModel.data.category[0].sub[0].id;
+
 
                                     });
                                   }
-                                  else{
-                                    hidePrice = false;
-                                  }
+
 
 
                                 }
@@ -467,21 +497,99 @@ setState(() {
                       ],
                     ),
                   ),
+                  SizedBox(height: 5.h,width: screenUtil.screenWidth,
+                  ),
+                  Text(getTranslated(context, 'add_vedio'),
+                    style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontSize: screenUtil.setSp(16),
+                        fontWeight: FontWeight.bold
+                    ),),
+                  Container(
+                    height: 100.h,
+                    width: screenUtil.screenWidth,
+
+                    child:
+                    ListView(
+                      scrollDirection: Axis.horizontal,
+                      shrinkWrap: true,
+
+
+                      children: [
+                        Container(
+                          child: vedios.length>=1?
+                          Container():GestureDetector(
+                            onTap: (){
+                              showVedioPickerDialog(context).then((value){
+                                value.show(context);
+                              });
+                            },
+                            child:
+                            Container(
+                              width: 100.h,
+                              height: 100.h,
+                              padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5.0.h),
+                                  color: Color(0xFFFFFFFF),
+                                  border: Border.all(
+                                      color: Color(0xCC000000),
+                                      width: 1.0.w
+                                  )
+                              ),
+                              child: Icon(Icons.add,color: kMainColor,size: 50.h,),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10.w,
+                          height: 100.h,),
+                        ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context,index){
+                              return pickedVedio(vedios[index],index);
+                            }, separatorBuilder: (context,index) {
+                          return Container(width: 10.h,
+                            color: Color(0xFFFFFFFF),);
+                        }
+                            , itemCount: vedios.length),
+
+
+                      ],
+                    ),
+                  ),
                   SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
                     child:categories == null?
-                    Container():
+                    Container(
+
+                    ):
                     DropDown<Category>(
 
 
 
-                   isCleared: true,
+
+
+
+
+
 
                       items: categories,
-                      initialValue: categories[0],
+                      initialValue: categories.first,
 
 
+
+
+
+
+
+
+
+
+
+                      customWidgets: categories.map((p) => buildDropDownRow(p)).toList(),
                       hint:  Text(mLanguage == "en"?categories[0].enTitle:categories[0].arTitle,
                         textAlign: TextAlign.start,
                         style: TextStyle(
@@ -491,20 +599,25 @@ setState(() {
                             fontSize: screenUtil.setSp(15)
                         ),),
                       onChanged: (Category category){
-                        subCategory =[];
-                        categoryId = category.sub[0].id;
-                        print("categoryid ---> ${categoryId}");
-                        subCategory = category.sub;
+
                         setState(() {
+
+                          this.category = category;
+                          subCategory = category.sub;
+                          mSubCategory = null;
 
                         });
 
 
 
+
+
                       },
-                      customWidgets: categories.map((p) => buildDropDownRow(p)).toList(),
-                      isExpanded: true,
+
+                      isExpanded: false,
                       showUnderline: false,
+                  isCleared: category == null?true:false,
+
                     ),
                   ),
                   SizedBox(height: 1.h,
@@ -516,22 +629,23 @@ setState(() {
                   SizedBox(
                     height: 50.h,
                     width: screenUtil.screenWidth,
-                    child:subCategory == null?
+                    child:subCategory==null?
                     Container():
                     SizedBox(
                       height: 50.h,
                       width: screenUtil.screenWidth,
-                      child:
+                      child: new
                       DropDown<Sub>(
 
 
 
-isCleared: true,
+
 
                         items: subCategory,
 
-                        hint:  Text( mLanguage == "en"?subCategory[0].enTitle:
-                        subCategory[0].arTitle,
+
+                        hint:  Text( mLanguage == "en"?subCategory.isNotEmpty?subCategory[0].enTitle:"":
+                        subCategory.isNotEmpty? subCategory[0].arTitle:"",
                           textAlign: TextAlign.start,
                           style: TextStyle(
 
@@ -541,6 +655,11 @@ isCleared: true,
                           ),),
                         onChanged: (Sub category){
                           categoryId = category.id;
+
+                         setState(() {
+                           mSubCategory = category;
+
+                         });
                           print("subCategoryId ---> ${categoryId}");
 
 
@@ -549,6 +668,7 @@ isCleared: true,
                         customWidgets: subCategory.map((p) => buildSubCategoryRow(p)).toList(),
                         isExpanded: true,
                         showUnderline: false,
+                        isCleared: mSubCategory == null?true:false,
                       ),
                     ),
                   ),
@@ -588,41 +708,7 @@ isCleared: true,
                     )
                     ),
                   ),
-                  SizedBox(height: 1.h,
-                    width: screenUtil.screenWidth,
-                    child: Container(
-                      color: Color(0xFFc3c3c3),
-                    ),),  SizedBox(height: 10.h,),
-                  TextField(
 
-                    keyboardType: TextInputType.text,
-                    minLines: 1,
-                    maxLines: 1,
-                    enableInteractiveSelection: true,
-                    controller: _titleArController,
-
-
-                    textInputAction: TextInputAction.next,
-                    textAlign: TextAlign.start,
-                    textAlignVertical: TextAlignVertical.center,
-
-
-
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: getTranslated(context, 'post_title_ar'),
-                        isCollapsed: true,
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.all(10.h),
-                        hintStyle: TextStyle(
-                          color: Color(0xFFa3a3a3),
-
-                        )
-                    ),
-                  ),
                   SizedBox(height: 1.h,
                     width: screenUtil.screenWidth,
                     child: Container(
@@ -644,39 +730,6 @@ isCleared: true,
 
                     textCapitalization: TextCapitalization.sentences,
                     decoration: InputDecoration(hintText: getTranslated(context, 'post_description'),
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        isCollapsed: true,
-                        contentPadding: EdgeInsets.all(10.h),
-                        hintStyle: TextStyle(
-                          color: Color(0xFFa3a3a3),
-
-                        )
-                    ),
-                  ),
-                  SizedBox(height: 1.h,
-                    width: screenUtil.screenWidth,
-                    child: Container(
-                      color: Color(0xFFc3c3c3),
-                    ),),  SizedBox(height: 10.h,),
-                  TextField(
-
-                    keyboardType: TextInputType.multiline,
-                    minLines: 1,
-                    maxLines: 50,
-                    enableInteractiveSelection: true,
-                    controller: _descriptionArController,
-
-                    textInputAction: TextInputAction.newline,
-                    textAlign: TextAlign.start,
-                    textAlignVertical: TextAlignVertical.center,
-
-
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: InputDecoration(hintText: getTranslated(context, 'post_description_ar'),
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         enabledBorder: InputBorder.none,
@@ -1073,10 +1126,9 @@ isCleared: true,
     print("subCategoryId ---> ${categoryId}");
     String postTitle = _titleController.text;
     String postDescription =_descriptionController.text;
-    String postTitleAr = _titleArController.text;
-    String postDescriptionAr = _descriptionArController.text;
+
     String age = _ageController.text;
-    String price = _priceController.text;
+    String price = _priceController.text  ==""?"0.5":_priceController.text ;
     if(mImages.isEmpty){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
 
@@ -1084,10 +1136,10 @@ isCleared: true,
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'sub_category_error'))));
 
     }
-    else if(postTitle.trim()==""||postTitleAr.trim()==""){
+    else if(postTitle.trim()==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'title_error'))));
 
-    }else if(postDescription==""||postDescriptionAr.trim()==""){
+    }else if(postDescription==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'description_error'))));
 
     }else if(genderId==""){
@@ -1115,11 +1167,11 @@ isCleared: true,
           dynamic response = await petMartService.addPost(
               postTitle,
 
-              postTitleAr,
+              postTitle,
 
               key,
               postDescription,
-              postDescriptionAr,
+              postDescription,
               price==""?"0.5":price,
               categoryId,
               age,
@@ -1130,7 +1182,8 @@ isCleared: true,
               phoneNumber,
               mLanguage,
               mCompressedImages,
-              null);
+              null,
+          vedioUrl);
           modelHud.changeIsLoading(false);
           bool status = response['ok'];
           if (status) {
@@ -1161,7 +1214,7 @@ isCleared: true,
             phoneNumber,
             mLanguage,
             mCompressedImages,
-            null);
+            null,vedioUrl);
         modelHud.changeIsLoading(false);
         bool status = response['ok'];
         if (status) {
@@ -1318,6 +1371,176 @@ isCleared: true,
       ],
     );
     alert.show();
+
+  }
+  Future<NAlertDialog> showVedioPickerDialog(BuildContext context)async {
+    nAlertDialog =   await NAlertDialog(
+      dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
+
+      content: Padding(child: Text(getTranslated(context, 'select_vedio')),
+        padding: EdgeInsets.all(10),),
+      actions: <Widget>[
+        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
+
+          _getVedioFromCamera(context);
+        }),
+        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
+          _getVedioFromGallery(context);
+        }),
+
+      ],
+    );
+    return nAlertDialog;
+  }
+  Container pickedVedio(File image,int position){
+    return Container(
+      width: 100.h,
+      height: 100.h,
+      padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5.0.h),
+        color: Color(0xFFFFFFFF),
+        border: Border.all(
+            color: Color(0xCC000000),
+            width: 1.0.w
+        ),
+        image: DecorationImage(
+            image: FileImage(File(image.path)),
+            fit: BoxFit.fill),
+      ),
+      child: Container(
+        alignment: AlignmentDirectional.topStart,
+        child: Stack(
+
+          children: [
+            Center(
+              child: Icon(Icons.video_library_sharp,color: kMainColor,size: 50.h,),
+            ),
+            Positioned.directional(
+              textDirection:  Directionality.of(context),
+
+              child: GestureDetector(
+                  onTap: (){
+                    vedios.removeAt(position);
+                    vedioUrl ="";
+                    setState(() {
+
+                    });
+
+                  },
+                  child: Icon(Icons.delete,color: Colors.red,size: 20.h,)),
+            ),
+          ],
+        ),
+
+      ),
+
+
+    );
+  }
+  Future _getVedioFromGallery(BuildContext context) async {
+    var pickedFile = null;
+    final picker = ImagePicker();
+    pickedFile = await picker.pickVideo(source: ImageSource.gallery,maxDuration:Duration(seconds: 15));
+    Navigator.pop(context);
+    if (pickedFile != null) {
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      await VideoCompress.setLogLevel(0);
+      final MediaInfo  info = await VideoCompress.compressVideo(
+        pickedFile.path,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false,
+        includeAudio: true,
+      );
+      print(info.path);
+
+
+
+
+
+      isSelected = true;
+      File _image = File(info.path);
+
+      vedios.add(_image) ;
+      Navigator.pop(context);
+      PetMartService petMartService = PetMartService();
+      dynamic response = await petMartService.addVedio(_image);
+      modelHud.changeIsLoading(false);
+      bool status = response['ok'];
+      if (status) {
+        vedioUrl = response['data']['link'];
+      } else {
+        ShowPostAlertDialog(context, response['data']['msg'], false);
+      }
+
+      // updateImage(context);
+
+
+
+    } else {
+
+
+      mChooseImage = 'لم يتم اختيار الصورة';
+    }
+
+
+    setState(() {
+
+
+    });
+
+
+
+  }
+  Future _getVedioFromCamera(BuildContext context) async {
+    final picker = ImagePicker();
+    var pickedFile = await picker.pickVideo(source: ImageSource.camera,maxDuration:Duration(seconds: 15));
+    Navigator.pop(context);
+    if (pickedFile != null) {
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      await VideoCompress.setLogLevel(0);
+      final MediaInfo  info = await VideoCompress.compressVideo(
+        pickedFile.path,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false,
+        includeAudio: true,
+      );
+      print(info.path);
+
+
+
+
+
+      isSelected = true;
+      File _image = File(info.path);
+
+      vedios.add(_image) ;
+
+      PetMartService petMartService = PetMartService();
+      dynamic response = await petMartService.addVedio(_image);
+      modelHud.changeIsLoading(false);
+      bool status = response['ok'];
+      if (status) {
+        vedioUrl = response['data']['link'];
+      } else {
+        ShowPostAlertDialog(context, response['data']['msg'], false);
+      }
+
+
+
+
+    } else {
+      mChooseImage= 'لم يتم اختيار الصورة';
+    }
+
+    setState(() {
+
+    });
+
+
+
 
   }
 

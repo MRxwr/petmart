@@ -14,6 +14,8 @@ import 'package:pet_mart/screens/post_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'my_post_details_screen.dart';
 class MyPostScreen extends StatefulWidget {
   static String id = 'MyPostScreen';
   @override
@@ -102,7 +104,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    Map<String, dynamic>   response  = await petMartService.myPosts("1");
+    Map<String, dynamic>   response  = await petMartService.myPosts(userId);
     return response;
   }
   Future<void> postList(String type) async{
@@ -297,7 +299,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
                   return GestureDetector(
                     onTap: (){
                       Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new PostDetailsScreen(postId:products[index].id,postName:languageCode =="en"? products[index].enTitle:products[index].arTitle ,);
+                        return new MyPostDetailsScreen(postId:products[index].id,postName:languageCode =="en"? products[index].enTitle:products[index].arTitle ,);
                       }));
                     },
                     child: Container(

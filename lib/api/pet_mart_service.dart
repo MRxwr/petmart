@@ -6,8 +6,15 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/BidNewModel.dart';
+import 'package:pet_mart/model/DeletePostImageModel.dart';
 import 'package:pet_mart/model/InitModel.dart';
+import 'package:pet_mart/model/MyNewAuctionDetailsModel.dart';
+import 'package:pet_mart/model/PaymentUrlModel.dart';
+import 'package:pet_mart/model/ServiceDetailsModel.dart';
+import 'package:pet_mart/model/ServicesModel.dart';
 import 'package:pet_mart/model/ShopProductDetailsModel.dart';
+import 'package:pet_mart/model/StopAuctionModel.dart';
 import 'package:pet_mart/model/add_post_model.dart';
 import 'package:pet_mart/model/auction_details_model.dart';
 import 'package:pet_mart/model/auction_model.dart';
@@ -54,7 +61,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../model/InitEditModel.dart';
 import '../model/MyPostsModel.dart';
+import '../model/SuccessModel.dart';
 
 class PetMartService{
   static String TAG_BASE_URL= "https://createkwservers.com/petmart2/request/";
@@ -294,6 +303,64 @@ class PetMartService{
 
 
   }
+  Future<InitEditModel> initEdit( String id)async{
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+
+print(TAG_BASE_URL + "?action=editPost&edit=0&id=${id}");
+    var response = await dio.post(
+      TAG_BASE_URL + "?action=editPost&edit=0&id=${id}",
+    );
+
+    print(response);
+    InitEditModel resetModel;
+    if(response.statusCode == 200){
+      resetModel = InitEditModel.fromJson(Map<String, dynamic>.from(response.data));
+    }
+
+
+
+    print(response.data);
+    return resetModel;
+
+
+  }
+  Future<DeletePostImageModel> deleteImage( String id)async{
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+
+
+    var response = await dio.post(
+      TAG_BASE_URL + "?action=removeImage&remove=1&id=${id}",
+    );
+
+    print(response);
+    DeletePostImageModel resetModel;
+    if(response.statusCode == 200){
+      resetModel = DeletePostImageModel.fromJson(Map<String, dynamic>.from(response.data));
+    }
+
+
+
+    print(response.data);
+    return resetModel;
+
+
+  }
   Future<PostModel> post(String action,String id) async {
     var dio = Dio();
     dio.options.headers['content-Type'] = 'multipart/form-data';
@@ -513,7 +580,7 @@ print(TAG_BASE_URL + "?action=item&id=${petId}");
     print(TAG_BASE_URL + "?action=shopItemDetails&id=${petId}");
 
     var response = await dio.get(
-      TAG_BASE_URL + "?action=item&id=${petId}",
+      TAG_BASE_URL + "?action=shopItemDetails&id=${petId}",
     );
 
 
@@ -699,12 +766,12 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
 
 
 
-    print(TAG_BASE_URL + "?action=packages");
+    print(TAG_BASE_URL + "?action=packages&buy=0");
     PackageModel packageModel;
     try {
       var response = await dio.get(
         TAG_BASE_URL +
-            "?action=packages",
+            "?action=packages&buy=0",
       );
 
       print(response);
@@ -724,6 +791,46 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
     return packageModel;;
 
   }
+  Future<PaymentUrlModel> paymentUrl(Map<String,String> map)async{
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+    print(map);
+
+    print(TAG_BASE_URL + "?action=packages&buy=1");
+    PaymentUrlModel packageModel;
+    FormData formData = FormData.fromMap(map);
+
+    try {
+      var response = await dio.post(
+        TAG_BASE_URL +
+            "?action=packages&buy=1",
+          data: formData
+      );
+
+      print(response);
+
+
+      if (response.statusCode == 200) {
+        packageModel =
+            PaymentUrlModel.fromJson(Map<String, dynamic>.from(response.data));
+      }
+    }on Exception catch (_) {
+      packageModel = null;
+    }
+
+
+
+
+    return packageModel;;
+
+  }
+
   Future<PaymentModel> payment(Map map)async{
     print(map);
 
@@ -793,7 +900,7 @@ ChangePasswordModel changePasswordModel;
     String language = sharedPreferences.getString(LANG_CODE) ?? "en";
 
 
-print(id);
+print("userID---> ${id}");
     var response = await dio.get(
         TAG_BASE_URL + "?action=myPosts&id=${id}",
         );
@@ -806,20 +913,174 @@ print(id);
     return resp;
 
   }
-  Future<DeleteModel> deleteModel(Map map)async{
-    print(map);
+  Future<dynamic> myNewAuctions(String id)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+    Map<String,String> map = Map();
+    map['customerId']= id;
 
-    String body = json.encode(map);
 
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}post/delete"),headers: {"Content-Type": "application/json"},body: body);
-    print(' response ${response}');
-    DeleteModel deleteModel;
-    if(response.statusCode == 200){
-      deleteModel = DeleteModel.fromJson(jsonDecode(response.body));
+    print("userID---> ${id}");
+    FormData formData = FormData.fromMap(map);
+    var response = await dio.post(
+      TAG_BASE_URL + "?action=auctions&type=my",
+      data: formData
+    );
+    print(response.data);
+    MyPostsModel postModel;
+    if (response.statusCode == 200) {
+      resp =
+          response.data;
     }
+    return resp;
+
+  }
+  Future<StopAuctionModel> stopAuction(Map<String,String> map)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
 
 
-    print(response.body);
+    FormData formData = FormData.fromMap(map);
+    String body = json.encode(map);
+    var response = await dio.post(
+        TAG_BASE_URL + "?action=auctions&type=stop",
+        data: formData);
+    StopAuctionModel changePasswordModel;
+    if (response.statusCode == 200) {
+      changePasswordModel = StopAuctionModel.fromJson(Map<String, dynamic>.from(response.data));
+      print(resp);
+    }
+    return changePasswordModel;
+
+  }
+  Future<BidNewModel> bid(Map<String,String> map)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+    FormData formData = FormData.fromMap(map);
+    String body = json.encode(map);
+    var response = await dio.post(
+        TAG_BASE_URL + "?action=auctions&type=submitBid",
+        data: formData);
+    BidNewModel changePasswordModel;
+    if (response.statusCode == 200) {
+      changePasswordModel = BidNewModel.fromJson(Map<String, dynamic>.from(response.data));
+      print(resp);
+    }
+    return changePasswordModel;
+
+  }
+
+  Future<MyNewAuctionDetailsModel> myNewAuctionDetails(Map<String,String> map)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+    FormData formData = FormData.fromMap(map);
+    String body = json.encode(map);
+    var response = await dio.post(
+        TAG_BASE_URL + "?action=auctions&type=details",
+        data: formData);
+    MyNewAuctionDetailsModel changePasswordModel;
+    if (response.statusCode == 200) {
+      changePasswordModel = MyNewAuctionDetailsModel.fromJson(Map<String, dynamic>.from(response.data));
+      print(resp);
+    }
+    return changePasswordModel;
+
+  }
+  Future<dynamic> NewAuctionList()async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+
+    var response = await dio.post(
+        TAG_BASE_URL + "?action=auctions&type=list",
+    );
+    print(response.data);
+    MyPostsModel postModel;
+    if (response.statusCode == 200) {
+      resp =
+          response.data;
+    }
+    return resp;
+
+  }
+  Future<DeleteModel> deleteModel(String postId)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+    print("userID---> ${postId}");
+    var response = await dio.get(
+      TAG_BASE_URL + "?action=removePost&remove=1&id=${postId}",
+    );
+    print(response.data);
+    DeleteModel deleteModel;
+    if (response.statusCode == 200) {
+      deleteModel = DeleteModel.fromJson(Map<String, dynamic>.from(response.data));
+    }
+    return deleteModel;
+
+  }
+  Future<SuccessModel> successPayment(String orderId)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+
+    var response = await dio.get(
+      TAG_BASE_URL + "?action=success&orderId=${orderId}",
+    );
+    print(response.data);
+    SuccessModel deleteModel;
+    if (response.statusCode == 200) {
+      deleteModel = SuccessModel.fromJson(Map<String, dynamic>.from(response.data));
+    }
     return deleteModel;
 
   }
@@ -941,6 +1202,30 @@ print(id);
     return hospitalModel;
 
   }
+  Future<ServicesModel> services()async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+
+    var response = await dio.post(
+      TAG_BASE_URL + "?action=services",
+    );
+    ServicesModel servicesModel;
+    if (response.statusCode == 200) {
+      servicesModel = ServicesModel.fromJson(Map<String, dynamic>.from(response.data));
+      print(resp);
+    }
+    return servicesModel;
+
+  }
+
   Future<HospitalsModel> hospital()async{
 
 
@@ -992,6 +1277,34 @@ print(id);
     HospitalDetailsModel hospitalModel;
     if(response.statusCode == 200){
       hospitalModel = HospitalDetailsModel.fromJson(Map<String, dynamic>.from(response.data));
+    }
+
+
+
+    return hospitalModel;
+
+  }
+  Future<ServiceDetailsModel> serviceDetails(String id)async{
+
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+
+
+    var response = await dio.post(
+      TAG_BASE_URL + "?action=serviceDetails&id=${id}",
+    );
+
+    print(response);
+    ServiceDetailsModel hospitalModel;
+    if(response.statusCode == 200){
+      hospitalModel = ServiceDetailsModel.fromJson(Map<String, dynamic>.from(response.data));
     }
 
 
@@ -1100,9 +1413,52 @@ if(path == null){
 
 
   }
+  Future<dynamic> addVedio(File vedio) async{
+    dynamic resp;
+    var dio ;
+    try {
+    BaseOptions options = new BaseOptions(
+        baseUrl: TAG_BASE_URL,
+        receiveDataWhenStatusError: true,
+        connectTimeout: 600*1000, // 60 seconds
+        receiveTimeout: 600*1000 // 60 seconds
+    );
+
+    dio = new Dio(options);
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    Map<String, dynamic> map = Map();
+
+
+
+        print('path --> ${vedio.absolute.path}');
+
+        String childFileName = vedio.absolute.path
+            .split('/')
+            .last;
+        print ('childFileName ${childFileName}');
+        map['video']=  await MultipartFile.fromFile(vedio.path, filename: childFileName);
+    FormData formData = new FormData.fromMap(map);
+    final  response = await dio.post("?action=uploadVideo", data: formData);
+
+    if (response.statusCode == 200) {
+      resp = response.data;
+      print(resp);
+    }
+
+  } on DioError catch(e) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx and is also not 304.
+      resp = e.response.data;
+      print(resp);
+    }
+  return resp;
+
+
+  }
   Future<dynamic> addPost(String english_name,String arabic_name,String post_type,String english_description,String arabic_description, String price,String category_id, String age,String age_id,
       String gender, String owner_id, String sub_category_id,
-      String contact_no,String mLanguage,List<File> images ,File vedio)async{
+      String contact_no,String mLanguage,List<File> images ,File vedio,String vedioUrl)async{
     SharedPref sharedPref = SharedPref();
 
 
@@ -1120,14 +1476,16 @@ if(path == null){
       );
 
       dio = new Dio(options);
-      dio.options.contentType = 'application/json';
+      dio.options.headers['content-Type'] = 'multipart/form-data';
+      dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+
 
 
       Map<String, dynamic> map = Map();
 
       map['enTitle'] = english_name;
       map['arTitle'] = arabic_name;
-      map['postType'] = post_type;
+
       map['enDetails'] = english_description;
       map['arDetails'] = arabic_description;
       map['price'] = price;
@@ -1136,9 +1494,12 @@ if(path == null){
       map['ageType'] = age_id;
       map['gender'] = gender;
       map['customerId'] = owner_id;
+
       map['categoryId'] = category_id;
-      map['contact_no'] = contact_no;
-      map['language'] = mLanguage;
+      map['video'] = vedioUrl;
+
+
+
       for(int i =0;i<images.length;i++){
         String path = images[i].absolute.path;
         print('path --> ${images[i].absolute.path}');
@@ -1149,6 +1510,8 @@ if(path == null){
         print ('childFileName ${childFileName}');
         map['image[${i}]']=  await MultipartFile.fromFile(path, filename: childFileName);
       }
+
+      print(map);
   // File vedioFile =  File.fromRawPath(Uint8List.fromList([0]));
   //         String childFileName = vedioFile.path
   //             .split('/')
@@ -1260,8 +1623,13 @@ if(path == null){
   }
   Future<dynamic> editPost(String id,String english_name,String arabic_name,String post_type,String english_description,String arabic_description, String price,String category_id, String age,String age_id,
       String gender, String owner_id, String sub_category_id,
-      String contact_no,String mLanguage,List<File> images ,File vedio)async{
+      String contact_no,String mLanguage,List<File> images ,File vedio,String vedioUrl)async{
     SharedPref sharedPref = SharedPref();
+
+
+
+
+
 
 
 
@@ -1278,26 +1646,29 @@ if(path == null){
       );
 
       dio = new Dio(options);
-      dio.options.contentType = 'application/json';
+      dio.options.headers['content-Type'] = 'multipart/form-data';
+      dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+
 
 
       Map<String, dynamic> map = Map();
-      map['post_id'] = id;
 
-      map['english_name'] = english_name;
-      map['arabic_name'] = arabic_name;
-      map['post_type'] = post_type;
-      map['english_description'] = english_description;
-      map['arabic_description'] = arabic_description;
+      map['enTitle'] = english_name;
+      map['arTitle'] = arabic_name;
+
+      map['enDetails'] = english_description;
+      map['arDetails'] = arabic_description;
       map['price'] = price;
-      map['category_id'] = category_id;
+
       map['age'] = age;
-      map['age_id'] = age_id;
+      map['ageType'] = age_id;
       map['gender'] = gender;
-      map['owner_id'] = owner_id;
-      map['sub_category_id'] = sub_category_id;
-      map['contact_no'] = contact_no;
-      map['language'] = mLanguage;
+      map['customerId'] = owner_id;
+      map['categoryId'] = category_id;
+      map['video'] = vedioUrl;
+      print(map);
+
+
       for(int i =0;i<images.length;i++){
         String path = images[i].absolute.path;
         print('path --> ${images[i].absolute.path}');
@@ -1306,7 +1677,7 @@ if(path == null){
             .split('/')
             .last;
         print ('childFileName ${childFileName}');
-        map['images[${i}]']=  await MultipartFile.fromFile(path, filename: childFileName);
+        map['image[${i}]']=  await MultipartFile.fromFile(path, filename: childFileName);
       }
       // File vedioFile =  File.fromRawPath(Uint8List.fromList([0]));
       //         String childFileName = vedioFile.path
@@ -1314,7 +1685,7 @@ if(path == null){
       //         .last;
       // map['videos[0]'] = await MultipartFile.fromFile(vedioFile.path, filename: childFileName);
       FormData formData = new FormData.fromMap(map);
-      final  response = await dio.post("post/update", data: formData);
+      final  response = await dio.post("?action=editPost&edit=1&id=${id}", data: formData);
 
       if (response.statusCode == 200) {
         resp = response.data;
@@ -1348,7 +1719,7 @@ if(path == null){
 
 
     var response = await dio.get(
-      TAG_BASE_URL + "?action=myPosts&id=${id}",
+      TAG_BASE_URL + "?action=notifications&id=${id}",
     );
 
     print(response);

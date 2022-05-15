@@ -1,14 +1,17 @@
 import 'dart:convert';
+import 'dart:core';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:pet_mart/model/my_auctions_model.dart' as Model;
+import 'package:pet_mart/model/MyNewAuctionModel.dart';
+import 'package:pet_mart/model/NewAcutionListModel.dart' as NewAcutionListModel;
+
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
-import 'package:pet_mart/model/auction_model.dart' as AuctionModel;
-import 'package:pet_mart/model/check_credit_model.dart';
+
+
 import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
@@ -20,6 +23,7 @@ import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
+import '../model/auction_type.dart';
 import 'create_auction_screen.dart';
 import 'credit_screen.dart';
 import 'login_screen.dart';
@@ -31,145 +35,207 @@ class AuctionScreen extends StatefulWidget {
 
 class _AuctionScreenState extends State<AuctionScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  List<Categories> categories = List();
-  List<bool> selectedList = List();
-  Model.MyAuctionsModel myAuctionModel = null;
+  List<Categories> categories = [];
+  List<bool> selectedList =[];
+
+
   HomeModel homeModel;
-  AuctionModel.AuctionModel auctionModel;
+
   double itemWidth;
   double itemHeight;
   String languageCode;
-  Future<AuctionModel.AuctionModel> auction(String catId) async{
+  // Future<AuctionModel.AuctionModel> auction(String catId) async{
+  //
+  //   SharedPreferences _preferences = await SharedPreferences.getInstance();
+  //    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+  //
+  //   String loginData = _preferences.getString(kUserModel);
+  //   Map map ;
+  //
+  //   if(loginData == null){
+  //     map = {"category_id":catId,
+  //       "id":"",
+  //       "language":languageCode};
+  //   }else{
+  //     final body = json.decode(loginData);
+  //     LoginModel   loginModel = LoginModel.fromJson(body);
+  //     map = {"category_id":catId,
+  //       "id":loginModel.data.id,
+  //       "language":languageCode};
+  //
+  //   }
+  //
+  //
+  //
+  //
+  //   PetMartService petMartService = PetMartService();
+  //   AuctionModel.AuctionModel auctionModel = await petMartService.auction(map);
+  //   return auctionModel;
+  // }
+  String loginData = "";
+  String userId="";
+  // Future<void> getList(String catId) async{
+  //
+  //   SharedPreferences _preferences = await SharedPreferences.getInstance();
+  //   String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+  //
+  //   String loginData = _preferences.getString(kUserModel);
+  //   Map map ;
+  //   print('loginData ${loginData}');
+  //
+  //   if(loginData == null){
+  //     userId = "";
+  //     map = {"category_id":catId,
+  //       "id":"",
+  //       "language":languageCode};
+  //   }else{
+  //
+  //     final body = json.decode(loginData);
+  //     LoginModel   loginModel = LoginModel.fromJson(body);
+  //     userId = loginModel.data.id;
+  //     print('userId --> ${userId}');
+  //     map = {"category_id":catId,
+  //       "id":loginModel.data.id,
+  //       "language":languageCode};
+  //   }
+  //
+  //
+  //
+  //
+  //   PetMartService petMartService = PetMartService();
+  //   auctionModel = await petMartService.auction(map);
+  //   setState(() {
+  //
+  //   });
+  //
+  // }
 
+MyNewAuctionModel myNewAuctionModel;
+  NewAcutionListModel. NewAcutionListModel mNewAuctionListModel;
+  String myAuctionErrorString="";
+  String AuctionErrorString ="";
+
+  Future<void> auctions() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-    String loginData = _preferences.getString(kUserModel);
-    Map map ;
+     loginData = _preferences.getString(kUserModel)??null;
+     if(loginData != null){
+       final body = json.decode(loginData);
+       LoginModel   loginModel = LoginModel.fromJson(body);
+       userId = loginModel.data.id;
+       PetMartService petMartService = PetMartService();
+       Map<String, dynamic>   response  = await petMartService.myNewAuctions(userId);
+       bool isOk  = response['ok'];
+       if(isOk){
+         myAuctionErrorString = "";
+         myNewAuctionModel = MyNewAuctionModel.fromJson(response);
+         myAuctionList = myNewAuctionModel.data.live;
+         if(myAuctionList == null){
+           myAuctionList = [];
+         }
+       }else{
+         myAuctionErrorString = response['data']['msg'];
+       }
 
-    if(loginData == null){
-      map = {"category_id":catId,
-        "id":"",
-        "language":languageCode};
-    }else{
-      final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
-      map = {"category_id":catId,
-        "id":loginModel.data.id,
-        "language":languageCode};
 
-    }
-
-
-
-
+     }
     PetMartService petMartService = PetMartService();
-    AuctionModel.AuctionModel auctionModel = await petMartService.auction(map);
-    return auctionModel;
-  }
-  String loginData = null;
-  String userId="";
-  Future<void> getList(String catId) async{
+    Map<String, dynamic>   responseList  = await petMartService.NewAuctionList();
+    bool isNewOk = responseList['ok'];
+    if(isNewOk){
+      mNewAuctionListModel = NewAcutionListModel.NewAcutionListModel.fromJson(responseList);
 
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-
-    String loginData = _preferences.getString(kUserModel);
-    Map map ;
-    print('loginData ${loginData}');
-
-    if(loginData == null){
-      userId = "";
-      map = {"category_id":catId,
-        "id":"",
-        "language":languageCode};
+      AuctionErrorString = "";
     }else{
-
-      final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
-      userId = loginModel.data.id;
-      print('userId --> ${userId}');
-      map = {"category_id":catId,
-        "id":loginModel.data.id,
-        "language":languageCode};
+      AuctionErrorString = responseList['data']['msg'];
     }
 
 
 
-
-    PetMartService petMartService = PetMartService();
-    auctionModel = await petMartService.auction(map);
-    setState(() {
-
-    });
-
   }
-  Future<HomeModel> getHomeModel() async{
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String homeString = sharedPreferences.getString("home");
-print('homeString --> ${homeString}');
 
-    HomeModel  homeModel ;
+//   Future<HomeModel> getHomeModel() async{
+//     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+//     String homeString = sharedPreferences.getString("home");
+// print('homeString --> ${homeString}');
+//
+//     HomeModel  homeModel ;
+//
+//
+//     final body = json.decode(homeString);
+//     homeModel = HomeModel.fromJson(body);
+//     SharedPreferences _preferences = await SharedPreferences.getInstance();
+//     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+//
+//     String loginData = _preferences.getString(kUserModel);
+//     Map map ;
+//     print('loginData ${loginData}');
+//
+//     if(loginData != null) {
+//       final body = json.decode(loginData);
+//       LoginModel   loginModel = LoginModel.fromJson(body);
+//       Map myAuctionMap;
+//       userId = loginModel.data.id;
+//       myAuctionMap = {
+//         "id": loginModel.data.id,
+//         "language": languageCode,
+//         "auction_type": "all"};
+//
+//
+//       PetMartService petMartService = PetMartService();
+//       myAuctionModel = await petMartService.myAuctions(myAuctionMap);
+//       print('myAuctionModel --> ${myAuctionModel}');
+//     }
+//
+//
+//
+//     return homeModel;
+//   }
+  List<Live> myAuctionList =[];
+  List<AuctionType> auctionTypeList =[];
+  int position=0;
 
-
-    final body = json.decode(homeString);
-    homeModel = HomeModel.fromJson(body);
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-
-    String loginData = _preferences.getString(kUserModel);
-    Map map ;
-    print('loginData ${loginData}');
-
-    if(loginData != null) {
-      final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
-      Map myAuctionMap;
-      userId = loginModel.data.id;
-      myAuctionMap = {
-        "id": loginModel.data.id,
-        "language": languageCode,
-        "auction_type": "all"};
-
-
-      PetMartService petMartService = PetMartService();
-      myAuctionModel = await petMartService.myAuctions(myAuctionMap);
-      print('myAuctionModel --> ${myAuctionModel}');
-    }
-
-
-
-    return homeModel;
-  }
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getHomeModel().then((value){
-homeModel = value;
+    AuctionType  liveType = AuctionType("مباشر", "live", true);
+    AuctionType  doneType = AuctionType("انتهي", "Done", false);
+    AuctionType  cancleType = AuctionType("ملغي", "Cancel", false);
+    auctionTypeList.add(liveType);
+    auctionTypeList.add(doneType);
+    auctionTypeList.add(cancleType);
+    auctions().then((value)  {
+    setState(() {
 
-
-        // List<Images> images = null;
-        String categoryId = "";
-        Categories category = Categories(id:categoryId,arTitle:getTranslated(context, 'all'),enTitle:getTranslated(context, 'all'),logo: "");
-        categories.add(category);
-        selectedList.add(true);
-
-        for(int i =0;i<homeModel.data.categories.length;i++){
-          categories.add(homeModel.data.categories[i]);
-          selectedList.add(false);
-          print("CatId-->${homeModel.data.categories[i].id}");
-        }
-
-
-    }).whenComplete(() {
-      auction("").then((value){
-        setState(() {
-          auctionModel = value;
-        });
-
-      });
     });
+    });
+//     getHomeModel().then((value){
+// homeModel = value;
+//
+//
+//         // List<Images> images = null;
+//         String categoryId = "";
+//         Categories category = Categories(id:categoryId,arTitle:getTranslated(context, 'all'),enTitle:getTranslated(context, 'all'),logo: "");
+//         categories.add(category);
+//         selectedList.add(true);
+//
+//         for(int i =0;i<homeModel.data.categories.length;i++){
+//           categories.add(homeModel.data.categories[i]);
+//           selectedList.add(false);
+//           print("CatId-->${homeModel.data.categories[i].id}");
+//         }
+//
+//
+//     }).whenComplete(() {
+//       auction("").then((value){
+//         setState(() {
+//           auctionModel = value;
+//         });
+//
+//       });
+//     });
   }
   @override
   Widget build(BuildContext context) {
@@ -180,7 +246,7 @@ homeModel = value;
     return Scaffold(
       body: Container(
 
-        child: homeModel == null?
+        child: loginData == ""?
         Container(
           child: CircularProgressIndicator(
 
@@ -199,73 +265,162 @@ homeModel = value;
           children: [
 
             Container(
+              child: userId == ""?
+              Container():Container(
 
-              padding: EdgeInsets.all(10.h),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Opacity(
-                      opacity: userId == ""?0.0:1.0,
-                      child: Container(
+                padding:
+                EdgeInsets.all(10.h),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
 
 
                         child: Text(getTranslated(context, 'my_auction')
                           ,style: TextStyle(color: Color(0xFF000000),fontSize: screenUtil.setSp(16),
                               fontWeight: FontWeight.bold),),
                       ),
-                    ),
-                    previewButton(getTranslated(context, 'create_auction'), context),
+                      previewButton(getTranslated(context, 'create_auction'), context),
 
-                  ],
-                )),
-            SizedBox(height: 1,width: width,
-            child: Container(
-              color: Color(0xFF0000000),
-            ),),
+                    ],
+                  )),
+            ),
             Container(
-              child:userId== "" || myAuctionModel == null?
+              child:userId == ""?
+              Container():SizedBox(height: 1,width: width,
+              child: Container(
+                color: Color(0xFF0000000),
+              ),),
+            ),
+            Container(
+              child:userId== ""?
                 Container()
-          :Column(
-                children: [
-                  SizedBox(height: 10.w,),
-                  Container(
-                    child:
-                    Container(
-                      height: 200.h,
-                      width: width,
-                      child: ListView.separated(
-                        scrollDirection: Axis.horizontal,
-                          itemBuilder:(context,index){
-                        return GestureDetector(
-                          onTap: (){
-                            Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                              return new MyAuctionDetails(id:myAuctionModel.data.auctionData[index].auctionId,postName:myAuctionModel.data.auctionData[index].auctionName ,);
-                            }));
-                          },
-                          child: Container(
-                            margin: EdgeInsets.all(6.w),
-                            child: Card(
-                                clipBehavior: Clip.antiAliasWithSaveLayer,
-                                elevation: 1.w,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0.h),
-                                ),
-                                color: Color(0xFFFFFFFF),
-                                child: buildMyAuctionItem(myAuctionModel.data.auctionData[index],context)),
-                          ),
-                        );
-                      } , separatorBuilder: (context,index){
-                        return Container(width: 10.w,);
-                      }, itemCount: myAuctionModel.data.auctionData.length),
-                    ),
-                  ),
-                  SizedBox(height: 10.w,),
-                  SizedBox(height: 1,width: width,
-                    child: Container(
-                      color: Color(0xFF0000000),
-                    ),),
-                ],
+          :Container(
+            child:myAuctionErrorString != ""?
+            Container(
+              child: Text(
+                myAuctionErrorString,
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: screenUtil.setSp(16),
+                    fontWeight: FontWeight.w600
+                ),
               ),
+              alignment: AlignmentDirectional.center,
+            ):
+            Column(
+                  children: [
+                    SizedBox(height: 10.w,),
+                    Container(
+                      margin: EdgeInsets.all(10.h),
+                      height: 35.h,
+                      child: ListView.separated(
+
+                          scrollDirection: Axis.horizontal,
+
+                          itemBuilder: (context,index){
+                            return
+                              GestureDetector(
+                                onTap: (){
+                                  bool selectedIndex = auctionTypeList[index].isSelected;
+                                  if(!selectedIndex){
+
+                                    for(int i =0;i<auctionTypeList.length;i++){
+                                      if(i == index){
+                                        auctionTypeList[i].isSelected= true;
+                                      }else{
+                                        auctionTypeList[i].isSelected= false;
+                                      }
+                                    }
+
+
+
+                                    myAuctionList =[];
+                                    if(index==0){
+                                      myAuctionList = myNewAuctionModel.data.live;
+
+                                    }else if(index == 1){
+                                      myAuctionList = myNewAuctionModel.data.done;
+                                    }else if(index == 2){
+                                      myAuctionList = myNewAuctionModel.data.cancel;
+                                    }
+                                    if(myAuctionList == null){
+                                      myAuctionList = [];
+                                    }
+                                    position = index;
+                                    setState(() {
+
+                                    });
+
+
+                                  }
+
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 10.w),
+                                    child: selectRow(auctionTypeList[index],context,index)),
+                              );
+                          }
+                          ,
+                          separatorBuilder: (context,index) {
+                            return Container(height: 10.h,
+                              color: Color(0xFFFFFFFF),);
+                          }
+                          ,itemCount: auctionTypeList.length),
+
+                    ),
+                    Container(
+                      child:myAuctionList.isEmpty?
+                          Container(
+                            height: 200.h,
+                            width: width,
+                            alignment: AlignmentDirectional.center,
+                            child: Text(
+                            "No Auction Available",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: screenUtil.setSp(16),
+                                fontWeight: FontWeight.w600
+                            ),
+                          ),
+                          ):
+                      Container(
+                        height: 200.h,
+                        width: width,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                            itemBuilder:(context,index){
+                          return GestureDetector(
+                            onTap: (){
+                              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                return new MyAuctionDetails(id:myAuctionList[index].id,postName:languageCode == "en"?myAuctionList[index].enTitle:myAuctionList[index].enTitle);
+                              }));
+                            },
+                            child: Container(
+                              margin: EdgeInsets.all(6.w),
+                              child: Card(
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  elevation: 1.w,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0.h),
+                                  ),
+                                  color: Color(0xFFFFFFFF),
+                                  child: buildMyAuctionItem(myAuctionList[index],context)),
+                            ),
+                          );
+                        } , separatorBuilder: (context,index){
+                          return Container(width: 10.w,);
+                        }, itemCount: myAuctionList.length),
+                      ),
+                    ),
+                    SizedBox(height: 10.w,),
+                    SizedBox(height: 1,width: width,
+                      child: Container(
+                        color: Color(0xFF0000000),
+                      ),),
+                  ],
+                ),
+          ),
             ),
             Container(
               alignment: AlignmentDirectional.centerStart,
@@ -278,66 +433,17 @@ homeModel = value;
               child: Container(
                 color: Color(0xFF0000000),
               ),),
-            Container(
-              margin: EdgeInsets.all(10.h),
-              height: 35.h,
-              child: ListView.separated(
 
-                  scrollDirection: Axis.horizontal,
-
-                  itemBuilder: (context,index){
-                    return
-                      GestureDetector(
-                        onTap: (){
-                          bool selectedIndex = selectedList[index];
-                          if(!selectedIndex){
-                            auctionModel = null;
-                            for(int i =0;i<selectedList.length;i++){
-                              if(i == index){
-                                selectedList[i]= true;
-                              }else{
-                                selectedList[i]= false;
-                              }
-                            }
-
-                            setState(() {
-
-                            });
-                            getList(categories[index].id);
-
-                          }
-
-                        },
-                        child: Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w),
-                            child: selectRow(categories[index],context,index)),
-                      );
-                  }
-                  ,
-                  separatorBuilder: (context,index) {
-                    return Container(height: 10.h,
-                      color: Color(0xFFFFFFFF),);
-                  }
-                  ,itemCount: categories.length),
-
-            ),
             SizedBox(height: 5.h,width: width,
             ),
             Container(
               child:
-              auctionModel== null?
-              Container(
-                child: CircularProgressIndicator(
 
-
-                ),
-                alignment: AlignmentDirectional.center,
-              ):
-              auctionModel.data.isEmpty?
+              AuctionErrorString != ""?
 
               Container(
                 child: Text(
-                  auctionModel.message,
+                  AuctionErrorString,
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: screenUtil.setSp(16),
@@ -355,13 +461,13 @@ homeModel = value;
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                     childAspectRatio:itemWidth/itemHeight),
-                itemCount: auctionModel.data.length,
+                itemCount: mNewAuctionListModel.data.length,
 
                 itemBuilder: (context,index){
                   return GestureDetector(
                     onTap: (){
                       Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new AuctionDetailsScreen(mAuctionModel:auctionModel.data[index]);
+                        return new AuctionDetailsScreen(mAuctionModel:mNewAuctionListModel.data[index]);
                       }));
                     },
                     child: Container(
@@ -376,7 +482,7 @@ homeModel = value;
                               borderRadius: BorderRadius.circular(10.0.h),
                             ),
                             color: Color(0xFFFFFFFF),
-                            child: buildItem(auctionModel.data[index],context))),
+                            child: buildItem(mNewAuctionListModel.data[index],context))),
                   );
                 },
               ),
@@ -387,12 +493,12 @@ homeModel = value;
       ),
     );
   }
-  Container selectRow(Categories category,BuildContext context,int selectedIndex){
+  Container selectRow(AuctionType category,BuildContext context,int selectedIndex){
 
     return
       Container(
         child:
-        selectedList[selectedIndex]?
+        category.isSelected?
         Container(
           padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
           decoration: BoxDecoration(
@@ -401,7 +507,7 @@ homeModel = value;
           ),
           child: Text(
             languageCode == "en"?
-            category.enTitle:category.arTitle,
+            category.nameEn:category.nameAr,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -422,7 +528,7 @@ homeModel = value;
           ),
           child: Text(
             languageCode == "en"?
-            category.enTitle:category.arTitle,
+            category.nameEn:category.nameAr,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -448,7 +554,7 @@ homeModel = value;
       style: flatButtonStyle,
       onPressed: () {
 
-        createAuction(context);
+         createAuction(context);
 
       },
       child: Text(text,style: TextStyle(
@@ -458,7 +564,7 @@ homeModel = value;
       ),),
     );
   }
-  Widget buildItem(AuctionModel.Data data, BuildContext context) {
+  Widget buildItem(NewAcutionListModel.Data data, BuildContext context) {
     return Container(
       child: Column(
         children: [
@@ -468,7 +574,7 @@ homeModel = value;
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.gallery.isEmpty?"":data.gallery[0].image,
+                  imageUrl:KImageUrl+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -519,7 +625,8 @@ homeModel = value;
                 Container(
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    data.name,
+                    languageCode == "en"?
+                    data.enTitle:data.arTitle,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -535,7 +642,7 @@ homeModel = value;
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 5.w),
                       child: Text(
-                        data.imageCount.toString(),
+                        data.images.toString(),
                         style: TextStyle(
                             color: Color(0xFF000000),
                             fontWeight: FontWeight.normal,
@@ -578,7 +685,7 @@ homeModel = value;
     );
 
   }
-  Widget buildMyAuctionItem(Model.AuctionData data, BuildContext context) {
+  Widget buildMyAuctionItem(Live data, BuildContext context) {
     String timer ="";
     return Container(
       width: 150.w,
@@ -591,7 +698,7 @@ homeModel = value;
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:data.gallery.isEmpty?"":data.gallery[0].image,
+                  imageUrl:KImageUrl+data.image,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -643,7 +750,8 @@ homeModel = value;
                 Container(
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    data.auctionName,
+                    languageCode == "en"?data.enTitle:
+                    data.arTitle,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -660,7 +768,7 @@ homeModel = value;
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 5.w),
                       child: Text(
-                        data.imageCount.toString(),
+                        data.images.toString(),
                         style: TextStyle(
                             color: Color(0xFF000000),
                             fontWeight: FontWeight.normal,
@@ -673,15 +781,15 @@ homeModel = value;
                 )),
                 Expanded(
                   flex: 1,
-                  child: Countdown(
-                    seconds: getRemainingTime(data.endDate),
-                    build: (BuildContext context, double time) => Container(
+                  child: Container(
+                    child: position == 1?
+                    Container(
                       alignment: AlignmentDirectional.centerStart,
                       margin: EdgeInsetsDirectional.only(start: 4.w),
                       child: Text(
 
 
-                          time.toInt()<=0 ? getTranslated(context, 'complete_string') :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
+                        "Done",
                           style: TextStyle(
 
                             color: Color(0xFF000000),
@@ -690,11 +798,47 @@ homeModel = value;
 
                           )
                       ),
+                    ):
+                    position == 2? Container(
+                      alignment: AlignmentDirectional.centerStart,
+                      margin: EdgeInsetsDirectional.only(start: 4.w),
+                      child: Text(
+
+
+                          "Stopped",
+                          style: TextStyle(
+
+                            color: Color(0xFF000000),
+                            fontSize: screenUtil.setSp(12),
+                            fontWeight: FontWeight.bold,
+
+                          )
+                      ),
+                    ):
+
+                    Countdown(
+                      seconds: getRemainingTime(data.endDate),
+                      build: (BuildContext context, double time) => Container(
+                        alignment: AlignmentDirectional.centerStart,
+                        margin: EdgeInsetsDirectional.only(start: 4.w),
+                        child: Text(
+
+
+                            time.toInt()<=0 ? getTranslated(context, 'complete_string') :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
+                            style: TextStyle(
+
+                              color: Color(0xFF000000),
+                              fontSize: screenUtil.setSp(12),
+                              fontWeight: FontWeight.bold,
+
+                            )
+                        ),
+                      ),
+                      interval: Duration(seconds: 1),
+                      onFinished: () {
+                        print('Timer is done!');
+                      },
                     ),
-                    interval: Duration(seconds: 1),
-                    onFinished: () {
-                      print('Timer is done!');
-                    },
                   ),
                 ),
               ],
@@ -709,7 +853,7 @@ homeModel = value;
   int  getRemainingTime(String date ){
     var now = new DateTime.now();
     print(now);
-    DateTime tempDate = new DateFormat("dd-MM-yyyy hh:mm:ss").parse(date);
+    DateTime tempDate = new DateFormat("yyyy-MM-dd hh:mm:ss").parse(date);
     Duration difference = tempDate.difference(now);
     return difference.inSeconds;
   }
@@ -736,47 +880,48 @@ homeModel = value;
 
     return tokens.join(':');
   }
-  Future<CheckCreditModel> checkCreditModel() async{
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String loginData = sharedPreferences.getString(kUserModel);
-
-    final body = json.decode(loginData);
-    LoginModel   loginModel = LoginModel.fromJson(body);
-
-
-    Map map ;
-
-
-    map = {"user_id":loginModel.data.id};
-
-
-
-
-
-    PetMartService petMartService = PetMartService();
-    CheckCreditModel creditModel = await petMartService.checkCredit(map);
-    return creditModel;
-  }
+  // Future<CheckCreditModel> checkCreditModel() async{
+  //   SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+  //   String loginData = sharedPreferences.getString(kUserModel);
+  //
+  //   final body = json.decode(loginData);
+  //   LoginModel   loginModel = LoginModel.fromJson(body);
+  //
+  //
+  //   Map map ;
+  //
+  //
+  //   map = {"user_id":loginModel.data.id};
+  //
+  //
+  //
+  //
+  //
+  //   PetMartService petMartService = PetMartService();
+  //   CheckCreditModel creditModel = await petMartService.checkCredit(map);
+  //   return creditModel;
+  // }
   createAuction(BuildContext context) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      final modelHud = Provider.of<ModelHud>(context,listen: false);
-      modelHud.changeIsLoading(true);
-      checkCreditModel().then((value){
-        modelHud.changeIsLoading(false);
-        int credit = int.parse(value.data.credit);
-        print('credit --->${credit}');
-
-        if(credit>0){
-          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-            return new CreateAuctionScreen();
-          }));
-        }else{
-          ShowAlertDialog(context, value.message);
-        }
-      });
-      print("true");
+      // final modelHud = Provider.of<ModelHud>(context,listen: false);
+      // modelHud.changeIsLoading(true);
+      // checkCreditModel().then((value){
+      //   modelHud.changeIsLoading(false);
+      //   int credit = int.parse(value.data.credit);
+      //   print('credit --->${credit}');
+      //
+      //   if(credit>0){
+      //
+      //   }else{
+      //     ShowAlertDialog(context, value.message);
+      //   }
+      // });
+      // print("true");
+      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+        return new CreateAuctionScreen();
+      }));
 
     }else{
       ShowAlerLogintDialog(context,getTranslated(context, 'not_login'));

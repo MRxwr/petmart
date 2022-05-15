@@ -1,36 +1,42 @@
-/// status : "success"
-/// message : "Post has been deleted."
-/// data : []
-
 class DeleteModel {
-  String _status;
-  String _message;
+  bool ok;
+  String error;
+  String status;
+  Data data;
 
+  DeleteModel({this.ok, this.error, this.status, this.data});
 
-  String get status => _status;
-  String get message => _message;
-
-
-  DeleteModel({
-      String status, 
-      String message}){
-    _status = status;
-    _message = message;
-
-}
-
-  DeleteModel.fromJson(dynamic json) {
-    _status = json["status"];
-    _message = json["message"];
-
+  DeleteModel.fromJson(Map<String, dynamic> json) {
+    ok = json['ok'];
+    error = json['error'];
+    status = json['status'];
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    var map = <String, dynamic>{};
-    map["status"] = _status;
-    map["message"] = _message;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['ok'] = this.ok;
+    data['error'] = this.error;
+    data['status'] = this.status;
+    if (this.data != null) {
+      data['data'] = this.data.toJson();
+    }
+    return data;
+  }
+}
 
-    return map;
+class Data {
+  String msg;
+
+  Data({this.msg});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    msg = json['msg'];
   }
 
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['msg'] = this.msg;
+    return data;
+  }
 }

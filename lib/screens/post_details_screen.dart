@@ -22,6 +22,8 @@ import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/edit_post_screen.dart';
 import 'package:pet_mart/screens/message_screen.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
+import 'package:pet_mart/screens/vedio_screen.dart';
+import 'package:pet_mart/screens/youtube_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -438,15 +440,48 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      mLanguage =="en"?
-                      postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle,
-                      style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: screenUtil.setSp(14),
-                          fontWeight: FontWeight.normal
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          mLanguage =="en"?
+                          postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle,
+                          style: TextStyle(
+                              color: Color(0xFF000000),
+                              fontSize: screenUtil.setSp(14),
+                              fontWeight: FontWeight.normal
 
-                      ),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: (){
+                            String vedioUrl= postDetailsModel.data.items[0].video;
+                            String title = "";
+                            if(mLanguage == "en"){
+                              title = postDetailsModel.data.items[0].enTitle;
+                            }else{
+                              title = postDetailsModel.data.items[0].arTitle;
+                            }
+                            if(vedioUrl.trim()!=""){
+                              if(vedioUrl.contains("youtu")){
+                                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                  return new YouTubeScreen(youtubeId:vedioUrl,auctionName: title);
+                                }));
+                              }else{
+                                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                  return new VideoScreen(vedioUrl:vedioUrl,auctionName: title,);
+                                }));
+                              }
+
+                            }
+
+                          },
+                          child: Image.asset('assets/images/play-button.png',
+                            height: 30.w,width: 30.w,fit: BoxFit.fill,
+                            color:postDetailsModel.data.items[0].video== ""?Color(0xFFAAAAAA):kMainColor ,
+                          ),
+                        )
+                      ],
                     ),
                     Text(
                       '',

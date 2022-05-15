@@ -21,8 +21,8 @@
   "add_photo": "Add Photo",
   "select_category": "Select Category",
   "select_sub_category":"Select Sub Category",
-  "post_title": "Post Title in English",
-  "post_description": "Post Description in English",
+  "post_title": "Post Title ",
+  "post_description": "Post Description ",
   "age_string": "Age",
   "select_gender": "Select Gender",
   "post_price": "Post Price",
@@ -180,7 +180,13 @@
   "post_description_ar": "Post Description in Arabic ",
   "no_notification_available": "No Notification Available",
   "products": "Products",
-  "write_search_text": "Enter Search Text"
+  "write_search_text": "Enter Search Text",
+  "service": "Services",
+  "select_payment_method": "Select Payment Method",
+  "knet": "KNET",
+  "master": "Master Card",
+  "go_to_myaccount": "Go To My Account",
+  "go_to_credit": "Go To Packages"
 
 
 }

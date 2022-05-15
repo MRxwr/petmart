@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/MyNewAuctionDetailsModel.dart';
 import 'package:pet_mart/model/auction_details_model.dart';
 import 'package:pet_mart/model/delete_model.dart';
 import 'package:pet_mart/model/login_model.dart';
@@ -17,11 +18,13 @@ import 'package:pet_mart/model/my_auction_details_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:pet_mart/screens/vedio_screen.dart';
+import 'package:pet_mart/screens/youtube_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/StopAuctionModel.dart';
 import 'main_sceen.dart';
 class MyAuctionDetails extends StatefulWidget {
   String id;
@@ -33,7 +36,7 @@ class MyAuctionDetails extends StatefulWidget {
 }
 
 class _MyAuctionDetailsState extends State<MyAuctionDetails> {
-  MyAuctionDetailsModel mAuctionDetailsModel = null;
+  MyNewAuctionDetailsModel mAuctionDetailsModel = null;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final CarouselController _controller = CarouselController();
   ScreenUtil screenUtil = ScreenUtil();
@@ -47,20 +50,22 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
   double _initialRating ;
   bool _isRTLMode = false;
   bool _isVertical = false;
-  Future<MyAuctionDetailsModel> auction() async{
+  String languageCode;
+  LoginModel   loginModel;
+  Future<MyNewAuctionDetailsModel> auction() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
     String loginData = _preferences.getString(kUserModel);
-    Map map ;
+    Map<String,String> map  = Map();
+
 
 
       final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
-      map = {"auction_id":widget.id,
-        "user_id":loginModel.data.id,
-        "language":languageCode};
+         loginModel = LoginModel.fromJson(body);
+    map['auctionId']= widget.id;
+    map['customerId']= loginModel.data.id;
       print(map);
 
 
@@ -68,38 +73,38 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
 
 
     PetMartService petMartService = PetMartService();
-    MyAuctionDetailsModel auctionDetailsModel = await petMartService.myAuctionDetails(map);
+    MyNewAuctionDetailsModel auctionDetailsModel = await petMartService.myNewAuctionDetails(map);
     return auctionDetailsModel;
   }
-  Future<void> auctionLoad() async{
-    mAuctionDetailsModel = null;
-    setState(() {
-
-    });
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-
-    String loginData = _preferences.getString(kUserModel);
-    Map map ;
-
-
-      final body = json.decode(loginData);
-      LoginModel   loginModel = LoginModel.fromJson(body);
-      map = {"auction_id":widget.id,
-        "user_id":loginModel.data.id,
-        "language":languageCode};
-
-
-
-
-
-    PetMartService petMartService = PetMartService();
-    mAuctionDetailsModel = await petMartService.myAuctionDetails(map);
-    _rating = double.parse(mAuctionDetailsModel.data.rating.toDouble());
-    setState(() {
-
-    });
-  }
+  // Future<void> auctionLoad() async{
+  //   mAuctionDetailsModel = null;
+  //   setState(() {
+  //
+  //   });
+  //   SharedPreferences _preferences = await SharedPreferences.getInstance();
+  //   String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+  //
+  //   String loginData = _preferences.getString(kUserModel);
+  //   Map map ;
+  //
+  //
+  //     final body = json.decode(loginData);
+  //     LoginModel   loginModel = LoginModel.fromJson(body);
+  //     map = {"auction_id":widget.id,
+  //       "user_id":loginModel.data.id,
+  //       "language":languageCode};
+  //
+  //
+  //
+  //
+  //
+  //   PetMartService petMartService = PetMartService();
+  //   mAuctionDetailsModel = await petMartService.myAuctionDetails(map);
+  //   _rating = double.parse(mAuctionDetailsModel.data.rating.toDouble());
+  //   setState(() {
+  //
+  //   });
+  // }
   @override
   void initState() {
     // TODO: implement initState
@@ -107,7 +112,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     auction().then((value){
       setState(() {
         mAuctionDetailsModel = value;
-        _rating = double.parse(mAuctionDetailsModel.data.rating.toString());
+        // _rating = double.parse(mAuctionDetailsModel.data.rating.toString());
 
       });
     });
@@ -170,6 +175,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                 children: [
                   Container(
                     child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
                       children: [
                         Container(
                           height: 200.h,
@@ -201,7 +207,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                       });
                                     }
                                 ),
-                                items: mAuctionDetailsModel.data.gallery.map((item) =>
+                                items: mAuctionDetailsModel.data[0].image.map((item) =>
                                     Stack(
 
 
@@ -209,24 +215,20 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
 
                                         GestureDetector(
                                           onTap: (){
-                                            String url = item.image.trim();
-                                            String type = item.type;
-                                            if(type == 'video'){
-                                              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                                return new VideoScreen(vedioUrl:url,auctionName: mAuctionDetailsModel.data.auctionName,);
-                                              }));
-                                            }else {
+                                            String url =KImageUrl+ item;
+
+
                                               if (url.isNotEmpty) {
                                                 Navigator.of(context, rootNavigator: true)
                                                     .push(new MaterialPageRoute(
                                                     builder: (BuildContext context) {
                                                       return new PhotoScreen(
                                                         imageProvider: NetworkImage(
-                                                            KImageUrl+url
+                                                           url
                                                         ),);
                                                     }));
                                               }
-                                            }
+
                                           },
 
 
@@ -236,24 +238,13 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                               Container(
                                                 width: width,
 
-                                                child:item.type == 'video'?
-                                                GestureDetector(
-                                                  onTap: (){
-                                                    String url = item.image.trim();
-                                                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                                      return new VideoScreen(vedioUrl:url,auctionName: mAuctionDetailsModel.data.auctionName,);
-                                                    }));
-                                                  },
-                                                  child: Container(
-                                                    color: Colors.black,
-                                                  ),
-                                                ):
+                                               child:
 
                                                 CachedNetworkImage(
                                                   width: width,
 
                                                   fit: BoxFit.fill,
-                                                  imageUrl:'${KImageUrl+item.image}',
+                                                  imageUrl:'${KImageUrl+item}',
                                                   imageBuilder: (context, imageProvider) => Card(
                                                     elevation: 1.h,
                                                     child: Container(
@@ -311,32 +302,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                             end: 0,
                                             top: 0,
                                             bottom: 0,
-                                            child: item.type =='video' ?
-                                            Center(
-                                              child: GestureDetector(
-                                                onTap: (){
-                                                  String type = item.type;
-                                                  String url = item.image.trim();
-                                                  if(type == 'video'){
-                                                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                                      return new VideoScreen(vedioUrl:url,auctionName: mAuctionDetailsModel.data.auctionName,);
-                                                    }));
-                                                  }
-                                                },
-                                                child: Container(
-                                                  height: 60.h,
-                                                  width: 60.h,
-
-                                                  decoration: BoxDecoration(
-                                                      image: DecorationImage(
-                                                          image: AssetImage('assets/images/youtube_icon.png'),
-                                                          fit: BoxFit.fill
-                                                      )
-                                                  ),
-                                                  child: Icon(Icons.video_collection,color: kMainColor,size: 50.h),
-                                                ),
-                                              ),
-                                            ):
+                                            child:
                                             Container())
 
                                       ] ,
@@ -349,11 +315,11 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                 start: 0,
                                 end:0,
                                 child: Opacity(
-                                  opacity: mAuctionDetailsModel.data.gallery.length>1?1.0:0.0,
+                                  opacity: mAuctionDetailsModel.data[0].image.length>1?1.0:0.0,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: mAuctionDetailsModel.data.gallery.map((item) {
-                                      int index =mAuctionDetailsModel.data.gallery.indexOf(item);
+                                    children: mAuctionDetailsModel.data[0].image.map((item) {
+                                      int index =mAuctionDetailsModel.data[0].image.indexOf(item);
                                       return Container(
                                         width: 8.0.w,
                                         height: 8.0.h,
@@ -381,20 +347,55 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                             color: Color(0x88000000),
                           ),),
                         SizedBox(height: 20.h,),
-            Container(
-                    margin: EdgeInsets.symmetric(horizontal: 10.w),
-                    child: Text(mAuctionDetailsModel.data.auctionName,
-                        textAlign: TextAlign.start,
-                        style: TextStyle(
-                            color: Color(0xFF000000),
-                            fontSize: screenUtil.setSp(16),
-                            fontWeight: FontWeight.bold
-                        )
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      languageCode =="en"?
+                      mAuctionDetailsModel.data[0].enTitle:mAuctionDetailsModel.data[0].enTitle,
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: screenUtil.setSp(14),
+                          fontWeight: FontWeight.normal
+
+                      ),
                     ),
-            ),
+                    GestureDetector(
+                      onTap: (){
+                        String vedioUrl= mAuctionDetailsModel.data[0].video;
+                        String title = "";
+                        if(languageCode == "en"){
+                          title = mAuctionDetailsModel.data[0].enTitle;
+                        }else{
+                          title = mAuctionDetailsModel.data[0].arTitle;
+                        }
+                        if(vedioUrl.trim()!=""){
+                          if(vedioUrl.contains("youtu")){
+                            Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                              return new YouTubeScreen(youtubeId:vedioUrl,auctionName: title);
+                            }));
+                          }else{
+                            Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                              return new VideoScreen(vedioUrl:vedioUrl,auctionName: title,);
+                            }));
+                          }
+
+                        }
+
+                      },
+                      child: Image.asset('assets/images/play-button.png',
+                        height: 30.w,width: 30.w,fit: BoxFit.fill,
+                        color:mAuctionDetailsModel.data[0].video== ""?Color(0xFFAAAAAA):kMainColor ,
+                      ),
+                    )
+                  ],
+                ),
+              ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: Text(mAuctionDetailsModel.data.auctionDescription,
+                          child: Text(languageCode == "en"?mAuctionDetailsModel.data[0].enTitle:mAuctionDetailsModel.data[0].arTitle,
                               textAlign: TextAlign.start,
                               style: TextStyle(
                                   color: Color(0xFF000000),
@@ -427,7 +428,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data.auctionDate}',
+                                child: Text('${mAuctionDetailsModel.data[0].endDate}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -462,7 +463,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text(getFormattedDate(mAuctionDetailsModel.data.endDate),
+                                child: Text(getFormattedDate(mAuctionDetailsModel.data[0].endDate),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -497,7 +498,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data.bidValue}',
+                                child: Text('${mAuctionDetailsModel.data[0].price}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -532,7 +533,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data.currentBidValue} ${getTranslated(context, 'kwd')}',
+                                child: Text('${mAuctionDetailsModel.data[0].reach} ${getTranslated(context, 'kwd')}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -567,7 +568,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data.totalParticipate} ${getTranslated(context,'person')}',
+                                child: Text('${mAuctionDetailsModel.data[0].bidders.length} ${getTranslated(context,'person')}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -579,6 +580,106 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                             ),
                           ],
                         ),
+                        ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.vertical,
+
+
+
+
+
+                            itemBuilder: (context,index){
+                              return Container(
+                                height: 120.h,
+
+                                child: Row(
+                                  children: [
+                                    Expanded(flex:1,child:Container(
+                                      child: CachedNetworkImage(
+                                        width: 120.w,
+                                        height: 120.h,
+                                        imageUrl: KImageUrl+mAuctionDetailsModel.data[0].bidders[index].logo,
+                                        imageBuilder: (context, imageProvider) =>
+                                            Container(
+
+
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.rectangle,
+
+                                                  image: DecorationImage(
+                                                      fit: BoxFit.fill,
+                                                      image: imageProvider),
+                                                )
+                                            ),
+                                        placeholder: (context, url) =>
+                                            Center(
+                                              child: SizedBox(
+                                                  height: 30.h,
+                                                  width: 30.h,
+                                                  child: new CircularProgressIndicator()),
+                                            ),
+
+
+                                        errorWidget: (context, url, error) =>  Container(
+
+
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.rectangle,
+
+                                              image: DecorationImage(
+                                                  image: AssetImage('assets/images/icon.png')),
+                                            )
+                                        ),
+
+                                      ),
+                                    )
+                                    ), Expanded(flex:2,child:Column(
+                                      children: [
+                                        Expanded(
+                                          flex:1,
+                                          child: Container(
+                                            child: Text(mAuctionDetailsModel.data[0].bidders[index].name,
+                                              style: TextStyle(
+                                                  color: Color(0xFF000000),
+                                                  fontSize: screenUtil.setSp(16),
+                                                  fontWeight: FontWeight.normal
+                                              ),),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex:1,
+                                          child: Container(
+                                            child: Text(mAuctionDetailsModel.data[0].bidders[index].date,
+                                              style: TextStyle(
+                                                  color: Color(0xFF000000),
+                                                  fontSize: screenUtil.setSp(16),
+                                                  fontWeight: FontWeight.normal
+                                              ),),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          flex:1,
+                                          child: Container(
+                                            child: Text(mAuctionDetailsModel.data[0].bidders[index].bid+" " +getTranslated(context, "kwd"),
+                                              style: TextStyle(
+                                                  color: Color(0xFF000000),
+                                                  fontSize: screenUtil.setSp(16),
+                                                  fontWeight: FontWeight.normal
+                                              ),),
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                    )
+                                  ],
+                                ),
+
+                              );
+                            }, separatorBuilder: (context,index){
+                          return Container(height: 1.h,
+                            color: Color(0xFF000000),);}
+                            , itemCount:mAuctionDetailsModel.data[0].bidders.length),
                       ],
                     ),
                   ),
@@ -586,9 +687,9 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                       bottom: 0,
                       start: 0,
                       end: 0,
-                      child: Opacity(
-                        opacity: compareDate(mAuctionDetailsModel.data.endDate)?1.0:0.0,
-                          child: deleteButton(getTranslated(context, 'stop_auction'),context)))
+                      child: Container(
+
+                          child:mAuctionDetailsModel.data[0].status== "1"? deleteButton(getTranslated(context, 'stop_auction'),context):Container()))
                 ],
               ),
           ),
@@ -689,20 +790,17 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     modelHud.changeIsLoading(true);
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    Map map;
-    map = {
-      'auction_id': widget.id,
+    Map map = new Map();
+    map['customerId'] = loginModel.data.id;
+    map['auctionId'] = widget.id;
 
-
-      'language': languageCode
-    };
     PetMartService petMartService = PetMartService();
-    DeleteModel deleteModel = await petMartService.deleteAuction(map);
-    String status = deleteModel.status;
+    StopAuctionModel deleteModel = await petMartService.stopAuction(map);
+    bool status = deleteModel.ok;
     modelHud.changeIsLoading(false);
-    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.message)));
+    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.data.msg)));
 
-    if(status == 'success'){
+    if(status ){
       Navigator.pushReplacementNamed(context,MainScreen.id);
     }
   }

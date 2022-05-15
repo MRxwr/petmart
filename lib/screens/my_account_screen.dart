@@ -190,7 +190,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     user().then((value){
       setState(() {
         userModel = value;
-        imageUrl = KImageUrl+value.data.logo;
+        imageUrl = value.data.logo;
       });
     });
 
@@ -267,7 +267,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('${getTranslated(context, 'your_credit')} ${ loginModel.data.points}',
+                              Text('${getTranslated(context, 'your_credit')} ${ userModel.data.points}',
                               style: TextStyle(
                                 color: Color(0xFFFFFFFF),
                                 fontWeight: FontWeight.normal,
@@ -275,10 +275,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                               ),),
                               GestureDetector(
                                 onTap: (){
-                                  Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                    return new CreditScreen();
-
-                                  }));
+                                  _buttonTapped();
                                 },
                                 child: Text(getTranslated(context,'purchase_credit'),
                                   style: TextStyle(
@@ -491,32 +488,41 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       SizedBox(height: 10.h,width: width,),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
-                        child: UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
-                          lastName = value;
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
+                            lastName = value;
 
-                        },mText: userModel.data.name.split(" ")[1],
+                          },mText: userModel.data.name.split(" ")[1],
 
+                          ),
                         ),
                       ),
                       SizedBox(height: 10.h,width: width,),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
-                        child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
-                          email = value;
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
+                            email = value;
 
-                        },
-                          mText: userModel.data.email,
+                          },
+                            mText: userModel.data.email,
+                          ),
                         ),
                       ),
                       SizedBox(height: 10.h,width: width,),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
                         child:
-                        PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
-                          phone = value;
+                        Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
+                            phone = value;
 
-                        },
-                          mText: userModel.data.mobile,
+                          },
+                            mText: userModel.data.mobile,
+                          ),
                         ),
                       ),
                       SizedBox(height: 20.h,width: width,),
@@ -658,6 +664,45 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   }
   void getImageString(String filePath){
 
+  }
+  Future _buttonTapped() async {
+    Map results =  await Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) {
+      return new CreditScreen();
+    }
+    ));
+
+    if (results != null && results.containsKey('selection')) {
+      userModel = null;
+      setState(() {
+
+      });
+
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
+      String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+      mLanguage = languageCode;
+      String loginData = _preferences.getString(kUserModel);
+
+
+
+      final body = json.decode(loginData);
+      loginModel = LoginModel.fromJson(body);
+      userId = loginModel.data.id;
+
+      Map<String, String> map = Map();
+      map['id']=userId;
+      map['email']= email;
+
+
+
+
+      PetMartService petMartService = PetMartService();
+       userModel = await petMartService.user(map);
+      imageUrl = userModel.data.logo;
+      setState(() {
+
+      });
+
+    }
   }
 }
 

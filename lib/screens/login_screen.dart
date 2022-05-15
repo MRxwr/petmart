@@ -105,29 +105,35 @@ class _LoginScreenState extends State<LoginScreen> {
                   Expanded(flex: 2,
                       child:  Center(
                         child:
-                        NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
-                          print(value);
-                          _fullName= value;
-                          setState(() {
+                        Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
+                            print(value);
+                            _fullName= value;
+                            setState(() {
 
-                          });
-                        },
+                            });
+                          },
 
+                          ),
                         ),
                       )),
                   Expanded(flex: 2,
                       child:  Container(
                         alignment: AlignmentDirectional.center,
                         child:
-                        PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
-                          print(value);
-                          setState(() {
+                        Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
+                            print(value);
+                            setState(() {
 
-                          });
-                          _password= value;
+                            });
+                            _password= value;
 
-                        },
-                          mText: _password,
+                          },
+                            mText: _password,
+                          ),
                         ),
                       )),
                   Expanded(flex: 1,

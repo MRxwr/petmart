@@ -102,40 +102,58 @@ class _RegisterScreenState extends State<RegisterScreen> {
               margin: EdgeInsets.all(10.h),
               child: ListView(
                 children: [
-                  UserNameTextField(hint:getTranslated(context, 'first_name'),onClick: (value){
-                    firstName = value;
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: UserNameTextField(hint:getTranslated(context, 'first_name'),onClick: (value){
+                      firstName = value;
 
-                  },
+                    },
+                    ),
                   ),
                   SizedBox(height: 10.h,),
-                  UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
-                    lastName = value;
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
+                      lastName = value;
 
-                  },
+                    },
+                    ),
                   ),
                   SizedBox(height: 10.h,),
-                  NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
-                    email = value;
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
+                      email = value;
 
-                  },
+                    },
+                    ),
                   ),
                   SizedBox(height: 10.h,),
-                  PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
-                    password= value;
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
+                      password= value;
 
-                  },
+                    },
+                    ),
                   ),
                   SizedBox(height: 10.h,),
-                  PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
-                    confirmPassword = value;
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
+                      confirmPassword = value;
 
-                  },
+                    },
+                    ),
                   ),
                   SizedBox(height: 10.h,),
-                  PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
-                    mobileNumber = value;
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
+                      mobileNumber = value;
 
-                  },
+                    },
+                    ),
                   ),
                   SizedBox(height: 10.h,),
                   Center(child: confirmButton(getTranslated(context, 'create_account'),context)),

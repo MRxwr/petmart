@@ -73,10 +73,13 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
               children: [
                 Center(child: Image.asset('assets/images/img_language_logo.png',height:200.h ,width: 200.w,)),
                  SizedBox(height: 10.h,),
-                NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
-                  _email = value;
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
+                    _email = value;
 
-                },
+                  },
+                  ),
                 ),
                 SizedBox(height: 14.h,),
 

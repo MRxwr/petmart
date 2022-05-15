@@ -76,22 +76,31 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             child:
             ListView(
               children: [
-                PasswordTextField(hint:getTranslated(context, 'old_password'),onClick: (value){
-                  oldPassword = value;
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: PasswordTextField(hint:getTranslated(context, 'old_password'),onClick: (value){
+                    oldPassword = value;
 
-                },
+                  },
+                  ),
                 ),
                 SizedBox(height: 10.h,),
-                PasswordTextField(hint:getTranslated(context, 'new_password'),onClick: (value){
-                  newPassword = value;
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: PasswordTextField(hint:getTranslated(context, 'new_password'),onClick: (value){
+                    newPassword = value;
 
-                },
+                  },
+                  ),
                 ),
                 SizedBox(height: 10.h,),
-                PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
-                  confirmPassword = value;
+                Directionality(
+                  textDirection: TextDirection.ltr,
+                  child: PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
+                    confirmPassword = value;
 
-                },
+                  },
+                  ),
                 ),
                 SizedBox(height: 10.h,),
                 Center(child: confirmButton(getTranslated(context, 'change_password'),context))

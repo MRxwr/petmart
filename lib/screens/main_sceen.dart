@@ -69,9 +69,12 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
   ScreenUtil screenUtil = ScreenUtil();
   bool isLogIn = false;
   LoginModel loginModel;
-  int index =3;
+  int index =0;
   final navigatorKey = GlobalKey<NavigatorState>();
   bool isStart = true;
+
+  String languageCode="";
+  String mLangaugeCode ="";
 
   void _selectedTab(int index) {
     setState(() {
@@ -98,7 +101,8 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     }).whenComplete(() {
       getLoginModel().then((value){
         setState(() {
-
+          mLangaugeCode = languageCode;
+          _title = mLangaugeCode == "en"?"Home":"الرئيسية";
           loginModel = value;
 
         });
@@ -109,6 +113,8 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
   Future<bool> isLoggedIn() async{
     SharedPreferences sharedPref =await SharedPreferences.getInstance();
     bool isLoggedIn =  sharedPref.getBool(kIsLogin)??false;
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     print('isLogIn ${isLoggedIn}');
     return isLoggedIn;
   }
@@ -233,7 +239,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
   Widget build(BuildContext context) {
     this.context = context;
     if(isStart){
-      _title = getTranslated(context, 'home');
+
       isStart = false;
     }
     // _title = getTranslated(context, 'home');
@@ -245,6 +251,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
         AppBar(
           centerTitle: true,
           title: Text(
+
             _title,
             style: TextStyle(
               color: Color(0xFFFFFFFF),
@@ -320,14 +327,26 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           index: index,
           children: [
 
-               Navigator(
-                key: _vediosScreen,
-                onGenerateRoute: (route) => MaterialPageRoute(
-                  settings: route,
-                  maintainState: false,
-                  builder: (context) => PrivacyMainScreen(),
-                ),
+
+
+
+            Navigator(
+              key: _homeScreen,
+              onGenerateRoute: (route) => MaterialPageRoute(
+                settings: route,
+                maintainState: false,
+                builder: (context) => HomeScreen(),
               ),
+
+            ),
+            Navigator(
+              key: _competitionNewsScreen,
+              onGenerateRoute: (route) => MaterialPageRoute(
+                settings: route,
+                maintainState: false,
+                builder: (context) => AdaptionScreen(),
+              ),
+            ),
 
             Navigator(
               key: _amateursNews,
@@ -338,24 +357,13 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
               ),
             ),
             Navigator(
-              key: _competitionNewsScreen,
+              key: _vediosScreen,
               onGenerateRoute: (route) => MaterialPageRoute(
                 settings: route,
                 maintainState: false,
-                builder: (context) => AdaptionScreen(),
+                builder: (context) => AuctionScreen(),
               ),
             ),
-            Navigator(
-              key: _homeScreen,
-              onGenerateRoute: (route) => MaterialPageRoute(
-                settings: route,
-                maintainState: false,
-                builder: (context) => HomeScreen(),
-              ),
-
-            ),
-
-
 
 
 
@@ -377,13 +385,15 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           },
           items: [
 
-            FABBottomAppBarItem(iconPath:
-            'assets/images/hospital_pets.png', text: getTranslated(context, 'hospital')),
-            FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: getTranslated(context, 'lost')),
 
-            FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: getTranslated(context, 'adaption')),
+
+
+
             FABBottomAppBarItem(iconPath:'assets/images/img_home.png', text: getTranslated(context, 'home')),
-
+            FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: getTranslated(context, 'adaption')),
+            FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: getTranslated(context, 'lost')),
+            FABBottomAppBarItem(iconPath:
+            'assets/images/img_auction.png', text: getTranslated(context, 'auction')),
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -729,7 +739,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
   void _onTap(int val, BuildContext context) {
     if (index == val) {
       switch (val) {
-        case 3:
+        case 0:
           print(val);
           _title=getTranslated(context, 'home');
           _homeScreen.currentState.popUntil((route) => route.isFirst);
@@ -739,7 +749,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           });
 
           break;
-        case 2:
+        case 1:
           print(val);
           _title=getTranslated(context, 'adaption');
           _competitionNewsScreen.currentState.popUntil((route) => route.isFirst);
@@ -749,7 +759,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           }));
 
           break;
-        case 1:
+        case 2:
           print(val);
           _title=getTranslated(context, 'lost');
           _amateursNews.currentState.popUntil((route) => route.isFirst);
@@ -758,7 +768,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
 
           });
           break;
-        case 0:
+        case 3:
           print(val);
           _title=getTranslated(context, 'hospital');
           setState(() {
@@ -773,28 +783,28 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
       }
     } else {
       index = val;
-      if(index ==0){
-        _title=getTranslated(context, 'hospital');
-        _vediosScreen.currentState.pushReplacementNamed(PrivacyMainScreen.id);
+      if(index ==3){
+        _title=getTranslated(context, 'auction');
+        _vediosScreen.currentState.pushReplacementNamed(AuctionScreen.id);
         setState(() {
 
         });
 
-      }else if(index == 1){
+      }else if(index == 2){
         _title=getTranslated(context, 'lost');
         _amateursNews.currentState.pushReplacementNamed(LostScreen.id);
          setState(() {
 
         });
 
-      }else if(index == 2){
+      }else if(index == 1){
         _title=getTranslated(context, 'adaption');
         _competitionNewsScreen.currentState.pushReplacementNamed(AdaptionScreen.id);
          setState(() {
 
         });
 
-      }else if(index == 3){
+      }else if(index == 0){
         _title=getTranslated(context, 'home');
         _homeScreen.currentState.pushReplacementNamed(HomeScreen.id);
          setState(() {

@@ -52,7 +52,8 @@ class NameTextField extends StatelessWidget {
               initialValue: mText,
 
 
-              textAlign: TextAlign.start,
+
+              textAlign: TextAlign.left,
                 textCapitalization: TextCapitalization.words,
                 keyboardType: TextInputType.emailAddress ,
                 onSaved: onClick,

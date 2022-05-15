@@ -221,10 +221,10 @@ Gender copyWith({  List<String> arabic,
 /// arTitle : "هسكي سيبيري"
 /// enTitle : "Siberian Husky"
 
-class Sub extends Equatable {
+class Sub  extends Equatable{
   Sub({
       String id, 
-      String parentId, 
+      String parentId,
       String arTitle, 
       String enTitle,}){
     _id = id;
@@ -239,8 +239,7 @@ class Sub extends Equatable {
     _arTitle = json['arTitle'];
     _enTitle = json['enTitle'];
   }
-  @override
-  List<Object> get props => [id];
+
   String name = "tag";
   String _id;
   String _parentId;
@@ -269,8 +268,13 @@ Sub copyWith({  String id,
     return map;
   }
 
+  @override
+  int get hashCode => super.hashCode;
 
 
+  // TODO: implement props
+  @override
+  List<Object> get props => [id,enTitle,arTitle,parentId];
 }
 
 /// id : "4"
@@ -294,10 +298,10 @@ Sub copyWith({  String id,
 /// enTitle : "Birds"
 /// sub : [{"id":"3","parentId":"2","arTitle":"صقور","enTitle":"Falcons"},{"id":"10","parentId":"2","arTitle":"نسور","enTitle":"Eagles"}]
 
-class Category  extends Equatable{
+class Category  extends Equatable {
   Category({
       String id, 
-      String parentId, 
+      String parentId,
       String arTitle, 
       String enTitle, 
       List<Sub> sub,}){
@@ -325,7 +329,7 @@ class Category  extends Equatable{
   String _arTitle;
   String _enTitle;
   List<Sub> _sub;
-  String name = "tag2";
+
 Category copyWith({  String id,
   String parentId,
   String arTitle,
@@ -355,10 +359,12 @@ Category copyWith({  String id,
     return map;
   }
 
-  @override
-  // TODO: implement props
-  List<Object> get props => [id];
 
+  @override
+  bool get stringify => true;
+
+  @override
+  List<Object> get props => [id,enTitle,arTitle,parentId,sub];
 }
 
 /// id : "3"
