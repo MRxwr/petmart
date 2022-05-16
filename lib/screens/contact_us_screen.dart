@@ -15,6 +15,9 @@ import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/utilities/service_locator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../api/pet_mart_service.dart';
+import '../model/cms_model.dart';
 class ContactUsScreen extends StatefulWidget {
   static String id = 'ContactUsScreen';
   @override
@@ -24,6 +27,8 @@ class ContactUsScreen extends StatefulWidget {
 class _ContactUsScreenState extends State<ContactUsScreen> {
   String _platformVersion = 'Unknown';
   final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
+  String languageCode="";
+  CmsModel cmsModel;
 
 
 
@@ -31,6 +36,21 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    privacyPolicy().then((value) {
+      setState(() {
+        cmsModel = value;
+
+      });
+
+    });
+
+  }
+  Future<CmsModel> privacyPolicy() async{
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+    PetMartService petMartService = PetMartService();
+    CmsModel  cmsModel = await petMartService.cms();
+    return cmsModel;
 
   }
   @override
@@ -74,7 +94,12 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
       ),
        body:
        Container(
-         child: Column(
+         child:cmsModel == null?
+         Container(
+           child: CircularProgressIndicator(),
+           alignment: FractionalOffset.center,
+         ):
+         Column(
            children: [
              Expanded(
                  flex:1,
@@ -102,7 +127,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _service.sendEmail("Petmartkw@gmail.com");
+                         _service.sendEmail(cmsModel.data.email);
                        },
                        child: Padding(
                          padding:  EdgeInsets.all(2.0.h),
@@ -116,7 +141,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text("Petmartkw@gmail.com",
+                             Text(cmsModel.data.email,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -128,7 +153,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _service.call("55175589");
+                         _service.call(cmsModel.data.call);
 
 
                        },
@@ -145,7 +170,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text("55175589",
+                             Text(cmsModel.data.call,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -157,7 +182,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _openUrl(url("55175589", ""));
+                         _openUrl(url("965"+cmsModel.data.whatsapp, ""));
 
                        },
                        child: Padding(
@@ -172,7 +197,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text("55175589",
+                             Text(cmsModel.data.call,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),

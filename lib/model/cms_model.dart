@@ -31,9 +31,19 @@ class Data {
   String arTerms;
   String enPolicy;
   String arPolicy;
+  String email;
+  String call;
+  String whatsapp;
 
   Data(
-      {this.version, this.enTerms, this.arTerms, this.enPolicy, this.arPolicy});
+      {this.version,
+        this.enTerms,
+        this.arTerms,
+        this.enPolicy,
+        this.arPolicy,
+        this.email,
+        this.call,
+        this.whatsapp});
 
   Data.fromJson(Map<String, dynamic> json) {
     version = json['version'];
@@ -41,6 +51,9 @@ class Data {
     arTerms = json['arTerms'];
     enPolicy = json['enPolicy'];
     arPolicy = json['arPolicy'];
+    email = json['email'];
+    call = json['call'];
+    whatsapp = json['whatsapp'];
   }
 
   Map<String, dynamic> toJson() {
@@ -50,6 +63,9 @@ class Data {
     data['arTerms'] = this.arTerms;
     data['enPolicy'] = this.enPolicy;
     data['arPolicy'] = this.arPolicy;
+    data['email'] = this.email;
+    data['call'] = this.call;
+    data['whatsapp'] = this.whatsapp;
     return data;
   }
 }

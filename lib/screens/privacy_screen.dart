@@ -38,6 +38,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
   Widget build(BuildContext context) {
     ScreenUtil screenUtil = ScreenUtil();
     return Scaffold(
+      backgroundColor: Color(0xFFFFFFFF),
 
       appBar: AppBar(
         backgroundColor: kMainColor,
@@ -77,22 +78,30 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
         color: Color(0xFFFFFFFF),
         child: cmsModel != null?
         SingleChildScrollView(
-          child: Padding(
-              padding: EdgeInsets.all(20.w),
-              child: HtmlWidget(
+
+          child: Container(
+            alignment: AlignmentDirectional.topStart,
+            color: Color(0xFFFFFFFF),
+            child: Padding(
+                padding: EdgeInsets.all(20.w),
+                child: HtmlWidget(
 
 
-                languageCode == "en"? cmsModel.data.enPolicy:cmsModel.data.arPolicy,
-                textStyle: TextStyle(
-                    color: Color(0xFF000000),
-                    fontWeight: FontWeight.w500,
-                    fontSize: screenUtil.setSp(
-                        12)
-
-                ),
-              )
 
 
+                  languageCode == "en"? cmsModel.data.enPolicy:cmsModel.data.arPolicy,
+                  textStyle: TextStyle(
+
+                      color: Color(0xFF000000),
+                      fontWeight: FontWeight.w500,
+                      fontSize: screenUtil.setSp(
+                          12)
+
+                  ),
+                )
+
+
+            ),
           ),
         ):
         Container(

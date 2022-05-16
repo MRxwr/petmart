@@ -951,7 +951,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
           onPressed: ()async {
             if(success){
               await alert.dismiss();
-              Navigator.pushReplacementNamed(context,SplashScreen.id);
+              Navigator.pop(context,"true");
             }else{
               await alert.dismiss();
             }

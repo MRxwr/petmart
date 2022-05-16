@@ -36,88 +36,29 @@ class AuctionScreen extends StatefulWidget {
 
 class _AuctionScreenState extends State<AuctionScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  List<Categories> categories = [];
-  List<bool> selectedList =[];
 
 
   HomeModel homeModel;
 
   double itemWidth;
   double itemHeight;
-  String languageCode;
-  // Future<AuctionModel.AuctionModel> auction(String catId) async{
-  //
-  //   SharedPreferences _preferences = await SharedPreferences.getInstance();
-  //    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-  //
-  //   String loginData = _preferences.getString(kUserModel);
-  //   Map map ;
-  //
-  //   if(loginData == null){
-  //     map = {"category_id":catId,
-  //       "id":"",
-  //       "language":languageCode};
-  //   }else{
-  //     final body = json.decode(loginData);
-  //     LoginModel   loginModel = LoginModel.fromJson(body);
-  //     map = {"category_id":catId,
-  //       "id":loginModel.data.id,
-  //       "language":languageCode};
-  //
-  //   }
-  //
-  //
-  //
-  //
-  //   PetMartService petMartService = PetMartService();
-  //   AuctionModel.AuctionModel auctionModel = await petMartService.auction(map);
-  //   return auctionModel;
-  // }
+  String languageCode="";
+
+
   String loginData = "";
   String userId="";
-  // Future<void> getList(String catId) async{
-  //
-  //   SharedPreferences _preferences = await SharedPreferences.getInstance();
-  //   String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-  //
-  //   String loginData = _preferences.getString(kUserModel);
-  //   Map map ;
-  //   print('loginData ${loginData}');
-  //
-  //   if(loginData == null){
-  //     userId = "";
-  //     map = {"category_id":catId,
-  //       "id":"",
-  //       "language":languageCode};
-  //   }else{
-  //
-  //     final body = json.decode(loginData);
-  //     LoginModel   loginModel = LoginModel.fromJson(body);
-  //     userId = loginModel.data.id;
-  //     print('userId --> ${userId}');
-  //     map = {"category_id":catId,
-  //       "id":loginModel.data.id,
-  //       "language":languageCode};
-  //   }
-  //
-  //
-  //
-  //
-  //   PetMartService petMartService = PetMartService();
-  //   auctionModel = await petMartService.auction(map);
-  //   setState(() {
-  //
-  //   });
-  //
-  // }
-
-
-MyNewAuctionModel myNewAuctionModel;
-  NewAcutionListModel. NewAcutionListModel mNewAuctionListModel;
+MyNewAuctionModel myNewAuctionModel = null;
+  NewAcutionListModel. NewAcutionListModel mNewAuctionListModel = null;
   String myAuctionErrorString="";
   String AuctionErrorString ="";
 
   Future<void> auctions() async{
+    AuctionType  liveType = AuctionType("مباشر", "live", true);
+    AuctionType  doneType = AuctionType("انتهي", "Done", false);
+    AuctionType  cancleType = AuctionType("ملغي", "Cancel", false);
+    auctionTypeList.add(liveType);
+    auctionTypeList.add(doneType);
+    auctionTypeList.add(cancleType);
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
@@ -233,12 +174,7 @@ MyNewAuctionModel myNewAuctionModel;
   void initState() {
     // TODO: implement initState
     super.initState();
-    AuctionType  liveType = AuctionType("مباشر", "live", true);
-    AuctionType  doneType = AuctionType("انتهي", "Done", false);
-    AuctionType  cancleType = AuctionType("ملغي", "Cancel", false);
-    auctionTypeList.add(liveType);
-    auctionTypeList.add(doneType);
-    auctionTypeList.add(cancleType);
+
     auctions().then((value)  {
     setState(() {
 
@@ -487,37 +423,40 @@ MyNewAuctionModel myNewAuctionModel;
               )
                   :
 
-              GridView.builder(scrollDirection: Axis.vertical,
+              Container(
+                child:mNewAuctionListModel == null?
+                Container():GridView.builder(scrollDirection: Axis.vertical,
 
 
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                    childAspectRatio:itemWidth/itemHeight),
-                itemCount: mNewAuctionListModel.data.length,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
+                      childAspectRatio:itemWidth/itemHeight),
+                  itemCount: mNewAuctionListModel.data.length,
 
-                itemBuilder: (context,index){
-                  return GestureDetector(
-                    onTap: (){
-                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new AuctionDetailsScreen(mAuctionModel:mNewAuctionListModel.data[index]);
-                      }));
-                    },
-                    child: Container(
-                        margin: EdgeInsets.all(6.w),
+                  itemBuilder: (context,index){
+                    return GestureDetector(
+                      onTap: (){
+                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                          return new AuctionDetailsScreen(mAuctionModel:mNewAuctionListModel.data[index]);
+                        }));
+                      },
+                      child: Container(
+                          margin: EdgeInsets.all(6.w),
 
 
-                        child:
-                        Card(
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            elevation: 1.w,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0.h),
-                            ),
-                            color: Color(0xFFFFFFFF),
-                            child: buildItem(mNewAuctionListModel.data[index],context))),
-                  );
-                },
+                          child:
+                          Card(
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              elevation: 1.w,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0.h),
+                              ),
+                              color: Color(0xFFFFFFFF),
+                              child: buildItem(mNewAuctionListModel.data[index],context))),
+                    );
+                  },
+                ),
               ),
             ),
 
@@ -953,9 +892,7 @@ MyNewAuctionModel myNewAuctionModel;
 
 
         if(credit>0){
-          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-            return new CreateAuctionScreen();
-          }));
+          _buttonTapped();
         }else{
           ShowAlertDialog(context, getTranslated(context, "credit_not_enough"));
         }
@@ -1099,6 +1036,39 @@ MyNewAuctionModel myNewAuctionModel;
       ],
     );
     alert.show();
+
+  }
+  Future<void> _buttonTapped() async {
+    String results =  await  Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      return new CreateAuctionScreen();
+    }));
+
+    if(results == "true"){
+
+       setState(() {
+         loginData = "";
+         userId="";
+         myNewAuctionModel = null;
+         mNewAuctionListModel = null;
+         myAuctionErrorString="";
+         AuctionErrorString ="";
+         auctionTypeList = [];
+         myAuctionList =[];
+         languageCode = "";
+       });
+
+
+       auctions().then((value)  {
+         setState(() {
+
+         });
+       });
+    }
+
+
+
+
+
 
   }
 }

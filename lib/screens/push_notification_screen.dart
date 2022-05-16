@@ -44,11 +44,8 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     bool  isOk  = response['ok'];
     if (isOk) {
       NotificationModel notificationModel = NotificationModel.fromJson(response);
-      int  notificationNumber = notificationModel.data.notification.length;
-      SharedPreferences sharedPreferenc = await SharedPreferences.getInstance();
-      sharedPreferenc.setInt("notificationCount", notificationNumber);
-      String appBadgeSupported;
-      Provider.of<NotificationNotifier>(context,listen: false).addCount(0);
+
+      Provider.of<NotificationNotifier>(context,listen: false).addCount(int.parse(notificationModel.data.total));
     }
 
     // try {

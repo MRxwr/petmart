@@ -302,8 +302,10 @@ mLanguage = languageCode;
       buttons: [
         DialogButton(
           child: Text(
+
             getTranslated(context, 'knet'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+            textAlign: TextAlign.center,
           ),
           onPressed: ()async{
             await alert.dismiss();
@@ -332,8 +334,10 @@ mLanguage = languageCode;
         ),
         DialogButton(
           child: Text(
+
             getTranslated(context, 'master'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+            textAlign: TextAlign.center,
           ),
           onPressed: ()async {
             await alert.dismiss();

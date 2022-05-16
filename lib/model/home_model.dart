@@ -28,8 +28,9 @@ class HomeModel {
 class Data {
   List<Banners> banners;
   List<Categories> categories;
+  int totalNotifications;
 
-  Data({this.banners, this.categories});
+  Data({this.banners, this.categories, this.totalNotifications});
 
   Data.fromJson(Map<String, dynamic> json) {
     if (json['banners'] != null) {
@@ -44,6 +45,7 @@ class Data {
         categories.add(new Categories.fromJson(v));
       });
     }
+    totalNotifications = json['totalNotifications'];
   }
 
   Map<String, dynamic> toJson() {
@@ -54,6 +56,7 @@ class Data {
     if (this.categories != null) {
       data['categories'] = this.categories.map((v) => v.toJson()).toList();
     }
+    data['totalNotifications'] = this.totalNotifications;
     return data;
   }
 }

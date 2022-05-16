@@ -37,6 +37,7 @@ class _TermsScreenState extends State<TermsScreen> {
   Widget build(BuildContext context) {
     ScreenUtil screenUtil = ScreenUtil();
     return Scaffold(
+      backgroundColor: Color(0xFFFFFFFF),
 
       appBar: AppBar(
         backgroundColor: kMainColor,
@@ -76,25 +77,28 @@ class _TermsScreenState extends State<TermsScreen> {
           color: Color(0xFFFFFFFF),
           child: cmsModel != null?
           SingleChildScrollView(
-            child: Padding(
+            child: Container(
+              alignment: AlignmentDirectional.topStart,
+              child: Padding(
 
-                padding: EdgeInsets.all(20.w),
-                child: HtmlWidget(
+                  padding: EdgeInsets.all(20.w),
+                  child: HtmlWidget(
 
-                  languageCode == "en"?
-
-
-                  cmsModel.data.enTerms: cmsModel.data.arTerms,
-                  textStyle: TextStyle(
-                      color: Color(0xFF000000),
-                      fontWeight: FontWeight.w500,
-                      fontSize: screenUtil.setSp(
-                          12)
-
-                  ),
-                )
+                    languageCode == "en"?
 
 
+                    cmsModel.data.enTerms: cmsModel.data.arTerms,
+                    textStyle: TextStyle(
+                        color: Color(0xFF000000),
+                        fontWeight: FontWeight.w500,
+                        fontSize: screenUtil.setSp(
+                            12)
+
+                    ),
+                  )
+
+
+              ),
             ),
           ):
           Container(

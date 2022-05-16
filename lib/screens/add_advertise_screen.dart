@@ -65,7 +65,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   List<GenderModel> genderList = [];
   List<Category> categories = null;
   List<Sub> subCategory = null;
-  String genderId ="";
+  String genderId ="3";
   String ageName="";
   String key ="sell";
   LoginModel loginModel;
@@ -1127,7 +1127,7 @@ setState(() {
     String postTitle = _titleController.text;
     String postDescription =_descriptionController.text;
 
-    String age = _ageController.text;
+    String age = _ageController.text == ""?"0":_ageController.text;
     String price = _priceController.text  ==""?"0.5":_priceController.text ;
     if(mImages.isEmpty){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
@@ -1141,9 +1141,6 @@ setState(() {
 
     }else if(postDescription==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'description_error'))));
-
-    }else if(genderId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'gender_error'))));
 
     }else {
       List<File> mCompressedImages  = List();
