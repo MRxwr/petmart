@@ -747,8 +747,132 @@ children: [
                   ),
                 ),
               ),
-              Container(alignment: AlignmentDirectional.center,
-                  child: previewButton(getTranslated(context, 'sumbit_bid'), context))
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 10.w),
+                  width: screenUtil.screenWidth,
+                  child: previewButton(getTranslated(context, 'sumbit_bid'), context)),
+              SizedBox(height: 20.w,),
+              SizedBox(height: 1.h,
+                width: width,
+                child: Container(
+                  color: Color(0x88000000),
+                ),),
+              SizedBox(height: 10.w,),
+              Container(
+                alignment: AlignmentDirectional.topStart,
+                padding: EdgeInsets.symmetric(horizontal:10.h),
+                child: Text(
+
+                  getTranslated(context, 'highest_bidder'),
+                  style: TextStyle(
+                      color: Color(0xFF000000),
+                      fontSize: screenUtil.setSp(14),
+                      fontWeight: FontWeight.bold
+                  ),
+                ),
+              ),
+
+
+              ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+
+
+
+
+
+                  itemBuilder: (context,index){
+                    return Container(
+                      height: 120.h,
+
+                      child: Row(
+                        children: [
+                          Expanded(flex:1,child:Container(
+                            child: CachedNetworkImage(
+                              width: 120.w,
+                              height: 120.h,
+                              imageUrl: KImageUrl+mAuctionDetailsModel.data[0].bidders[index].logo,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+
+
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+
+                                        image: DecorationImage(
+                                            fit: BoxFit.fill,
+                                            image: imageProvider),
+                                      )
+                                  ),
+                              placeholder: (context, url) =>
+                                  Center(
+                                    child: SizedBox(
+                                        height: 30.h,
+                                        width: 30.h,
+                                        child: new CircularProgressIndicator()),
+                                  ),
+
+
+                              errorWidget: (context, url, error) =>  Container(
+
+
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+
+                                    image: DecorationImage(
+                                        image: AssetImage('assets/images/icon.png')),
+                                  )
+                              ),
+
+                            ),
+                          )
+                          ), Expanded(flex:2,child:Column(
+                            children: [
+                              Expanded(
+                                flex:1,
+                                child: Container(
+                                  child: Text(mAuctionDetailsModel.data[0].bidders[index].name,
+                                    style: TextStyle(
+                                        color: Color(0xFF000000),
+                                        fontSize: screenUtil.setSp(16),
+                                        fontWeight: FontWeight.normal
+                                    ),),
+                                ),
+                              ),
+                              Expanded(
+                                flex:1,
+                                child: Container(
+                                  child: Text(mAuctionDetailsModel.data[0].bidders[index].date,
+                                    style: TextStyle(
+                                        color: Color(0xFF000000),
+                                        fontSize: screenUtil.setSp(16),
+                                        fontWeight: FontWeight.normal
+                                    ),),
+                                ),
+                              ),
+                              Expanded(
+                                flex:1,
+                                child: Container(
+                                  child: Text(mAuctionDetailsModel.data[0].bidders[index].bid+" " +getTranslated(context, "kwd"),
+                                    style: TextStyle(
+                                        color: Color(0xFF000000),
+                                        fontSize: screenUtil.setSp(16),
+                                        fontWeight: FontWeight.normal
+                                    ),),
+                                ),
+                              ),
+                            ],
+                          )
+                          )
+                        ],
+                      ),
+
+                    );
+                  }, separatorBuilder: (context,index){
+                return Container(height: 1.h,
+                  color: Color(0xFF000000),);}
+                  , itemCount:mAuctionDetailsModel.data[0].bidders.length),
 
             ],
           ),

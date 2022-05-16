@@ -1540,7 +1540,7 @@ if(path == null){
   }
   Future<dynamic> addAuction(String english_name,String arabic_name,String english_description,String arabic_description, String start_date,String end_date, String bid_value,String auction_type,
       String category_id, String owner_id, String sub_category_id,
-     String mLanguage,List<File> images ,List<File> vedio)async{
+     String mLanguage,List<File> images ,List<File> vedio,String vedioUrl)async{
     SharedPref sharedPref = SharedPref();
 
 
@@ -1563,21 +1563,21 @@ if(path == null){
       dio.options.contentType = 'application/json';
       Map<String, dynamic> map = Map();
 
-      map['english_name'] = english_name;
-      map['arabic_name'] = arabic_name;
+      map['title'] = english_name;
 
-      map['english_description'] = english_description;
-      map['arabic_description'] = arabic_description;
-      map['start_date'] = start_date;
-      map['end_date'] = end_date;
-      map['category_id'] = category_id;
-      map['bid_value'] = bid_value;
-      map['auction_type'] = auction_type;
 
-      map['owner_id'] = owner_id;
-      map['sub_category_id'] = sub_category_id;
+      map['details'] = english_description;
 
-      map['language'] = mLanguage;
+
+      map['endDate'] = end_date;
+
+      map['price'] = bid_value;
+
+
+      map['customerId'] = owner_id;
+
+
+      map['video'] = vedioUrl;
       for(int i =0;i<images.length;i++){
         print('path --> ${images[i].absolute.path}');
 
@@ -1585,7 +1585,7 @@ if(path == null){
             .split('/')
             .last;
         print ('childFileName ${childFileName}');
-        map['images[${i}]']=  await MultipartFile.fromFile(images[i].absolute.path, filename: childFileName);
+        map['image[${i}]']=  await MultipartFile.fromFile(images[i].absolute.path, filename: childFileName);
       }
       if(vedio.isNotEmpty){
         for(int i =0;i<vedio.length;i++){
@@ -1601,7 +1601,7 @@ if(path == null){
 
       print('map --> ${map}');
          FormData formData = new FormData.fromMap(map);
-      final  response = await dio.post("auction/create", data: formData);
+      final  response = await dio.post("?action=auctions&type=add", data: formData);
 
       if (response.statusCode == 200) {
         resp = response.data;

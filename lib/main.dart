@@ -175,42 +175,42 @@ class _MyAppState extends State<MyApp> {
 
   String _messageText = "Waiting for message...";
 
-Future <void> getToken() async{
-  SharedPreferences _preferences = await SharedPreferences.getInstance();
-  String mToken =_preferences.getString("token")??"";
-  if(mToken ==""){
-    String toke = await FirebaseMessaging.instance.getToken(vapidKey: "BEp83hChFvm1ckxAt291kepX_T43rkk1e6j3ltN_tyxmk6CICMvnGN0BISLDX6VWjR46QaYuX0OJ51VS7Wy1b6M");
-    print('token --> ${toke}');
+  Future <void> getToken() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String mToken =_preferences.getString("token")??"";
+    if(mToken ==""){
+      String toke = await FirebaseMessaging.instance.getToken(vapidKey: "BEp83hChFvm1ckxAt291kepX_T43rkk1e6j3ltN_tyxmk6CICMvnGN0BISLDX6VWjR46QaYuX0OJ51VS7Wy1b6M");
+      print('token --> ${toke}');
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
 
 
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    _preferences.setString("token", toke);
-    print('Token Saved!');
-    PetMartService petMartService  = PetMartService();
-    String deviceType = "";
-    if(Platform.isAndroid){
-      deviceType = "a";
-    }else{
-      deviceType = "i";
+      String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+      _preferences.setString("token", toke);
+      print('Token Saved!');
+      PetMartService petMartService  = PetMartService();
+      String deviceType = "";
+      if(Platform.isAndroid){
+        deviceType = "a";
+      }else{
+        deviceType = "i";
+      }
+      Map<String,String> map = Map();
+      map['device_token'] = toke;
+      map['language']= languageCode;
+      map['device_type']= deviceType;
+      print(map);
+
+      TokenModel tokenModel = await petMartService.registerToken(map);
+      print('message ----> ${tokenModel.message}');
     }
-    Map<String,String> map = Map();
-    map['device_token'] = toke;
-    map['language']= languageCode;
-    map['device_type']= deviceType;
-    print(map);
 
-    TokenModel tokenModel = await petMartService.registerToken(map);
-    print('message ----> ${tokenModel.message}');
   }
-
-}
-Future<void> init() async{
-  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-  bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+  Future<void> init() async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
 
 
-}
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -219,29 +219,29 @@ Future<void> init() async{
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage message) {
-          if(message != null){
-            print('remoteMessgae sss${message.toString()}');
-            dynamic dataObject=  message.data;
+      if(message != null){
+        print('remoteMessgae sss${message.toString()}');
+        dynamic dataObject=  message.data;
 
-            print('dataObject ---> ${dataObject.toString()}');
-            String type = dataObject['push_type'];
+        print('dataObject ---> ${dataObject.toString()}');
+        String type = dataObject['push_type'];
 
-            print('type ---> ${type}');
-            if (type .contains('chatuser')){
+        print('type ---> ${type}');
+        if (type .contains('chatuser')){
 
-              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                return new MyMessagesScreen();
-              }));
+          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+            return new MyMessagesScreen();
+          }));
 
 
 
-            }else if(type .contains('rateonuser')){
-              String auctionId = dataObject['auction_id'];
-              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
-              }));
-            }
-          }
+        }else if(type .contains('rateonuser')){
+          String auctionId = dataObject['auction_id'];
+          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+            return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
+          }));
+        }
+      }
 
 
 
@@ -344,110 +344,110 @@ Future<void> init() async{
       );
     } else {
       return FutureBuilder(  future: Firebase.initializeApp(),
-      builder: (context,snapShot){
-        if(snapShot.hasError){
-          return Container(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }else{
-          return
+        builder: (context,snapShot){
+          if(snapShot.hasError){
+            return Container(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }else{
+            return
 
-            ScreenUtilInit(
-
-
-              builder:() =>
-
-                  MultiProvider(
-                    providers: [
-                      ChangeNotifierProvider<ModelHud>(create: (context) => ModelHud()),
-                      ChangeNotifierProvider<NotificationNotifier>(create: (context) => NotificationNotifier()),
-                    ],
-                    child:
-
-                    OverlaySupport(
-
-                      child: MaterialApp(
-                          navigatorKey: navigatorKey ,
+              ScreenUtilInit(
 
 
-                        theme: ThemeData(
+                  builder:(child) =>
 
-
-                            fontFamily: 'Cairo',
-                            accentColor: kSecondaryColor,
-                            primaryColor: kSecondaryColor
-
-
-
-                        ) ,
-                        builder: (context, child) {
-                          ScreenUtil.setContext(context);
-                          return MediaQuery(
-                            child: child,
-                            data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                          );
-                        },
-
-
-
-                        locale: _local,
-
-                        supportedLocales: [
-                          Locale('en', 'US'),
-                          Locale('ar', 'KW')
+                      MultiProvider(
+                        providers: [
+                          ChangeNotifierProvider<ModelHud>(create: (context) => ModelHud()),
+                          ChangeNotifierProvider<NotificationNotifier>(create: (context) => NotificationNotifier()),
                         ],
-                        localizationsDelegates: [
-                          SetLocalization.localizationsDelegate,
-                          GlobalMaterialLocalizations.delegate,
-                          GlobalWidgetsLocalizations.delegate,
-                          GlobalCupertinoLocalizations.delegate,
-                        ],
-                        localeResolutionCallback: (deviceLocal, supportedLocales) {
-                          for (var local in supportedLocales) {
-                            if (local.languageCode == deviceLocal.languageCode &&
-                                local.countryCode == deviceLocal.countryCode) {
-                              return deviceLocal;
+                        child:
+
+                        OverlaySupport(
+
+                          child: MaterialApp(
+                            navigatorKey: navigatorKey ,
+
+
+                            theme: ThemeData(
+
+
+                                fontFamily: 'Cairo',
+                                accentColor: kSecondaryColor,
+                                primaryColor: kSecondaryColor
+
+
+
+                            ) ,
+                            builder: (context, child) {
+               
+                              return MediaQuery(
+                                child: child,
+                                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                              );
+                            },
+
+
+
+                            locale: _local,
+
+                            supportedLocales: [
+                              Locale('en', 'US'),
+                              Locale('ar', 'KW')
+                            ],
+                            localizationsDelegates: [
+                              SetLocalization.localizationsDelegate,
+                              GlobalMaterialLocalizations.delegate,
+                              GlobalWidgetsLocalizations.delegate,
+                              GlobalCupertinoLocalizations.delegate,
+                            ],
+                            localeResolutionCallback: (deviceLocal, supportedLocales) {
+                              for (var local in supportedLocales) {
+                                if (local.languageCode == deviceLocal.languageCode &&
+                                    local.countryCode == deviceLocal.countryCode) {
+                                  return deviceLocal;
+                                }
+                              }
+                              print(supportedLocales.first.countryCode);
+                              return supportedLocales.first;
                             }
-                          }
-                          print(supportedLocales.first.countryCode);
-                          return supportedLocales.first;
-                        }
-                        ,
-                        debugShowCheckedModeBanner: false,
-                        initialRoute: SplashScreen.id,
-                        routes: {
-                          SplashScreen.id: (context) => SplashScreen(),
-                          MainScreen.id: (context) => MainScreen(),
-                          LanguageScreen.id: (context) => LanguageScreen(),
-                          AddAdvertiseScreen.id: (context) => AddAdvertiseScreen(),
-                          ContactUsScreen.id: (context) => ContactUsScreen(),
-                          TermsScreen.id: (context) => TermsScreen(),
-                          PrivacyScreen.id: (context) => PrivacyScreen(),
-                          LoginScreen.id: (context) => LoginScreen(),
-                          ForgetPasswordScreen.id: (context) => ForgetPasswordScreen(),
-                          RegisterScreen.id: (context) => RegisterScreen(),
-                          VerifyOtpScreen.id: (context) => VerifyOtpScreen(),
-                          MyAccountScreen.id: (context) => MyAccountScreen(),
-                          MyPostScreen.id: (context) => MyPostScreen(),
-                          MyAuctionScreen.id: (context) => MyAuctionScreen(),
-                          OrdersScreen.id: (context) => OrdersScreen(),
-                          PushNotificationScreen.id: (context) => PushNotificationScreen(),
-                          AuctionDetailsScreen.id: (context) => AuctionDetailsScreen(),
-                          ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
-                          AdaptionScreen.id: (context) => AdaptionScreen(),
-                          LostScreen.id: (context) => LostScreen(),
-                          PrivacyMainScreen.id: (context) => PrivacyMainScreen(),
-                        },
+                            ,
+                            debugShowCheckedModeBanner: false,
+                            initialRoute: SplashScreen.id,
+                            routes: {
+                              SplashScreen.id: (context) => SplashScreen(),
+                              MainScreen.id: (context) => MainScreen(),
+                              LanguageScreen.id: (context) => LanguageScreen(),
+                              AddAdvertiseScreen.id: (context) => AddAdvertiseScreen(),
+                              ContactUsScreen.id: (context) => ContactUsScreen(),
+                              TermsScreen.id: (context) => TermsScreen(),
+                              PrivacyScreen.id: (context) => PrivacyScreen(),
+                              LoginScreen.id: (context) => LoginScreen(),
+                              ForgetPasswordScreen.id: (context) => ForgetPasswordScreen(),
+                              RegisterScreen.id: (context) => RegisterScreen(),
+                              VerifyOtpScreen.id: (context) => VerifyOtpScreen(),
+                              MyAccountScreen.id: (context) => MyAccountScreen(),
+                              MyPostScreen.id: (context) => MyPostScreen(),
+                              MyAuctionScreen.id: (context) => MyAuctionScreen(),
+                              OrdersScreen.id: (context) => OrdersScreen(),
+                              PushNotificationScreen.id: (context) => PushNotificationScreen(),
+                              AuctionDetailsScreen.id: (context) => AuctionDetailsScreen(),
+                              ChangePasswordScreen.id: (context) => ChangePasswordScreen(),
+                              AdaptionScreen.id: (context) => AdaptionScreen(),
+                              LostScreen.id: (context) => LostScreen(),
+                              PrivacyMainScreen.id: (context) => PrivacyMainScreen(),
+                            },
 
-                      ),
-                    ),
-                  )
-          );
-        }
+                          ),
+                        ),
+                      )
+              );
+          }
 
-      },);
+        },);
 
 
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:images_picker/images_picker.dart';
 
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:flutter/material.dart';
@@ -53,6 +54,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   List<CategoryParent.Categories> categoryList;
   SubCategory.CategoryModel mSubCategoryModel;
   String path =null;
+  String vedioUrl ="";
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   bool isSelected = false;
@@ -96,6 +98,214 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     );
     return nAlertDialog;
   }
+  Container pickedVedio(File image,int position){
+    return Container(
+      width: 100.h,
+      height: 100.h,
+      padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(5.0.h),
+        color: Color(0xFFFFFFFF),
+        border: Border.all(
+            color: Color(0xCC000000),
+            width: 1.0.w
+        ),
+        image: DecorationImage(
+            image: FileImage(File(image.path)),
+            fit: BoxFit.fill),
+      ),
+      child: Container(
+        alignment: AlignmentDirectional.topStart,
+        child: Stack(
+
+          children: [
+            Center(
+              child: Icon(Icons.video_library_sharp,color: kMainColor,size: 50.h,),
+            ),
+            Positioned.directional(
+              textDirection:  Directionality.of(context),
+
+              child: GestureDetector(
+                  onTap: (){
+                    vedios.removeAt(position);
+                    vedioUrl ="";
+                    setState(() {
+
+                    });
+
+                  },
+                  child: Icon(Icons.delete,color: Colors.red,size: 20.h,)),
+            ),
+          ],
+        ),
+
+      ),
+
+
+    );
+  }
+  Future _getVedioFromGallery(BuildContext context) async {
+    var pickedFile = null;
+    final picker = ImagePicker();
+    pickedFile = await picker.pickVideo(source: ImageSource.gallery,maxDuration:Duration(seconds: 15));
+    Navigator.pop(context);
+    if (pickedFile != null) {
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      await VideoCompress.setLogLevel(0);
+      final MediaInfo  info = await VideoCompress.compressVideo(
+        pickedFile.path,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false,
+        includeAudio: true,
+      );
+      print(info.path);
+
+
+
+
+
+      isSelected = true;
+      File _image = File(info.path);
+
+      vedios.add(_image) ;
+      Navigator.pop(context);
+      PetMartService petMartService = PetMartService();
+      dynamic response = await petMartService.addVedio(_image);
+      modelHud.changeIsLoading(false);
+      bool status = response['ok'];
+      if (status) {
+        vedioUrl = response['data']['link'];
+      } else {
+        ShowPostAlertDialog(context, response['data']['msg'], false);
+      }
+
+      // updateImage(context);
+
+
+
+    } else {
+
+
+      mChooseImage = 'لم يتم اختيار الصورة';
+    }
+
+
+    setState(() {
+
+
+    });
+
+
+
+  }
+  Future<void> ShowPostAlertDialog(BuildContext context ,String title,bool success) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: title,
+
+
+      buttons: [
+
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok_string'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            if(success){
+              await alert.dismiss();
+              Navigator.pushReplacementNamed(context,SplashScreen.id);
+            }else{
+              await alert.dismiss();
+            }
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        )
+      ],
+    );
+    alert.show();
+
+  }
+  Future _getVedioFromCamera(BuildContext context) async {
+    final picker = ImagePicker();
+    var pickedFile = await picker.pickVideo(source: ImageSource.camera,maxDuration:Duration(seconds: 15));
+    Navigator.pop(context);
+    if (pickedFile != null) {
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      await VideoCompress.setLogLevel(0);
+      final MediaInfo  info = await VideoCompress.compressVideo(
+        pickedFile.path,
+        quality: VideoQuality.MediumQuality,
+        deleteOrigin: false,
+        includeAudio: true,
+      );
+      print(info.path);
+
+
+
+
+
+      isSelected = true;
+      File _image = File(info.path);
+
+      vedios.add(_image) ;
+
+      PetMartService petMartService = PetMartService();
+      dynamic response = await petMartService.addVedio(_image);
+      modelHud.changeIsLoading(false);
+      bool status = response['ok'];
+      if (status) {
+        vedioUrl = response['data']['link'];
+      } else {
+        ShowPostAlertDialog(context, response['data']['msg'], false);
+      }
+
+
+
+
+    } else {
+      mChooseImage= 'لم يتم اختيار الصورة';
+    }
+
+    setState(() {
+
+    });
+
+
+
+
+  }
+
   String ageId ="";
   String languageCode = "";
   Future<CategoryParent.HomeModel> home() async{
@@ -110,33 +320,47 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     return homeModel;
   }
   Future _getImageFromGallery(BuildContext context) async {
-    var pickedFile = null;
-    pickedFile = await picker.getImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
+    List<XFile> pickedFile = [];
+    ImagePicker picker = ImagePicker();
+    try {
+      List<Media> res = await ImagesPicker.pick(
+        count: 10,
+        pickType: PickType.all,
+        language: Language.System,
+        maxTime: 30,
+        // maxSize: 500,
+        cropOpt: CropOption(
+          // aspectRatio: CropAspectRatio.wh16x9,
+          cropType: CropType.rect,
+        ),
+      );
+
+      if (res!= null || res.isNotEmpty) {
+        isSelected = true;
+        for (int i = 0; i < res.length; i++) {
+          File _image = File(res[i].path);
+          mImages.add(_image);
+          Paths.add(_image.path);
+        }
 
 
+        // updateImage(context);
 
 
+      } else {
+        mChooseImage = 'لم يتم اختيار الصورة';
+      }
 
-      isSelected = true;
-      File _image = File(pickedFile.path);
-
-      mImages .add(_image) ;
-      Paths.add(_image.path);
-      // updateImage(context);
+      setState(() {
 
 
+      });
 
-    } else {
-      mChooseImage = 'لم يتم اختيار الصورة';
+
+      Navigator.pop(context);
+    }catch(e){
+      print(e.toString());
     }
-    setState(() {
-
-
-    });
-
-
-    Navigator.pop(context);
   }
   Future _getImageFromCamera(BuildContext context) async {
     var pickedFile = await picker.getImage(source: ImageSource.camera);
@@ -168,87 +392,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
   }
 
-  Future _getVedioFromGallery(BuildContext context) async {
-    var pickedFile = null;
-    pickedFile = await picker.getVideo(source: ImageSource.gallery,maxDuration:Duration(seconds: 15));
-    Navigator.pop(context);
-    if (pickedFile != null) {
-      final modelHud = Provider.of<ModelHud>(context,listen: false);
-      modelHud.changeIsLoading(true);
-      await VideoCompress.setLogLevel(0);
-      final MediaInfo  info = await VideoCompress.compressVideo(
-        pickedFile.path,
-        quality: VideoQuality.MediumQuality,
-        deleteOrigin: false,
-        includeAudio: true,
-      );
-      print(info.path);
 
-
-
-
-
-      isSelected = true;
-      File _image = File(info.path);
-
-      vedios.add(_image) ;
-
-      // updateImage(context);
-      modelHud.changeIsLoading(false);
-
-
-    } else {
-      mChooseImage = 'لم يتم اختيار الصورة';
-    }
-    Navigator.pop(context);
-    setState(() {
-
-
-    });
-
-
-
-  }
-  Future _getVedioFromCamera(BuildContext context) async {
-    var pickedFile = await picker.getVideo(source: ImageSource.camera,maxDuration:Duration(seconds: 15));
-    Navigator.pop(context);
-    if (pickedFile != null) {
-      final modelHud = Provider.of<ModelHud>(context,listen: false);
-      modelHud.changeIsLoading(true);
-      await VideoCompress.setLogLevel(0);
-      final MediaInfo  info = await VideoCompress.compressVideo(
-        pickedFile.path,
-        quality: VideoQuality.MediumQuality,
-        deleteOrigin: false,
-        includeAudio: true,
-      );
-      print(info.path);
-
-
-      File _image = File(pickedFile.path);
-
-      vedios.add(_image) ;
-      isSelected = true;
-      mChooseImage="تم اختيار الصورة";
-      modelHud.changeIsLoading(false);
-
-      // updateImage(context);
-
-
-
-
-    } else {
-      mChooseImage= 'لم يتم اختيار الصورة';
-    }
-
-    setState(() {
-
-    });
-
-
-
-
-  }
 
   Future<Map> map() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -283,19 +427,15 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     print(mStartDate);
     print(mEndDate);
     map().then((value) {
-
-  mLanguage = value['language'];
-
-
-
-
-    }).whenComplete(() {
-      home().then((value) {
-        setState(() {
-          homeModel = value;
-          categoryList = value.data.categories;
-        });
+      setState(() {
+        mLanguage = value['language'];
       });
+
+
+
+
+
+
     });
   }
   @override
@@ -351,7 +491,8 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
             child:
 
             Container(
-              child: homeModel == null?Container(
+              child: mLanguage == ""?
+              Container(
                 child: CircularProgressIndicator(
 
 
@@ -449,26 +590,29 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
 
                         children: [
-                          GestureDetector(
-                            onTap: (){
-                              showVedioPickerDialog(context).then((value){
-                                value.show(context);
-                              });
-                            },
-                            child:
-                            Container(
-                              width: 100.h,
-                              height: 100.h,
-                              padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(5.0.h),
-                                  color: Color(0xFFFFFFFF),
-                                  border: Border.all(
-                                      color: Color(0xCC000000),
-                                      width: 1.0.w
-                                  )
+                          Container(
+                            child: vedios.length>=1?
+                            Container():GestureDetector(
+                              onTap: (){
+                                showVedioPickerDialog(context).then((value){
+                                  value.show(context);
+                                });
+                              },
+                              child:
+                              Container(
+                                width: 100.h,
+                                height: 100.h,
+                                padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5.0.h),
+                                    color: Color(0xFFFFFFFF),
+                                    border: Border.all(
+                                        color: Color(0xCC000000),
+                                        width: 1.0.w
+                                    )
+                                ),
+                                child: Icon(Icons.add,color: kMainColor,size: 50.h,),
                               ),
-                              child: Icon(Icons.add,color: kMainColor,size: 50.h,),
                             ),
                           ),
                           SizedBox(width: 10.w,
@@ -489,103 +633,8 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(
-                      height: 50.h,
-                      width: screenUtil.screenWidth,
-                      child: DropDown<CategoryParent.Categories>(
 
 
-
-
-
-                        items: categoryList,
-
-                        hint:  Text(getTranslated(context, 'select_category') ,
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-
-                              color: Color(0xFFc3c3c3),
-                              fontWeight: FontWeight.w600,
-                              fontSize: screenUtil.setSp(15)
-                          ),),
-                        onChanged: (CategoryParent.Categories category){
-                          mSubCategoryModel = null;
-                          categoryId = category.id;
-                          print('CategoryId -->${categoryId}');
-                          final modelHud = Provider.of<ModelHud>(context,listen: false);
-                          modelHud.changeIsLoading(true);
-                          subCategory(categoryId).then((value){
-                            modelHud.changeIsLoading(false);
-                            setState(() {
-                              subCategoryId = value.data.categories[0].id;
-                              mSubCategoryModel = value;
-                              print('subCategoryId -->${subCategoryId}');
-                            });
-                          });
-
-
-                        },
-                        customWidgets: categoryList.map((p) => buildDropDownRow(p)).toList(),
-                        isExpanded: true,
-                        showUnderline: false,
-                      ),
-                    ),
-                    SizedBox(height: 1.h,
-                      width: screenUtil.screenWidth,
-                      child: Container(
-                        color: Color(0xFFc3c3c3),
-                      ),),
-                    SizedBox(height: 10.h,),
-                    SizedBox(
-                      height: 50.h,
-                      width: screenUtil.screenWidth,
-                      child: mSubCategoryModel == null?
-                      SizedBox(
-
-                        child: Text(getTranslated(context, 'select_sub_category'),
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-
-                              color: Color(0xFFc3c3c3),
-                              fontWeight: FontWeight.w600,
-                              fontSize: screenUtil.setSp(15)
-                          ),),
-                      ):  SizedBox(
-                        height: 50.h,
-                        width: screenUtil.screenWidth,
-                        child: DropDown<SubCategory.Categories>(
-
-
-
-
-
-                          items: mSubCategoryModel.data.categories,
-
-                          hint:  Text(mLanguage == "en"?mSubCategoryModel.data.categories[0].enTitle: mSubCategoryModel.data.categories[0].arTitle,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-
-                                color: Color(0xFF000000),
-                                fontWeight: FontWeight.w600,
-                                fontSize: screenUtil.setSp(15)
-                            ),),
-                          onChanged: (SubCategory.Categories category){
-                            subCategoryId = category.id;
-
-
-
-                          },
-                          customWidgets: mSubCategoryModel.data.categories.map((p) => buildSubCategoryRow(p)).toList(),
-                          isExpanded: true,
-                          showUnderline: false,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 1.h,
-                      width: screenUtil.screenWidth,
-                      child: Container(
-                        color: Color(0xFFc3c3c3),
-                      ),),
                     SizedBox(height: 10.h,),
                     TextField(
 
@@ -736,51 +785,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
     );
   }
-  Container pickedVedio(File image,int position){
-    return Container(
-      width: 100.h,
-      height: 100.h,
-      padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(5.0.h),
-        color: Color(0xFFFFFFFF),
-        border: Border.all(
-            color: Color(0xCC000000),
-            width: 1.0.w
-        ),
-        image: DecorationImage(
-            image: FileImage(File(image.path)),
-            fit: BoxFit.fill),
-      ),
-      child: Container(
-        alignment: AlignmentDirectional.topStart,
-        child: Stack(
 
-          children: [
-            Center(
-              child: Icon(Icons.video_library_sharp,color: kMainColor,size: 50.h,),
-            ),
-            Positioned.directional(
-              textDirection:  Directionality.of(context),
-
-              child: GestureDetector(
-                  onTap: (){
-                    vedios.removeAt(position);
-                    setState(() {
-
-                    });
-
-                  },
-                  child: Icon(Icons.delete,color: Colors.red,size: 20.h,)),
-            ),
-          ],
-        ),
-
-      ),
-
-
-    );
-  }
   Future<SubCategory.CategoryModel> subCategory(String categoryId) async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
@@ -868,13 +873,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
 
     }
-    else if(subCategoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'category_error'))));
 
-    }else if(categoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'sub_category_error'))));
-
-    }
     else if(postTitle==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'auction_title_error'))));
 
@@ -898,14 +897,14 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
       }
       PetMartService petMartService = PetMartService();
-      dynamic response = await petMartService.addAuction(postTitle, postTitle, postDescription, postDescription, mStartDate,mEndDate, price,"running",categoryId, userId, subCategoryId, mLanguage, mCompressedImages, vedios);
+      dynamic response = await petMartService.addAuction(postTitle, postTitle, postDescription, postDescription, mStartDate,mEndDate, price,"running",categoryId, userId, subCategoryId, mLanguage, mCompressedImages, vedios,vedioUrl);
       modelHud.changeIsLoading(false);
-      String status = response['status'];
-      if(status == 'success'){
-        ShowAlertDialog(context, response['message'],true);
+      bool status = response['ok'];
+      if(status){
+        ShowAlertDialog(context, response['data']['msg'],true);
 
       }else{
-        ShowAlertDialog(context, response['message'],false);
+        ShowAlertDialog(context, response['data']['msg'],false);
       }
     }
 
