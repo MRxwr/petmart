@@ -24,6 +24,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timer_count_down/timer_count_down.dart';
 
 import '../model/auction_type.dart';
+import '../model/user_model.dart';
 import 'create_auction_screen.dart';
 import 'credit_screen.dart';
 import 'login_screen.dart';
@@ -110,6 +111,7 @@ class _AuctionScreenState extends State<AuctionScreen> {
   //
   // }
 
+
 MyNewAuctionModel myNewAuctionModel;
   NewAcutionListModel. NewAcutionListModel mNewAuctionListModel;
   String myAuctionErrorString="";
@@ -195,7 +197,38 @@ MyNewAuctionModel myNewAuctionModel;
   List<Live> myAuctionList =[];
   List<AuctionType> auctionTypeList =[];
   int position=0;
+  LoginModel loginModel;
+  Future<UserModel> user() async{
 
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+    String loginData = _preferences.getString(kUserModel);
+
+
+
+    final body = json.decode(loginData);
+    loginModel = LoginModel.fromJson(body);
+    userId = loginModel.data.id;
+
+    Map<String, String> map = Map();
+    map['id']=userId;
+
+
+
+
+
+    PetMartService petMartService = PetMartService();
+    UserModel userModel = await petMartService.user(map);
+
+
+
+
+
+
+
+    return userModel;
+  }
   @override
   void initState() {
     // TODO: implement initState
@@ -905,23 +938,29 @@ MyNewAuctionModel myNewAuctionModel;
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
     if(isLoggedIn){
-      // final modelHud = Provider.of<ModelHud>(context,listen: false);
-      // modelHud.changeIsLoading(true);
-      // checkCreditModel().then((value){
-      //   modelHud.changeIsLoading(false);
-      //   int credit = int.parse(value.data.credit);
-      //   print('credit --->${credit}');
-      //
-      //   if(credit>0){
-      //
-      //   }else{
-      //     ShowAlertDialog(context, value.message);
-      //   }
-      // });
-      // print("true");
-      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-        return new CreateAuctionScreen();
-      }));
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+      user().then((value){
+        modelHud.changeIsLoading(false);
+        String points = value.data.points;
+        int credit =0;
+        if(points.toString() == "null" || points.trim()==""){
+          credit = 0;
+        }else{
+          credit = int.parse(points);
+        }
+
+
+
+        if(credit>0){
+          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+            return new CreateAuctionScreen();
+          }));
+        }else{
+          ShowAlertDialog(context, getTranslated(context, "credit_not_enough"));
+        }
+      });
+      print("true");
 
     }else{
       ShowAlerLogintDialog(context,getTranslated(context, 'not_login'));

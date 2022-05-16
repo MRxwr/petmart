@@ -186,7 +186,8 @@
   "knet": "KNET",
   "master": "Master Card",
   "go_to_myaccount": "Go To My Account",
-  "go_to_credit": "Go To Packages"
+  "go_to_credit": "Go To Packages",
+  "credit_not_enough": "You do not have enough credit, do you want to buy?"
 
 
 }

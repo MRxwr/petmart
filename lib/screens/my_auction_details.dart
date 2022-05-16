@@ -112,6 +112,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     auction().then((value){
       setState(() {
         mAuctionDetailsModel = value;
+        print("mAuctionDetailsModel.data[0].status ---> ${mAuctionDetailsModel.data[0].status}");
         // _rating = double.parse(mAuctionDetailsModel.data.rating.toString());
 
       });
@@ -689,7 +690,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                       end: 0,
                       child: Container(
 
-                          child:mAuctionDetailsModel.data[0].status== "1"? deleteButton(getTranslated(context, 'stop_auction'),context):Container()))
+                          child:mAuctionDetailsModel.data[0].status== "0"? deleteButton(getTranslated(context, 'stop_auction'),context):Container()))
                 ],
               ),
           ),
@@ -790,7 +791,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     modelHud.changeIsLoading(true);
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    Map map = new Map();
+    Map<String,String> map = new Map();
     map['customerId'] = loginModel.data.id;
     map['auctionId'] = widget.id;
 
