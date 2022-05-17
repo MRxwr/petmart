@@ -955,7 +955,7 @@ children: [
         map['customerId']=loginModel.data.id;
         map['bidderId']=loginModel.data.id;
         map['auctionId']=mAuctionDetailsModel.data[0].id;
-        map['bid']='${currentBid}';
+        map['bid']='${double.parse(mAuctionDetailsModel.data[0].reach)+currentBid}';
 
         PetMartService petMartService = PetMartService();
         BidNewModel bidModel = await petMartService.bid(map);

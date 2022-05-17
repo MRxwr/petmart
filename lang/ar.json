@@ -187,5 +187,10 @@
   "master": "ماستر",
   "go_to_myaccount": " الذهاب الي حسابي",
   "go_to_credit": "الذهاب إلي العروض",
-  "credit_not_enough": "ليس لديك رصيد كاف,هل تريد الشراء؟"
+  "credit_not_enough": "ليس لديك رصيد كاف,هل تريد الشراء؟",
+  "cancel": "ملغي",
+  "live": "مباشر",
+  "Done": "انتهي",
+  "no_available_auctions": "لا يوجد مزادات متاحة",
+  "post_add_successfuly": "لقد تمت إضافة الإعلان بنجاح"
 }

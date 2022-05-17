@@ -901,7 +901,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       modelHud.changeIsLoading(false);
       bool status = response['ok'];
       if(status){
-        ShowAlertDialog(context, response['data']['msg'],true);
+        ShowAlertDialog(context, getTranslated(context, "post_add_successfuly"),true);
 
       }else{
         ShowAlertDialog(context, response['data']['msg'],false);

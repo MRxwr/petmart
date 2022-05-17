@@ -17,6 +17,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/auction_details_screen.dart';
 import 'package:pet_mart/screens/my_auction_details.dart';
+import 'package:pet_mart/screens/my_auction_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -53,38 +54,30 @@ MyNewAuctionModel myNewAuctionModel = null;
   String AuctionErrorString ="";
 
   Future<void> auctions() async{
-    AuctionType  liveType = AuctionType("مباشر", "live", true);
-    AuctionType  doneType = AuctionType("انتهي", "Done", false);
-    AuctionType  cancleType = AuctionType("ملغي", "Cancel", false);
-    auctionTypeList.add(liveType);
-    auctionTypeList.add(doneType);
-    auctionTypeList.add(cancleType);
+    isLoading = false;
+    // AuctionType  liveType = AuctionType("مباشر", "live", true);
+    // AuctionType  doneType = AuctionType("انتهي", "Done", false);
+    // AuctionType  cancleType = AuctionType("ملغي", "Cancel", false);
+    // auctionTypeList.add(liveType);
+    // auctionTypeList.add(doneType);
+    // auctionTypeList.add(cancleType);
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
      loginData = _preferences.getString(kUserModel)??null;
-     if(loginData != null){
+     if(loginData != null) {
        final body = json.decode(loginData);
-       LoginModel   loginModel = LoginModel.fromJson(body);
+       LoginModel loginModel = LoginModel.fromJson(body);
        userId = loginModel.data.id;
-       PetMartService petMartService = PetMartService();
-       Map<String, dynamic>   response  = await petMartService.myNewAuctions(userId);
-       bool isOk  = response['ok'];
-       if(isOk){
-         myAuctionErrorString = "";
-         myNewAuctionModel = MyNewAuctionModel.fromJson(response);
-         myAuctionList = myNewAuctionModel.data.live;
-         if(myAuctionList == null){
-           myAuctionList = [];
-         }
-       }else{
-         myAuctionErrorString = response['data']['msg'];
-       }
-
-
      }
+    //    }else{
+    //      myAuctionErrorString = response['data']['msg'];
+    //    }
+    //
+    //
+    //  }
     PetMartService petMartService = PetMartService();
-    Map<String, dynamic>   responseList  = await petMartService.NewAuctionList();
+    Map<String, dynamic>   responseList  = await petMartService.NewAuctionList(userId);
     bool isNewOk = responseList['ok'];
     if(isNewOk){
       mNewAuctionListModel = NewAcutionListModel.NewAcutionListModel.fromJson(responseList);
@@ -136,6 +129,7 @@ MyNewAuctionModel myNewAuctionModel = null;
 //     return homeModel;
 //   }
   List<Live> myAuctionList =[];
+  bool isLoading = true;
   List<AuctionType> auctionTypeList =[];
   int position=0;
   LoginModel loginModel;
@@ -215,7 +209,7 @@ MyNewAuctionModel myNewAuctionModel = null;
     return Scaffold(
       body: Container(
 
-        child: loginData == ""?
+        child: isLoading?
         Container(
           child: CircularProgressIndicator(
 
@@ -234,163 +228,25 @@ MyNewAuctionModel myNewAuctionModel = null;
           children: [
 
             Container(
-              child: userId == ""?
-              Container():Container(
+              child:
+              Container(
 
                 padding:
                 EdgeInsets.all(10.h),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Container(
+                      Expanded(flex:1,
+                          child: myAuctionButton(getTranslated(context, 'my_auction'), context)),
+                      SizedBox(width: 30.w,),
 
-
-                        child: Text(getTranslated(context, 'my_auction')
-                          ,style: TextStyle(color: Color(0xFF000000),fontSize: screenUtil.setSp(16),
-                              fontWeight: FontWeight.bold),),
-                      ),
-                      previewButton(getTranslated(context, 'create_auction'), context),
+                      Expanded(flex: 1,
+                          child: previewButton(getTranslated(context, 'create_auction'), context)),
 
                     ],
                   )),
             ),
-            Container(
-              child:userId == ""?
-              Container():SizedBox(height: 1,width: width,
-              child: Container(
-                color: Color(0xFF0000000),
-              ),),
-            ),
-            Container(
-              child:userId== ""?
-                Container()
-          :Container(
-            child:myAuctionErrorString != ""?
-            Container(
-              child: Text(
-                myAuctionErrorString,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: screenUtil.setSp(16),
-                    fontWeight: FontWeight.w600
-                ),
-              ),
-              alignment: AlignmentDirectional.center,
-            ):
-            Column(
-                  children: [
-                    SizedBox(height: 10.w,),
-                    Container(
-                      margin: EdgeInsets.all(10.h),
-                      height: 35.h,
-                      child: ListView.separated(
 
-                          scrollDirection: Axis.horizontal,
-
-                          itemBuilder: (context,index){
-                            return
-                              GestureDetector(
-                                onTap: (){
-                                  bool selectedIndex = auctionTypeList[index].isSelected;
-                                  if(!selectedIndex){
-
-                                    for(int i =0;i<auctionTypeList.length;i++){
-                                      if(i == index){
-                                        auctionTypeList[i].isSelected= true;
-                                      }else{
-                                        auctionTypeList[i].isSelected= false;
-                                      }
-                                    }
-
-
-
-                                    myAuctionList =[];
-                                    if(index==0){
-                                      myAuctionList = myNewAuctionModel.data.live;
-
-                                    }else if(index == 1){
-                                      myAuctionList = myNewAuctionModel.data.done;
-                                    }else if(index == 2){
-                                      myAuctionList = myNewAuctionModel.data.cancel;
-                                    }
-                                    if(myAuctionList == null){
-                                      myAuctionList = [];
-                                    }
-                                    position = index;
-                                    setState(() {
-
-                                    });
-
-
-                                  }
-
-                                },
-                                child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 10.w),
-                                    child: selectRow(auctionTypeList[index],context,index)),
-                              );
-                          }
-                          ,
-                          separatorBuilder: (context,index) {
-                            return Container(height: 10.h,
-                              color: Color(0xFFFFFFFF),);
-                          }
-                          ,itemCount: auctionTypeList.length),
-
-                    ),
-                    Container(
-                      child:myAuctionList.isEmpty?
-                          Container(
-                            height: 200.h,
-                            width: width,
-                            alignment: AlignmentDirectional.center,
-                            child: Text(
-                            "No Auction Available",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: screenUtil.setSp(16),
-                                fontWeight: FontWeight.w600
-                            ),
-                          ),
-                          ):
-                      Container(
-                        height: 200.h,
-                        width: width,
-                        child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                            itemBuilder:(context,index){
-                          return GestureDetector(
-                            onTap: (){
-                              Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                return new MyAuctionDetails(id:myAuctionList[index].id,postName:languageCode == "en"?myAuctionList[index].enTitle:myAuctionList[index].enTitle);
-                              }));
-                            },
-                            child: Container(
-                              margin: EdgeInsets.all(6.w),
-                              child: Card(
-                                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  elevation: 1.w,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0.h),
-                                  ),
-                                  color: Color(0xFFFFFFFF),
-                                  child: buildMyAuctionItem(myAuctionList[index],context)),
-                            ),
-                          );
-                        } , separatorBuilder: (context,index){
-                          return Container(width: 10.w,);
-                        }, itemCount: myAuctionList.length),
-                      ),
-                    ),
-                    SizedBox(height: 10.w,),
-                    SizedBox(height: 1,width: width,
-                      child: Container(
-                        color: Color(0xFF0000000),
-                      ),),
-                  ],
-                ),
-          ),
-            ),
             Container(
               alignment: AlignmentDirectional.centerStart,
               padding: EdgeInsets.all(10.h),
@@ -412,7 +268,7 @@ MyNewAuctionModel myNewAuctionModel = null;
 
               Container(
                 child: Text(
-                  AuctionErrorString,
+                  getTranslated(context, "no_available_auctions"),
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: screenUtil.setSp(16),
@@ -527,6 +383,39 @@ MyNewAuctionModel myNewAuctionModel = null;
       onPressed: () {
 
          createAuction(context);
+
+      },
+      child: Text(text,style: TextStyle(
+          color: Color(0xFF000000),
+          fontSize: screenUtil.setSp(14),
+          fontWeight: FontWeight.w500
+      ),),
+    );
+  }
+  TextButton myAuctionButton(String text,BuildContext context){
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      primary: Color(0xFF000000),
+      minimumSize: Size(88.w, 35.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+      shape:  RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+      ),
+      backgroundColor: Color(0xFFFFC300),
+    );
+
+    return TextButton(
+      style: flatButtonStyle,
+      onPressed: () async{
+        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+        bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+        if(isLoggedIn){
+          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+            return new MyAuctionScreen();
+          }));
+        }else{
+          ShowAlerLogintDialog(context,getTranslated(context, 'not_login'));
+        }
+
 
       },
       child: Text(text,style: TextStyle(
@@ -1048,6 +937,7 @@ MyNewAuctionModel myNewAuctionModel = null;
        setState(() {
          loginData = "";
          userId="";
+         isLoading = true;
          myNewAuctionModel = null;
          mNewAuctionListModel = null;
          myAuctionErrorString="";

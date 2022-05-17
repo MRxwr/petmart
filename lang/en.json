@@ -187,7 +187,12 @@
   "master": "Master",
   "go_to_myaccount": "Go To My Account",
   "go_to_credit": "Go To Packages",
-  "credit_not_enough": "You do not have enough credit, do you want to buy?"
+  "credit_not_enough": "You do not have enough credit, do you want to buy?",
+  "cancel": "Cancel",
+  "live": "Live",
+  "Done": "Done",
+  "no_available_auctions": "No Available Auctions",
+  "post_add_successfuly": "Post Added Successfully"
 
 
 }

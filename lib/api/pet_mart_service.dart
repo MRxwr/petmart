@@ -1014,7 +1014,7 @@ print("userID---> ${id}");
     return changePasswordModel;
 
   }
-  Future<dynamic> NewAuctionList()async{
+  Future<dynamic> NewAuctionList(String id)async{
     var resp;
     var dio = Dio();
     dio.options.headers['content-Type'] = 'multipart/form-data';
@@ -1024,10 +1024,16 @@ print("userID---> ${id}");
         .getInstance();
     String language = sharedPreferences.getString(LANG_CODE) ?? "en";
 
+    Map<String,String> map = Map();
+    map['customerId']= id;
 
+
+    print("userID---> ${id}");
+    FormData formData = FormData.fromMap(map);
 
     var response = await dio.post(
         TAG_BASE_URL + "?action=auctions&type=list",
+        data: formData
     );
     print(response.data);
     MyPostsModel postModel;

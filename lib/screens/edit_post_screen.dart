@@ -1307,7 +1307,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
           modelHud.changeIsLoading(false);
           bool status = response['ok'];
           if (status) {
-            ShowPostAlertDialog(context, response['data']['msg'], true);
+            ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly"), true);
           } else {
             ShowPostAlertDialog(context, response['data']['msg'], false);
           }
@@ -1340,7 +1340,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
         bool status = response['ok'];
         if (status) {
-          ShowPostAlertDialog(context, response['data']['msg'], true);
+          ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly"), true);
         } else {
           ShowPostAlertDialog(context, response['data']['msg'], false);
         }

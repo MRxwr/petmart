@@ -14,6 +14,9 @@ import 'package:pet_mart/screens/my_auction_details.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timer_count_down/timer_count_down.dart';
+
+import '../model/MyNewAuctionModel.dart';
+import '../model/auction_type.dart';
 class MyAuctionScreen extends StatefulWidget {
   static String id = 'MyAuctionScreen';
   @override
@@ -45,20 +48,52 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    typesList.add(TypeModel(typeNameAr: 'الكل',typeNameEn: 'All',key: 'all',selected: true));
-    typesList.add(TypeModel(typeNameAr: 'مستمر',typeNameEn: 'Running',key: 'running',selected: false));
-   typesList.add(TypeModel(typeNameAr: 'القادمة',typeNameEn: 'Upcoming',key: 'upcoming',selected: false));
-    typesList.add(TypeModel(typeNameAr: 'اكتمال',typeNameEn: 'Complete',key: 'complete',selected: false));
-map().then((value) {
-  userId = value["userId"];
-  mLanguage = value['language'];
-}).whenComplete(() {
-  myAuctions('all').then((value) {
-    setState(() {
-      myAuctionsModel = value;
-    });
-  });
-});
+   getMyActions().then((value) {
+     setState(() {
+
+     });
+
+   });
+  }
+  List<Live> myAuctionList =[];
+  String languageCode="";
+  int position=0;
+
+  String loginData = "";
+  List<AuctionType> auctionTypeList =[];
+  MyNewAuctionModel myNewAuctionModel = null;
+  String myAuctionErrorString ="";
+  Future<void> getMyActions() async{
+    AuctionType  liveType = AuctionType("مباشر", "live", true);
+    AuctionType  doneType = AuctionType("انتهي", "Done", false);
+    AuctionType  cancleType = AuctionType("ملغي", "Cancel", false);
+    auctionTypeList.add(liveType);
+    auctionTypeList.add(doneType);
+    auctionTypeList.add(cancleType);
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+    loginData = _preferences.getString(kUserModel)??null;
+
+      final body = json.decode(loginData);
+      LoginModel   loginModel = LoginModel.fromJson(body);
+      userId = loginModel.data.id;
+      PetMartService petMartService = PetMartService();
+      Map<String, dynamic>   response  = await petMartService.myNewAuctions(userId);
+      bool isOk  = response['ok'];
+      if(isOk){
+        myAuctionErrorString = "";
+        myNewAuctionModel = MyNewAuctionModel.fromJson(response);
+        myAuctionList = myNewAuctionModel.data.live;
+        if(myAuctionList == null){
+          myAuctionList = [];
+        }
+      }else{
+        myAuctionErrorString = response['data']['msg'];
+      }
+
+
+
   }
   Future<Model.MyAuctionsModel> myAuctions(String type) async{
     Map map;
@@ -134,14 +169,14 @@ map().then((value) {
       ),
       backgroundColor: Color(0xFFFFFFFF),
       body: Container(
-child: mLanguage == ""?
-Container(
-  child: CircularProgressIndicator(
+ child: loginData == ""?
+      Container(
+      child: CircularProgressIndicator(
 
 
-  ),
-  alignment: AlignmentDirectional.center,
-):
+      ),
+      alignment: AlignmentDirectional.center,
+    ):
     ListView(
       padding: EdgeInsets.zero,
       scrollDirection: Axis.vertical,
@@ -155,6 +190,7 @@ Container(
         SizedBox(height: 5.h,width: width,
         ),
         Container(
+          margin: EdgeInsets.all(10.h),
           height: 35.h,
           child: ListView.separated(
 
@@ -164,24 +200,36 @@ Container(
                 return
                   GestureDetector(
                     onTap: (){
-                      bool selectedIndex = typesList[index].selected;
-                      print('selectedIndex ${selectedIndex}');
-
+                      bool selectedIndex = auctionTypeList[index].isSelected;
                       if(!selectedIndex){
-                        for(int i =0;i<typesList.length;i++){
-                          if(i == index){
-                            typesList[i].selected= true;
-                          }else{
-                            typesList[i].selected= false;
-                          }
 
+                        for(int i =0;i<auctionTypeList.length;i++){
+                          if(i == index){
+                            auctionTypeList[i].isSelected= true;
+                          }else{
+                            auctionTypeList[i].isSelected= false;
+                          }
                         }
 
-                        myAuctionsModel = null;
+
+
+                        myAuctionList =[];
+                        if(index==0){
+                          myAuctionList = myNewAuctionModel.data.live;
+                          print(myAuctionList.length);
+
+                        }else if(index == 1){
+                          myAuctionList = myNewAuctionModel.data.done;
+                        }else if(index == 2){
+                          myAuctionList = myNewAuctionModel.data.cancel;
+                        }
+                        if(myAuctionList == null){
+                          myAuctionList = [];
+                        }
+                        position = index;
                         setState(() {
 
                         });
-                        postList(typesList[index].key);
 
 
                       }
@@ -189,7 +237,7 @@ Container(
                     },
                     child: Container(
                         padding: EdgeInsets.symmetric(horizontal: 10.w),
-                        child: selectRow(typesList[index],context,index,mLanguage)),
+                        child: selectRow(auctionTypeList[index],context,index)),
                   );
               }
               ,
@@ -197,7 +245,8 @@ Container(
                 return Container(height: 10.h,
                   color: Color(0xFFFFFFFF),);
               }
-              ,itemCount: typesList.length),
+              ,itemCount: auctionTypeList.length),
+
         ),
         SizedBox(height: 5.h,width: width,
         ),
@@ -208,109 +257,229 @@ Container(
         SizedBox(height: 5.h,width: width,
         ),
         Container(
+          child:myAuctionList.isEmpty?
+          Container(
+            height: 200.h,
+            width: width,
+            alignment: AlignmentDirectional.center,
+            child: Text(
+              getTranslated(context, "no_available_auctions"),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: screenUtil.setSp(16),
+                  fontWeight: FontWeight.w600
+              ),
+            ),
+          ):
+          Container(
+
+            width: width,
             child:
-            myAuctionsModel== null?
-            Container(
-              child: CircularProgressIndicator(
-
-
-              ),
-              alignment: AlignmentDirectional.center,
-            ):
-            myAuctionsModel.data.auctionData.isEmpty?
-
-            Container(
-              child: Text(
-                myAuctionsModel.message,
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: screenUtil.setSp(16),
-                    fontWeight: FontWeight.w600
-                ),
-              ),
-              alignment: AlignmentDirectional.center,
-            )
-                :GridView.builder(scrollDirection: Axis.vertical,
+            GridView.builder(scrollDirection: Axis.vertical,
 
 
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
                   childAspectRatio:itemWidth/itemHeight),
-              itemCount: myAuctionsModel.data.auctionData.length,
+              itemCount: myAuctionList.length,
 
               itemBuilder: (context,index){
                 return GestureDetector(
                   onTap: (){
                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      return new MyAuctionDetails(id:myAuctionsModel.data.auctionData[index].auctionId,postName:myAuctionsModel.data.auctionData[index].auctionName ,);
+                      return new MyAuctionDetails(id:myAuctionList[index].id,postName:languageCode == "en"?myAuctionList[index].enTitle:myAuctionList[index].enTitle);
                     }));
                   },
                   child: Container(
-                      margin: EdgeInsets.all(6.w),
-
-                      child:
-                      Card(
-                          clipBehavior: Clip.antiAliasWithSaveLayer,
-                          elevation: 1.w,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0.h),
-                          ),
-                          color: Color(0xFFFFFFFF),
-                          child: buildItem(myAuctionsModel.data.auctionData[index],context))),
+                    margin: EdgeInsets.all(6.w),
+                    child: Card(
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        elevation: 1.w,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0.h),
+                        ),
+                        color: Color(0xFFFFFFFF),
+                        child: buildMyAuctionItem(myAuctionList[index],context)),
+                  ),
                 );
               },
-            ),
-        )
+            )
+
+
+          ),
+        ),
+
       ],
     )
       ),
     );
   }
-  Container selectRow(TypeModel category,BuildContext context,int selectedIndex,String mLangauage){
+  Widget buildMyAuctionItem(Live data, BuildContext context) {
+    String timer ="";
+    return Container(
+      width: 150.w,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 4,
+            child: Stack(
+              children: [
+                CachedNetworkImage(
+                  width: itemWidth,
+                  imageUrl:KImageUrl+data.image,
+                  imageBuilder: (context, imageProvider) => Stack(
+                    children: [
+                      ClipRRect(
 
-    return
-      Container(
-        child:
-        typesList[selectedIndex].selected?
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5.0.h),
-              color: kMainColor
-          ),
-          child: Text(mLangauage =="en"?category.typeNameEn:
-          category.typeNameAr,
-            style: TextStyle(
-                color: Color(0xCC000000),
-                fontSize: screenUtil.setSp(14),
-                fontWeight: FontWeight.w500
+                        child: Container(
+                            width: itemWidth,
 
+                            decoration: BoxDecoration(
+
+                              shape: BoxShape.rectangle,
+
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: imageProvider),
+                            )
+                        ),
+                      ),
+                    ],
+                  ),
+                  placeholder: (context, url) =>
+                      Center(
+                        child: SizedBox(
+                            height: 50.h,
+                            width: 50.h,
+                            child: new CircularProgressIndicator()),
+                      ),
+
+
+                  errorWidget: (context, url, error) => ClipRRect(
+                      child: Image.asset('assets/images/placeholder_error.png',  color: Color(0x80757575).withOpacity(0.5),
+                        colorBlendMode: BlendMode.difference,fit: BoxFit.fill,)),
+
+                ),
+                // Positioned.directional(
+                //   textDirection:  Directionality.of(context),
+                //   bottom: 2.h,
+                //   start: 4.w,
+                //   child:
+                //
+                // )
+              ],
             ),
           ),
-        ) :
-        Container(
-          padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5.0.h),
-              color: Color(0xFFFFFFFF),
-              border: Border.all(
-                  color: Color(0xCC000000),
-                  width: 1.0.w
-              )
-          ),
-          child: Text(
-            mLangauage =="en"?category.typeNameEn:
-            category.typeNameAr,
-            style: TextStyle(
-                color: Color(0xCC000000),
-                fontSize: screenUtil.setSp(14),
-                fontWeight: FontWeight.w500
+          Expanded(flex:3,child: Container(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex:1,child:
+                Container(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    languageCode == "en"?data.enTitle:
+                    data.arTitle,
+                    style: TextStyle(
+                        color: Color(0xFF000000),
+                        fontWeight: FontWeight.normal,
+                        fontSize: screenUtil.setSp(12)
+                    ),
 
+                  ),
+                )),
+                Expanded(flex:1,child:
+                Row(
+                  children: [
+                    Image.asset('assets/images/placeholder_image_count.png',height: 20.h,
+                      width: 20.w,fit: BoxFit.fill,),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      child: Text(
+                        data.images.toString(),
+                        style: TextStyle(
+                            color: Color(0xFF000000),
+                            fontWeight: FontWeight.normal,
+                            fontSize: screenUtil.setSp(14)
+                        ),
+
+                      ),
+                    ),
+                  ],
+                )),
+                Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: position == 1?
+                    Container(
+                      alignment: AlignmentDirectional.centerStart,
+                      margin: EdgeInsetsDirectional.only(start: 4.w),
+                      child: Text(
+
+
+
+                          getTranslated(context, 'Done'),
+                          style: TextStyle(
+
+                            color: Color(0xFF000000),
+                            fontSize: screenUtil.setSp(12),
+                            fontWeight: FontWeight.bold,
+
+                          )
+                      ),
+                    ):
+                    position == 2? Container(
+                      alignment: AlignmentDirectional.centerStart,
+                      margin: EdgeInsetsDirectional.only(start: 4.w),
+                      child: Text(
+
+
+                          getTranslated(context, 'cancel'),
+                          style: TextStyle(
+
+                            color: Color(0xFF000000),
+                            fontSize: screenUtil.setSp(12),
+                            fontWeight: FontWeight.bold,
+
+                          )
+                      ),
+                    ):
+
+                    Countdown(
+                      seconds: getRemainingTime(data.endDate),
+                      build: (BuildContext context, double time) => Container(
+                        alignment: AlignmentDirectional.centerStart,
+                        margin: EdgeInsetsDirectional.only(start: 4.w),
+                        child: Text(
+
+
+                            time.toInt()<=0 ? getTranslated(context, 'complete_string') :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
+                            style: TextStyle(
+
+                              color: Color(0xFF000000),
+                              fontSize: screenUtil.setSp(12),
+                              fontWeight: FontWeight.bold,
+
+                            )
+                        ),
+                      ),
+                      interval: Duration(seconds: 1),
+                      onFinished: () {
+                        print('Timer is done!');
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ),
-      );
+          ))
+
+        ],
+      ),
+    );
+
   }
   Widget buildItem(Model.AuctionData data, BuildContext context) {
     return Container(
@@ -431,7 +600,7 @@ Container(
   int  getRemainingTime(String date ){
     var now = new DateTime.now();
     print(now);
-    DateTime tempDate = new DateFormat("dd-MM-yyyy hh:mm:ss").parse(date);
+    DateTime tempDate = new DateFormat("yyyy-MM-dd hh:mm:ss").parse(date);
     Duration difference = tempDate.difference(now);
     return difference.inSeconds;
   }
@@ -457,6 +626,52 @@ Container(
     tokens.add('${seconds}s');
 
     return tokens.join(':');
+  }
+  Container selectRow(AuctionType category,BuildContext context,int selectedIndex){
+
+    return
+      Container(
+        child:
+        category.isSelected?
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5.0.h),
+              color: kMainColor
+          ),
+          child: Text(
+            languageCode == "en"?
+            category.nameEn:category.nameAr,
+            style: TextStyle(
+                color: Color(0xCC000000),
+                fontSize: screenUtil.setSp(14),
+                fontWeight: FontWeight.w500
+
+            ),
+          ),
+        ) :
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5.0.h),
+              color: Color(0xFFFFFFFF),
+              border: Border.all(
+                  color: Color(0xCC000000),
+                  width: 1.0.w
+              )
+          ),
+          child: Text(
+            languageCode == "en"?
+            category.nameEn:category.nameAr,
+            style: TextStyle(
+                color: Color(0xCC000000),
+                fontSize: screenUtil.setSp(14),
+                fontWeight: FontWeight.w500
+
+            ),
+          ),
+        ),
+      );
   }
 
 }
