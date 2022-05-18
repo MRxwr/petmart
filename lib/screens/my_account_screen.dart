@@ -18,6 +18,7 @@ import 'package:pet_mart/model/update_profile_model.dart';
 import 'package:pet_mart/model/user_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/credit_screen.dart';
+import 'package:pet_mart/screens/favorite_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/widgets/name_textfield.dart';
 import 'package:pet_mart/widgets/phone_textfield.dart';
@@ -237,7 +238,17 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           ),
 
           actions: [
-            SizedBox(width: 30.h,)
+
+            GestureDetector(
+              onTap: (){
+                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                  return new FavoriteScreen();
+                }));
+
+              },
+              child: Icon(Icons.interests,color: Colors.white,size: 30.h,),
+            ),
+            SizedBox(width: 10.w,),
 
           ],
 
@@ -526,7 +537,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         ),
                       ),
                       SizedBox(height: 20.h,width: width,),
-                      Center(child: confirmButton(getTranslated(context, 'update_profile'),context)),
+                      Container(margin: EdgeInsets.symmetric(horizontal: 20.w),
+                          child: confirmButton(getTranslated(context, 'update_profile'),context)),
                     ],
                   )
                   ,

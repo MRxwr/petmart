@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:core';
-
+import '../model/InterestModel.dart' as Interest;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -52,9 +52,10 @@ MyNewAuctionModel myNewAuctionModel = null;
   NewAcutionListModel. NewAcutionListModel mNewAuctionListModel = null;
   String myAuctionErrorString="";
   String AuctionErrorString ="";
-
+  Interest.InterestModel interestModel;
+  List<bool> selectedList =[];
   Future<void> auctions() async{
-    isLoading = false;
+    isLoading = true;
     // AuctionType  liveType = AuctionType("مباشر", "live", true);
     // AuctionType  doneType = AuctionType("انتهي", "Done", false);
     // AuctionType  cancleType = AuctionType("ملغي", "Cancel", false);
@@ -70,14 +71,27 @@ MyNewAuctionModel myNewAuctionModel = null;
        LoginModel loginModel = LoginModel.fromJson(body);
        userId = loginModel.data.id;
      }
+    PetMartService petMartService = PetMartService();
+     interestModel = await petMartService.interests(userId);
+     Interest.Data data = Interest.Data(id: "0",enTitle:"ALL",arTitle: "الكل");
+    interestModelList.add(data);
+    selectedList.add(true);
+    for(int i =0;i<interestModel.data.length;i++){
+      interestModelList.add(interestModel.data[i]);
+      selectedList.add(false);
+    }
+
+
+
+
     //    }else{
     //      myAuctionErrorString = response['data']['msg'];
     //    }
     //
     //
     //  }
-    PetMartService petMartService = PetMartService();
-    Map<String, dynamic>   responseList  = await petMartService.NewAuctionList(userId);
+
+    Map<String, dynamic>   responseList  = await petMartService.NewAuctionList(userId,"0");
     bool isNewOk = responseList['ok'];
     if(isNewOk){
       mNewAuctionListModel = NewAcutionListModel.NewAcutionListModel.fromJson(responseList);
@@ -86,7 +100,7 @@ MyNewAuctionModel myNewAuctionModel = null;
     }else{
       AuctionErrorString = responseList['data']['msg'];
     }
-
+isLoading = false;
 
 
   }
@@ -129,8 +143,9 @@ MyNewAuctionModel myNewAuctionModel = null;
 //     return homeModel;
 //   }
   List<Live> myAuctionList =[];
-  bool isLoading = true;
+  bool isLoading;
   List<AuctionType> auctionTypeList =[];
+  List<Interest.Data> interestModelList =[];
   int position=0;
   LoginModel loginModel;
   Future<UserModel> user() async{
@@ -200,6 +215,7 @@ MyNewAuctionModel myNewAuctionModel = null;
 //       });
 //     });
   }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -262,6 +278,61 @@ MyNewAuctionModel myNewAuctionModel = null;
             SizedBox(height: 5.h,width: width,
             ),
             Container(
+              margin: EdgeInsets.all(10.h),
+              height: 35.h,
+              child: ListView.separated(
+
+                  scrollDirection: Axis.horizontal,
+
+                  itemBuilder: (context,index){
+                    return
+                      GestureDetector(
+                        onTap: ()async{
+                          bool isSelected = selectedList[index];
+                          if(!isSelected){
+                            for(int i =0;i<selectedList.length;i++){
+                              if(i == index){
+                                selectedList[i]= true;
+                              }else{
+                                selectedList[i]= false;
+                              }
+                            }
+                            AuctionErrorString = "";
+                            mNewAuctionListModel = null;
+                            setState(() {
+
+                            });
+                            PetMartService petMartService = PetMartService();
+                            Map<String, dynamic>   responseList  = await petMartService.NewAuctionList(userId,interestModelList[index].id);
+                            bool isNewOk = responseList['ok'];
+                            if(isNewOk){
+                              mNewAuctionListModel = NewAcutionListModel.NewAcutionListModel.fromJson(responseList);
+
+                              AuctionErrorString = "";
+                            }else{
+                              AuctionErrorString = responseList['data']['msg'];
+                            }
+                            setState(() {
+
+                            });
+                          }
+
+
+                        },
+                        child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 10.w),
+                            child: selectRow(interestModelList[index],context,index)),
+                      );
+                  }
+                  ,
+                  separatorBuilder: (context,index) {
+                    return Container(height: 10.h,
+                      color: Color(0xFFFFFFFF),);
+                  }
+                  ,itemCount: interestModelList.length),
+
+            ),
+            Container(
               child:
 
               AuctionErrorString != ""?
@@ -281,7 +352,13 @@ MyNewAuctionModel myNewAuctionModel = null;
 
               Container(
                 child:mNewAuctionListModel == null?
-                Container():GridView.builder(scrollDirection: Axis.vertical,
+                Container(
+                  child: CircularProgressIndicator(
+
+
+                  ),
+                  alignment: AlignmentDirectional.center,
+                ):GridView.builder(scrollDirection: Axis.vertical,
 
 
                   shrinkWrap: true,
@@ -321,12 +398,12 @@ MyNewAuctionModel myNewAuctionModel = null;
       ),
     );
   }
-  Container selectRow(AuctionType category,BuildContext context,int selectedIndex){
+  Container selectRow(Interest.Data category,BuildContext context,int selectedIndex){
 
     return
       Container(
         child:
-        category.isSelected?
+        selectedList[selectedIndex]?
         Container(
           padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
           decoration: BoxDecoration(
@@ -335,7 +412,7 @@ MyNewAuctionModel myNewAuctionModel = null;
           ),
           child: Text(
             languageCode == "en"?
-            category.nameEn:category.nameAr,
+            category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -356,7 +433,7 @@ MyNewAuctionModel myNewAuctionModel = null;
           ),
           child: Text(
             languageCode == "en"?
-            category.nameEn:category.nameAr,
+            category.enTitle:category.arTitle,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -937,7 +1014,7 @@ MyNewAuctionModel myNewAuctionModel = null;
        setState(() {
          loginData = "";
          userId="";
-         isLoading = true;
+         isLoading = false;
          myNewAuctionModel = null;
          mNewAuctionListModel = null;
          myAuctionErrorString="";

@@ -396,7 +396,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
               ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: Text(languageCode == "en"?mAuctionDetailsModel.data[0].enTitle:mAuctionDetailsModel.data[0].arTitle,
+                          child: Text(languageCode == "en"?mAuctionDetailsModel.data[0].enDetails:mAuctionDetailsModel.data[0].arDetails,
                               textAlign: TextAlign.start,
                               style: TextStyle(
                                   color: Color(0xFF000000),

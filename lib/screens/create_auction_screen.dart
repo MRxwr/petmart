@@ -27,6 +27,7 @@ import 'package:pet_mart/model/home_model.dart' as CategoryParent;
 import 'package:video_compress/video_compress.dart';
 
 
+import '../model/InterestModel.dart' as Interest;
 import 'main_sceen.dart';
 class CreateAuctionScreen extends StatefulWidget {
   const CreateAuctionScreen({Key key}) : super(key: key);
@@ -78,7 +79,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     );
     return nAlertDialog;
   }
-  final picker = ImagePicker();
+
   Future<NAlertDialog> showVedioPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
@@ -98,6 +99,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     );
     return nAlertDialog;
   }
+
   Container pickedVedio(File image,int position){
     return Container(
       width: 100.h,
@@ -321,7 +323,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   }
   Future _getImageFromGallery(BuildContext context) async {
     List<XFile> pickedFile = [];
-    ImagePicker picker = ImagePicker();
+
     try {
       List<Media> res = await ImagesPicker.pick(
         count: 10,
@@ -363,6 +365,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     }
   }
   Future _getImageFromCamera(BuildContext context) async {
+    final picker = ImagePicker();
     var pickedFile = await picker.getImage(source: ImageSource.camera);
     if (pickedFile != null) {
 
@@ -393,28 +396,36 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   }
 
 
+String userId ="";
+  Future<Interest.InterestModel> interest() async{
 
-  Future<Map> map() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
-
-
     String loginData = _preferences.getString(kUserModel);
+
+
+
     final body = json.decode(loginData);
     loginModel = LoginModel.fromJson(body);
-    String initData = _preferences.getString("initModel");
-    print('initData --> ${initData}');
-    final initBody = json.decode(initData);
-    // initModel = InitModel.fromJson(initBody);
+    userId = loginModel.data.id;
 
-    Map map ;
-    map = {"language":languageCode,
-      "userId":loginModel.data.id};
-    return map;
+
+
+    PetMartService petMartService = PetMartService();
+    Interest.InterestModel interestModel = await petMartService.interests(userId);
+
+
+
+
+
+
+
+    return interestModel;
   }
   String mStartDate;
   String mEndDate;
+  Interest.InterestModel interestModel;
   @override
   void initState() {
     // TODO: implement initState
@@ -426,9 +437,10 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     mEndDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(end);
     print(mStartDate);
     print(mEndDate);
-    map().then((value) {
+    interest().then((value) {
       setState(() {
-        mLanguage = value['language'];
+        interestModel = value;
+
       });
 
 
@@ -491,7 +503,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
             child:
 
             Container(
-              child: mLanguage == ""?
+              child: interestModel == null?
               Container(
                 child: CircularProgressIndicator(
 
@@ -633,7 +645,71 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
                         ],
                       ),
                     ),
+                    SizedBox(height: 10.h,),
+                    SizedBox(
+                      height: 50.h,
+                      width: screenUtil.screenWidth,
+                      child:interestModel == null?
+                      Container(
 
+                      ):
+                      DropDown<Interest.Data>(
+
+
+
+
+
+
+
+
+
+                        items: interestModel.data,
+
+
+
+
+
+
+
+
+
+
+
+
+                        customWidgets: interestModel.data.map((p) => buildDropDownRow(p)).toList(),
+                        hint:  Text(getTranslated(context, 'select_category'),
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+
+                              color: Color(0xFF000000),
+                              fontWeight: FontWeight.w600,
+                              fontSize: screenUtil.setSp(15)
+                          ),),
+                        onChanged: (Interest.Data category){
+                          categoryId = category.id;
+                          setState(() {
+
+
+
+                          });
+
+
+
+
+
+                        },
+
+                        isExpanded: false,
+                        showUnderline: false,
+
+
+                      ),
+                    ),
+                    SizedBox(height: 1.h,
+                      width: screenUtil.screenWidth,
+                      child: Container(
+                        color: Color(0xFFc3c3c3),
+                      ),),
 
                     SizedBox(height: 10.h,),
                     TextField(
@@ -806,7 +882,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(categoryId);
     return auctionDetailsModel;
   }
-  Widget buildDropDownRow(CategoryParent.Categories category) {
+  Widget buildDropDownRow(Interest.Data category) {
     return Container(
 
 
@@ -873,7 +949,10 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
 
     }
+    else if(categoryId==""){
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'category_error'))));
 
+    }
     else if(postTitle==""){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'auction_title_error'))));
 

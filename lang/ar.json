@@ -192,5 +192,8 @@
   "live": "مباشر",
   "Done": "انتهي",
   "no_available_auctions": "لا يوجد مزادات متاحة",
-  "post_add_successfuly": "لقد تمت إضافة الإعلان بنجاح"
+  "post_add_successfuly": "لقد تمت إضافة الإعلان بنجاح",
+  "intersts": "المفضلة",
+  "add_to_interests": "أضف إلى الاهتمامات",
+  "interested_added_successfully": "لقد تمت الإضافة الي المفظلة بنجاح"
 }

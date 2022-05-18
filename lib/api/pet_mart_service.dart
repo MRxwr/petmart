@@ -6,9 +6,11 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/AddInterestModel.dart';
 import 'package:pet_mart/model/BidNewModel.dart';
 import 'package:pet_mart/model/DeletePostImageModel.dart';
 import 'package:pet_mart/model/InitModel.dart';
+import 'package:pet_mart/model/InterestModel.dart';
 import 'package:pet_mart/model/MyNewAuctionDetailsModel.dart';
 import 'package:pet_mart/model/PaymentUrlModel.dart';
 import 'package:pet_mart/model/ServiceDetailsModel.dart';
@@ -791,6 +793,48 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
     return packageModel;;
 
   }
+  Future<InterestModel> interests(String id)async{
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+    print(TAG_BASE_URL + "?action=interest&type=get");
+    InterestModel packageModel;
+    try {
+      Map<String,String> map = Map();
+      map['customerId']= id;
+
+
+      print("userID---> ${id}");
+      FormData formData = FormData.fromMap(map);
+      var response = await dio.post(
+          TAG_BASE_URL + "?action=interest&type=get",
+          data: formData
+      );
+
+
+      print(response);
+
+
+      if (response.statusCode == 200) {
+        packageModel =
+            InterestModel.fromJson(Map<String, dynamic>.from(response.data));
+      }
+    }on Exception catch (_) {
+      packageModel = null;
+    }
+
+
+
+
+    return packageModel;;
+
+  }
   Future<PaymentUrlModel> paymentUrl(Map<String,String> map)async{
     var dio = Dio();
     dio.options.headers['content-Type'] = 'multipart/form-data';
@@ -819,6 +863,45 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
       if (response.statusCode == 200) {
         packageModel =
             PaymentUrlModel.fromJson(Map<String, dynamic>.from(response.data));
+      }
+    }on Exception catch (_) {
+      packageModel = null;
+    }
+
+
+
+
+    return packageModel;;
+
+  }
+  Future<AddInterestModel> addInterest(Map<String,String> map)async{
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+    print(map);
+
+    print(TAG_BASE_URL + "?action=packages&buy=1");
+    AddInterestModel packageModel;
+    FormData formData = FormData.fromMap(map);
+
+    try {
+      var response = await dio.post(
+          TAG_BASE_URL +
+              "?action=interest&type=add",
+          data: formData
+      );
+
+      print(response);
+
+
+      if (response.statusCode == 200) {
+        packageModel =
+            AddInterestModel.fromJson(Map<String, dynamic>.from(response.data));
       }
     }on Exception catch (_) {
       packageModel = null;
@@ -1014,7 +1097,7 @@ print("userID---> ${id}");
     return changePasswordModel;
 
   }
-  Future<dynamic> NewAuctionList(String id)async{
+  Future<dynamic> NewAuctionList(String id,String filterId)async{
     var resp;
     var dio = Dio();
     dio.options.headers['content-Type'] = 'multipart/form-data';
@@ -1026,7 +1109,7 @@ print("userID---> ${id}");
 
     Map<String,String> map = Map();
     map['customerId']= id;
-
+    map['filterId']= filterId;
 
     print("userID---> ${id}");
     FormData formData = FormData.fromMap(map);
@@ -1571,7 +1654,7 @@ if(path == null){
 
       map['title'] = english_name;
 
-
+      map['filterId'] = category_id;
       map['details'] = english_description;
 
 

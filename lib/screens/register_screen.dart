@@ -25,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:unique_identifier/unique_identifier.dart';
 
 import '../utilities/shared_prefs.dart';
+import 'favorite_screen.dart';
 import 'main_sceen.dart';
 class RegisterScreen extends StatefulWidget {
   static String id = 'RegisterScreen';
@@ -319,7 +320,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           await sharedPref.saveBool(kIsLogin, true);
           await sharedPref.saveString("email", email);
           await sharedPref.saveString("password", password);
-          Navigator.pushReplacementNamed(context,MainScreen.id);
+          Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+            return new FavoriteScreen();
+          }));
         } else {
           ErrorModel errorModel = ErrorModel.fromJson(response);
           _scaffoldKey.currentState.showSnackBar(

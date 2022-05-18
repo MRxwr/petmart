@@ -416,7 +416,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
               Container(
                 padding: EdgeInsets.all(6.h),
                 child: Text(
-                  languageCode == "en"?mAuctionDetailsModel.data[0].enTitle:mAuctionDetailsModel.data[0].arTitle,
+                  languageCode == "en"?mAuctionDetailsModel.data[0].enDetails:mAuctionDetailsModel.data[0].arDetails,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(12),

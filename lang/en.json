@@ -192,7 +192,10 @@
   "live": "Live",
   "Done": "Done",
   "no_available_auctions": "No Available Auctions",
-  "post_add_successfuly": "Post Added Successfully"
+  "post_add_successfuly": "Post Added Successfully",
+  "intersts": "Interests",
+  "add_to_interests": "Add To Interests",
+  "interested_added_successfully": "Interests Added Successfully"
 
 
 }
