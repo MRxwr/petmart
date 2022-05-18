@@ -195,7 +195,6 @@
   "post_add_successfuly": "Post Added Successfully",
   "intersts": "Interests",
   "add_to_interests": "Add To Interests",
-  "interested_added_successfully": "Interests Added Successfully"
-
-
+  "interested_added_successfully": "Interests Added Successfully",
+  "select_vedio_error": "Please choose a video less than 15 seconds"
 }

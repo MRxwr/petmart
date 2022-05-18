@@ -28,6 +28,7 @@
   "sumbit_post": "إرسال",
   "image_error": "يرجى تحديد الصورة على الأقل",
   "category_error": "الرجاء تحديد الفئة",
+  "select_vedio_error": "من فضلك اختار فيديو اقل من ١٥ ثانية",
   "sub_category_error": "الرجاء تحديد الفئة الفرعية",
   "title_error": "الرجاء إدخال عنوان الإعلان",
   "description_error": "الرجاء إدخال وصف الإعلان",
