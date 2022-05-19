@@ -35,6 +35,7 @@ class _VideoScreenState extends State<VideoScreen> {
 
 
 
+
   }
   Future<void> initialize() async{
     _videoPlayerController = VideoPlayerController.network(
@@ -52,6 +53,7 @@ class _VideoScreenState extends State<VideoScreen> {
         DeviceOrientation.portraitUp,
         DeviceOrientation.portraitDown,
       ],
+
       videoPlayerController: _videoPlayerController,
       aspectRatio: _aspectRatio,
       autoInitialize: true,
@@ -64,11 +66,13 @@ class _VideoScreenState extends State<VideoScreen> {
           DeviceOrientation.landscapeRight,
           DeviceOrientation.landscapeLeft,
         ]);
+
       } else {
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.portraitUp,
           DeviceOrientation.portraitDown,
         ]);
+
       }
     });
   }

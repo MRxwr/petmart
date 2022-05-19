@@ -885,7 +885,7 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
 
     print(map);
 
-    print(TAG_BASE_URL + "?action=packages&buy=1");
+
     AddInterestModel packageModel;
     FormData formData = FormData.fromMap(map);
 
@@ -896,7 +896,7 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
           data: formData
       );
 
-      print(response);
+      print(response.data);
 
 
       if (response.statusCode == 200) {

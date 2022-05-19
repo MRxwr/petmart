@@ -256,12 +256,19 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     modelHud.changeIsLoading(true);
     Map<String,String> map = Map();
     map['customerId'] = userId;
+    List<String> selectedId = [];
     for(int i =0;i<selectedList.length;i++){
       if(selectedList[i]){
-        map['category[$i]'] = interestModel.data[i].id;
+        selectedId.add(interestModel.data[i].id);
+
       }
 
     }
+    for(int j=0;j<selectedId.length;j++){
+      map['category[$j]'] =selectedId[j] ;
+    }
+
+    print("interest Map---> ${map}");
     PetMartService petMartService = PetMartService();
     AddInterestModel addInterestModel  =await petMartService.addInterest(map);
     bool isOk = addInterestModel.ok;
