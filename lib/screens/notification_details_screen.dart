@@ -16,6 +16,8 @@ import 'package:provider/provider.dart';
 import 'package:rating_bar/rating_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../model/AuctionBidModel.dart';
 class NotificationDetailsScreen extends StatefulWidget {
   String id;
   String name;
@@ -30,38 +32,37 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
   double _ratingOwner=0.0;
   double _ratingBidder=0.0;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  AuctionDetailsModel mAuctionDetailsModel;
+  AuctionBidModel mAuctionDetailsModel;
   String userId ;
   String AuctionAwnerId ;
   String highestBidderId;
 
-  Future<AuctionDetailsModel> auction() async{
+  String mLanguage ="";
+
+  Future<AuctionBidModel> auction() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-
+    mLanguage = languageCode;
     String loginData = _preferences.getString(kUserModel);
-    Map map ;
+    Map<String,String> map = Map() ;
 
-    if(loginData == null){
-      map = {"auction_id":widget.id,
-        "user_id":"",
-        "language":languageCode};
-    }else{
+    if(loginData != null){
+
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
       userId = loginModel.data.id;
-      map = {"auction_id":widget.id,
-        "user_id":loginModel.data.id,
-        "language":languageCode};
-      print(map);
+      map['auctionId'] = widget.id;
+      map['userId'] = userId;
+
+
     }
 
 
 
 
     PetMartService petMartService = PetMartService();
-    AuctionDetailsModel auctionDetailsModel = await petMartService.auctionDetails(map);
+    AuctionBidModel auctionDetailsModel = await petMartService.auctionBidDetails(map);
     return auctionDetailsModel;
   }
   @override
@@ -71,8 +72,8 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
     auction().then((value){
       setState(() {
         mAuctionDetailsModel = value;
-        AuctionAwnerId = mAuctionDetailsModel.data.ownerData.customerId;
-        highestBidderId = mAuctionDetailsModel.data.bidderData.customerId;
+        AuctionAwnerId = mAuctionDetailsModel.data.owner.id;
+        highestBidderId = mAuctionDetailsModel.data.winner.id;
       });
     });
   }
@@ -146,24 +147,24 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                               fontSize: screenUtil.setSp(16),
                               fontWeight: FontWeight.w600
                             ),),
-                            Text(mAuctionDetailsModel.data.ownerData.firstname,
+                            Text(mAuctionDetailsModel.data.owner.name,
                               style: TextStyle(
                                   color: Color(0xFF000000),
                                   fontSize: screenUtil.setSp(16),
                                   fontWeight: FontWeight.w600
                               ),),
-                            Text(getTranslated(context, 'category'),
-                              style: TextStyle(
-                                  color: kMainColor,
-                                  fontSize: screenUtil.setSp(16),
-                                  fontWeight: FontWeight.w600
-                              ),),
-                            Text(mAuctionDetailsModel.data.category,
-                              style: TextStyle(
-                                  color: Color(0xFF000000),
-                                  fontSize: screenUtil.setSp(16),
-                                  fontWeight: FontWeight.w600
-                              ),)
+                            // Text(getTranslated(context, 'category'),
+                            //   style: TextStyle(
+                            //       color: kMainColor,
+                            //       fontSize: screenUtil.setSp(16),
+                            //       fontWeight: FontWeight.w600
+                            //   ),),
+                            // Text(mAuctionDetailsModel.data.category,
+                            //   style: TextStyle(
+                            //       color: Color(0xFF000000),
+                            //       fontSize: screenUtil.setSp(16),
+                            //       fontWeight: FontWeight.w600
+                            //   ),)
 
                           ],
                         ),
@@ -172,7 +173,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           height: 100.w,
 
                           fit: BoxFit.fill,
-                          imageUrl:mAuctionDetailsModel.data.auctionImage,
+                          imageUrl:KImageUrl+mAuctionDetailsModel.data.image.toString(),
                           imageBuilder: (context, imageProvider) => Card(
                             elevation: 1.h,
                             child: Container(
@@ -219,25 +220,25 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
 
                       ],
                     ),
-                    Text(getTranslated(context, 'sub_category'),
-                      style: TextStyle(
-                          color: kMainColor,
-                          fontSize: screenUtil.setSp(16),
-                          fontWeight: FontWeight.w600
-                      ),),
-                    Text(mAuctionDetailsModel.data.subCategory,
-                      style: TextStyle(
-                          color: Color(0xFF000000),
-                          fontSize: screenUtil.setSp(16),
-                          fontWeight: FontWeight.w600
-                      ),),
+                    // Text(getTranslated(context, 'sub_category'),
+                    //   style: TextStyle(
+                    //       color: kMainColor,
+                    //       fontSize: screenUtil.setSp(16),
+                    //       fontWeight: FontWeight.w600
+                    //   ),),
+                    // Text(mAuctionDetailsModel.data.subCategory,
+                    //   style: TextStyle(
+                    //       color: Color(0xFF000000),
+                    //       fontSize: screenUtil.setSp(16),
+                    //       fontWeight: FontWeight.w600
+                    //   ),),
                     Text(getTranslated(context, 'auction_description'),
                       style: TextStyle(
                           color: kMainColor,
                           fontSize: screenUtil.setSp(16),
                           fontWeight: FontWeight.w600
                       ),),
-                    Text(mAuctionDetailsModel.data.auctionDescription,
+                    Text(mLanguage == "en"?mAuctionDetailsModel.data.enDetails:mAuctionDetailsModel.data.arDetails,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(16),
@@ -254,7 +255,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                                   fontSize: screenUtil.setSp(16),
                                   fontWeight: FontWeight.w600
                               ),),
-                            Text(getFormattedDate(mAuctionDetailsModel.data.stateDate),
+                            Text(getFormattedDate(mAuctionDetailsModel.data.startDate.split(" ")[0]),
                               style: TextStyle(
                                   color: Color(0xFF000000),
                                   fontSize: screenUtil.setSp(16),
@@ -270,7 +271,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                                   fontSize: screenUtil.setSp(16),
                                   fontWeight: FontWeight.w600
                               ),),
-                            Text(getFormattedDate(mAuctionDetailsModel.data.endDate),
+                            Text(getFormattedDate(mAuctionDetailsModel.data.endDate.split(" ")[0]),
                               style: TextStyle(
                                   color: Color(0xFF000000),
                                   fontSize: screenUtil.setSp(16),
@@ -290,7 +291,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           fontSize: screenUtil.setSp(16),
                           fontWeight: FontWeight.w600
                       ),),
-                    Text(mAuctionDetailsModel.data.bidderData.firstname,
+                    Text(mAuctionDetailsModel.data.winner.name,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(16),
@@ -302,7 +303,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           fontSize: screenUtil.setSp(16),
                           fontWeight: FontWeight.w600
                       ),),
-                    Text("${mAuctionDetailsModel.data.highestBidderValue}${getTranslated(context, 'kwd')}",
+                    Text("${mAuctionDetailsModel.data.reach}${getTranslated(context, 'kwd')}",
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(16),
@@ -327,7 +328,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                             ),),
                           Container(
                             alignment: AlignmentDirectional.centerStart,
-                            child: mAuctionDetailsModel.data.isSubmit == 1?
+                            child: mAuctionDetailsModel.data.ownerRated == 1?
                             RatingBar.readOnly(
                               initialRating: userId == AuctionAwnerId?
                               double.parse(mAuctionDetailsModel.data.userRating) :

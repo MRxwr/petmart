@@ -1,3 +1,4 @@
+import 'package:auto_orientation/auto_orientation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,16 +21,22 @@ class VideoScreen extends StatefulWidget {
 class _VideoScreenState extends State<VideoScreen> {
   VideoPlayerController _videoPlayerController;
   ChewieController _chewieController;
-  double _aspectRatio = 16 / 9;
+  double _aspectRatio = 3/2;
   Future<void> _initializeVideoPlayerFuture;
   @override
   void initState() {
     super.initState();
     print(widget.vedioUrl);
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+    AutoOrientation.landscapeAutoMode();
     initialize().then((value) {
       setState(() {
 
       });
+
 
     });
 
@@ -59,6 +66,7 @@ class _VideoScreenState extends State<VideoScreen> {
       autoInitialize: true,
       autoPlay: true,
       showControls: true,
+      fullScreenByDefault: true
     );
     _chewieController.addListener(() {
       if (_chewieController.isFullScreen) {
@@ -81,6 +89,7 @@ class _VideoScreenState extends State<VideoScreen> {
   void dispose() {
     _videoPlayerController.dispose();
     _chewieController.dispose();
+    AutoOrientation.portraitAutoMode();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
       DeviceOrientation.landscapeLeft,

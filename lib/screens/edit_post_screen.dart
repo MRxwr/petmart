@@ -32,6 +32,7 @@ import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_compress/video_compress.dart';
+import 'package:video_player/video_player.dart';
 
 import '../model/DeletePostImageModel.dart';
 import '../model/age_model.dart';
@@ -1659,38 +1660,41 @@ class _EditPostScreenState extends State<EditPostScreen> {
     pickedFile = await picker.pickVideo(source: ImageSource.gallery,maxDuration:Duration(seconds: 15));
     Navigator.pop(context);
     if (pickedFile != null) {
-      final modelHud = Provider.of<ModelHud>(context,listen: false);
-      modelHud.changeIsLoading(true);
-      await VideoCompress.setLogLevel(0);
-      final MediaInfo  info = await VideoCompress.compressVideo(
-        pickedFile.path,
-        quality: VideoQuality.MediumQuality,
-        deleteOrigin: false,
-        includeAudio: true,
-      );
-      print(info.path);
+      VideoPlayerController testLengthController = new VideoPlayerController.file(File(pickedFile.path));//Your file here
+      await testLengthController.initialize();
+      if (testLengthController.value.duration.inSeconds > 15) {
+        pickedFile = null;
+        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'select_vedio_error'))));
+      }else {
+        final modelHud = Provider.of<ModelHud>(context, listen: false);
+        modelHud.changeIsLoading(true);
+        await VideoCompress.setLogLevel(0);
+        final MediaInfo info = await VideoCompress.compressVideo(
+          pickedFile.path,
+          quality: VideoQuality.MediumQuality,
+          deleteOrigin: false,
+          includeAudio: true,
+        );
+        print(info.path);
 
 
+        isSelected = true;
+        File _image = File(info.path);
 
+        vedios.add(_image);
+        Navigator.pop(context);
+        PetMartService petMartService = PetMartService();
+        dynamic response = await petMartService.addVedio(_image);
+        modelHud.changeIsLoading(false);
+        bool status = response['ok'];
+        if (status) {
+          vedioUrl = response['data']['link'];
+        } else {
+          ShowPostAlertDialog(context, response['data']['msg'], false);
+        }
 
-
-      isSelected = true;
-      File _image = File(info.path);
-
-      vedios.add(_image) ;
-      Navigator.pop(context);
-      PetMartService petMartService = PetMartService();
-      dynamic response = await petMartService.addVedio(_image);
-      modelHud.changeIsLoading(false);
-      bool status = response['ok'];
-      if (status) {
-        vedioUrl = response['data']['link'];
-      } else {
-        ShowPostAlertDialog(context, response['data']['msg'], false);
+        // updateImage(context);
       }
-
-      // updateImage(context);
-
 
 
     } else {

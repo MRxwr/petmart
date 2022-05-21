@@ -7,12 +7,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/AddInterestModel.dart';
+import 'package:pet_mart/model/AuctionBidModel.dart';
 import 'package:pet_mart/model/BidNewModel.dart';
 import 'package:pet_mart/model/DeletePostImageModel.dart';
 import 'package:pet_mart/model/InitModel.dart';
 import 'package:pet_mart/model/InterestModel.dart';
 import 'package:pet_mart/model/MyNewAuctionDetailsModel.dart';
 import 'package:pet_mart/model/PaymentUrlModel.dart';
+import 'package:pet_mart/model/RatingAuctionModel.dart';
 import 'package:pet_mart/model/ServiceDetailsModel.dart';
 import 'package:pet_mart/model/ServicesModel.dart';
 import 'package:pet_mart/model/ShopProductDetailsModel.dart';
@@ -1092,6 +1094,54 @@ print("userID---> ${id}");
     MyNewAuctionDetailsModel changePasswordModel;
     if (response.statusCode == 200) {
       changePasswordModel = MyNewAuctionDetailsModel.fromJson(Map<String, dynamic>.from(response.data));
+      print(resp);
+    }
+    return changePasswordModel;
+
+  }
+  Future<AuctionBidModel> auctionBidDetails(Map<String,String> map)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+    FormData formData = FormData.fromMap(map);
+    String body = json.encode(map);
+    var response = await dio.post(
+        TAG_BASE_URL + "?action=rating&type=get",
+        data: formData);
+    AuctionBidModel changePasswordModel;
+    if (response.statusCode == 200) {
+      changePasswordModel = AuctionBidModel.fromJson(Map<String, dynamic>.from(response.data));
+      print(resp);
+    }
+    return changePasswordModel;
+
+  }
+  Future<RatingAuctionModel> ratingAuction(Map<String,String> map)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+    FormData formData = FormData.fromMap(map);
+    String body = json.encode(map);
+    var response = await dio.post(
+        TAG_BASE_URL + "?action=rating&type=send",
+        data: formData);
+    RatingAuctionModel changePasswordModel;
+    if (response.statusCode == 200) {
+      changePasswordModel = RatingAuctionModel.fromJson(Map<String, dynamic>.from(response.data));
       print(resp);
     }
     return changePasswordModel;
