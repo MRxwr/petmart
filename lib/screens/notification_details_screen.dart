@@ -417,7 +417,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           Container():
                       GestureDetector(
                         onTap: (){
-                          call(mAuctionDetailsModel.data.ownerData.mobile);
+                          call(mAuctionDetailsModel.data.owner.mobile);
                         },
                         child: Container(
                           width: width,
@@ -451,7 +451,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
 
                       GestureDetector(
                         onTap: (){
-                          call(mAuctionDetailsModel.data.bidderData.mobile);
+                          call(mAuctionDetailsModel.data.winner.mobile);
                         },
                         child: Container(
                           width: width,
