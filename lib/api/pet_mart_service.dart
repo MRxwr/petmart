@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/AddInterestModel.dart';
 import 'package:pet_mart/model/AuctionBidModel.dart';
+import 'package:pet_mart/model/AuctionStatusModel.dart';
 import 'package:pet_mart/model/BidNewModel.dart';
 import 'package:pet_mart/model/DeletePostImageModel.dart';
 import 'package:pet_mart/model/InitModel.dart';
@@ -1094,6 +1095,30 @@ print("userID---> ${id}");
     MyNewAuctionDetailsModel changePasswordModel;
     if (response.statusCode == 200) {
       changePasswordModel = MyNewAuctionDetailsModel.fromJson(Map<String, dynamic>.from(response.data));
+      print(resp);
+    }
+    return changePasswordModel;
+
+  }
+  Future<AuctionStatusModel> sendAuctionStatus(Map<String,String> map)async{
+    var resp;
+    var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+    // dio.options.headers["ezyocreate"] = "CreateEZYo";
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
+    FormData formData = FormData.fromMap(map);
+    String body = json.encode(map);
+    var response = await dio.post(
+        TAG_BASE_URL + "?action=ownerResponse",
+        data: formData);
+    AuctionStatusModel changePasswordModel;
+    if (response.statusCode == 200) {
+      changePasswordModel = AuctionStatusModel.fromJson(Map<String, dynamic>.from(response.data));
       print(resp);
     }
     return changePasswordModel;

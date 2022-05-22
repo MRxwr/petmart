@@ -196,5 +196,8 @@
   "post_add_successfuly": "لقد تمت إضافة الإعلان بنجاح",
   "intersts": "المفضلة",
   "add_to_interests": "أضف إلى الاهتمامات",
-  "interested_added_successfully": "لقد تمت الإضافة الي المفظلة بنجاح"
+  "interested_added_successfully": "لقد تمت الإضافة الي المفظلة بنجاح",
+  "rated_successfuly": "لقد تمت عملية التقييم بنجاح",
+  "accept": "موافقة",
+  "refuse": "رفض"
 }

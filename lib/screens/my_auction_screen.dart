@@ -216,7 +216,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
                         myAuctionList =[];
                         if(index==0){
                           myAuctionList = myNewAuctionModel.data.live;
-                          print(myAuctionList.length);
+
 
                         }else if(index == 1){
                           myAuctionList = myNewAuctionModel.data.done;

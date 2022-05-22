@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../model/AuctionBidModel.dart';
+import '../model/RatingAuctionModel.dart';
 class NotificationDetailsScreen extends StatefulWidget {
   String id;
   String name;
@@ -328,12 +329,11 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                             ),),
                           Container(
                             alignment: AlignmentDirectional.centerStart,
-                            child: mAuctionDetailsModel.data.ownerRated == 1?
+                            child: mAuctionDetailsModel.data.ownerRated == "1"?
                             RatingBar.readOnly(
-                              initialRating: userId == AuctionAwnerId?
-                              double.parse(mAuctionDetailsModel.data.userRating) :
-                              double.parse(mAuctionDetailsModel.data.rating)
-                              ,
+                              initialRating:
+                              double.parse(mAuctionDetailsModel.data.owner.oRate)
+                         ,
                               filledIcon: Icons.star,
                               emptyIcon: Icons.star_border,
                               halfFilledIcon: Icons.star_half,
@@ -375,11 +375,10 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                             ),),
                           Container(
                             alignment: AlignmentDirectional.centerStart,
-                            child:mAuctionDetailsModel.data.isSubmit == 1?
+                            child:mAuctionDetailsModel.data.winnerRated == "1"?
                             RatingBar.readOnly(
-                              initialRating: userId == highestBidderId?
-                              double.parse(mAuctionDetailsModel.data.userRating) :
-                            double.parse(mAuctionDetailsModel.data.rating)
+                              initialRating:
+                              double.parse(mAuctionDetailsModel.data.winner.oRate)
                               ,
                               filledIcon: Icons.star,
                               emptyIcon: Icons.star_border,
@@ -480,7 +479,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                     ),
                     SizedBox(height: 14.w,),
                     Container(
-                      child: mAuctionDetailsModel.data.isSubmit == 1?
+                      child: getUserType()?
                           Container():
 
                       Container(
@@ -561,19 +560,36 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
     }
     print(rating);
     Map map = Map();
-    map['user_id'] = id;
-    map['from_user_id'] = userId;
-    map['rating_value'] = rating.toString();
-    map['auction_id'] = mAuctionDetailsModel.data.auctionId;
+    map['userId'] = id;
+
+    map['rate'] = rating.toString();
+    map['auctionId'] = widget.id;
     PetMartService petMartService = PetMartService();
-    RatingModel auctionDetailsModel = await petMartService.rating(map);
+    RatingAuctionModel auctionDetailsModel = await petMartService.ratingAuction(map);
     modelHud.changeIsLoading(false);
     String status = auctionDetailsModel.status;
     if(status == 'success'){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(auctionDetailsModel.message)));
+      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'rated_successfuly'))));
 Navigator.pop(context);
     }
 
 
+  }
+  bool  getUserType(){
+    if(userId == AuctionAwnerId){
+      if(mAuctionDetailsModel.data.winnerRated == "1"){
+        return true;
+      }else{
+        return false;
+      }
+
+
+    }else if(userId == highestBidderId){
+      if(mAuctionDetailsModel.data.ownerRated == "1"){
+        return true;
+      }else{
+        return false;
+      }
+    }
   }
 }

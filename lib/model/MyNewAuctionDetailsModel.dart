@@ -35,12 +35,11 @@ class Data {
   String endDate;
   String enTitle;
   String arTitle;
-  String enDetails;
-  String arDetails;
   String price;
   String reach;
   String video;
   String status;
+  String accept;
   List<String> bids;
   List<String> image;
   Customer customer;
@@ -51,12 +50,11 @@ class Data {
         this.endDate,
         this.enTitle,
         this.arTitle,
-        this.enDetails,
-        this.arDetails,
         this.price,
         this.reach,
         this.video,
         this.status,
+        this.accept,
         this.bids,
         this.image,
         this.customer,
@@ -67,12 +65,11 @@ class Data {
     endDate = json['endDate'];
     enTitle = json['enTitle'];
     arTitle = json['arTitle'];
-    enDetails = json['enDetails'];
-    arDetails = json['arDetails'];
     price = json['price'];
     reach = json['reach'];
     video = json['video'];
     status = json['status'];
+    accept = json['accept'];
     bids = json['bids'].cast<String>();
     image = json['image'].cast<String>();
     customer = json['customer'] != null
@@ -92,12 +89,11 @@ class Data {
     data['endDate'] = this.endDate;
     data['enTitle'] = this.enTitle;
     data['arTitle'] = this.arTitle;
-    data['enDetails'] = this.enDetails;
-    data['arDetails'] = this.arDetails;
     data['price'] = this.price;
     data['reach'] = this.reach;
     data['video'] = this.video;
     data['status'] = this.status;
+    data['accept'] = this.accept;
     data['bids'] = this.bids;
     data['image'] = this.image;
     if (this.customer != null) {

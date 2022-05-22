@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/AuctionStatusModel.dart';
 import 'package:pet_mart/model/MyNewAuctionDetailsModel.dart';
 import 'package:pet_mart/model/auction_details_model.dart';
 import 'package:pet_mart/model/delete_model.dart';
@@ -355,7 +356,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                   children: [
                     Text(
                       languageCode =="en"?
-                      mAuctionDetailsModel.data[0].enTitle:mAuctionDetailsModel.data[0].enTitle,
+                      mAuctionDetailsModel.data[0].enTitle:mAuctionDetailsModel.data[0].arTitle,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -396,7 +397,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
               ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: Text(languageCode == "en"?mAuctionDetailsModel.data[0].enDetails:mAuctionDetailsModel.data[0].arDetails,
+                          child: Text(languageCode == "en"?mAuctionDetailsModel.data[0].arTitle:mAuctionDetailsModel.data[0].arTitle,
                               textAlign: TextAlign.start,
                               style: TextStyle(
                                   color: Color(0xFF000000),
@@ -690,7 +691,25 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                       end: 0,
                       child: Container(
 
-                          child:mAuctionDetailsModel.data[0].status== "0"? deleteButton(getTranslated(context, 'stop_auction'),context):Container()))
+                          child:mAuctionDetailsModel.data[0].status== "0"? deleteButton(getTranslated(context, 'stop_auction'),context):
+                              mAuctionDetailsModel.data[0].accept == "0"?
+                              Container(
+
+                                  padding:
+                                  EdgeInsets.symmetric(horizontal: 10.w),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Expanded(flex:1,
+                                          child: AcceptButton(getTranslated(context, 'accept'), context)),
+                                      SizedBox(width: 30.w,),
+
+                                      Expanded(flex: 1,
+                                          child: RefuseButton(getTranslated(context, 'refuse'), context)),
+
+                                    ],
+                                  )):
+                          Container()))
                 ],
               ),
           ),
@@ -716,6 +735,64 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
           color: Color(0xFFFFFFFF),
           fontSize: screenUtil.setSp(18),
           fontWeight: FontWeight.bold
+      ),),
+    );
+  }
+  TextButton AcceptButton(String text,BuildContext context){
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      primary: Color(0xFF000000),
+      minimumSize: Size(88.w, 35.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+      shape:  RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+      ),
+      backgroundColor: kMainColor,
+    );
+
+    return TextButton(
+      style: flatButtonStyle,
+      onPressed: () {
+        Map<String,String> map  = Map();
+        map['auctionId'] = widget.id;
+        map['accept'] = "1";
+        sendAuctionStatus(map);
+
+        // createAuction(context);
+
+      },
+      child: Text(text,style: TextStyle(
+          color: Color(0xFF000000),
+          fontSize: screenUtil.setSp(14),
+          fontWeight: FontWeight.w500
+      ),),
+    );
+  }
+  TextButton RefuseButton(String text,BuildContext context){
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      primary: Color(0xFF000000),
+      minimumSize: Size(88.w, 35.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+      shape:  RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+      ),
+      backgroundColor: Color(0xFFFF0000),
+    );
+
+    return TextButton(
+      style: flatButtonStyle,
+      onPressed: () async{
+
+        Map<String,String> map  = Map();
+        map['auctionId'] = widget.id;
+        map['accept'] = "2";
+        sendAuctionStatus(map);
+
+
+      },
+      child: Text(text,style: TextStyle(
+          color: Color(0xFF000000),
+          fontSize: screenUtil.setSp(14),
+          fontWeight: FontWeight.w500
       ),),
     );
   }
@@ -785,6 +862,22 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     );
     alert.show();
 
+  }
+  void sendAuctionStatus(Map<String,String> map)async{
+    final modelHud = Provider.of<ModelHud>(context,listen: false);
+    modelHud.changeIsLoading(true);
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+    PetMartService petMartService = PetMartService();
+    AuctionStatusModel deleteModel = await petMartService.sendAuctionStatus(map);
+    bool status = deleteModel.ok;
+    modelHud.changeIsLoading(false);
+    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.data.msg)));
+
+    if(status ){
+      Navigator.pushReplacementNamed(context,MainScreen.id);
+    }
   }
   void deleteAuction()async{
     final modelHud = Provider.of<ModelHud>(context,listen: false);

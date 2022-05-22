@@ -196,5 +196,8 @@
   "intersts": "Interests",
   "add_to_interests": "Add To Interests",
   "interested_added_successfully": "Interests Added Successfully",
-  "select_vedio_error": "Please choose a video less than 15 seconds"
+  "select_vedio_error": "Please choose a video less than 15 seconds",
+  "rated_successfuly": "Rated Successfully",
+  "accept": "Accept",
+  "refuse": "Refuse"
 }
