@@ -68,19 +68,18 @@ class _HomeScreenState extends State<HomeScreen> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     Map map ;
+    String id ="";
     if(loginModel == null){
-      map = {'id': "",
-        "language":languageCode
-      };
+      id ="";
+
     }else{
-      map = {'id': loginModel.data.id,
-        "language":languageCode
-      };
+      id = loginModel.data.id;
+
     }
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    HomeModel home = await petMartService.home(map);
+    HomeModel home = await petMartService.home(id);
 
     Provider.of<NotificationNotifier>(context,listen: false).addCount(home.data.totalNotifications);
     return home;

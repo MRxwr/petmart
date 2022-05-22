@@ -199,5 +199,7 @@
   "interested_added_successfully": "لقد تمت الإضافة الي المفظلة بنجاح",
   "rated_successfuly": "لقد تمت عملية التقييم بنجاح",
   "accept": "موافقة",
-  "refuse": "رفض"
+  "refuse": "رفض",
+  "auction_details": "تفاضيل المزاد",
+  "decline_bidder": "هل تريد رفض أعلي مزايد"
 }

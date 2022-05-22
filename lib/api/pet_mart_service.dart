@@ -222,7 +222,7 @@ class PetMartService{
     print(response.body);
     return verifyOtpModel;
   }
-  Future<HomeModel> home(Map map) async {
+  Future<HomeModel> home(String id) async {
     var dio = Dio();
     dio.options.headers['content-Type'] = 'multipart/form-data';
     dio.options.headers['petmartcreate'] = "PetMartCreateCo";
@@ -233,9 +233,9 @@ class PetMartService{
 
 
 
-    String body = json.encode(map);
+
     var response = await dio.post(
-        TAG_BASE_URL + "?action=home",
+        TAG_BASE_URL + "?action=home&id=${id}",
        );
 
      print(response);
@@ -1143,20 +1143,17 @@ print("userID---> ${id}");
     AuctionBidModel changePasswordModel;
     if (response.statusCode == 200) {
       changePasswordModel = AuctionBidModel.fromJson(Map<String, dynamic>.from(response.data));
-      print(resp);
+      print(response.data);
     }
     return changePasswordModel;
 
   }
   Future<RatingAuctionModel> ratingAuction(Map<String,String> map)async{
-    var resp;
+
     var dio = Dio();
     dio.options.headers['content-Type'] = 'multipart/form-data';
     dio.options.headers['petmartcreate'] = "PetMartCreateCo";
     // dio.options.headers["ezyocreate"] = "CreateEZYo";
-    SharedPreferences sharedPreferences = await SharedPreferences
-        .getInstance();
-    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
 
 
     FormData formData = FormData.fromMap(map);
@@ -1165,9 +1162,10 @@ print("userID---> ${id}");
         TAG_BASE_URL + "?action=rating&type=send",
         data: formData);
     RatingAuctionModel changePasswordModel;
+    print(response.data);
     if (response.statusCode == 200) {
       changePasswordModel = RatingAuctionModel.fromJson(Map<String, dynamic>.from(response.data));
-      print(resp);
+
     }
     return changePasswordModel;
 
@@ -1729,7 +1727,7 @@ if(path == null){
 
       map['title'] = english_name;
 
-      map['filterId'] = category_id;
+      map['categoryId'] = category_id;
       map['details'] = english_description;
 
 

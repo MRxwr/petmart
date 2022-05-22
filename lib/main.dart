@@ -28,6 +28,7 @@ import 'package:pet_mart/screens/login_screen.dart';
 import 'package:pet_mart/screens/lost_screen.dart';
 import 'package:pet_mart/screens/main_sceen.dart';
 import 'package:pet_mart/screens/my_account_screen.dart';
+import 'package:pet_mart/screens/my_auction_details.dart';
 import 'package:pet_mart/screens/my_auction_screen.dart';
 import 'package:pet_mart/screens/my_message_screen.dart';
 import 'package:pet_mart/screens/my_post_screen.dart';
@@ -219,29 +220,29 @@ class _MyAppState extends State<MyApp> {
     FirebaseMessaging.instance
         .getInitialMessage()
         .then((RemoteMessage message) {
-      if(message != null){
-        print('remoteMessgae sss${message.toString()}');
-        dynamic dataObject=  message.data;
-
-        print('dataObject ---> ${dataObject.toString()}');
-        String type = dataObject['push_type'];
-
-        print('type ---> ${type}');
-        if (type .contains('chatuser')){
-
-          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-            return new MyMessagesScreen();
-          }));
-
-
-
-        }else if(type .contains('rateonuser')){
-          String auctionId = dataObject['auction_id'];
-          Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-            return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
-          }));
-        }
-      }
+      // if(message != null){
+      //   print('remoteMessgae sss${message.toString()}');
+      //   dynamic dataObject=  message.data;
+      //
+      //   print('dataObject ---> ${dataObject.toString()}');
+      //   String type = dataObject['auctionType'];
+      //
+      //   print('type ---> ${type}');
+      //   if (type == "1"){
+      //     String auctionId = dataObject['auctionId'];
+      //     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      //       return new MyAuctionDetails(id:auctionId,postName:getTranslated(context, 'auction_details'));
+      //     }));
+      //
+      //
+      //
+      //   }else if(type == "2"){
+      //     String auctionId = dataObject['auctionId'];
+      //     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      //       return new NotificationDetailsScreen(id:auctionId,name: getTranslated(context, 'auction_details'),);
+      //     }));
+      //   }
+      // }
 
 
 
@@ -276,22 +277,28 @@ class _MyAppState extends State<MyApp> {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('A new onMessageOpenedApp event was published!');
-      String remoteMessgae = message.data.toString();
-      dynamic dataObject=  message.data;
-      print('dataObject ---> ${dataObject.toString()}');
-      String type = dataObject['push_type'];
-      if (type .contains('chatuser') ){
-        Navigator.of(navigatorKey.currentContext,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-          return new MyMessagesScreen();
-        }));
-      }else if(type .contains('rateonuser') ){
-        String auctionId = dataObject['auction_id'];
-        Navigator.of(navigatorKey.currentContext,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-          return new NotificationDetailsScreen(id:auctionId,name: 'Auction Details',);
-        }));
-      }
+      // String remoteMessgae = message.data.toString();
+      // dynamic dataObject=  message.data;
+      // print('dataObject ---> ${dataObject.toString()}');
+      // String type = dataObject['auctionType'];
+      //
+      // print('type ---> ${type}');
+      // if (type == "1"){
+      //   String auctionId = dataObject['auctionId'];
+      //   Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      //     return new MyAuctionDetails(id:auctionId,postName:getTranslated(context, 'auction_details'));
+      //   }));
+      //
+      //
+      //
+      // }else if(type == "2"){
+      //   String auctionId = dataObject['auctionId'];
+      //   Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+      //     return new NotificationDetailsScreen(id:auctionId,name: getTranslated(context, 'auction_details'),);
+      //   }));
+      // }
 
-      print('remoteMessgae ${remoteMessgae}');
+
 
       // Navigator.pushNamed(context, '/message',
       //     arguments: MessageArguments(message, true));

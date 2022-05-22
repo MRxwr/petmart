@@ -17,6 +17,8 @@ import 'package:pet_mart/screens/notification_details_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'my_auction_details.dart';
 class PushNotificationScreen extends StatefulWidget {
   static String id = 'PushNotificationScreen';
   @override
@@ -154,8 +156,15 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                       borderRadius: 30.0,
                       padding: 8.0,
                       showOnOff: false,
-                      onToggle: (val)  {
+                      onToggle: (val)  async{
                         // notify(val);
+
+                        SharedPreferences _preferences = await SharedPreferences.getInstance();
+                        _preferences.setBool("enable", true);
+                        status = val;
+                        setState(() {
+
+                        });
 
                       },
                     ),
@@ -200,6 +209,76 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                       itemBuilder: (context,index){
                         return
                           GestureDetector(
+                            onTap: () async{
+                            String auctionId = notificationModel.data.notification[index].auctionId.toString();
+                            if(auctionId.trim() !="0") {
+                              String auctionType = notificationModel.data
+                                  .notification[index].auctionType;
+                              if (auctionType == "1") {
+                                String results = await Navigator.of(
+                                    context, rootNavigator: true).push(
+                                    new MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                          return new MyAuctionDetails(
+                                              id: auctionId,
+                                              postName: getTranslated(
+                                                  context, 'auction_details'));
+                                        }));
+                                if (results == "true") {
+                                  isOkey = "";
+                                  setState(() {
+
+                                  });
+                                  getNotificationList().then((value) {
+                                    setState(() {
+                                      response = value;
+                                      bool isOk = response['ok'];
+                                      if (isOk) {
+                                        isOkey = "1";
+                                        notificationModel =
+                                            NotificationModel.fromJson(
+                                                response);
+                                      } else {
+                                        isOkey = "0";
+                                      }
+                                    });
+                                  });
+                                }
+                              } else if (auctionType == "2") {
+                                String results = await Navigator.of(
+                                    context).push(
+                                    new MaterialPageRoute(
+                                        builder: (BuildContext context) {
+                                          return new NotificationDetailsScreen(
+                                            id: auctionId,
+                                            name: getTranslated(
+                                                context, 'auction_details'),);
+                                        }));
+                                if (results == "true") {
+                                  isOkey = "";
+                                  setState(() {
+
+                                  });
+                                  getNotificationList().then((value) {
+                                    setState(() {
+                                      response = value;
+                                      bool isOk = response['ok'];
+                                      if (isOk) {
+                                        isOkey = "1";
+                                        notificationModel =
+                                            NotificationModel.fromJson(
+                                                response);
+                                      } else {
+                                        isOkey = "0";
+                                      }
+                                    });
+                                  });
+                                }
+                              } else if (auctionType == "0") {
+                                print(auctionType);
+                              }
+                            }
+                            },
 
                             child: Container(
                             margin: EdgeInsets.symmetric(horizontal: 6.h),

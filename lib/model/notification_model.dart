@@ -57,8 +57,17 @@ class Notification {
   String userId;
   String notification;
   String seen;
+  String auctionType;
+  String auctionId;
 
-  Notification({this.id, this.date, this.userId, this.notification, this.seen});
+  Notification(
+      {this.id,
+        this.date,
+        this.userId,
+        this.notification,
+        this.seen,
+        this.auctionType,
+        this.auctionId});
 
   Notification.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -66,6 +75,8 @@ class Notification {
     userId = json['userId'];
     notification = json['notification'];
     seen = json['seen'];
+    auctionType = json['auctionType'];
+    auctionId = json['auctionId'];
   }
 
   Map<String, dynamic> toJson() {
@@ -75,6 +86,8 @@ class Notification {
     data['userId'] = this.userId;
     data['notification'] = this.notification;
     data['seen'] = this.seen;
+    data['auctionType'] = this.auctionType;
+    data['auctionId'] = this.auctionId;
     return data;
   }
 }

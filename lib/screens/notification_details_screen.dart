@@ -256,7 +256,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                                   fontSize: screenUtil.setSp(16),
                                   fontWeight: FontWeight.w600
                               ),),
-                            Text(getFormattedDate(mAuctionDetailsModel.data.startDate.split(" ")[0]),
+                            Text(getFormattedDate(mAuctionDetailsModel.data.startDate),
                               style: TextStyle(
                                   color: Color(0xFF000000),
                                   fontSize: screenUtil.setSp(16),
@@ -272,7 +272,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                                   fontSize: screenUtil.setSp(16),
                                   fontWeight: FontWeight.w600
                               ),),
-                            Text(getFormattedDate(mAuctionDetailsModel.data.endDate.split(" ")[0]),
+                            Text(getFormattedDate(mAuctionDetailsModel.data.endDate),
                               style: TextStyle(
                                   color: Color(0xFF000000),
                                   fontSize: screenUtil.setSp(16),
@@ -559,18 +559,18 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
       rating = _ratingBidder;
     }
     print(rating);
-    Map map = Map();
-    map['userId'] = id;
+    Map<String,String> map = Map();
+    map['userId'] = userId;
 
     map['rate'] = rating.toString();
     map['auctionId'] = widget.id;
     PetMartService petMartService = PetMartService();
     RatingAuctionModel auctionDetailsModel = await petMartService.ratingAuction(map);
     modelHud.changeIsLoading(false);
-    String status = auctionDetailsModel.status;
-    if(status == 'success'){
+    bool status = auctionDetailsModel.ok;
+    if(status){
       _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'rated_successfuly'))));
-Navigator.pop(context);
+Navigator.pop(context,"true");
     }
 
 

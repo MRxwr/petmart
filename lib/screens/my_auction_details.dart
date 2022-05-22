@@ -27,6 +27,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/StopAuctionModel.dart';
 import 'main_sceen.dart';
+import 'notification_details_screen.dart';
 class MyAuctionDetails extends StatefulWidget {
   String id;
   String postName;
@@ -751,12 +752,26 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
 
     return TextButton(
       style: flatButtonStyle,
-      onPressed: () {
+      onPressed: () async {
+
+        final modelHud = Provider.of<ModelHud>(context,listen: false);
+        modelHud.changeIsLoading(true);
+        SharedPreferences _preferences = await SharedPreferences.getInstance();
+        String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
         Map<String,String> map  = Map();
         map['auctionId'] = widget.id;
         map['accept'] = "1";
-        sendAuctionStatus(map);
-
+        PetMartService petMartService = PetMartService();
+        AuctionStatusModel deleteModel = await petMartService.sendAuctionStatus(map);
+        bool status = deleteModel.ok;
+        modelHud.changeIsLoading(false);
+        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.data.msg)));
+     String result =  await Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+          return new NotificationDetailsScreen(id:widget.id,name: getTranslated(context, 'auction_details'),);
+        }));
+     if(result == "true"){
+       Navigator.pop(context,"true");
+     }
         // createAuction(context);
 
       },
@@ -782,10 +797,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
       style: flatButtonStyle,
       onPressed: () async{
 
-        Map<String,String> map  = Map();
-        map['auctionId'] = widget.id;
-        map['accept'] = "2";
-        sendAuctionStatus(map);
+       DeclineUser(context);
 
 
       },
@@ -863,7 +875,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     alert.show();
 
   }
-  void sendAuctionStatus(Map<String,String> map)async{
+  void sendAuctionStatus(Map<String,String> map,String status)async{
     final modelHud = Provider.of<ModelHud>(context,listen: false);
     modelHud.changeIsLoading(true);
     SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -930,6 +942,86 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     }else{
       return false;
     }
+
+  }
+  Future<void> DeclineUser(BuildContext context) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: getTranslated(context, 'decline_bidder'),
+
+
+      buttons: [
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'ok'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async{
+            await alert.dismiss();
+            final modelHud = Provider.of<ModelHud>(context,listen: false);
+            modelHud.changeIsLoading(true);
+            SharedPreferences _preferences = await SharedPreferences.getInstance();
+            String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+            Map<String,String> map  = Map();
+            map['auctionId'] = widget.id;
+            map['accept'] = "2";
+            PetMartService petMartService = PetMartService();
+            AuctionStatusModel deleteModel = await petMartService.sendAuctionStatus(map);
+            bool status = deleteModel.ok;
+            modelHud.changeIsLoading(false);
+            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.data.msg)));
+            Navigator.pop(context,"true");
+
+            // _changeLanguage('en').then((value) {
+            //   Navigator.of(context).pushReplacementNamed( MainScreen.id);
+            // });
+
+
+          },
+          color: Color(0xFFFF0000),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
+            style: TextStyle(color: Color(0xFF000000), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        )
+      ],
+    );
+    alert.show();
 
   }
 }

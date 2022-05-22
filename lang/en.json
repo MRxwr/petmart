@@ -199,5 +199,7 @@
   "select_vedio_error": "Please choose a video less than 15 seconds",
   "rated_successfuly": "Rated Successfully",
   "accept": "Accept",
-  "refuse": "Refuse"
+  "refuse": "Refuse",
+  "auction_details": "Auction Details",
+  "decline_bidder": "Do you want to reject the highest bidder?"
 }
