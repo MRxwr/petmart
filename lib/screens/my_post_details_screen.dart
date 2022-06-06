@@ -968,10 +968,10 @@ class _MyPostDetailsScreenState extends State<MyPostDetailsScreen> {
   String url(String phone,String message) {
     if (Platform.isAndroid) {
       // add the [https]
-      return "https://wa.me/$phone/?text=+965${Uri.parse(message)}"; // new line
+      return "https://wa.me/$phone/?text=${Uri.parse(message)}"; // new line
     } else {
       // add the [https]
-      return "https://api.whatsapp.com/send?phone=+965$phone=${Uri.parse(message)}"; // new line
+      return "https://api.whatsapp.com/send?phone=$phone=${Uri.parse(message)}"; // new line
     }
   }
   Future<void> _openUrl(String url) async {

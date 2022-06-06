@@ -1658,7 +1658,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
     var pickedFile = null;
     final picker = ImagePicker();
     pickedFile = await picker.pickVideo(source: ImageSource.gallery,maxDuration:Duration(seconds: 15));
-    Navigator.pop(context);
+
     if (pickedFile != null) {
       VideoPlayerController testLengthController = new VideoPlayerController.file(File(pickedFile.path));//Your file here
       await testLengthController.initialize();
@@ -1715,7 +1715,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
   Future _getVedioFromCamera(BuildContext context) async {
     final picker = ImagePicker();
     var pickedFile = await picker.pickVideo(source: ImageSource.camera,maxDuration:Duration(seconds: 15));
-    Navigator.pop(context);
+
     if (pickedFile != null) {
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);

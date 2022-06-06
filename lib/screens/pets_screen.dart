@@ -57,7 +57,7 @@ class _PetsScreenState extends State<PetsScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    Model.PetsModel petsModel = await petMartService.pets(catId);
+    Model.PetsModel petsModel = await petMartService.pets(catId,widget.parentCategoryId);
     return petsModel;
   }
   Future<void> petsList() async{
@@ -83,7 +83,7 @@ class _PetsScreenState extends State<PetsScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    petsModel = await petMartService.pets(catId);
+    petsModel = await petMartService.pets(catId,widget.parentCategoryId);
     setState(() {
 
     });

@@ -1131,14 +1131,14 @@ class _LostDetailScreenState extends State<LostDetailScreen> {
   String url(String phone,String message) {
 
     if (Platform.isAndroid) {
-      phone = "+965$phone";
+      phone = "$phone";
       // add the [https]
       // print("https://api.whatsapp.com/send?phone=+965$phone&text=${Uri.parse(message)}");
       return "https://wa.me/$phone/?text=${Uri.parse(message)}";
       return "https://wa.me/$phone/?text=+965${Uri.parse(message)}"; // new line
     } else {
       // add the [https]
-      return "https://api.whatsapp.com/send?phone=+965$phone=${Uri.parse(message)}"; // new line
+      return "https://api.whatsapp.com/send?phone=$phone=${Uri.parse(message)}"; // new line
     }
   }
   Future<void> _openUrl(String url) async {

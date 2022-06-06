@@ -519,7 +519,7 @@ print(TAG_BASE_URL + "?action=editPost&edit=0&id=${id}");
 
     return resp;
   }
-  Future<PetsModel> pets(String catId) async {
+  Future<PetsModel> pets(String catId,String parentId) async {
 
     var dio = Dio();
     dio.options.headers['content-Type'] = 'multipart/form-data';
@@ -533,9 +533,10 @@ print(TAG_BASE_URL + "?action=editPost&edit=0&id=${id}");
 
 
     var response = await dio.post(
-      TAG_BASE_URL + "?action=categoryItems&id=${catId}",
+      TAG_BASE_URL + "?action=categoryItems&id=${catId}&parentId=${parentId}",
     );
 
+    print( TAG_BASE_URL + "?action=categoryItems&id=${catId}&parentId=${parentId}");
     print(response);
 
     PetsModel categoryModel;
