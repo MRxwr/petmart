@@ -17,6 +17,7 @@ import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/model/token_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/providers/notification_count.dart';
+import 'package:pet_mart/providers/title_provider.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
 import 'package:pet_mart/screens/add_advertise_screen.dart';
 import 'package:pet_mart/screens/auction_details_screen.dart';
@@ -370,6 +371,7 @@ class _MyAppState extends State<MyApp> {
                         providers: [
                           ChangeNotifierProvider<ModelHud>(create: (context) => ModelHud()),
                           ChangeNotifierProvider<NotificationNotifier>(create: (context) => NotificationNotifier()),
+                          ChangeNotifierProvider<TitleProvider>(create: (context) => TitleProvider()),
                         ],
                         child:
 
@@ -377,6 +379,10 @@ class _MyAppState extends State<MyApp> {
 
                           child: MaterialApp(
                             navigatorKey: navigatorKey ,
+                            onUnknownRoute:(settings) => MaterialPageRoute(
+                                builder: (context) => SplashScreen(
+
+                                )),
 
 
                             theme: ThemeData(

@@ -12,6 +12,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/DeleteUserModel.dart';
 import 'package:pet_mart/model/check_credit_model.dart';
 import 'package:pet_mart/model/home_model.dart';
 
@@ -19,6 +20,7 @@ import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/notification_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/providers/notification_count.dart';
+import 'package:pet_mart/providers/title_provider.dart';
 import 'package:pet_mart/screens/privacy_main_screen.dart';
 import 'package:pet_mart/screens/search_screen.dart';
 import 'package:pet_mart/screens/adaption_screen.dart';
@@ -60,7 +62,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientMixin{
   String _lastSelected = 'TAB: 0';
-  final _homeScreen = GlobalKey<NavigatorState>();
+  final  _homeScreen = GlobalKey<NavigatorState>();
   final _competitionNewsScreen = GlobalKey<NavigatorState>();
   final _amateursNews = GlobalKey<NavigatorState>();
   final _vediosScreen = GlobalKey<NavigatorState>();
@@ -98,16 +100,46 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
 
     isLoggedIn().then((value){
       isLogIn = value;
+      mLangaugeCode = languageCode;
+
+      if(languageCode == "en"){
+        _title = 'Home';
+      }else{
+        _title = 'الرئيسية';
+      }
+      print('title---> ${_title}');
     }).whenComplete(() {
-      getLoginModel().then((value){
-        setState(() {
-          mLangaugeCode = languageCode;
-          _title = mLangaugeCode == "en"?"Home":"الرئيسية";
-          loginModel = value;
+      if(isLogIn){
+        getLoginModel().then((value){
+          setState(() {
+            mLangaugeCode = languageCode;
+
+            if(languageCode == "en"){
+              _title = 'Home';
+            }else{
+              _title = 'الرئيسية';
+            }
+            print('title---> ${_title}');
+            loginModel = value;
+
+          });
 
         });
+      }else{
+        mLangaugeCode = languageCode;
 
-      });
+        if(languageCode == "en"){
+          _title = 'Home';
+        }else{
+          _title = 'الرئيسية';
+        }
+        print('title---> ${_title}');
+        loginModel = null;
+        setState(() {
+
+        });
+      }
+
     });
   }
   Future<bool> isLoggedIn() async{
@@ -115,24 +147,42 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     bool isLoggedIn =  sharedPref.getBool(kIsLogin)??false;
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+    if(languageCode == "en"){
+      _title = 'Home';
+    }else{
+      _title = 'الرئيسية';
+    }
+    Provider.of<TitleProvider>(context,listen: false).addCount(_title);
     print('isLogIn ${isLoggedIn}');
     return isLoggedIn;
   }
   Future<LoginModel> getLoginModel() async{
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String loginData = sharedPreferences.getString(kUserModel);
+    String loginData = sharedPreferences.getString(kUserModel)??"";
+    String languageCode = sharedPreferences.getString(LANG_CODE) ?? ENGLISH;
+    if(languageCode == "en"){
+      _title = 'Home';
+    }else{
+      _title = 'الرئيسية';
+    }
+    Provider.of<TitleProvider>(context,listen: false).addCount(_title);
+if(loginData != null) {
+  final body = json.decode(loginData);
+  print('body --->${body}');
 
-    final body = json.decode(loginData);
-    LoginModel   loginModel = LoginModel.fromJson(body);
+   loginModel = LoginModel.fromJson(body);
+}
     SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
     int count = _preferences.getInt("notificationCount")??0;
     String appBadgeSupported;
-    Map mapped = {
-      "id":loginModel.data.id,
-      "language":languageCode
-    };
+    // Map mapped = {
+    //   "id":loginModel.data.id,
+    //   "language":languageCode
+    // };
+
     // PetMartService petMartService = PetMartService();
     // NotificationModel notificationModel =await petMartService.notification(mapped);
     // int  notificationNumber = notificationModel.data.length;
@@ -248,15 +298,21 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
         appBar:
         AppBar(
           centerTitle: true,
-          title: Text(
+          title:
+          Consumer<TitleProvider>(
+            builder: (context, count, child){
+              return   Text(
 
-            _title,
-            style: TextStyle(
-              color: Color(0xFFFFFFFF),
-              fontSize: screenUtil.setSp(16),
-              fontWeight: FontWeight.bold
-            ),
+                count.title,
+                style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: screenUtil.setSp(16),
+                    fontWeight: FontWeight.bold
+                ),
+              );
+            },
           ),
+
           backgroundColor: kMainColor,
            leading: Builder(
             builder: (BuildContext context) {
@@ -295,7 +351,9 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
 
                     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
                     bool isLoggedIn = sharedPreferences.getBool(kIsLogin)??false;
+                    int notifcationCount = 0;
                     if(isLoggedIn){
+
                       Navigator.pushNamed(context, PushNotificationScreen.id);
                     }else{
                       ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
@@ -304,7 +362,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
                   },
                   child: Padding(
                       padding: EdgeInsets.all(4.h),
-                      child: NamedIcon(notificationCount: count.notifcationCount,)
+                      child: NamedIcon(notificationCount: isLogIn?count.notifcationCount:0,)
                   ),
                 );
               },
@@ -560,7 +618,9 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
             ListTile(
               onTap: (){
                 Navigator.pop(context);
-                Navigator.pushNamed(context, MyAccountScreen.id);
+                Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+                  return new MyAccountScreen(isFromPayment: false,paymentId: "",);
+                }));
 
               },
 
@@ -714,6 +774,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
                     fontWeight: FontWeight.normal
                 ),),
             ),
+
           ],
         ),
 
@@ -721,6 +782,36 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
 
     );
   }
+  void deleteUser() async{
+
+      final modelHud = Provider.of<ModelHud>(context,listen: false);
+      modelHud.changeIsLoading(true);
+
+      SharedPreferences _preferences = await SharedPreferences.getInstance();
+      String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+      PetMartService petMartService = PetMartService();
+      String deviceType="";
+      String loginData = _preferences.getString(kUserModel);
+
+
+
+      final body = json.decode(loginData);
+   LoginModel   loginModel = LoginModel.fromJson(body);
+    String  mUser = loginModel.data.id;
+
+      DeleteUserModel  deleteUserModel = await petMartService.deleteUser(mUser);
+
+
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setBool(kIsLogin, false);
+      sharedPreferences.remove(kUserModel);
+      modelHud.changeIsLoading(false);
+      Navigator.pushReplacementNamed(context, LoginScreen.id);
+
+
+    }
+
   Widget _buildFab(BuildContext context) {
     final icons = [ Icons.sms, Icons.mail, Icons.phone ];
     return  FloatingActionButton(
@@ -768,7 +859,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
           break;
         case 3:
           print(val);
-          _title=getTranslated(context, 'hospital');
+          _title=getTranslated(context, 'auction');
           setState(() {
 
           });
@@ -779,7 +870,8 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
 
         default:
       }
-    } else {
+    }
+    else {
       index = val;
       if(index ==3){
         _title=getTranslated(context, 'auction');
@@ -816,6 +908,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
 
 
     }
+    Provider.of<TitleProvider>(context,listen: false).addCount(_title);
   }
   Future<void> ShowLanguageDialog(BuildContext context) async{
     var alert;
@@ -876,6 +969,71 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
             _changeLanguage('ar').then((value) {
               Navigator.of(context).pushReplacementNamed( MainScreen.id);
             });
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        )
+      ],
+    );
+    alert.show();
+
+  }
+  Future<void> DeleteDialog(BuildContext context) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: getTranslated(context, 'delete_account'),
+
+
+      buttons: [
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'yes'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async{
+            await alert.dismiss();
+            deleteUser();
+
+
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
           },
           color: Color(0xFFFFC300),
           radius: BorderRadius.circular(6.w),

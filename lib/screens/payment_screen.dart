@@ -4,16 +4,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:my_fatoorah/my_fatoorah.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
+import 'package:pet_mart/model/PostPaymentModel.dart';
 import 'package:pet_mart/model/SuccessModel.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/package_model.dart'as Model;
 import 'package:pet_mart/model/payment_model.dart';
 import 'package:pet_mart/providers/model_hud.dart' as Hud;
+import 'package:pet_mart/screens/my_account_screen.dart';
 import 'package:pet_mart/screens/splash_screen.dart';
 
 
@@ -44,28 +46,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
   String mLanguage;
   ScreenUtil screenUtil = ScreenUtil();
 
-  PaymentModel paymentModel;
+  PostPaymentModel paymentModel;
 
 
   String mUrl ='';
-  Future<PaymentModel> payment()async {
-    SharedPreferences _preferences = await SharedPreferences.getInstance();
-    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    String loginData = _preferences.getString(kUserModel);
-    final body = json.decode(loginData);
-    LoginModel   loginModel = LoginModel.fromJson(body);
-   Map map = {
-      'package_id': widget.packageModel.id,
-      'user_id': loginModel.data.id,
-     'language':languageCode,
-     'address':''
-
-    };
-    PetMartService petMartService = PetMartService();
-    PaymentModel paymentModel =await petMartService.payment(map);
-    String url = paymentModel.paymentUrl;
-    return paymentModel;
-  }
+  // Future<PaymentModel> payment()async {
+  //   SharedPreferences _preferences = await SharedPreferences.getInstance();
+  //   String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+  //   String loginData = _preferences.getString(kUserModel);
+  //   final body = json.decode(loginData);
+  //   LoginModel   loginModel = LoginModel.fromJson(body);
+  //  Map map = {
+  //     'package_id': widget.packageModel.id,
+  //     'user_id': loginModel.data.id,
+  //    'language':languageCode,
+  //    'address':''
+  //
+  //   };
+  //  print("pay map -->"+map.toString());
+  //   PetMartService petMartService = PetMartService();
+  //   PaymentModel paymentModel =await petMartService.payment(map);
+  //   String url = paymentModel.paymentUrl;
+  //   return paymentModel;
+  // }
 
 
 
@@ -74,6 +77,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     super.initState();
+    print(widget.url);
 
     // payment().then((value) {
     //   setState(() {
@@ -84,23 +88,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
 
 
-  void showSuccessDialog(BuildContext context) {
-     SweetAlert.show(context,
-        title: getTranslated(context, 'success'),
-        subtitle: getTranslated(context, 'payment_success'),
 
-        showCancelButton: false,
-        confirmButtonColor: kMainColor,
-        confirmButtonText: getTranslated(context, 'go_to_myaccount'),
-        style: SweetAlertStyle.success,
-    onPress: (bool isConfirm){
-     Navigator.pop(context,true);
-
-
-
-      return true;
-    });
-  }
   Future<void> showFailDialog() {
     SweetAlert.show(context,
         title: getTranslated(context, 'fail'),
@@ -160,26 +148,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
             onLoadStop: (InAppWebViewController controller, Uri url)  async{
 
               if(url.toString().toLowerCase().contains('https://createkwservers.com/petmart2/request/index.php?action=success')){
-                final modelHud = Provider.of<ModelHud>(context,listen: false);
-                modelHud.changeIsLoading(true);
-                PetMartService petMartService = PetMartService();
 
-                SuccessModel successModel =await petMartService.successPayment(widget.id);
-                modelHud.changeIsLoading(false);
-                if(successModel.ok){
-                  SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                  sharedPreferences.setBool("isSuccess", true);
-                  // Navigator.of(context).pop(true);
-                  showSuccessDialog(context);
+                Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+                  return new MyAccountScreen(paymentId: widget.id,isFromPayment: true,);
+                }));
 
+              }else if(url.toString().toLowerCase().contains('https://createkwservers.com/petmart2/request/index.php?action=failure')){
 
-                }
+                Navigator.pop(context,"true");
 
-
-              }else if(url.toString().toLowerCase().contains('https://createkwservers.com/petmart2/request/index.php?action=fail')){
-                SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-                sharedPreferences.setBool("isSuccess", false);
-                showFailDialog();
               }
 
             },

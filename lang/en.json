@@ -25,7 +25,7 @@
   "post_description": "Post Description ",
   "age_string": "Age",
   "select_gender": "Select Gender",
-  "post_price": "Post Price",
+  "post_price": "selling price",
   "sumbit_post": "Submit Post",
   "image_error": "Please Select Image at Least",
   "category_error": "Please Select Category",
@@ -92,7 +92,7 @@
   "add_post": "Add Post",
   "auction": "Auction",
   "lost": "Lost",
-  "adaption": "Adaption",
+  "adaption": "Adoption",
   "terms_conditions": "Terms and Conditions",
   "privacy_policy": "Privacy Policy",
   "current_credit": "Current credit : ",
@@ -201,5 +201,12 @@
   "accept": "Accept",
   "refuse": "Refuse",
   "auction_details": "Auction Details",
-  "decline_bidder": "Do you want to reject the highest bidder?"
+  "decline_bidder": "Do you want to reject the highest bidder?",
+  "point": "Points",
+  "K_D": "K.D",
+  "days": "Days",
+  "delete_account": "Delete My Account",
+  "yes": "Continue",
+  "auction_success": "Auction has been added successfully",
+  "oks": "yes"
 }

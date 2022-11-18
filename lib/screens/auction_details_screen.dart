@@ -884,7 +884,7 @@ children: [
     print('endDate ${date}');
     var now = new DateTime.now();
     print(now);
-    DateTime tempDate = new DateFormat("yyyy-MM-dd hh:mm:ss").parse(date);
+    DateTime tempDate = DateTime.parse(date);
     Duration difference = tempDate.difference(now);
     return difference.inSeconds;
   }

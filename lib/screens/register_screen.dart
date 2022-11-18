@@ -10,6 +10,7 @@ import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/error_model.dart';
 import 'package:pet_mart/model/login_model.dart';
+import 'package:pet_mart/model/otp_model.dart';
 import 'package:pet_mart/model/register_model.dart';
 import 'package:pet_mart/providers/model_hud.dart';
 import 'package:pet_mart/screens/login_screen.dart';
@@ -306,12 +307,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
         print(map);
 
         Map<String, dynamic>   response = await petMartService.register(map);
-        modelHud.changeIsLoading(false);
+
         bool  isOk  = response['ok'];
         if (isOk) {
           LoginModel registerModel = LoginModel.fromJson(response);
-
+          String mob = "965${mobileNumber}";
+          modelHud.changeIsLoading(false);
           // Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: registerModel.data.mobile,otp: registerModel.data.otp.toString(),userId: registerModel.data.customerId,)));
+          OtpModel otpModel = await petMartService.verifyOtp(mob);
+          bool okay = otpModel.ok;
+
+
 
           _scaffoldKey.currentState.showSnackBar(
               SnackBar(content: Text("success")));
@@ -320,10 +326,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           await sharedPref.saveBool(kIsLogin, true);
           await sharedPref.saveString("email", email);
           await sharedPref.saveString("password", password);
-          Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
-            return new FavoriteScreen();
-          }));
+          if(okay){
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: mob,otp: otpModel.data.code.toString(),userId: registerModel.data.id,)));
+          }
+          // Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+          //   return new FavoriteScreen();
+          // }));
         } else {
+          modelHud.changeIsLoading(false);
           ErrorModel errorModel = ErrorModel.fromJson(response);
           _scaffoldKey.currentState.showSnackBar(
               SnackBar(content: Text(errorModel.data.msg)));

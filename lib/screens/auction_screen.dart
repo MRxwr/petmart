@@ -52,7 +52,7 @@ MyNewAuctionModel myNewAuctionModel = null;
   NewAcutionListModel. NewAcutionListModel mNewAuctionListModel = null;
   String myAuctionErrorString="";
   String AuctionErrorString ="";
-  Interest.InterestModel interestModel;
+  HomeModel interestModel;
   List<bool> selectedList =[];
   Future<void> auctions() async{
     isLoading = true;
@@ -72,12 +72,14 @@ MyNewAuctionModel myNewAuctionModel = null;
        userId = loginModel.data.id;
      }
     PetMartService petMartService = PetMartService();
-     interestModel = await petMartService.interests(userId);
-     Interest.Data data = Interest.Data(id: "0",enTitle:"ALL",arTitle: "الكل");
+    interestModel = await petMartService.home(userId);
+
+
+     Categories data = Categories(id: "0",enTitle:"ALL",arTitle: "الكل",logo: "");
     interestModelList.add(data);
     selectedList.add(true);
-    for(int i =0;i<interestModel.data.length;i++){
-      interestModelList.add(interestModel.data[i]);
+    for(int i =0;i<interestModel.data.categories.length;i++){
+      interestModelList.add(interestModel.data.categories[i]);
       selectedList.add(false);
     }
 
@@ -145,7 +147,7 @@ isLoading = false;
   List<Live> myAuctionList =[];
   bool isLoading;
   List<AuctionType> auctionTypeList =[];
-  List<Interest.Data> interestModelList =[];
+  List<Categories> interestModelList =[];
   int position=0;
   LoginModel loginModel;
   Future<UserModel> user() async{
@@ -358,7 +360,8 @@ isLoading = false;
 
                   ),
                   alignment: AlignmentDirectional.center,
-                ):GridView.builder(scrollDirection: Axis.vertical,
+                ):
+                GridView.builder(scrollDirection: Axis.vertical,
 
 
                   shrinkWrap: true,
@@ -398,7 +401,7 @@ isLoading = false;
       ),
     );
   }
-  Container selectRow(Interest.Data category,BuildContext context,int selectedIndex){
+  Container selectRow(Categories category,BuildContext context,int selectedIndex){
 
     return
       Container(
@@ -503,6 +506,7 @@ isLoading = false;
     );
   }
   Widget buildItem(NewAcutionListModel.Data data, BuildContext context) {
+    print(data.id);
     return Container(
       child: Column(
         children: [
@@ -791,7 +795,8 @@ isLoading = false;
   int  getRemainingTime(String date ){
     var now = new DateTime.now();
     print(now);
-    DateTime tempDate = new DateFormat("yyyy-MM-dd hh:mm:ss").parse(date);
+    DateTime tempDate =  DateTime.parse(date);
+    print(date);
     Duration difference = tempDate.difference(now);
     return difference.inSeconds;
   }
@@ -906,7 +911,7 @@ isLoading = false;
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'oks'),
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

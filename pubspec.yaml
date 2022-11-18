@@ -66,8 +66,9 @@ dependencies:
   grouped_list: ^4.1.0
   image_picker: ^0.8.5+3
   my_fatoorah: ^3.0.6
-  flutter_webview_plugin:
-    git: https://github.com/nuc134r/flutter_webview_plugin.git
+  flutter_inappwebview: ^5.4.4+3
+
+
   group_radio_button: ^1.1.0
   firebase_core: ^1.10.0
   firebase_database: ^8.1.0

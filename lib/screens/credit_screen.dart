@@ -14,6 +14,7 @@ import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sweetalert/sweetalert.dart';
 
 import '../model/login_model.dart';
 import '../providers/model_hud.dart';
@@ -198,7 +199,7 @@ mLanguage = languageCode;
                                       fontSize: screenUtil.setSp(10),
                                       fontWeight: FontWeight.bold
                                   ),),
-                                Text(packageModel.data.package[index].points,
+                                Text(packageModel.data.package[index].points +" "+getTranslated(context, "point"),
                                   style: TextStyle(
                                       color: kMainColor,
                                       fontSize: screenUtil.setSp(10),
@@ -208,13 +209,13 @@ mLanguage = languageCode;
                             ),
                             Column(
                               children: [
-                                Text('${getTranslated(context, 'valid_for')} ${packageModel.data.package[index].validity}',
+                                Text('${getTranslated(context, 'valid_for')} ${packageModel.data.package[index].validity} ${getTranslated(context, "days")}',
                                   style: TextStyle(
                                       color: kMainColor,
                                       fontSize: screenUtil.setSp(10),
                                       fontWeight: FontWeight.normal
                                   ),),
-                                Text(packageModel.data.package[index].price,
+                                Text(packageModel.data.package[index].price+" "+getTranslated(context, "K_D"),
                                   style: TextStyle(
                                       color: kMainColor,
                                       fontSize: screenUtil.setSp(10),
@@ -309,11 +310,11 @@ mLanguage = languageCode;
           ),
           onPressed: ()async{
             await alert.dismiss();
-            Map<String,String> map = Map();
+            Map<String,dynamic> map = Map();
             map['packageId']= package.id;
             map['customerId'] = userId;
             map['paymentMethod'] = "1";
-            print(map);
+            print("post  map +"+map.toString());
             final modelHud = Provider.of<ModelHud>(context,listen: false);
             modelHud.changeIsLoading(true);
             PetMartService petmartService = PetMartService();
@@ -341,7 +342,7 @@ mLanguage = languageCode;
           ),
           onPressed: ()async {
             await alert.dismiss();
-            Map map = Map();
+            Map map = Map<String,dynamic>();
             map['packageId']= package.id;
             map['customerId'] = userId;
             map['paymentMethod'] = "2";
@@ -349,6 +350,7 @@ mLanguage = languageCode;
             modelHud.changeIsLoading(true);
             PetMartService petmartService = PetMartService();
             PaymentUrlModel paymentUrlModel =  await petmartService.paymentUrl(map);
+            modelHud.changeIsLoading(false);
             if(paymentUrlModel.ok){
               String url = paymentUrlModel.data.url;
               String id = paymentUrlModel.data.id.toString();
@@ -370,11 +372,16 @@ mLanguage = languageCode;
 
   }
   Future<void> _buttonTapped(Model.Package package,String url,String id,BuildContext context) async {
-    bool results =  await Navigator.of(context,
+    String  results =  await Navigator.of(context,
     ).push(new MaterialPageRoute(builder: (BuildContext context) {
       return new PaymentScreen(packageModel: package, url: url, id: id,);
     }
     ));
+    if(results == "true"){
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setBool("isSuccess", false);
+      showFailDialog();
+    }
     SharedPreferences sharedPreferences  =await SharedPreferences.getInstance();
     bool isSucccess = sharedPreferences.getBool("isSuccess");
     if(isSucccess){
@@ -386,5 +393,24 @@ mLanguage = languageCode;
 
 
 
+  }
+
+
+  Future<void> showFailDialog() {
+    SweetAlert.show(context,
+        title: getTranslated(context, 'fail'),
+        subtitle: getTranslated(context, 'payment_fail'),
+        showCancelButton: false,
+        confirmButtonColor: Color(0xFFFF0000),
+        confirmButtonText: getTranslated(context, 'ok'),
+        style: SweetAlertStyle.error,
+        onPress: (bool isConfirm) {
+
+
+
+
+
+          return true;
+        });
   }
 }

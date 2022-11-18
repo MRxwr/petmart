@@ -51,11 +51,21 @@ class _MyPostScreenState extends State<MyPostScreen> {
           isOk  = value['ok'];
         products = [];
         if(isOk){
-         postModel = MyPostsModel.fromJson(value);
+         postModel = MyPostsModel.fromJson(Map<String, dynamic>.from(value));
 
-          products..addAll(postModel.data.items.lost);
-          products..addAll(postModel.data.items.adoption);
-          products..addAll(postModel.data.items.sale);
+             // MyPostsModel.fromJson(value);
+         if(postModel.data.items.lost != null){
+           products..addAll(postModel.data.items.lost);
+         }
+
+         if(postModel.data.items.adoption != null){
+           products..addAll(postModel.data.items.adoption);
+         }
+         if(postModel.data.items.sale != null){
+           products..addAll(postModel.data.items.sale);
+         }
+
+
         }
 
         // for(int i =0;i< postModel.data.items.lost.length;i++){
@@ -104,7 +114,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    Map<String, dynamic>   response  = await petMartService.myPosts(userId);
+    dynamic   response  = await petMartService.myPosts(userId);
     return response;
   }
   Future<void> postList(String type) async{
@@ -124,9 +134,16 @@ class _MyPostScreenState extends State<MyPostScreen> {
         //   products.add(postModel.data.items.sale[i]);
         //
         // }
-        products..addAll(postModel.data.items.lost);
-        products..addAll(postModel.data.items.adoption);
-        products..addAll(postModel.data.items.sale);
+        if(postModel.data.items.lost != null){
+          products..addAll(postModel.data.items.lost);
+        }
+
+        if(postModel.data.items.adoption != null){
+          products..addAll(postModel.data.items.adoption);
+        }
+        if(postModel.data.items.sale != null){
+          products..addAll(postModel.data.items.sale);
+        }
       } else if (type == "adoption") {
         products = [];
         products..addAll(postModel.data.items.adoption);

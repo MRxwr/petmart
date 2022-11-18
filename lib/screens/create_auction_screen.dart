@@ -29,6 +29,7 @@ import 'package:video_player/video_player.dart';
 
 
 import '../model/InterestModel.dart' as Interest;
+import '../model/home_model.dart';
 import 'main_sceen.dart';
 class CreateAuctionScreen extends StatefulWidget {
   const CreateAuctionScreen({Key key}) : super(key: key);
@@ -401,7 +402,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
 
 String userId ="";
-  Future<Interest.InterestModel> interest() async{
+  Future<HomeModel> interest() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
@@ -417,7 +418,7 @@ String userId ="";
 
 
     PetMartService petMartService = PetMartService();
-    Interest.InterestModel interestModel = await petMartService.interests(userId);
+   HomeModel interestModel = await petMartService.home(userId);
 
 
 
@@ -429,7 +430,7 @@ String userId ="";
   }
   String mStartDate;
   String mEndDate;
-  Interest.InterestModel interestModel;
+  HomeModel interestModel;
   @override
   void initState() {
     // TODO: implement initState
@@ -439,8 +440,8 @@ String userId ="";
 
     mStartDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
     mEndDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(end);
-    print(mStartDate);
-    print(mEndDate);
+    print("mStartDate-->"+mStartDate);
+    print("mEndDate-->"+mEndDate);
     interest().then((value) {
       setState(() {
         interestModel = value;
@@ -657,7 +658,7 @@ String userId ="";
                       Container(
 
                       ):
-                      DropDown<Interest.Data>(
+                      DropDown<Categories>(
 
 
 
@@ -667,7 +668,7 @@ String userId ="";
 
 
 
-                        items: interestModel.data,
+                        items: interestModel.data.categories,
 
 
 
@@ -680,7 +681,7 @@ String userId ="";
 
 
 
-                        customWidgets: interestModel.data.map((p) => buildDropDownRow(p)).toList(),
+                        customWidgets: interestModel.data.categories.map((p) => buildDropDownRow(p)).toList(),
                         hint:  Text(getTranslated(context, 'select_category'),
                           textAlign: TextAlign.start,
                           style: TextStyle(
@@ -689,7 +690,7 @@ String userId ="";
                               fontWeight: FontWeight.w600,
                               fontSize: screenUtil.setSp(15)
                           ),),
-                        onChanged: (Interest.Data category){
+                        onChanged: (Categories category){
                           categoryId = category.id;
                           setState(() {
 
@@ -886,7 +887,7 @@ String userId ="";
     SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(categoryId);
     return auctionDetailsModel;
   }
-  Widget buildDropDownRow(Interest.Data category) {
+  Widget buildDropDownRow(Categories category) {
     return Container(
 
 
@@ -944,6 +945,16 @@ String userId ="";
       ),),
     );
   }
+  String replaceArabicNumber(String input) {
+    const english = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const arabic = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+    for (int i = 0; i < english.length; i++) {
+      input = input.replaceAll(arabic[i], english[i]);
+    }
+    print("$input");
+    return input;
+  }
   void validate(BuildContext context) async {
     String postTitle = _titleController.text;
     String postDescription =_descriptionController.text;
@@ -980,11 +991,11 @@ String userId ="";
 
       }
       PetMartService petMartService = PetMartService();
-      dynamic response = await petMartService.addAuction(postTitle, postTitle, postDescription, postDescription, mStartDate,mEndDate, price,"running",categoryId, userId, subCategoryId, mLanguage, mCompressedImages, vedios,vedioUrl);
+      dynamic response = await petMartService.addAuction(postTitle, postTitle, postDescription, postDescription, mStartDate,mEndDate, replaceArabicNumber(price),"running",categoryId, userId, subCategoryId, mLanguage, mCompressedImages, vedios,vedioUrl);
       modelHud.changeIsLoading(false);
       bool status = response['ok'];
       if(status){
-        ShowAlertDialog(context, getTranslated(context, "post_add_successfuly"),true);
+        ShowAlertDialog(context, getTranslated(context, "auction_success"),true);
 
       }else{
         ShowAlertDialog(context, response['data']['msg'],false);

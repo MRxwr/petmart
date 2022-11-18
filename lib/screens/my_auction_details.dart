@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'dart:ffi';
+
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_controller.dart';
@@ -431,7 +431,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data[0].endDate}',
+                                child: Text('${getFormattedDate(mAuctionDetailsModel.data[0].endDate,1)}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -466,7 +466,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text(getFormattedDate(mAuctionDetailsModel.data[0].endDate),
+                                child: Text(getFormattedDate(mAuctionDetailsModel.data[0].endDate,0),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -910,18 +910,19 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
       Navigator.pushReplacementNamed(context,MainScreen.id);
     }
   }
-  String getFormattedDate(String date) {
+  String getFormattedDate(String date,int day) {
     /// Convert into local date format.
-    var localDate = DateTime.parse(date);
-
+    var localDate = DateTime.parse(date).subtract(Duration(days: day));
+    
     /// inputFormat - format getting from api or other func.
     /// e.g If 2021-05-27 9:34:12.781341 then format must be yyyy-MM-dd HH:mm
     /// If 27/05/2021 9:34:12.781341 then format must be dd/MM/yyyy HH:mm
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
     var inputDate = inputFormat.parse(localDate.toString());
 
+
     /// outputFormat - convert into format you want to show.
-    var outputFormat = DateFormat('dd MMM AT hh:mm a');
+    var outputFormat = DateFormat('  hh:mm a - dd MMM yyyy',"ar");
     var outputDate = outputFormat.format(inputDate);
 
     return outputDate.toString();

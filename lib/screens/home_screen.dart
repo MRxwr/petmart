@@ -57,11 +57,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String loginData = sharedPreferences.getString(kUserModel);
+    print('loginData---> ${loginData}');
 
 
+if(loginData != null){
+  final body = json.decode(loginData);
 
-    final body = json.decode(loginData);
-    LoginModel   loginModel = LoginModel.fromJson(body);
+     loginModel = LoginModel.fromJson(body);
+}
+
     return loginModel;
   }
   Future<HomeModel> home() async{
@@ -502,7 +506,7 @@ double height = MediaQuery.of(context).size.height;
                           flex:2,
                           child: Container(
                             alignment: AlignmentDirectional.center,
-                            child: Image.asset('assets/images/services.png',width: 70.w,
+                            child: Image.asset('assets/images/truck.png',width: 70.w,
                               height: 70.w,
                               fit: BoxFit.fill,
                             ),

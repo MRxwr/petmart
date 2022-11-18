@@ -11,6 +11,7 @@ import 'package:pet_mart/model/AuctionBidModel.dart';
 import 'package:pet_mart/model/AuctionStatusModel.dart';
 import 'package:pet_mart/model/BidNewModel.dart';
 import 'package:pet_mart/model/DeletePostImageModel.dart';
+import 'package:pet_mart/model/DeleteUserModel.dart';
 import 'package:pet_mart/model/InitModel.dart';
 import 'package:pet_mart/model/InterestModel.dart';
 import 'package:pet_mart/model/MyNewAuctionDetailsModel.dart';
@@ -123,21 +124,8 @@ class PetMartService{
 
 
   }
-  Future<OtpModel> resentOtp(Map map) async {
 
-    String body = json.encode(map);
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}customer/resentotp"),headers: {"Content-Type": "application/json"},body: body);
-    print(response);
-    OtpModel otpModel;
-    if(response.statusCode == 200){
-      otpModel = OtpModel.fromJson(jsonDecode(response.body));
-    }
-
-    print(response.body);
-    print(response.body);
-    return otpModel;
-  }
-  Future<dynamic> loginModel(Map map) async {
+  Future<dynamic> loginModel(Map<String,dynamic> map) async {
 
     var resp;
     var dio = Dio();
@@ -208,19 +196,33 @@ class PetMartService{
       return null;
     }
   }
-  Future<VerifyOtpModel> verifyOtp(Map map) async {
+  Future<OtpModel> verifyOtp(String mobile) async {
+    var dio = Dio();
+    OtpModel otpModel;
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
 
-    String body = json.encode(map);
-    final response = await http.post(Uri.parse("${TAG_BASE_URL}customer/verify"),headers: {"Content-Type": "application/json"},body: body);
-    print(response);
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+
+
+    var response = await dio.get(
+      TAG_BASE_URL + "?action=sms&mobile=${mobile}",
+    );
+
+    print('otp ---> ${response.data}');
+
     VerifyOtpModel verifyOtpModel;
     if(response.statusCode == 200){
-      verifyOtpModel = VerifyOtpModel.fromJson(jsonDecode(response.body));
+      otpModel = OtpModel.fromJson(Map<String, dynamic>.from(response.data));
     }
 
-    print(verifyOtpModel.message);
-    print(response.body);
-    return verifyOtpModel;
+
+
+    return otpModel;
   }
   Future<HomeModel> home(String id) async {
     var dio = Dio();
@@ -260,10 +262,13 @@ class PetMartService{
 
 
 
+    String language = sharedPreferences.getString(LANG_CODE) ?? "en";
+
+
 
 
     var response = await dio.post(
-      TAG_BASE_URL + "?action=user&type=forgetPassword&email=${email}",
+      TAG_BASE_URL + "?action=user&type=forgetPassword&email=${email}&lang=${language}",
     );
 
     print(response);
@@ -478,8 +483,9 @@ print(TAG_BASE_URL + "?action=editPost&edit=0&id=${id}");
     var response = await dio.post(
       TAG_BASE_URL + "?action=categories&id=${catId}",
     );
+    print( TAG_BASE_URL + "?action=categories&id=${catId}");
 
-    print(response);
+    print(response.data);
 
     CategoryModel categoryModel;
     if(response.statusCode == 200){
@@ -839,8 +845,52 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
     return packageModel;;
 
   }
-  Future<PaymentUrlModel> paymentUrl(Map<String,String> map)async{
+  Future<DeleteUserModel> deleteUser(String id)async{
     var dio = Dio();
+    dio.options.headers['content-Type'] = 'multipart/form-data';
+    dio.options.headers['petmartcreate'] = "PetMartCreateCo";
+
+    SharedPreferences sharedPreferences = await SharedPreferences
+        .getInstance();
+
+
+
+    print(TAG_BASE_URL + "?action=user&type=deleteUser&userId=${id}");
+    DeleteUserModel packageModel;
+    try {
+
+      var response = await dio.post(
+          TAG_BASE_URL + "?action=user&type=deleteUser&userId=${id}",
+
+      );
+
+
+      print(response);
+
+
+      if (response.statusCode == 200) {
+        packageModel =
+            DeleteUserModel.fromJson(Map<String, dynamic>.from(response.data));
+      }
+    }on Exception catch (_) {
+      packageModel = null;
+    }
+
+
+
+
+    return packageModel;
+
+  }
+  Future<PaymentUrlModel> paymentUrl(Map<String,dynamic> map)async{
+    BaseOptions options = new BaseOptions(
+        baseUrl: TAG_BASE_URL ,
+        receiveDataWhenStatusError: true,
+        connectTimeout: 60*1000, // 60 seconds
+        receiveTimeout: 60*1000 // 60 seconds
+    );
+
+    var dio = Dio(options);
     dio.options.headers['content-Type'] = 'multipart/form-data';
     dio.options.headers['petmartcreate'] = "PetMartCreateCo";
 
@@ -850,18 +900,20 @@ print(TAG_BASE_URL + "?action=shareView&update=${update}&type=${type}&id=${id}")
 
     print(map);
 
+
     print(TAG_BASE_URL + "?action=packages&buy=1");
     PaymentUrlModel packageModel;
     FormData formData = FormData.fromMap(map);
+    print("formdata-->"+formData.toString());
 
     try {
       var response = await dio.post(
-        TAG_BASE_URL +
+
             "?action=packages&buy=1",
           data: formData
       );
 
-      print(response);
+print("response--->"+response.data.toString()+"");
 
 
       if (response.statusCode == 200) {
@@ -991,8 +1043,7 @@ print("userID---> ${id}");
     var response = await dio.get(
         TAG_BASE_URL + "?action=myPosts&id=${id}",
         );
-    print(response.data);
-    MyPostsModel postModel;
+
     if (response.statusCode == 200) {
       resp =
           response.data;
@@ -1090,6 +1141,7 @@ print("userID---> ${id}");
 
     FormData formData = FormData.fromMap(map);
     String body = json.encode(map);
+    print(TAG_BASE_URL + "?action=auctions&type=details");
     var response = await dio.post(
         TAG_BASE_URL + "?action=auctions&type=details",
         data: formData);
@@ -1128,6 +1180,7 @@ print("userID---> ${id}");
   Future<AuctionBidModel> auctionBidDetails(Map<String,String> map)async{
     var resp;
     var dio = Dio();
+    print(map);
     dio.options.headers['content-Type'] = 'multipart/form-data';
     dio.options.headers['petmartcreate'] = "PetMartCreateCo";
     // dio.options.headers["ezyocreate"] = "CreateEZYo";
@@ -1141,6 +1194,7 @@ print("userID---> ${id}");
     var response = await dio.post(
         TAG_BASE_URL + "?action=rating&type=get",
         data: formData);
+    print(TAG_BASE_URL + "?action=rating&type=get");
     AuctionBidModel changePasswordModel;
     if (response.statusCode == 200) {
       changePasswordModel = AuctionBidModel.fromJson(Map<String, dynamic>.from(response.data));
@@ -1162,6 +1216,8 @@ print("userID---> ${id}");
     var response = await dio.post(
         TAG_BASE_URL + "?action=rating&type=send",
         data: formData);
+    print(TAG_BASE_URL + "?action=rating&type=send");
+    print('mapRate ---> ${map}');
     RatingAuctionModel changePasswordModel;
     print(response.data);
     if (response.statusCode == 200) {
@@ -1731,7 +1787,7 @@ if(path == null){
       map['categoryId'] = category_id;
       map['details'] = english_description;
 
-
+      map['startDate'] = start_date;
       map['endDate'] = end_date;
 
       map['price'] = bid_value;
@@ -1741,6 +1797,7 @@ if(path == null){
 
 
       map['video'] = vedioUrl;
+      print("map --->"+map.toString());
       for(int i =0;i<images.length;i++){
         print('path --> ${images[i].absolute.path}');
 
@@ -1804,8 +1861,8 @@ if(path == null){
       BaseOptions options = new BaseOptions(
           baseUrl: TAG_BASE_URL,
           receiveDataWhenStatusError: true,
-          connectTimeout: 600*1000, // 60 seconds
-          receiveTimeout: 600*1000 // 60 seconds
+          connectTimeout: 60000*1000, // 60 seconds
+          receiveTimeout: 600000*1000 // 60 seconds
       );
 
       dio = new Dio(options);
@@ -1884,6 +1941,7 @@ if(path == null){
     var response = await dio.get(
       TAG_BASE_URL + "?action=notifications&id=${id}",
     );
+    print( TAG_BASE_URL + "?action=notifications&id=${id}");
 
     print(response);
     NotificationModel notificationModel;

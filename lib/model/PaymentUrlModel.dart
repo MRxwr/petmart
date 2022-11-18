@@ -57,8 +57,8 @@ PaymentUrlModel copyWith({  bool ok,
 
 class Data {
   Data({
-      String url, 
-      int id,}){
+      String url,
+    dynamic id,}){
     _url = url;
     _id = id;
 }
@@ -68,14 +68,14 @@ class Data {
     _id = json['id'];
   }
   String _url;
-  int _id;
+  dynamic _id;
 Data copyWith({  String url,
-  int id,
+  dynamic id,
 }) => Data(  url: url ?? _url,
   id: id ?? _id,
 );
   String get url => _url;
-  int get id => _id;
+  dynamic get id => _id;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

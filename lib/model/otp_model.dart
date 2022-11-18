@@ -1,63 +1,45 @@
-/// status : "success"
-/// message : "Your OTP has been sent to your mobile."
-/// data : {"otp":749337}
-
 class OtpModel {
-  String _status;
-  String _message;
-  Data _data;
+  bool ok;
+  String error;
+  String status;
+  Data data;
 
-  String get status => _status;
-  String get message => _message;
-  Data get data => _data;
+  OtpModel({this.ok, this.error, this.status, this.data});
 
-  OtpModel({
-      String status, 
-      String message, 
-      Data data}){
-    _status = status;
-    _message = message;
-    _data = data;
-}
-
-  OtpModel.fromJson(dynamic json) {
-    _status = json["status"];
-    _message = json["message"];
-    _data = json["data"] != null ? Data.fromJson(json["data"]) : null;
+  OtpModel.fromJson(Map<String, dynamic> json) {
+    ok = json['ok'];
+    error = json['error'];
+    status = json['status'];
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    var map = <String, dynamic>{};
-    map["status"] = _status;
-    map["message"] = _message;
-    if (_data != null) {
-      map["data"] = _data.toJson();
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['ok'] = this.ok;
+    data['error'] = this.error;
+    data['status'] = this.status;
+    if (this.data != null) {
+      data['data'] = this.data.toJson();
     }
-    return map;
+    return data;
   }
-
 }
-
-/// otp : 749337
 
 class Data {
-  int _otp;
+  int code;
+  String response;
 
-  int get otp => _otp;
+  Data({this.code, this.response});
 
-  Data({
-      int otp}){
-    _otp = otp;
-}
-
-  Data.fromJson(dynamic json) {
-    _otp = json["otp"];
+  Data.fromJson(Map<String, dynamic> json) {
+    code = json['code'];
+    response = json['response'];
   }
 
   Map<String, dynamic> toJson() {
-    var map = <String, dynamic>{};
-    map["otp"] = _otp;
-    return map;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['code'] = this.code;
+    data['response'] = this.response;
+    return data;
   }
-
 }

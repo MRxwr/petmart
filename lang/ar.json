@@ -24,7 +24,7 @@
   "post_description": "وصف الإعلان",
   "age_string": "العمر",
   "select_gender": "حدد النوع",
-  "post_price": "سعر الإعلان",
+  "post_price": "سعر البيع",
   "sumbit_post": "إرسال",
   "image_error": "يرجى تحديد الصورة على الأقل",
   "category_error": "الرجاء تحديد الفئة",
@@ -201,5 +201,13 @@
   "accept": "موافقة",
   "refuse": "رفض",
   "auction_details": "تفاضيل المزاد",
-  "decline_bidder": "هل تريد رفض أعلي مزايد"
+  "decline_bidder": "هل تريد رفض أعلي مزايد",
+  "point": "نقاط",
+  "K_D": "د.ك",
+  "days": "أيام",
+  "delete_account": "حذف الحساب الشخصي",
+  "yes": "استمرار",
+  "auction_success": "لقد تمت إضافة المزاد بنجاح",
+  "oks": "نعم"
+
 }

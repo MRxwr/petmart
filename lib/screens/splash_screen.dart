@@ -16,6 +16,7 @@ import 'package:pet_mart/model/home_model.dart';
 import 'package:pet_mart/model/login_model.dart';
 import 'package:pet_mart/model/push_notification.dart';
 import 'package:pet_mart/screens/languagee_screen.dart';
+import 'package:pet_mart/screens/login_screen.dart';
 import 'package:pet_mart/screens/main_sceen.dart';
 import 'package:pet_mart/screens/push_notification_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
@@ -76,10 +77,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
             }).whenComplete((){
               getLanguageSelected().then((value){
-                if(value){
+                bool isSelectLanguage =   value['isSelectLanguage'] ;
+                bool isUserLoginIn =   value['isUserLoginIn'] ;
+                if(isSelectLanguage & isUserLoginIn){
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (BuildContext context) => MainScreen()));
-                }else{
+                }else if(isSelectLanguage & !isUserLoginIn){
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (BuildContext context) => MainScreen()));
+                }else if(!isSelectLanguage & !isUserLoginIn){
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (BuildContext context) => LanguageScreen()));
                 }
@@ -93,13 +99,20 @@ class _SplashScreenState extends State<SplashScreen> {
 
           }).whenComplete((){
             getLanguageSelected().then((value){
-              if(value){
+              bool isSelectLanguage =   value['isSelectLanguage'] ;
+              bool isUserLoginIn =   value['isUserLoginIn'] ;
+              if(isSelectLanguage & isUserLoginIn){
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (BuildContext context) => MainScreen()));
-              }else{
+              }else if(isSelectLanguage & !isUserLoginIn){
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (BuildContext context) => MainScreen()));
+              }else if(!isSelectLanguage & !isUserLoginIn){
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (BuildContext context) => LanguageScreen()));
               }
+
+
 
             });
           });
@@ -129,9 +142,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
 
 
-  Future<bool> getLanguageSelected()async{
+  Future<Map<String,bool>> getLanguageSelected()async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    return sharedPreferences.getBool("selectLanguage")??false;
+    bool isSelectLanguage = sharedPreferences.getBool("selectLanguage")??false;
+
+    bool isLoggedIn =  sharedPreferences.getBool(kIsLogin)??false;
+    Map<String,bool> map ={};
+    map['isSelectLanguage'] = isSelectLanguage;
+    map['isUserLoginIn'] = isLoggedIn;
+    return map;
 }
   Future<HomeModel> home() async{
 
@@ -141,6 +160,7 @@ class _SplashScreenState extends State<SplashScreen> {
     print('loginData --> ${loginData}');
     LoginModel  loginModel = null;
     bool isLoggedIn =  sharedPreferences.getBool(kIsLogin)??false;
+    String id ="";
     String uniqueId;
     if(isLoggedIn){
       String token =deviceToken;
@@ -162,37 +182,44 @@ class _SplashScreenState extends State<SplashScreen> {
         var data = await deviceInfoPlugin.iosInfo;
         uniqueId = data.identifierForVendor;
       }
-      Map map = {
-        'email':fullName,
-        'password':password,
-        'device_token':token,
-        'imei_number': uniqueId,
-        'device_type': deviceType,
-        'language':languageCode
+      Map<String,dynamic> map = {};
+      map['email'] = fullName;
+      map['password'] = password;
+      map['firebase'] = token;
 
+      dynamic response = await petMartService.loginModel(map);
+      bool isOk = response['ok'];
 
-      };
-       loginModel = await petMartService.loginModel(map);
-      String mStatus = loginModel.status;
-      if(mStatus.trim() == 'success') {
+      if(isOk){
+        loginModel = LoginModel.fromJson(response);
+
         SharedPref sharedPref = SharedPref();
         await sharedPref.save(kUserModel, loginModel);
-        await sharedPref.saveBool(kIsLogin, true);
+
+        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+        sharedPreferences.setBool(kIsLogin,true);
         await sharedPref.saveString("emil", fullName);
         await sharedPref.saveString("password", password);
+        id = loginModel.data.id;
+      }else{
+        id ="";
+        SharedPref sharedPref = SharedPref();
+        await sharedPref.save(kUserModel, "");
+
+        await sharedPref.saveBool(kIsLogin, false);
+        SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setBool(kIsLogin,false);
+        await sharedPref.saveString("emil", "");
+        await sharedPref.saveString("password", "");
       }
+
     }
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     Map map ;
-    String id ="";
-    if(loginModel == null){
-      id ="";
-    }else{
-      id = loginModel.data.id;
 
-    }
+
 
     print('map --> ${map}');
     PetMartService petMartService = PetMartService();

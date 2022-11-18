@@ -292,7 +292,7 @@ class _NotificationDetailsScreenState extends State<NotificationDetailsScreen> {
                           fontSize: screenUtil.setSp(16),
                           fontWeight: FontWeight.w600
                       ),),
-                    Text(mAuctionDetailsModel.data.winner.name,
+                    Text(mAuctionDetailsModel.data.winner.name.toString(),
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(16),

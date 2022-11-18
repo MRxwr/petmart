@@ -24,12 +24,20 @@ import 'package:pet_mart/widgets/name_textfield.dart';
 import 'package:pet_mart/widgets/phone_textfield.dart';
 import 'package:pet_mart/widgets/user_name_textfield.dart';
 import 'package:provider/provider.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sweetalert/sweetalert.dart';
 import 'package:unique_identifier/unique_identifier.dart';
 
+import '../model/DeleteUserModel.dart';
+import '../model/SuccessModel.dart';
+import 'login_screen.dart';
 import 'main_sceen.dart';
 class MyAccountScreen extends StatefulWidget {
   static String id = 'MyAccountScreen';
+  bool isFromPayment;
+  String paymentId;
+  MyAccountScreen({Key key,@required this.isFromPayment,@ required this.paymentId}) : super(key: key);
 
   @override
   _MyAccountScreenState createState() => _MyAccountScreenState();
@@ -152,8 +160,12 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
     PetMartService petMartService = PetMartService();
     UserModel userModel = await petMartService.user(map);
-
-
+    if(widget.isFromPayment) {
+      SuccessModel successModel = await petMartService.successPayment(
+          widget.paymentId);
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+      sharedPreferences.setBool("isSuccess", true);
+    }
 
 
 
@@ -192,12 +204,32 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       setState(() {
         userModel = value;
         imageUrl = value.data.logo;
+        if(widget.isFromPayment){
+          showSuccessDialog(context);
+        }
       });
     });
 
 
 
 
+  }
+  void showSuccessDialog(BuildContext context) {
+    SweetAlert.show(context,
+        title: getTranslated(context, 'success'),
+        subtitle: getTranslated(context, 'payment_success'),
+
+        showCancelButton: false,
+        confirmButtonColor: kMainColor,
+        confirmButtonText: getTranslated(context, 'ok'),
+        style: SweetAlertStyle.success,
+        onPress: (bool isConfirm){
+          Navigator.pop(context,true);
+
+
+
+          return true;
+        });
   }
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
@@ -246,7 +278,13 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                 }));
 
               },
-              child: Icon(Icons.interests,color: Colors.white,size: 30.h,),
+              child:
+              SizedBox(
+                height: 30.w,
+                width: 30.w,
+                child: Image.asset('assets/images/bookmark.png',color: Color(0xFFFFFFFF),width: 30.w,height: 30.w,
+                ),
+              ),
             ),
             SizedBox(width: 10.w,),
 
@@ -539,6 +577,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       SizedBox(height: 20.h,width: width,),
                       Container(margin: EdgeInsets.symmetric(horizontal: 20.w),
                           child: confirmButton(getTranslated(context, 'update_profile'),context)),
+                      SizedBox(height: 20.h,width: width,),
+                      Container(margin: EdgeInsets.symmetric(horizontal: 20.w),
+                          child: deleteButton(getTranslated(context, 'delete_account'),context)),
                     ],
                   )
                   ,
@@ -550,6 +591,100 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         ),
     ),
       );
+  }
+  Future<void> DeleteDialog(BuildContext context) async{
+    var alert;
+    var alertStyle = AlertStyle(
+
+      animationType: AnimationType.fromBottom,
+      isCloseButton: true,
+      isOverlayTapDismiss: true,
+      descStyle: TextStyle(fontWeight: FontWeight.normal,
+          color: Color(0xFF0000000),
+          fontSize: screenUtil.setSp(18)),
+      descTextAlign: TextAlign.start,
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+          color: Colors.grey,
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Color(0xFF000000),
+          fontWeight: FontWeight.normal,
+          fontSize: screenUtil.setSp(16)
+      ),
+      alertAlignment: AlignmentDirectional.center,
+    );
+    alert =   Alert(
+      context: context,
+      style: alertStyle,
+
+      title: getTranslated(context, 'delete_account'),
+
+
+      buttons: [
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'yes'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async{
+            await alert.dismiss();
+            deleteUser();
+
+
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        ),
+        DialogButton(
+          child: Text(
+            getTranslated(context, 'no'),
+            style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
+          ),
+          onPressed: ()async {
+            await alert.dismiss();
+
+          },
+          color: Color(0xFFFFC300),
+          radius: BorderRadius.circular(6.w),
+        )
+      ],
+    );
+    alert.show();
+
+  }
+  void deleteUser() async{
+
+    final modelHud = Provider.of<ModelHud>(context,listen: false);
+    modelHud.changeIsLoading(true);
+
+    SharedPreferences _preferences = await SharedPreferences.getInstance();
+    String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+    PetMartService petMartService = PetMartService();
+    String deviceType="";
+    String loginData = _preferences.getString(kUserModel);
+
+
+
+    final body = json.decode(loginData);
+    LoginModel   loginModel = LoginModel.fromJson(body);
+    String  mUser = loginModel.data.id;
+
+    DeleteUserModel  deleteUserModel = await petMartService.deleteUser(mUser);
+
+
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.setBool(kIsLogin, false);
+    sharedPreferences.remove(kUserModel);
+    modelHud.changeIsLoading(false);
+    Navigator.pushReplacementNamed(context, LoginScreen.id);
+
+
   }
   TextButton confirmButton(String text,BuildContext context){
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
@@ -567,6 +702,30 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       onPressed: () {
 
         validate(context);
+      },
+      child: Text(text,style: TextStyle(
+          color: Color(0xFF000000),
+          fontSize: screenUtil.setSp(14),
+          fontWeight: FontWeight.w500
+      ),),
+    );
+  }
+  TextButton deleteButton(String text,BuildContext context){
+    final ButtonStyle flatButtonStyle = TextButton.styleFrom(
+      primary: Color(0xFF000000),
+      minimumSize: Size(120.w, 35.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+      shape:  RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(5.0.w)),
+      ),
+      backgroundColor: Color(0xFFFFC300),
+    );
+
+    return TextButton(
+      style: flatButtonStyle,
+      onPressed: () {
+
+        DeleteDialog(context);
       },
       child: Text(text,style: TextStyle(
           color: Color(0xFF000000),

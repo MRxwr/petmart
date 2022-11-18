@@ -167,7 +167,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           CachedNetworkImage(
             width: 150.w,
             height: 150.h,
-            imageUrl:'${kImagePath+childcategory.image}',
+            imageUrl:'${KImageUrl+childcategory.image}',
             imageBuilder: (context, imageProvider) =>
                 Container(
                     width: 150.w,

@@ -598,10 +598,13 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
 
   }
   int  getRemainingTime(String date ){
+    print("EndDate ---> ${date}");
     var now = new DateTime.now();
-    print(now);
-    DateTime tempDate = new DateFormat("yyyy-MM-dd hh:mm:ss").parse(date);
+
+    print("Now ${now}");
+    DateTime tempDate =  DateTime.parse(date);
     Duration difference = tempDate.difference(now);
+    print("diff in hours -->${difference.inHours}");
     return difference.inSeconds;
   }
   String formatDuration(int d) {

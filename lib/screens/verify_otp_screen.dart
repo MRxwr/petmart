@@ -15,6 +15,8 @@ import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart' as Alert;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'favorite_screen.dart';
+
 class VerifyOtpScreen extends StatefulWidget {
   static String id = 'VerifyOtpScreen';
    String mobile="";
@@ -157,6 +159,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                         )
                       ],
                       onCompleted: (v) {
+                        currentText = v;
                         print("Completed");
                       },
                       // onTap: () {
@@ -236,6 +239,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   void sendotp(BuildContext context) async {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
     final modelHud = Provider.of<ModelHud>(context, listen: false);
     modelHud.changeIsLoading(true);
     Map map = {
@@ -244,16 +248,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       'mobile': widget.mobile,
       'language': languageCode
     };
-    PetMartService petMartService = PetMartService();
-    VerifyOtpModel verifyOtpModel = await petMartService.verifyOtp(map);
-    String mStatus = verifyOtpModel.status;
-    if (mStatus.trim() == 'success') {
+
+    if (currentText == widget.otp) {
       modelHud.changeIsLoading(false);
-      successAlertDialog(context,verifyOtpModel.message);
+      successAlertDialog(context,getTranslated(context, 'success'));
 
     }else{
       modelHud.changeIsLoading(false);
-      failAlertDialog(context, verifyOtpModel.message);
+      failAlertDialog(context, 'fail');
 
     }
 
@@ -270,14 +272,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     map['mobile'] =widget.mobile;
 
     PetMartService petMartService = PetMartService();
-    OtpModel resp  = await petMartService.resentOtp(map);
-    widget.otp = resp.data.otp.toString();
+    OtpModel resp  = await petMartService.verifyOtp(widget.mobile);
+    widget.otp = resp.data.code.toString();
     print('widget.otp ---> ${widget.otp}');
     print(resp);
     modelHud.changeIsLoading(false);
 
     _scaffoldKey.currentState.showSnackBar(
-        SnackBar(content: Text(resp.message)));
+        SnackBar(content: Text(resp.data.response)));
   }
 
   Future<void> successAlertDialog(BuildContext context ,String title) async{
@@ -321,7 +323,11 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
           ),
           onPressed: ()async {
             await alert.dismiss();
-            Navigator.pushReplacementNamed(context,LoginScreen.id);
+            SharedPreferences _preferences = await SharedPreferences.getInstance();
+            _preferences.setBool('verify', true);
+            Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+              return new FavoriteScreen();
+            }));
             // Navigator.pushReplacementNamed(context,LoginScreen.id);
 
           },
