@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/reset_model.dart';
@@ -38,7 +38,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                getTranslated(context, 'forget_password'),
+                getTranslated(context, 'forget_password')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -79,12 +79,14 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                     _email = value;
 
                   },
+                    mText: "",
+context: context,
                   ),
                 ),
                 SizedBox(height: 14.h,),
 
                 Center(
-                  child: Text(getTranslated(context, 'enter_email_address'),
+                  child: Text(getTranslated(context, 'enter_email_address')!,
                     textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Color(0xFF000000),
@@ -93,7 +95,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
                   ),),
                 ),
                 SizedBox(height: 25.h,),
-                confirmButton(getTranslated(context, 'confirm'),context)
+                confirmButton(getTranslated(context, 'confirm')!,context)
 
               ],
             ),
@@ -126,20 +128,20 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
     );
   }
   void validate(BuildContext context) async{
-    if(widget._globalKey.currentState.validate()) {
-      widget._globalKey.currentState.save();
+    if(widget._globalKey.currentState!.validate()) {
+      widget._globalKey.currentState!.save();
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
       PetMartService petMartService = PetMartService();
-      ResetModel resetModel = await petMartService.resetPassword(_email);
-      String mStatus = resetModel.status;
-      if(mStatus.trim() == 'success'){
+      ResetModel? resetModel = await petMartService.resetPassword(_email);
+      String? mStatus = resetModel!.status;
+      if(mStatus!.trim() == 'success'){
         modelHud.changeIsLoading(false);
         // _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(resetModel.message)));
-        successAlertDialog(context,resetModel.data.msg);
+        successAlertDialog(context,resetModel!.data!.msg!);
       }else{
         modelHud.changeIsLoading(false);
-        failAlertDialog(context,resetModel.data.msg);
+        failAlertDialog(context,resetModel!.data!.msg!);
 
               }
 
@@ -183,7 +185,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -237,7 +239,7 @@ class _ForgetPasswordScreenState extends State<ForgetPasswordScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

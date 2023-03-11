@@ -1,8 +1,8 @@
 class HomeModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   HomeModel({this.ok, this.error, this.status, this.data});
 
@@ -19,16 +19,16 @@ class HomeModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Banners> banners;
-  List<Categories> categories;
-  int totalNotifications;
+  List<Banners>? banners;
+  List<Categories>? categories;
+  int? totalNotifications;
 
   Data({this.banners, this.categories, this.totalNotifications});
 
@@ -36,13 +36,13 @@ class Data {
     if (json['banners'] != null) {
       banners = <Banners>[];
       json['banners'].forEach((v) {
-        banners.add(new Banners.fromJson(v));
+        banners!.add(new Banners.fromJson(v));
       });
     }
     if (json['categories'] != null) {
       categories = <Categories>[];
       json['categories'].forEach((v) {
-        categories.add(new Categories.fromJson(v));
+        categories!.add(new Categories.fromJson(v));
       });
     }
     totalNotifications = json['totalNotifications'];
@@ -51,10 +51,10 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.banners != null) {
-      data['banners'] = this.banners.map((v) => v.toJson()).toList();
+      data['banners'] = this.banners!.map((v) => v.toJson()).toList();
     }
     if (this.categories != null) {
-      data['categories'] = this.categories.map((v) => v.toJson()).toList();
+      data['categories'] = this.categories!.map((v) => v.toJson()).toList();
     }
     data['totalNotifications'] = this.totalNotifications;
     return data;
@@ -62,12 +62,12 @@ class Data {
 }
 
 class Banners {
-  String id;
-  String enTitle;
-  String arTitle;
-  String image;
-  String url;
-  String type;
+  String? id;
+  String? enTitle;
+  String? arTitle;
+  String? image;
+  String? url;
+  String? type;
 
   Banners(
       {this.id, this.enTitle, this.arTitle, this.image, this.url, this.type});
@@ -94,10 +94,10 @@ class Banners {
 }
 
 class Categories {
-  String id;
-  String enTitle;
-  String arTitle;
-  String logo;
+  String? id;
+  String? enTitle;
+  String? arTitle;
+  String? logo;
 
   Categories({this.id, this.enTitle, this.arTitle, this.logo});
 

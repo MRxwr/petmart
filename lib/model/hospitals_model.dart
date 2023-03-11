@@ -3,10 +3,10 @@
 /// data : [{"id":"1","name_english":"Test Hospital","name_arabic":"Test Hospital","most_view":"180","shared":"19","logo_image":"http://petmart.createkwservers.com/media/images/hospital/st_1.jpg"},{"id":"2","name_english":"Pet mart Test ","name_arabic":"بيت مارت تيست","most_view":"129","shared":"11","logo_image":"http://petmart.createkwservers.com/media/images/hospital/05.png"}]
 
 class HospitalsModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   HospitalsModel({this.ok, this.error, this.status, this.data});
 
@@ -23,14 +23,14 @@ class HospitalsModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Hospital> hospital;
+  List<Hospital>? hospital;
 
   Data({this.hospital});
 
@@ -38,7 +38,7 @@ class Data {
     if (json['hospital'] != null) {
       hospital = <Hospital>[];
       json['hospital'].forEach((v) {
-        hospital.add(new Hospital.fromJson(v));
+        hospital!.add(new Hospital.fromJson(v));
       });
     }
   }
@@ -46,22 +46,22 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.hospital != null) {
-      data['hospital'] = this.hospital.map((v) => v.toJson()).toList();
+      data['hospital'] = this.hospital!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Hospital {
-  String id;
-  String arTitle;
-  String enTitle;
-  String arDetails;
-  String enDetails;
-  String shares;
-  String views;
-  String mobile;
-  String logo;
+  String? id;
+  String? arTitle;
+  String? enTitle;
+  String? arDetails;
+  String? enDetails;
+  String? shares;
+  String? views;
+  String? mobile;
+  String? logo;
 
   Hospital(
       {this.id,

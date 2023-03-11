@@ -25,31 +25,33 @@ class MyAuctionScreen extends StatefulWidget {
 
 class _MyAuctionScreenState extends State<MyAuctionScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  List<TypeModel> typesList = List();
-  double itemWidth;
-  double itemHeight;
+  List<TypeModel> typesList = [];
+  double? itemWidth;
+  double? itemHeight;
   int selectedIndex =0;
   String mLanguage ="";
   String userId = "";
-  Model.MyAuctionsModel myAuctionsModel;
+  Model.MyAuctionsModel? myAuctionsModel;
   Future<Map> map() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
-    String loginData = _preferences.getString(kUserModel);
-    final body = json.decode(loginData);
+    String? loginData = _preferences.getString(kUserModel);
+    final body = json.decode(loginData!);
     LoginModel   loginModel = LoginModel.fromJson(body);
     Map map ;
     map = {"language":languageCode,
-      "userId":loginModel.data.id};
+      "userId":loginModel.data!.id};
     return map;
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
    getMyActions().then((value) {
      setState(() {
+       loginData = value;
 
      });
 
@@ -59,11 +61,12 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
   String languageCode="";
   int position=0;
 
-  String loginData = "";
+  String ?loginData ;
   List<AuctionType> auctionTypeList =[];
-  MyNewAuctionModel myNewAuctionModel = null;
+  MyNewAuctionModel? myNewAuctionModel ;
   String myAuctionErrorString ="";
-  Future<void> getMyActions() async{
+  Map<String, dynamic>? response;
+  Future<String> getMyActions() async{
     AuctionType  liveType = AuctionType("مباشر", "live", true);
     AuctionType  doneType = AuctionType("انتهي", "Done", false);
     AuctionType  cancleType = AuctionType("ملغي", "Cancel", false);
@@ -75,27 +78,31 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
 
     loginData = _preferences.getString(kUserModel)??null;
 
-      final body = json.decode(loginData);
+      final body = json.decode(loginData!);
       LoginModel   loginModel = LoginModel.fromJson(body);
-      userId = loginModel.data.id;
+      userId = loginModel.data!.id!;
       PetMartService petMartService = PetMartService();
-      Map<String, dynamic>   response  = await petMartService.myNewAuctions(userId);
-      bool isOk  = response['ok'];
+       response  = await petMartService.myNewAuctions(userId);
+      bool isOk  = response!['ok'];
       if(isOk){
         myAuctionErrorString = "";
         myNewAuctionModel = MyNewAuctionModel.fromJson(response);
-        myAuctionList = myNewAuctionModel.data.live;
-        if(myAuctionList == null){
+        if(response!['data'].containsKey('live')){
+          myAuctionList = myNewAuctionModel!.data.live;
+        }else{
           myAuctionList = [];
         }
+
+
       }else{
-        myAuctionErrorString = response['data']['msg'];
+        myAuctionErrorString = response!['data']['msg'];
       }
 
+      return loginData!;
 
 
   }
-  Future<Model.MyAuctionsModel> myAuctions(String type) async{
+  Future<Model.MyAuctionsModel?> myAuctions(String type) async{
     Map map;
     map = {
       "id":userId,
@@ -107,7 +114,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    Model.MyAuctionsModel auctionModel = await petMartService.myAuctions(map);
+    Model.MyAuctionsModel? auctionModel = await petMartService.myAuctions(map);
     return auctionModel;
   }
   Future<void> postList(String type) async{
@@ -141,7 +148,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'my_auction'),
+              getTranslated(context, 'my_auction')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -169,7 +176,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
       ),
       backgroundColor: Color(0xFFFFFFFF),
       body: Container(
- child: loginData == ""?
+ child: loginData == null?
       Container(
       child: CircularProgressIndicator(
 
@@ -215,17 +222,37 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
 
                         myAuctionList =[];
                         if(index==0){
-                          myAuctionList = myNewAuctionModel.data.live;
+                          if(response!['data']!.containsKey('live')){
+                            print(response!['live']);
+                            myAuctionList = myNewAuctionModel!.data.live;
+                          }else{
+                            myAuctionList = [];
+                          }
+
+
 
 
                         }else if(index == 1){
-                          myAuctionList = myNewAuctionModel.data.done;
+                          if(response!['data'].containsKey('done')){
+                            print(response!['done']);
+                            myAuctionList = myNewAuctionModel!.data.done;
+                          }else{
+                            myAuctionList = [];
+                          }
+
+
                         }else if(index == 2){
-                          myAuctionList = myNewAuctionModel.data.cancel;
+                          if(response!['data']!.containsKey('cancel')){
+                            print(response!['cancel']);
+                            myAuctionList = myNewAuctionModel!.data.done;
+                          }else{
+                            myAuctionList = [];
+                          }
+
                         }
-                        if(myAuctionList == null){
-                          myAuctionList = [];
-                        }
+                        // if(myAuctionList == null){
+                        //   myAuctionList = [];
+                        // }
                         position = index;
                         setState(() {
 
@@ -263,7 +290,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
             width: width,
             alignment: AlignmentDirectional.center,
             child: Text(
-              getTranslated(context, "no_available_auctions"),
+              getTranslated(context, "no_available_auctions")!,
               style: TextStyle(
                   color: Colors.black,
                   fontSize: screenUtil.setSp(16),
@@ -281,7 +308,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                  childAspectRatio:itemWidth/itemHeight),
+                  childAspectRatio:itemWidth!/itemHeight!),
               itemCount: myAuctionList.length,
 
               itemBuilder: (context,index){
@@ -300,7 +327,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
                           borderRadius: BorderRadius.circular(10.0.h),
                         ),
                         color: Color(0xFFFFFFFF),
-                        child: buildMyAuctionItem(myAuctionList[index],context)),
+                        child: buildMyAuctionItem(myAuctionList[index],context,position)),
                   ),
                 );
               },
@@ -315,7 +342,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
       ),
     );
   }
-  Widget buildMyAuctionItem(Live data, BuildContext context) {
+  Widget buildMyAuctionItem(Live data, BuildContext context,int position) {
     String timer ="";
     return Container(
       width: 150.w,
@@ -420,7 +447,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
 
 
 
-                          getTranslated(context, 'Done'),
+                          getTranslated(context, 'Done')!,
                           style: TextStyle(
 
                             color: Color(0xFF000000),
@@ -436,7 +463,7 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
                       child: Text(
 
 
-                          getTranslated(context, 'cancel'),
+                          getTranslated(context, 'cancel')!,
                           style: TextStyle(
 
                             color: Color(0xFF000000),
@@ -448,14 +475,14 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
                     ):
 
                     Countdown(
-                      seconds: getRemainingTime(data.endDate),
+                      seconds: getRemainingTime(data.endDate,data.date),
                       build: (BuildContext context, double time) => Container(
                         alignment: AlignmentDirectional.centerStart,
                         margin: EdgeInsetsDirectional.only(start: 4.w),
                         child: Text(
 
 
-                            time.toInt()<=0 ? getTranslated(context, 'complete_string') :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
+                            time.toInt()<=0 ? getTranslated(context, 'complete_string')! :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
                             style: TextStyle(
 
                               color: Color(0xFF000000),
@@ -467,6 +494,10 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
                       ),
                       interval: Duration(seconds: 1),
                       onFinished: () {
+                        myAuctionList.removeAt(position);
+                        setState(() {
+
+                        });
                         print('Timer is done!');
                       },
                     ),
@@ -597,9 +628,9 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
     );
 
   }
-  int  getRemainingTime(String date ){
+  int  getRemainingTime(String date,String startDate ){
     print("EndDate ---> ${date}");
-    var now = new DateTime.now();
+    var now =  DateTime.parse(startDate);
 
     print("Now ${now}");
     DateTime tempDate =  DateTime.parse(date);
@@ -619,14 +650,24 @@ class _MyAuctionScreenState extends State<MyAuctionScreen> {
     final List<String> tokens = [];
     if (days != 0) {
       tokens.add('${days}d');
+    }else{
+      tokens.add('00');
     }
     if (tokens.isNotEmpty || hours != 0){
       tokens.add('${hours}h');
+    }else{
+      tokens.add('00');
     }
     if (tokens.isNotEmpty || minutes != 0) {
       tokens.add('${minutes}m');
+    }else{
+      tokens.add('00');
     }
-    tokens.add('${seconds}s');
+    if (tokens.isNotEmpty || seconds != 0){
+      tokens.add('${seconds}s');
+    }else{
+      tokens.add('00');
+    }
 
     return tokens.join(':');
   }

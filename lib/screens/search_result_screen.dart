@@ -8,7 +8,7 @@ import 'package:pet_mart/utilities/constants.dart';
 class SearchResultScreen extends StatefulWidget {
   SearchModel searchModel;
   String mLanguage;
-  SearchResultScreen({Key key,@required this.searchModel,@required this.mLanguage}): super(key: key);
+  SearchResultScreen({Key? key,required this.searchModel,required this.mLanguage}): super(key: key);
 
   @override
   _SearchResultScreenState createState() => _SearchResultScreenState();
@@ -16,8 +16,8 @@ class SearchResultScreen extends StatefulWidget {
 
 class _SearchResultScreenState extends State<SearchResultScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  double itemWidth;
-  double itemHeight;
+  double? itemWidth;
+  double? itemHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'search_results'),
+              getTranslated(context, 'search_results')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -61,7 +61,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
       ),
       backgroundColor: Color(0xFFFFFFFF),
       body: Container(
-    child:    widget.searchModel.data.items.isEmpty?
+    child:    widget.searchModel.data!.items!.isEmpty?
     Container(
 
       alignment: AlignmentDirectional.center,
@@ -73,14 +73,14 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
       shrinkWrap: true,
       physics: const AlwaysScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-          childAspectRatio:itemWidth/itemHeight),
-      itemCount: widget.searchModel.data.items.length,
+          childAspectRatio:itemWidth!/itemHeight!),
+      itemCount: widget.searchModel.data!.items!.length,
 
       itemBuilder: (context,index){
         return GestureDetector(
           onTap: (){
             Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-              return new PetsDetailsScreen(postId:widget.searchModel.data.items[index].id,postName: widget.mLanguage == "en"?widget.searchModel.data.items[index].enTitle:widget.searchModel.data.items[index].arTitle,);
+              return new PetsDetailsScreen(postId:widget.searchModel.data!.items![index].id!,postName: widget.mLanguage == "en"?widget.searchModel.data!.items![index].enTitle!:widget.searchModel.data!.items![index].arTitle!,);
             }));
           },
           child: Container(
@@ -94,7 +94,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                     borderRadius: BorderRadius.circular(10.0.h),
                   ),
                   color: Color(0xFFFFFFFF),
-                  child: buildItem(widget.searchModel.data.items[index],context))),
+                  child: buildItem(widget.searchModel.data!.items![index],context))),
         );
       },
     ),
@@ -111,7 +111,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:KImageUrl+data.image,
+                  imageUrl:KImageUrl+data.image!,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -152,7 +152,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   start: 4.w,
                   child:
                   Text(
-                    data.date.split(" ").first,
+                    data.date!.split(" ").first,
                     style: TextStyle(
                         color: Color(0xFFFFFFFF)
 
@@ -171,7 +171,7 @@ class _SearchResultScreenState extends State<SearchResultScreen> {
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
                     widget.mLanguage == "en"?
-                    data.enTitle:data.arTitle,
+                    data.enTitle!:data.arTitle!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,

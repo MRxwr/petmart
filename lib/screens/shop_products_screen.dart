@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ShopProductsScreen extends StatefulWidget {
   String id;
   String name;
-  ShopProductsScreen({Key key,@required this.id,@required this.name}): super(key: key);
+  ShopProductsScreen({Key? key,required this.id,required this.name}): super(key: key);
 
   @override
   _ShopProductsScreenState createState() => _ShopProductsScreenState();

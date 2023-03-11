@@ -2,18 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:photo_view/photo_view.dart';
 class PhotoScreen extends StatefulWidget {
-  String imageUrl;
+
    PhotoScreen({
-     this.imageProvider,
-    this.backgroundDecoration,
-    this.minScale,
-    this.maxScale,
+    required this.imageProvider,
+
   });
 
   final ImageProvider imageProvider;
-  final BoxDecoration backgroundDecoration;
-  final dynamic minScale;
-  final dynamic maxScale;
+
 
 
   @override
@@ -65,8 +61,11 @@ class _PhotoScreenState extends State<PhotoScreen> {
                 child: PhotoView(
 
                   imageProvider: widget.imageProvider,
+                  backgroundDecoration: BoxDecoration(
+                    color: Colors.white
+                  ),
 
-                  backgroundDecoration: widget.backgroundDecoration,
+
                   minScale: 0.3,
 
 

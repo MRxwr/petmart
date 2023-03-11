@@ -5,14 +5,14 @@
 
 class ServicesModel {
   ServicesModel({
-      bool ok, 
-      String error, 
-      String status, 
-      Data data,}){
-    _ok = ok;
-    _error = error;
-    _status = status;
-    _data = data;
+      bool? ok,
+      String? error,
+      String? status,
+      Data? data,}){
+    _ok = ok!;
+    _error = error!;
+    _status = status!;
+    _data = data!;
 }
 
   ServicesModel.fromJson(dynamic json) {
@@ -21,23 +21,23 @@ class ServicesModel {
     _status = json['status'];
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
-  bool _ok;
-  String _error;
-  String _status;
-  Data _data;
-ServicesModel copyWith({  bool ok,
-  String error,
-  String status,
-  Data data,
+  bool? _ok;
+  String? _error;
+  String? _status;
+  Data? _data;
+ServicesModel copyWith({  bool? ok,
+  String? error,
+  String? status,
+  Data? data,
 }) => ServicesModel(  ok: ok ?? _ok,
   error: error ?? _error,
   status: status ?? _status,
   data: data ?? _data,
 );
-  bool get ok => _ok;
-  String get error => _error;
-  String get status => _status;
-  Data get data => _data;
+  bool get ok => _ok!;
+  String get error => _error!;
+  String get status => _status!;
+  Data get data => _data!;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -45,7 +45,7 @@ ServicesModel copyWith({  bool ok,
     map['error'] = _error;
     map['status'] = _status;
     if (_data != null) {
-      map['data'] = _data.toJson();
+      map['data'] = _data!.toJson();
     }
     return map;
   }
@@ -56,28 +56,30 @@ ServicesModel copyWith({  bool ok,
 
 class Data {
   Data({
-      List<Services> services,}){
-    _services = services;
+      List<Services>? services,}){
+    _services = services!;
 }
 
   Data.fromJson(dynamic json) {
     if (json['services'] != null) {
       _services = [];
       json['services'].forEach((v) {
-        _services.add(Services.fromJson(v));
+        _services!.add(Services.fromJson(v));
       });
+    }else{
+      _services = [];
     }
   }
-  List<Services> _services;
-Data copyWith({  List<Services> services,
+  List<Services>? _services;
+Data copyWith({  List<Services>? services,
 }) => Data(  services: services ?? _services,
 );
-  List<Services> get services => _services;
+  List<Services> get services => _services!;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     if (_services != null) {
-      map['services'] = _services.map((v) => v.toJson()).toList();
+      map['services'] = _services!.map((v) => v.toJson()).toList();
     }
     return map;
   }
@@ -96,24 +98,24 @@ Data copyWith({  List<Services> services,
 
 class Services {
   Services({
-      String id, 
-      String arTitle, 
-      String enTitle, 
-      String arDetails, 
-      String enDetails, 
-      String shares, 
-      String views, 
-      String mobile, 
-      String logo,}){
-    _id = id;
-    _arTitle = arTitle;
-    _enTitle = enTitle;
-    _arDetails = arDetails;
-    _enDetails = enDetails;
-    _shares = shares;
-    _views = views;
-    _mobile = mobile;
-    _logo = logo;
+    String? id,
+    String? arTitle,
+    String? enTitle,
+    String? arDetails,
+    String? enDetails,
+    String? shares,
+    String? views,
+    String? mobile,
+    String? logo,}){
+    _id = id!;
+    _arTitle = arTitle!;
+    _enTitle = enTitle!;
+    _arDetails = arDetails!;
+    _enDetails = enDetails!;
+    _shares = shares!;
+    _views = views!;
+    _mobile = mobile!;
+    _logo = logo!;
 }
 
   Services.fromJson(dynamic json) {
@@ -127,24 +129,24 @@ class Services {
     _mobile = json['mobile'];
     _logo = json['logo'];
   }
-  String _id;
-  String _arTitle;
-  String _enTitle;
-  String _arDetails;
-  String _enDetails;
-  String _shares;
-  String _views;
-  String _mobile;
-  String _logo;
-Services copyWith({  String id,
-  String arTitle,
-  String enTitle,
-  String arDetails,
-  String enDetails,
-  String shares,
-  String views,
-  String mobile,
-  String logo,
+  String? _id;
+  String? _arTitle;
+  String? _enTitle;
+  String? _arDetails;
+  String? _enDetails;
+  String? _shares;
+  String? _views;
+  String? _mobile;
+  String? _logo;
+Services copyWith({  String? id,
+  String? arTitle,
+  String? enTitle,
+  String? arDetails,
+  String? enDetails,
+  String? shares,
+  String? views,
+  String? mobile,
+  String? logo,
 }) => Services(  id: id ?? _id,
   arTitle: arTitle ?? _arTitle,
   enTitle: enTitle ?? _enTitle,
@@ -155,15 +157,15 @@ Services copyWith({  String id,
   mobile: mobile ?? _mobile,
   logo: logo ?? _logo,
 );
-  String get id => _id;
-  String get arTitle => _arTitle;
-  String get enTitle => _enTitle;
-  String get arDetails => _arDetails;
-  String get enDetails => _enDetails;
-  String get shares => _shares;
-  String get views => _views;
-  String get mobile => _mobile;
-  String get logo => _logo;
+  String get id => _id!;
+  String get arTitle => _arTitle!;
+  String get enTitle => _enTitle!;
+  String get arDetails => _arDetails!;
+  String get enDetails => _enDetails!;
+  String get shares => _shares!;
+  String get views => _views!;
+  String get mobile => _mobile!;
+  String get logo => _logo!;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

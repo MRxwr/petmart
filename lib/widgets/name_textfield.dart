@@ -10,13 +10,14 @@ import 'package:pet_mart/utilities/constants.dart';
 
 
 class NameTextField extends StatelessWidget {
-  final String hint;
-  final IconData icon;
-  final Function onClick;
-  final String mText;
-  BuildContext context;
+  final String? hint;
 
-  String _errorMessage(String str){
+   Function? onClick;
+   String? mText;
+  final BuildContext context;
+
+
+  String? _errorMessage(String str){
     switch(str){
       case 'Full Name':
 
@@ -25,14 +26,14 @@ class NameTextField extends StatelessWidget {
     }
   }
 
-   NameTextField({Key key, @required this.hint,@required this.icon,@required this.onClick, this.mText}) : super(key: key);
+    NameTextField({Key? key, required this.hint, this.onClick, this.mText,required this.context}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
+
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
-    TextEditingController myController = TextEditingController()..text = mText;
+    TextEditingController myController = TextEditingController()..text = mText!;
 
     return Container(
 
@@ -56,7 +57,11 @@ class NameTextField extends StatelessWidget {
               textAlign: TextAlign.left,
                 textCapitalization: TextCapitalization.words,
                 keyboardType: TextInputType.emailAddress ,
-                onSaved: onClick,
+                 onSaved: (value){
+                onClick!(value);
+
+
+                 },
                 textInputAction: TextInputAction.next,
                 maxLines: 1,
                 minLines: 1,
@@ -135,8 +140,8 @@ class NameTextField extends StatelessWidget {
     );
 
   }
-  String validateName(String value) {
-    bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value);
+  String? validateName(String? value) {
+    bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!);
 
     if (!emailValid) {
       return getTranslated(context, 'email_error');

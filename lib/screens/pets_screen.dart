@@ -19,27 +19,27 @@ class PetsScreen extends StatefulWidget {
   int selectCategory;
   String categryName;
 
-   PetsScreen({Key key,@required this.childcategory,@required this.categoryModel,@required this.parentCategoryId,@required this.selectCategory,@required this.categryName}) : super(key: key);
+   PetsScreen({Key? key,required this.childcategory,required this.categoryModel,required this.parentCategoryId,required this.selectCategory,required this.categryName}) : super(key: key);
 
   @override
   _PetsScreenState createState() => _PetsScreenState();
 }
 
 class _PetsScreenState extends State<PetsScreen> {
-  List<Categories> categoryList= List();
-  List<bool> selectedList = List();
+  List<Categories> categoryList= [];
+  List<bool> selectedList = [];
   ScreenUtil screenUtil = ScreenUtil();
-  Model.PetsModel petsModel;
+  Model.PetsModel? petsModel;
   String catId ="";
-  double itemWidth;
-  double itemHeight;
+  double? itemWidth;
+  double? itemHeight;
   String mLanguage ="";
-  Future<Model.PetsModel> pets() async{
+  Future<Model.PetsModel?> pets() async{
 
     for(int i =0;i<categoryList.length;i++){
       if(i == widget.selectCategory){
 
-        catId =categoryList[i].id;
+        catId =categoryList[i].id!;
       }
     }
     SharedPreferences _preferences = await SharedPreferences.getInstance();
@@ -57,14 +57,14 @@ class _PetsScreenState extends State<PetsScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    Model.PetsModel petsModel = await petMartService.pets(catId,widget.parentCategoryId);
+    Model.PetsModel? petsModel = await petMartService.pets(catId,widget.parentCategoryId);
     return petsModel;
   }
   Future<void> petsList() async{
     petsModel = null;
     for(int i =0;i<selectedList.length;i++){
       if(selectedList[i]){
-        catId = categoryList[i].id;
+        catId = categoryList[i].id!;
 
 
       }
@@ -97,8 +97,8 @@ class _PetsScreenState extends State<PetsScreen> {
     Categories cat = Categories(id:catId,arTitle:"الكل",enTitle:"ALL",image:"");
 
     categoryList.add(cat);
-    for(int i =0;i<widget.categoryModel.data.categories.length;i++){
-      categoryList.add(widget.categoryModel.data.categories[i]);
+    for(int i =0;i<widget.categoryModel.data!.categories!.length;i++){
+      categoryList.add(widget.categoryModel.data!.categories![i]);
 
 
     }
@@ -106,7 +106,7 @@ class _PetsScreenState extends State<PetsScreen> {
     for(int i =0;i<categoryList.length;i++){
       if(i == widget.selectCategory){
         selectedList.add(true);
-         catId =categoryList[i].id;
+         catId =categoryList[i].id!;
       }else{
         selectedList.add(false);
       }
@@ -191,7 +191,7 @@ class _PetsScreenState extends State<PetsScreen> {
 
                           for(int i =0;i<selectedList.length;i++){
                             if(i == index){
-                              catId = categoryList[i].id;
+                              catId = categoryList[i].id!;
                               selectedList[i]= true;
 
                             }else{
@@ -232,11 +232,11 @@ class _PetsScreenState extends State<PetsScreen> {
     ),
     alignment: AlignmentDirectional.center,
     ):
-    petsModel.data.items.isEmpty?
+    petsModel!.data!.items!.isEmpty?
 
     Container(
     child: Text(
-   getTranslated(context, "no_products"),
+   getTranslated(context, "no_products")!,
     style: TextStyle(
     color: Colors.black,
     fontSize: screenUtil.setSp(16),
@@ -254,16 +254,16 @@ class _PetsScreenState extends State<PetsScreen> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                  childAspectRatio:itemWidth/itemHeight),
-              itemCount: petsModel.data.items.length,
+                  childAspectRatio:itemWidth!/itemHeight!),
+              itemCount: petsModel!.data!.items!.length,
 
               itemBuilder: (context,index){
               print(index);
                 return GestureDetector(
                   onTap: (){
                     Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                      return new PetsDetailsScreen(postId:petsModel.data.items[index].id,postName: mLanguage == "en"?petsModel.data.items[index].enTitle:
-                      petsModel.data.items[index].arTitle);
+                      return new PetsDetailsScreen(postId:petsModel!.data!.items![index].id!,postName: mLanguage == "en"?petsModel!.data!.items![index].enTitle!:
+                      petsModel!.data!.items![index].arTitle!);
                     }));
                   },
                   child: Container(
@@ -277,7 +277,7 @@ class _PetsScreenState extends State<PetsScreen> {
                             borderRadius: BorderRadius.circular(10.0.h),
                           ),
                           color: Color(0xFFFFFFFF),
-                          child: buildItem(petsModel.data.items[index],context))),
+                          child: buildItem(petsModel!.data!.items![index],context))),
                 );
               },
             ),
@@ -296,7 +296,7 @@ class _PetsScreenState extends State<PetsScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:KImageUrl+data.image,
+                  imageUrl:KImageUrl+data.image!,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -337,7 +337,7 @@ class _PetsScreenState extends State<PetsScreen> {
                   start: 4.w,
                   child:
                   Text(
-                    data.date,
+                    data.date!,
                     style: TextStyle(
                         color: Color(0xFFFFFFFF)
 
@@ -356,7 +356,7 @@ class _PetsScreenState extends State<PetsScreen> {
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
                     mLanguage == "en"?
-                    data.enTitle:data.arTitle,
+                    data.enTitle!:data.arTitle!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -406,7 +406,7 @@ class _PetsScreenState extends State<PetsScreen> {
           ),
           child: Text(
             mLanguage == "en"?
-            category.enTitle:category.arTitle,
+            category.enTitle!:category.arTitle!,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -427,7 +427,7 @@ class _PetsScreenState extends State<PetsScreen> {
           ),
           child: Text(
             mLanguage == "en"?
-            category.enTitle:category.arTitle,
+            category.enTitle!:category.arTitle!,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),

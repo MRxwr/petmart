@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,8 +8,10 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -27,7 +30,8 @@ import 'package:pet_mart/screens/youtube_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,7 +42,7 @@ class PostDetailsScreen extends StatefulWidget {
   String  postId;
   String postName;
 
-  PostDetailsScreen({Key key,@required this.postId,@required this.postName}) : super(key: key);
+  PostDetailsScreen({Key? key,required this.postId,required this.postName}) : super(key: key);
   @override
   _PostDetailsScreenState createState() => _PostDetailsScreenState();
 }
@@ -46,8 +50,8 @@ class PostDetailsScreen extends StatefulWidget {
 class _PostDetailsScreenState extends State<PostDetailsScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   var imageProvider = null;
-  double itemWidth;
-  double itemHeight;
+  double? itemWidth;
+  double? itemHeight;
   String noOfViews ="";
   String noOfShares = "";
   String mLanguage ="";
@@ -76,7 +80,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       ),),
     );
   }
-  PostDetailsModel postDetailsModel;
+  PostDetailsModel? postDetailsModel;
   TextButton callButton(String text,BuildContext context,String phone) {
 
     final ButtonStyle flatButtonStyle = TextButton.styleFrom(
@@ -111,12 +115,12 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
   }
 
   final CarouselController _controller = CarouselController();
-  Future<PostDetailsModel> pets() async{
+  Future<PostDetailsModel?> pets() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
     Map map;
     if(loginData == null) {
       map = {
@@ -130,7 +134,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       LoginModel   loginModel = LoginModel.fromJson(body);
       map = {
         'post_id': widget.postId,
-        'user_id': loginModel.data.id,
+        'user_id': loginModel.data!.id,
 
         'language': languageCode
       };
@@ -138,7 +142,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    PostDetailsModel petsModel = await petMartService.petDetails(widget.postId);
+    PostDetailsModel? petsModel = await petMartService.petDetails(widget.postId);
 
     return petsModel;
   }
@@ -147,35 +151,75 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     modelHud.changeIsLoading(true);
 
     List<String> imagePaths = [];
+    List<String> fileNames = [];
+    String imageUrl =KImageUrl+ postDetailsModel!.data!.items![0].image![0];
+
+    var response = await http.get(Uri.parse(imageUrl));
+    Uint8List imageBytes =  response.bodyBytes;
+    final tempDir = await getTemporaryDirectory();
+    String path = '${tempDir.path}/${postDetailsModel!.data!.items![0].image![0]}.png';
+    File file = await File('${tempDir.path}/${postDetailsModel!.data!.items![0].image![0]}.png').create();
+    file.writeAsBytesSync(imageBytes);
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    String loginData = _preferences.getString(kUserModel);
+
+    mLanguage = languageCode;
+    String loginData = _preferences.getString(kUserModel)??"";
     Map map;
 
     final body = json.decode(loginData);
     LoginModel   loginModel = LoginModel.fromJson(body);
     map = {
       'post_id': widget.postId,
-      'user_id': loginModel.data.id
+      'user_id': loginModel.data!.id
     };
 
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    ShareModel petsModel = await petMartService.sharePet("share","item",widget.postId);
+
+    ShareModel? petsModel = await petMartService.sharePet("share","item",widget.postId);
     modelHud.changeIsLoading(false);
-    String title="";
-    title = languageCode == "en"?postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle;
-    String description="";
-    description = languageCode== "en"?postDetailsModel.data.items[0].enDetails:postDetailsModel.data.items[0].arDetails;
+    String? title;
+    title = languageCode == "en"?postDetailsModel!.data!.items![0].enTitle:postDetailsModel!.data!.items![0].arTitle;
+    String? description;
+    description = languageCode== "en"?postDetailsModel!.data!.items![0].enDetails:postDetailsModel!.data!.items![0].arDetails;
     //
+    // if(Platform.isIOS){
+    //   Share.share('${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
+    //
+    // }else{
+    //   Share.share('${title}' '\n ${description}' '\nhttps://onelink.to/3eq98v');
+    //
+    // }
+    final box = context.findRenderObject() as RenderBox?;
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    ShareResult shareResult;
+    imagePaths.add(path!);
+    var filename = path.split("/").last;
+    fileNames.add(filename);
+    String subject = "";
     if(Platform.isIOS){
-      Share.share('${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
-
+      subject = '${title}\n ${description} \n https://onelink.to/3eq98v';
     }else{
-      Share.share('${title}' '\n ${description}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
-
+      subject = '${title}\n ${description} \nhttps://onelink.to/3eq98v';
     }
+
+    if (imagePaths.isNotEmpty) {
+      final files = <XFile>[];
+      for (var i = 0; i < imagePaths.length; i++) {
+        files.add(XFile(imagePaths[i], name: fileNames[i]));
+      }
+      shareResult = await Share.shareXFiles(files,
+          text: subject,
+          subject: subject,
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    } else {
+      shareResult = await Share.shareWithResult(subject!,
+          subject: subject,
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+    }
+
     setState(() {
       noOfShares = "${int.parse(noOfShares)+1}";
 
@@ -186,14 +230,14 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
     Map map;
     if(loginData != null) {
       final body = json.decode(loginData);
       LoginModel loginModel = LoginModel.fromJson(body);
       map = {
         'post_id': widget.postId,
-        'user_id': loginModel.data.id,
+        'user_id': loginModel.data!.id,
 
         'language': languageCode
       };
@@ -201,7 +245,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       print('map --> ${map}');
 
       PetMartService petMartService = PetMartService();
-      ShareModel petsModel = await petMartService.sharePet("view","item",widget.postId);
+      ShareModel? petsModel = await petMartService.sharePet("view","item",widget.postId);
       setState(() {
         noOfViews = "${int.parse(noOfViews)+1}";
 
@@ -216,8 +260,8 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     pets().then((value) {
       setState(() {
         postDetailsModel = value;
-        noOfViews = value.data.items[0].views;
-        noOfShares = value.data.items[0].shares;
+        noOfViews = value!.data!.items![0].views!;
+        noOfShares = value!.data!.items![0].shares!;
       });
 
     }).whenComplete(() {
@@ -311,7 +355,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                             });
                           }
                       ),
-                      items: postDetailsModel.data.items[0].image.map((item) =>
+                      items: postDetailsModel!.data!.items![0].image!.map((item) =>
                           Stack(
 
                             children: [
@@ -404,11 +448,11 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                       start: 0,
                       end:0,
                       child: Opacity(
-                        opacity: postDetailsModel.data.items[0].image.length>1?1.0:0.0,
+                        opacity: postDetailsModel!.data!.items![0].image!.length>1?1.0:0.0,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: postDetailsModel.data.items[0].image.map((item) {
-                            int index =postDetailsModel.data.items[0].image.indexOf(item);
+                          children: postDetailsModel!.data!.items![0].image!.map((item) {
+                            int index =postDetailsModel!.data!.items![0].image!.indexOf(item);
                             return Container(
                               width: 8.0.w,
                               height: 8.0.h,
@@ -445,7 +489,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                       children: [
                         Text(
                           mLanguage =="en"?
-                          postDetailsModel.data.items[0].enTitle:postDetailsModel.data.items[0].arTitle,
+                          postDetailsModel!.data!.items![0].enTitle!:postDetailsModel!.data!.items![0].arTitle!,
                           style: TextStyle(
                               color: Color(0xFF000000),
                               fontSize: screenUtil.setSp(14),
@@ -455,12 +499,12 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                         ),
                         GestureDetector(
                           onTap: (){
-                            String vedioUrl= postDetailsModel.data.items[0].video;
+                            String vedioUrl= postDetailsModel!.data!.items![0].video!;
                             String title = "";
                             if(mLanguage == "en"){
-                              title = postDetailsModel.data.items[0].enTitle;
+                              title = postDetailsModel!.data!.items![0].enTitle!;
                             }else{
-                              title = postDetailsModel.data.items[0].arTitle;
+                              title = postDetailsModel!.data!.items![0].arTitle!;
                             }
                             if(vedioUrl.trim()!=""){
                               if(vedioUrl.contains("youtu")){
@@ -478,7 +522,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                           },
                           child: Image.asset('assets/images/play-button.png',
                             height: 30.w,width: 30.w,fit: BoxFit.fill,
-                            color:postDetailsModel.data.items[0].video== ""?Color(0xFFAAAAAA):kMainColor ,
+                            color:postDetailsModel!.data!.items![0].video== ""?Color(0xFFAAAAAA):kMainColor ,
                           ),
                         )
                       ],
@@ -496,7 +540,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${postDetailsModel.data.items[0].price}',
+                          '${postDetailsModel!.data!.items![0].price}',
                           style: TextStyle(
                               color: kMainColor,
                               fontSize: screenUtil.setSp(14),
@@ -504,7 +548,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
                           ),
                         ),
-                        previewButton(getTranslated(context, 'contact_name'), context,postDetailsModel.data.items[0].customer)
+                        previewButton(getTranslated(context, 'contact_name')!, context,postDetailsModel!.data!.items![0].customer!)
                       ],
                     ),
                   ],
@@ -568,7 +612,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     GestureDetector(
                       onTap: ()async{
 
-                        _openUrl(url(postDetailsModel.data.items[0].mobile, ""));
+                        _openUrl(url(postDetailsModel!.data!.items![0].mobile!, ""));
 
                       },
                       child: Column(
@@ -606,7 +650,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${getTranslated(context, 'gender')}${postDetailsModel.data.items[0].gender}  " ,
+                      "${getTranslated(context, 'gender')}${postDetailsModel!.data!.items![0].gender}  " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -615,7 +659,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                       ),
                     ),
                     Text(
-                      "${getTranslated(context, 'age')} ${postDetailsModel.data.items[0].age} ${mLanguage == "en"?postDetailsModel.data.items[0].ageType:postDetailsModel.data.items[0].ageTypeAr}   " ,
+                      "${getTranslated(context, 'age')} ${postDetailsModel!.data!.items![0].age} ${mLanguage == "en"?postDetailsModel!.data!.items![0].ageType:postDetailsModel!.data!.items![0].ageTypeAr}   " ,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -635,7 +679,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
                   mLanguage == "en"?
-                  "${postDetailsModel.data.items[0].enDetails}  ":"${postDetailsModel.data.items[0].arDetails}  " ,
+                  "${postDetailsModel!.data!.items![0].enDetails}  ":"${postDetailsModel!.data!.items![0].arDetails}  " ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -652,7 +696,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
               Container(
                 margin: EdgeInsets.all(10.w),
                 child:  Text(
-                  getTranslated(context, 'similar_ads') ,
+                  getTranslated(context, 'similar_ads')! ,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -839,7 +883,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                     Align(
                       alignment: AlignmentDirectional.topStart,
                       child: Text(
-                        getTranslated(context, 'contact_for_sell'),
+                        getTranslated(context, 'contact_for_sell')!,
                         textAlign: TextAlign.start,
                         style: TextStyle(
                             color: Color(0xFF000000),
@@ -855,7 +899,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                         CachedNetworkImage(
                           width: 80.w,
                           height: 80.h,
-                          imageUrl:KImageUrl+customer.logo,
+                          imageUrl:KImageUrl+customer.logo!,
                           imageBuilder: (context, imageProvider) => Stack(
                             children: [
                               ClipRRect(
@@ -922,7 +966,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                             Align(
                               alignment: AlignmentDirectional.topStart,
                               child: Text(
-                                customer.phone,
+                                customer.phone!,
                                 textAlign: TextAlign.start,
                                 style: TextStyle(
                                     color: Color(0xFF000000),
@@ -934,7 +978,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
                             ),
                           ],
                         ),
-                        callButton(getTranslated(context, 'call_now'), context, customer.phone.replaceAll('+', ''))
+                        callButton(getTranslated(context, 'call_now')!, context, customer.phone!.replaceAll('+', ''))
                       ],
                     )
                   ],
@@ -965,7 +1009,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       showDialog(customer);
 
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login')!);
     }
 
   }
@@ -976,7 +1020,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       ShareDialog(context);
 
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login')!);
     }
 
 
@@ -988,10 +1032,10 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
     if(isLoggedIn){
       SharedPreferences _preferences = await SharedPreferences.getInstance();
       String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-      String loginData = _preferences.getString(kUserModel);
+      String? loginData = _preferences.getString(kUserModel);
       Map map;
 
-      final body = json.decode(loginData);
+      final body = json.decode(loginData!);
       LoginModel   loginModel = LoginModel.fromJson(body);
       // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
       //   return new MessageScreen(contactName:postDetailsModel.data.contactDetail.customerName,
@@ -1002,7 +1046,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
       // }));
 
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login')!);
     }
 
   }
@@ -1042,7 +1086,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1056,7 +1100,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1109,7 +1153,7 @@ class _PostDetailsScreenState extends State<PostDetailsScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'reg_now'),
+            getTranslated(context, 'reg_now')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

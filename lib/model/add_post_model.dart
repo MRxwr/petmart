@@ -3,18 +3,18 @@
 /// data : [{"post_id":"124","post_name":"test","post_date":"28 May at 3:52 AM","post_image":"http://petmart.createkwservers.com/media/images/no-image.jpg","post_price":"200 KWD","category":"Bird","sub_category":"Talking bird ","post_description":"test","status":"disable","post_type":"sell","image_count":0}]
 
 class AddPostModel {
-  String _status;
-  String _message;
-  List<Data> _data;
+  String? _status;
+  String? _message;
+  List<Data>? _data;
 
-  String get status => _status;
-  String get message => _message;
-  List<Data> get data => _data;
+  String get status => _status!;
+  String get message => _message!;
+  List<Data> get data => _data!;
 
   AddPostModel({
-      String status, 
-      String message, 
-      List<Data> data}){
+      String? status,
+      String? message,
+      List<Data>? data}){
     _status = status;
     _message = message;
     _data = data;
@@ -26,7 +26,7 @@ class AddPostModel {
     if (json["data"] != null) {
       _data = [];
       json["data"].forEach((v) {
-        _data.add(Data.fromJson(v));
+        _data!.add(Data.fromJson(v));
       });
     }
   }
@@ -36,7 +36,7 @@ class AddPostModel {
     map["status"] = _status;
     map["message"] = _message;
     if (_data != null) {
-      map["data"] = _data.map((v) => v.toJson()).toList();
+      map["data"] = _data!.map((v) => v.toJson()).toList();
     }
     return map;
   }
@@ -56,42 +56,42 @@ class AddPostModel {
 /// image_count : 0
 
 class Data {
-  String _postId;
-  String _postName;
-  String _postDate;
-  String _postImage;
-  String _postPrice;
-  String _category;
-  String _subCategory;
-  String _postDescription;
-  String _status;
-  String _postType;
-  int _imageCount;
+  String? _postId;
+  String? _postName;
+  String? _postDate;
+  String? _postImage;
+  String? _postPrice;
+  String? _category;
+  String? _subCategory;
+  String? _postDescription;
+  String? _status;
+  String? _postType;
+  int? _imageCount;
 
-  String get postId => _postId;
-  String get postName => _postName;
-  String get postDate => _postDate;
-  String get postImage => _postImage;
-  String get postPrice => _postPrice;
-  String get category => _category;
-  String get subCategory => _subCategory;
-  String get postDescription => _postDescription;
-  String get status => _status;
-  String get postType => _postType;
-  int get imageCount => _imageCount;
+  String get postId => _postId!;
+  String get postName => _postName!;
+  String get postDate => _postDate!;
+  String get postImage => _postImage!;
+  String get postPrice => _postPrice!;
+  String get category => _category!;
+  String get subCategory => _subCategory!;
+  String get postDescription => _postDescription!;
+  String get status => _status!;
+  String get postType => _postType!;
+  int get imageCount => _imageCount!;
 
   Data({
-      String postId, 
-      String postName, 
-      String postDate, 
-      String postImage, 
-      String postPrice, 
-      String category, 
-      String subCategory, 
-      String postDescription, 
-      String status, 
-      String postType, 
-      int imageCount}){
+      String? postId,
+      String? postName,
+      String? postDate,
+      String? postImage,
+      String? postPrice,
+      String? category,
+      String? subCategory,
+      String? postDescription,
+      String? status,
+      String? postType,
+      int? imageCount}){
     _postId = postId;
     _postName = postName;
     _postDate = postDate;

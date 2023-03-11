@@ -4,8 +4,9 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/error_model.dart';
@@ -44,7 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String confirmPassword ='';
   String mobileNumber ='';
   String _platformImei = 'Unknown';
-  String uniqueId = "Unknown";
+  String? uniqueId ;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   void initState() {
@@ -71,7 +72,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 10.h),
                 child: Text(
-                  getTranslated(context, 'register'),
+                  getTranslated(context, 'register')!,
                   style: TextStyle(
                       color: Color(0xFFFFFFFF),
                       fontSize: screenUtil.setSp(16),
@@ -106,64 +107,75 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   Directionality(
                     textDirection: TextDirection.ltr,
-                    child: UserNameTextField(hint:getTranslated(context, 'first_name'),onClick: (value){
+                    child: UserNameTextField(hint:getTranslated(context, 'first_name')!,onClick: (value){
                       firstName = value;
 
-                    },
+                    },mText: "",
+                      context: context,
                     ),
                   ),
                   SizedBox(height: 10.h,),
                   Directionality(
                     textDirection: TextDirection.ltr,
-                    child: UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
+                    child: UserNameTextField(hint:getTranslated(context, 'last_name')!,onClick: (value){
                       lastName = value;
 
                     },
+                      mText: "",
+                      context: context,
                     ),
                   ),
                   SizedBox(height: 10.h,),
                   Directionality(
                     textDirection: TextDirection.ltr,
-                    child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
+                    child: NameTextField(hint:getTranslated(context, 'email_address')!,onClick: (value){
                       email = value;
 
                     },
+                      mText: "",
+                      context: context,
                     ),
                   ),
                   SizedBox(height: 10.h,),
                   Directionality(
                     textDirection: TextDirection.ltr,
-                    child: PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
+                    child: PasswordTextField(hint:getTranslated(context, 'password')!,onClick: (value){
                       password= value;
 
-                    },
+                    }
+                      ,mText: "",
+                      context: context,
                     ),
                   ),
                   SizedBox(height: 10.h,),
                   Directionality(
                     textDirection: TextDirection.ltr,
-                    child: PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
+                    child: PasswordTextField(hint:getTranslated(context, 'confirm_password')!,onClick: (value){
                       confirmPassword = value;
 
                     },
+                      mText: "",
+                      context: context,
                     ),
                   ),
                   SizedBox(height: 10.h,),
                   Directionality(
                     textDirection: TextDirection.ltr,
-                    child: PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
+                    child: PhoneTextField(hint:getTranslated(context, 'mobile')!,onClick: (value){
                       mobileNumber = value;
 
-                    },
+                    }
+                      ,mText: "",
+                      context: context,
                     ),
                   ),
                   SizedBox(height: 10.h,),
-                  Center(child: confirmButton(getTranslated(context, 'create_account'),context)),
+                  Center(child: confirmButton(getTranslated(context, 'create_account')!,context)),
                   SizedBox(height: 10.h,),
 
                   Center(
                     child:
-                    Text(getTranslated(context, 'register_info'),
+                    Text(getTranslated(context, 'register_info')!,
                       textAlign: TextAlign.center,
                       maxLines: 1,
 
@@ -178,7 +190,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(getTranslated(context, 'agree_with'),
+                        Text(getTranslated(context, 'agree_with')!,
                           textAlign: TextAlign.center,
                           maxLines: 1,
 
@@ -191,7 +203,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onTap: (){
                             Navigator.of(context).pushNamed(TermsScreen.id);
                           },
-                          child: Text(getTranslated(context, 'terms_conditions'),
+                          child: Text(getTranslated(context, 'terms_conditions')!,
                             textAlign: TextAlign.center,
                             maxLines: 1,
 
@@ -211,7 +223,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(getTranslated(context, 'already_register'),
+                        Text(getTranslated(context, 'already_register')!,
                           textAlign: TextAlign.center,
                           maxLines: 1,
 
@@ -224,7 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           onTap: (){
                             Navigator.of(context).pushReplacementNamed(LoginScreen.id);
                           },
-                          child: Text(getTranslated(context, 'login_now'),
+                          child: Text(getTranslated(context, 'login_now')!,
                             textAlign: TextAlign.center,
                             maxLines: 1,
 
@@ -273,8 +285,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void validate(BuildContext context)  async{
     print('confirmPassword  ${confirmPassword}');
     print('Password  ${password}');
-    if(widget._globalKey.currentState.validate()) {
-      widget._globalKey.currentState.save();
+    if(widget._globalKey.currentState!.validate()) {
+      widget._globalKey.currentState!.save();
       if (confirmPassword == password) {
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
@@ -303,6 +315,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         map['confirmPassword']= confirmPassword;
         map['mobile']= mobileNumber;
         map['firebase']= deviceToken;
+        String mDeviceType = "";
+        if(Platform.isAndroid){
+          mDeviceType = "Android";
+        }else{
+          mDeviceType = "Ios";
+        }
+        map['deviceType']=mDeviceType;
+
 
         print(map);
 
@@ -314,20 +334,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
           String mob = "965${mobileNumber}";
           modelHud.changeIsLoading(false);
           // Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: registerModel.data.mobile,otp: registerModel.data.otp.toString(),userId: registerModel.data.customerId,)));
-          OtpModel otpModel = await petMartService.verifyOtp(mob);
-          bool okay = otpModel.ok;
+          OtpModel? otpModel = await petMartService.verifyOtp(mob);
+          bool? okay = otpModel!.ok;
 
 
+          Fluttertoast.showToast(
+              msg: "success",
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+              fontSize: screenUtil.setSp(16)
+          );
 
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text("success")));
           SharedPref sharedPref = SharedPref();
           await sharedPref.save(kUserModel, registerModel);
           await sharedPref.saveBool(kIsLogin, true);
           await sharedPref.saveString("email", email);
           await sharedPref.saveString("password", password);
-          if(okay){
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: mob,otp: otpModel.data.code.toString(),userId: registerModel.data.id,)));
+          if(okay!){
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: mob,otp: otpModel.data!.code.toString(),userId: registerModel.data!.id!,)));
           }
           // Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
           //   return new FavoriteScreen();
@@ -335,13 +362,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
         } else {
           modelHud.changeIsLoading(false);
           ErrorModel errorModel = ErrorModel.fromJson(response);
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text(errorModel.data.msg)));
+          Fluttertoast.showToast(
+              msg: errorModel.data.msg,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: screenUtil.setSp(16)
+          );
+
         }
       }
     }else{
-      _scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text(getTranslated(context, 'password_not_equal'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'password_not_equal')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
     }
   }
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 class FailScreen extends StatefulWidget {
-  const FailScreen({Key key}) : super(key: key);
+  const FailScreen({Key? key}) : super(key: key);
 
   @override
   _FailScreenState createState() => _FailScreenState();

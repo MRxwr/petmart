@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'message_screen.dart';
 class MyMessagesScreen extends StatefulWidget {
-  const MyMessagesScreen({Key key}) : super(key: key);
+  const MyMessagesScreen({Key? key}) : super(key: key);
 
   @override
   _MyMessagesScreenState createState() => _MyMessagesScreenState();
@@ -20,20 +20,20 @@ class MyMessagesScreen extends StatefulWidget {
 
 class _MyMessagesScreenState extends State<MyMessagesScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  LoginModel   loginModel;
-  MyMessageModel messageModel;
-  Future<MyMessageModel> getMessages()async{
+  LoginModel?   loginModel;
+  MyMessageModel? messageModel;
+  Future<MyMessageModel?> getMessages()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    String loginData = _preferences.getString(kUserModel);
-    final body = json.decode(loginData);
+    String? loginData = _preferences.getString(kUserModel);
+    final body = json.decode(loginData!);
        loginModel = LoginModel.fromJson(body);
     PetMartService petMartService = PetMartService();
 
     Map map ;
-    map ={"user_id":loginModel.data.id,
+    map ={"user_id":loginModel!.data!.id,
     "language":languageCode};
-    MyMessageModel messageModel =await petMartService.myMessages(map);
+    MyMessageModel? messageModel =await petMartService.myMessages(map);
     return messageModel;
   }
   String status = "";
@@ -44,8 +44,8 @@ class _MyMessagesScreenState extends State<MyMessagesScreen> {
     super.initState();
     getMessages().then((value) {
       setState(() {
-        status = value.status;
-        messaage = value.message;
+        status = value!.status!;
+        messaage = value.message!;
 
         messageModel = value;
       });
@@ -66,7 +66,7 @@ class _MyMessagesScreenState extends State<MyMessagesScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                getTranslated(context, 'messages'),
+                getTranslated(context, 'messages')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -132,12 +132,13 @@ Container(
 
             InkWell(
               onTap: (){
+
                 Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                  return new MessageScreen(contactName:messageModel.data[index].senderName,
-                    contactImage:messageModel.data[index].senderImage ,
-                    contactId:messageModel.data[index].receiverId,
-                    postId: messageModel.data[index].postId,
-                    userId: loginModel.data.id);
+                  return new MessageScreen(contactName:messageModel!.data![index].senderName!,
+                    contactImage:messageModel!.data![index].senderImage! ,
+                    contactId:messageModel!.data![index].receiverId!,
+                    postId: messageModel!.data![index].postId!,
+                    userId: loginModel!.data!.id!, messageModel: null,);
                 }));
 
               },
@@ -147,7 +148,7 @@ Container(
                   CachedNetworkImage(
                     width: 90.w,
                     height: 90.h,
-                    imageUrl:'${messageModel.data[index].senderImage}',
+                    imageUrl:'${messageModel!.data![index].senderImage}',
                     imageBuilder: (context, imageProvider) =>
                         Container(
                             width: 90.w,
@@ -191,7 +192,7 @@ Container(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text(
-                        messageModel.data[index].senderName,
+                        messageModel!.data![index].senderName!,
                         style: TextStyle(
                             color: Color(0xFF000000),
                             fontSize: screenUtil.setSp(16),
@@ -199,7 +200,7 @@ Container(
                         ),
                       ),
                       Text(
-                        messageModel.data[index].message,
+                        messageModel!.data![index].message!,
                         style: TextStyle(
                             color: Color(0xFF000000),
                             fontSize: screenUtil.setSp(14),
@@ -213,7 +214,7 @@ Container(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text(
-                        messageModel.data[index].dayAgo,
+                        messageModel!.data![index].dayAgo!,
                         style: TextStyle(
                             color: Color(0xFF000000),
                             fontSize: screenUtil.setSp(14),
@@ -231,7 +232,7 @@ Container(
 
                         ),
                         child:
-                        Text('${messageModel.data[index].messageCount} ',
+                        Text('${messageModel!.data![index].messageCount} ',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 color: Color(0xFFFFFFFF),
@@ -248,7 +249,7 @@ Container(
           );
         }, separatorBuilder: (context,index){
       return Container(height: 1.h,
-      color: Color(0xFF000000),);}, itemCount: messageModel.data.length),
+      color: Color(0xFF000000),);}, itemCount: messageModel!.data!.length),
 ),
         ),
       ),

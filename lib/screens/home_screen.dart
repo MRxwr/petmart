@@ -19,7 +19,7 @@ import 'package:pet_mart/screens/web_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/widgets/arc_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:shape_of_view/shape_of_view.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../providers/notification_count.dart';
@@ -32,12 +32,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  LoginModel loginModel = null;
-  HomeModel homeModel = null;
+  LoginModel? loginModel ;
+  HomeModel? homeModel ;
 
   int _current =0;
   final CarouselController _controller = CarouselController();
-  String languageCode;
+  String? languageCode;
   @override
   void initState() {
     // TODO: implement initState
@@ -53,10 +53,10 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
   }
-  Future<LoginModel> getLoginModel() async{
+  Future<LoginModel?> getLoginModel() async{
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String loginData = sharedPreferences.getString(kUserModel);
+    String? loginData = sharedPreferences.getString(kUserModel);
     print('loginData---> ${loginData}');
 
 
@@ -71,21 +71,21 @@ if(loginData != null){
   Future<HomeModel> home() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    Map map ;
+
     String id ="";
     if(loginModel == null){
       id ="";
 
     }else{
-      id = loginModel.data.id;
+      id = loginModel!.data!.id!;
 
     }
-    print('map --> ${map}');
+
 
     PetMartService petMartService = PetMartService();
-    HomeModel home = await petMartService.home(id);
+    HomeModel? home = await petMartService.home(id);
 
-    Provider.of<NotificationNotifier>(context,listen: false).addCount(home.data.totalNotifications);
+    Provider.of<NotificationNotifier>(context,listen: false).addCount(home!.data!.totalNotifications!);
     return home;
   }
   @override
@@ -115,165 +115,181 @@ double height = MediaQuery.of(context).size.height;
           physics: const AlwaysScrollableScrollPhysics(),
 
           children: [
-            Stack(
-              children: [
-                Container(
-                  height: 120.h,
-                  width: width,
-                  child:
+            Container(
+              child: homeModel!.data!.banners!.isEmpty?
+              Container():
+              Stack(
+                children: [
+                  Container(
+                    height: 120.h,
+                    width: width,
+                    child:
 
-                  CarouselSlider(
+                    CarouselSlider(
 
-                    carouselController: _controller,
-                    options: CarouselOptions(
-                        autoPlay: true,
-                        autoPlayInterval: Duration(seconds: 2),
+                      carouselController: _controller,
+                      options: CarouselOptions(
+                          autoPlay: true,
+                          autoPlayInterval: Duration(seconds: 2),
 
-                        enableInfiniteScroll: true,
-
-
-                        height: double.infinity,
-                        viewportFraction: 1.0,
-                        enlargeCenterPage: false,
-                        disableCenter: true,
+                          enableInfiniteScroll: false,
 
 
+                          height: double.infinity,
+                          viewportFraction: 1.0,
+                          enlargeCenterPage: false,
+                          disableCenter: true,
 
 
 
 
-                        onPageChanged: (index, reason) {
-                          setState(() {
-                            _current = index;
-                          });
-                        }
-                    ),
-                    items: homeModel.data.banners.map((item) =>
-                        Stack(
-
-                          children: [
-                            GestureDetector(
-                              onTap: (){
-                                String url = item.image.trim();
-                                String link = item.url;
-                                String title = languageCode == "en"? item.enTitle:item.arTitle;
-                                if(link != null||link.trim() !=""){
-                                  Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(
-                                      builder: (BuildContext context) =>  WebScreen(url: link, name: title)));
-                                }else{
-                                if(url.isNotEmpty) {
-                                  Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                    return new PhotoScreen(imageProvider: NetworkImage(
-                                      KImageUrl+url,
-                                    ),);
-                                  }));
-
-                                }
-
-                              }},
 
 
-                              child:
-                              Container(
-                                width: width,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              _current = index;
+                            });
+                          }
+                      ),
+                      items: homeModel!.data!.banners!.map((item) =>
+                          Stack(
+
+                            children: [
+                              GestureDetector(
+                                onTap: (){
+                                  String url = item.image!.trim();
+                                  String link = item.url!;
+                                  String title = languageCode == "en"? item.enTitle!:item.arTitle!;
+                                  if(link != null||link.trim() !=""){
+                                    if(link.trim() == "#"){
+                                      Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                        return new PhotoScreen(imageProvider: NetworkImage(
+                                          KImageUrl+url,
+                                        ),);
+                                      }));
+                                    }else {
+                                      Navigator.of(context, rootNavigator: true)
+                                          .push(MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              WebScreen(url: link, name: title)));
+                                    }
+                                  }else{
+                                  if(url.isNotEmpty) {
+                                    Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                                      return new PhotoScreen(imageProvider: NetworkImage(
+                                        KImageUrl+url,
+                                      ),);
+                                    }));
+
+                                  }
+
+                                }},
+
 
                                 child:
-                                CachedNetworkImage(
+                                Container(
                                   width: width,
 
-                                  fit: BoxFit.fill,
-                                  imageUrl:'${KImageUrl+item.image}',
-                                  imageBuilder: (context, imageProvider) => Card(
-                                    elevation: 1.h,
-                                    child: Container(
-                                        width: width,
+                                  child:
+                                  CachedNetworkImage(
+                                    width: width,
+
+                                    fit: BoxFit.fill,
+                                    imageUrl:'${KImageUrl+item.image!}',
+                                    imageBuilder: (context, imageProvider) => Card(
+                                      elevation: 1.h,
+                                      child: Container(
+                                          width: width,
 
 
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(Radius.circular(8.0.w)),
 
 
-                                          image: DecorationImage(
+                                            image: DecorationImage(
 
 
-                                              fit: BoxFit.fill,
-                                              image: imageProvider),
-                                        )
-                                    ),
-                                  ),
-                                  placeholder: (context, url) =>
-                                      Column(
-                                        children: [
-                                          Expanded(
-                                            flex: 9,
-                                            child: Container(
-                                              height: height,
-                                              width: width,
-
-
-                                              alignment: FractionalOffset.center,
-                                              child: SizedBox(
-                                                  height: 50.h,
-                                                  width: 50.h,
-                                                  child: new CircularProgressIndicator()),
-                                            ),
-                                          ),
-                                        ],
+                                                fit: BoxFit.fill,
+                                                image: imageProvider),
+                                          )
                                       ),
+                                    ),
+                                    placeholder: (context, url) =>
+                                        Column(
+                                          children: [
+                                            Expanded(
+                                              flex: 9,
+                                              child: Container(
+                                                height: height,
+                                                width: width,
 
 
-                                  errorWidget: (context, url, error) => Container(
-                                      height: height,
-                                      width: width,
-                                      alignment: FractionalOffset.center,
-                                      child: Icon(Icons.image_not_supported)),
+                                                alignment: FractionalOffset.center,
+                                                child: SizedBox(
+                                                    height: 50.h,
+                                                    width: 50.h,
+                                                    child: new CircularProgressIndicator()),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
 
+
+                                    errorWidget: (context, url, error) => Container(
+                                        height: height,
+                                        width: width,
+                                        alignment: FractionalOffset.center,
+                                        child: Icon(Icons.image_not_supported)),
+
+                                  ),
+                                  // Image.network(
+                                  //
+                                  //
+                                  // '${kBaseUrl}${mAdsPhoto}${item.photo}'  , fit: BoxFit.fitWidth,
+                                  //   height: 600.h,),
                                 ),
-                                // Image.network(
-                                //
-                                //
-                                // '${kBaseUrl}${mAdsPhoto}${item.photo}'  , fit: BoxFit.fitWidth,
-                                //   height: 600.h,),
                               ),
-                            ),
 
-                          ] ,
-                        )).toList(),
+                            ] ,
+                          )).toList(),
 
+                    ),
                   ),
-                ),
-                Positioned.directional(textDirection: Directionality.of(context),
-                    bottom: 2.w,
-                    start: 0,
-                    end: 0,
+                  Positioned.directional(textDirection: Directionality.of(context),
+                      bottom: 2.w,
+                      start: 0,
+                      end: 0,
 
-                    child:  Opacity(
-                      opacity: homeModel.data.banners.length>1?1.0:0.0,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: homeModel.data.banners.map((item) {
-                          int index = homeModel.data.banners.indexOf(item);
-                          return Container(
-                            width: 8.0.w,
-                            height: 8.0.h,
-                            margin: EdgeInsets.symmetric(vertical: 10.0.w, horizontal: 2.0.h),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: _current == index
-                                  ? Color(0xFFEFA18B)
-                                  : Color(0xFF707070),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),)
-              ],
+                      child:  Opacity(
+                        opacity: homeModel!.data!.banners!.length>1?1.0:0.0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: homeModel!.data!.banners!.map((item) {
+                            int index = homeModel!.data!.banners!.indexOf(item);
+                            return Container(
+                              width: 8.0.w,
+                              height: 8.0.h,
+                              margin: EdgeInsets.symmetric(vertical: 10.0.w, horizontal: 2.0.h),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: _current == index
+                                    ? Color(0xFFEFA18B)
+                                    : Color(0xFF707070),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),)
+                ],
+              ),
             ),
 
-            Row(
-              children: [
-                previewButton(getTranslated(context, 'view_all'),context),
-              ],
+            Container(
+              child:homeModel!.data!.banners!.isEmpty?Container(): Row(
+                children: [
+                  previewButton(getTranslated(context, 'view_all')!,context),
+                ],
+              ),
             ),
             SizedBox(height: 10.h,),
             ListView.separated(
@@ -287,7 +303,7 @@ double height = MediaQuery.of(context).size.height;
                     GestureDetector(
                       onTap: (){
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new CategoriesScreen(category:homeModel.data.categories[index]);
+                          return new CategoriesScreen(category:homeModel!.data!.categories![index]);
                         }));
                       },
 
@@ -305,7 +321,7 @@ double height = MediaQuery.of(context).size.height;
                             height: 120.h,
 
                             fit: BoxFit.fill,
-                            imageUrl:KImageUrl+homeModel.data.categories[index].logo,
+                            imageUrl:KImageUrl+homeModel!.data!.categories![index].logo!,
                             imageBuilder: (context, imageProvider) => Container(
                                 width: width,
 
@@ -361,8 +377,8 @@ double height = MediaQuery.of(context).size.height;
                                   Padding(
                                     padding:  EdgeInsetsDirectional.only(start: 10.h),
                                     child: Text(languageCode == "en"?
-                                      homeModel.data.categories[index].enTitle:
-                                    homeModel.data.categories[index].arTitle,
+                                      homeModel!.data!.categories![index].enTitle!:
+                                    homeModel!.data!.categories![index].arTitle!,
                                       style: TextStyle(
                                           color: Color(0xFFFFFFFF),
                                           fontSize: screenUtil.setSp(16),
@@ -385,7 +401,7 @@ double height = MediaQuery.of(context).size.height;
                 separatorBuilder: (context,index){
               return Container(height: 10.h,
                 color: Color(0xFFFFFFFF),);
-            }, itemCount: homeModel.data.categories.length),
+            }, itemCount: homeModel!.data!.categories!.length),
             SizedBox(height: 10.h,),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -423,7 +439,7 @@ double height = MediaQuery.of(context).size.height;
                             color: Color(0x88AAAAAA),
 
                             width: width,
-                            child: Text( getTranslated(context, 'shop'),
+                            child: Text( getTranslated(context, 'shop')!,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Color(0xFFFFFFFF),
@@ -471,7 +487,7 @@ double height = MediaQuery.of(context).size.height;
                             color: Color(0x88AAAAAA),
                             height: 30.h,
                             width: width,
-                            child: Text( getTranslated(context, 'hospital'),
+                            child: Text( getTranslated(context, 'hospital')!,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Color(0xFFFFFFFF),
@@ -520,7 +536,7 @@ double height = MediaQuery.of(context).size.height;
 
                             alignment: AlignmentDirectional.center,
                             width: width,
-                            child: Text( getTranslated(context, 'service'),
+                            child: Text( getTranslated(context, 'service')!,
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   color: Color(0xFFFFFFFF),
@@ -566,7 +582,7 @@ double height = MediaQuery.of(context).size.height;
 
         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
 
-          return new AdvertiseScreen(homeModel:homeModel, langCode: languageCode,);
+          return new AdvertiseScreen(homeModel:homeModel!, langCode: languageCode!,);
         }));
       },
       child: Text(text,style: TextStyle(

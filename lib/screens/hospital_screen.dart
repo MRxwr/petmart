@@ -9,25 +9,25 @@ import 'package:pet_mart/screens/shop_products_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class HospitalScreen extends StatefulWidget {
-  const HospitalScreen({Key key}) : super(key: key);
+  const HospitalScreen({Key? key}) : super(key: key);
 
   @override
   _HospitalScreenState createState() => _HospitalScreenState();
 }
 
 class _HospitalScreenState extends State<HospitalScreen> {
-  HospitalModel hospitalModel;
-  double itemWidth;
-  double itemHeight;
+  HospitalModel? hospitalModel;
+  double? itemWidth;
+  double? itemHeight;
   ScreenUtil screenUtil = ScreenUtil();
   String mLanguage ="";
 
-  Future<HospitalModel> getHospitals()async{
+  Future<HospitalModel?> getHospitals()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
     PetMartService petMartService = PetMartService();
-    HospitalModel hospitalModel =await petMartService.hospitals();
+    HospitalModel? hospitalModel =await petMartService.hospitals();
     return hospitalModel;
   }
   @override
@@ -56,7 +56,7 @@ class _HospitalScreenState extends State<HospitalScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'shop'),
+              getTranslated(context, 'shop')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -98,14 +98,14 @@ Container(
     shrinkWrap: true,
     physics: const AlwaysScrollableScrollPhysics(),
     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-        childAspectRatio:itemWidth/itemHeight),
-    itemCount: hospitalModel.data.shop.length,
+        childAspectRatio:itemWidth!/itemHeight!),
+    itemCount: hospitalModel!.data!.shop!.length,
     itemBuilder: (context,index){
-      return GestureDetector(child: buildItem(hospitalModel.data.shop[index],context)
+      return GestureDetector(child: buildItem(hospitalModel!.data!.shop![index],context)
         ,onTap: (){
-          String mHospitalName =mLanguage == "en"? hospitalModel.data.shop[index].enTitle:hospitalModel.data.shop[index].arTitle;
+          String mHospitalName =mLanguage == "en"? hospitalModel!.data!.shop![index].enTitle!:hospitalModel!.data!.shop![index].arTitle!;
           Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
-            return new ShopDetailsScreen(id:hospitalModel.data.shop[index].id,name: mHospitalName);
+            return new ShopDetailsScreen(id:hospitalModel!.data!.shop![index].id!,name: mHospitalName);
           }));
 
         },);
@@ -124,7 +124,7 @@ Container(
           CachedNetworkImage(
             width: 150.w,
             height: 150.h,
-            imageUrl:'${KImageUrl+hospitalModel.logo}',
+            imageUrl:'${KImageUrl+hospitalModel.logo!}',
             imageBuilder: (context, imageProvider) =>
                 Container(
                     width: 150.w,
@@ -168,7 +168,7 @@ Container(
           Expanded(child: Container(
             alignment: AlignmentDirectional.center,
             child: Text(
-    mLanguage == "en"? hospitalModel.enTitle:hospitalModel.arTitle,
+    mLanguage == "en"? hospitalModel.enTitle!:hospitalModel.arTitle!,
               style: TextStyle(
                   color: Color(0xFF000000),
                   fontSize: screenUtil.setSp(12),

@@ -13,7 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class CategoriesScreen extends StatefulWidget {
   static String id = 'CategoriesScreen';
   CategoryParent.Categories category;
-  CategoriesScreen({Key key,@required this.category}): super(key: key);
+  CategoriesScreen({Key? key,required this.category}): super(key: key);
 
 
   @override
@@ -22,11 +22,11 @@ class CategoriesScreen extends StatefulWidget {
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  CategoryModel categoryModel;
-  double itemWidth;
-  double itemHeight;
+  CategoryModel? categoryModel;
+  double? itemWidth;
+  double? itemHeight;
   String languageCode="";
-  Future<CategoryModel> category() async{
+  Future<CategoryModel?> category() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
@@ -43,7 +43,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    CategoryModel auctionDetailsModel = await petMartService.category(widget.category.id);
+    CategoryModel? auctionDetailsModel = await petMartService.category(widget.category!.id!);
     return auctionDetailsModel;
   }
   @override
@@ -72,7 +72,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             child:categoryModel != null?
             Text(
               languageCode == "en"?
-              widget.category.enTitle:widget.category.arTitle,
+              widget.category.enTitle!:widget.category.arTitle!,
 
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
@@ -121,11 +121,11 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           ),
           alignment: AlignmentDirectional.center,
         ):
-        categoryModel.data.categories.isEmpty?
+        categoryModel!.data!.categories!.isEmpty?
 
         Container(
           child: Text(
-            getTranslated(context, "no_categories"),
+            getTranslated(context, "no_categories")!,
             style: TextStyle(
                 color: Colors.black,
                 fontSize: screenUtil.setSp(16),
@@ -141,14 +141,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           shrinkWrap: true,
           physics: const AlwaysScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-              childAspectRatio:itemWidth/itemHeight),
-          itemCount: categoryModel.data.categories.length,
+              childAspectRatio:itemWidth!/itemHeight!),
+          itemCount: categoryModel!.data!.categories!.length,
           itemBuilder: (context,index){
-            return GestureDetector(child: buildItem(categoryModel.data.categories[index],context)
+            return GestureDetector(child: buildItem(categoryModel!.data!.categories![index],context)
             ,onTap: (){
                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new PetsScreen(childcategory: categoryModel.data.categories[index],
-                          categoryModel : categoryModel,parentCategoryId: widget.category.id,selectCategory: index+1,categryName: languageCode == "en"?widget.category.enTitle:widget.category.arTitle,);
+                          return new PetsScreen(childcategory: categoryModel!.data!.categories![index],
+                          categoryModel : categoryModel!,parentCategoryId: widget.category.id!,selectCategory: index+1,categryName: languageCode == "en"?widget.category!.enTitle!:widget.category!.arTitle!,);
                         }));
               },);
           },
@@ -167,7 +167,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           CachedNetworkImage(
             width: 150.w,
             height: 150.h,
-            imageUrl:'${KImageUrl+childcategory.image}',
+            imageUrl:'${KImageUrl+childcategory.image!}',
             imageBuilder: (context, imageProvider) =>
                 Container(
                     width: 150.w,
@@ -209,7 +209,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             alignment: AlignmentDirectional.center,
             child: Text(
               languageCode == "en"?
-                childcategory.enTitle:childcategory.arTitle,
+                childcategory.enTitle!:childcategory.arTitle!,
               style: TextStyle(
                 color: Color(0xFF000000),
                 fontSize: screenUtil.setSp(12),

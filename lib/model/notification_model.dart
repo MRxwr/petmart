@@ -1,8 +1,8 @@
 class NotificationModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   NotificationModel({this.ok, this.error, this.status, this.data});
 
@@ -19,15 +19,15 @@ class NotificationModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  String total;
-  List<Notification> notification;
+  String? total;
+  List<Notification>? notification;
 
   Data({this.total, this.notification});
 
@@ -36,7 +36,7 @@ class Data {
     if (json['notification'] != null) {
       notification = <Notification>[];
       json['notification'].forEach((v) {
-        notification.add(new Notification.fromJson(v));
+        notification!.add(new Notification.fromJson(v));
       });
     }
   }
@@ -45,20 +45,20 @@ class Data {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['total'] = this.total;
     if (this.notification != null) {
-      data['notification'] = this.notification.map((v) => v.toJson()).toList();
+      data['notification'] = this.notification!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Notification {
-  String id;
-  String date;
-  String userId;
-  String notification;
-  String seen;
-  String auctionType;
-  String auctionId;
+  String? id;
+  String? date;
+  String? userId;
+  String? notification;
+  String? seen;
+  String? auctionType;
+  String? auctionId;
 
   Notification(
       {this.id,

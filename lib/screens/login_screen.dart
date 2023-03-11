@@ -4,8 +4,9 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/login_model.dart';
@@ -39,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String token ="";
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   String _platformImei = 'Unknown';
-  String uniqueId = "Unknown";
+  String? uniqueId = "Unknown";
   Future<String> getToken() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String mToken =_preferences.getString("token")??"";
@@ -89,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                           padding: EdgeInsets.all(10.w),
                           alignment: AlignmentDirectional.topEnd,
-                          child: Text(getTranslated(context, 'skip'),
+                          child: Text(getTranslated(context, 'skip')!,
                           style: TextStyle(
                             color:Color(0xFF000000),
                             fontSize: screenUtil.setSp(16)
@@ -108,12 +109,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         Directionality(
                           textDirection: TextDirection.ltr,
                           child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
-                            print(value);
+                            // print(value);
                             _fullName= value;
                             setState(() {
 
                             });
                           },
+                            mText: "",
+context: context,
 
                           ),
                         ),
@@ -124,7 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child:
                         Directionality(
                           textDirection: TextDirection.ltr,
-                          child: PasswordTextField(hint:getTranslated(context, 'password'),onClick: (value){
+                          child: PasswordTextField(hint:getTranslated(context, 'password')!,onClick: (value){
                             print(value);
                             setState(() {
 
@@ -133,6 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           },
                             mText: _password,
+
+context: context,
                           ),
                         ),
                       )),
@@ -144,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Container(
                           alignment: AlignmentDirectional.centerEnd,
                           child: Text(
-                            getTranslated(context, 'forget_password_string'),
+                            getTranslated(context, 'forget_password_string')!,
                             style: TextStyle(
                               color: Color(0xFF0000000),
                               fontSize: screenUtil.setSp(16),
@@ -158,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child:  Container(
                         alignment: AlignmentDirectional.center,
                         child:
-                        LoginButton(getTranslated(context, 'login'),context)
+                        LoginButton(getTranslated(context, 'login')!,context)
                       )
                   ),
                   Expanded(flex: 4,
@@ -168,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                           getTranslated(context, 'dont_have_account'),
+                           getTranslated(context, 'dont_have_account')!,
                               style: TextStyle(
                                   color: Color(0xFF0000000),
                                   fontSize: screenUtil.setSp(16),
@@ -182,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                               child:
                               Text(
-                                getTranslated(context, 'register_now'),
+                                getTranslated(context, 'register_now')!,
                                 style: TextStyle(
                                     color: Color(0xFF0000000),
                                     fontSize: screenUtil.setSp(16),
@@ -232,8 +237,8 @@ validate(context);
   }
   void validate(BuildContext context) async {
 
-    if(widget._globalKey.currentState.validate()) {
-      widget._globalKey.currentState.save();
+    if(widget._globalKey.currentState!.validate()) {
+      widget._globalKey.currentState!.save();
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
 
@@ -259,6 +264,13 @@ uniqueId = await UniqueIdentifier.serial;
       map['password']= _password;
 
       map['firebase']= token;
+      String mDeviceType = "";
+      if(Platform.isAndroid){
+        mDeviceType = "Android";
+      }else{
+        mDeviceType = "Ios";
+      }
+      map['deviceType']=mDeviceType;
 
       print(map);
 
@@ -269,9 +281,16 @@ uniqueId = await UniqueIdentifier.serial;
         RegisterModel registerModel = RegisterModel.fromJson(response);
 
         // Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifyOtpScreen(mobile: registerModel.data.mobile,otp: registerModel.data.otp.toString(),userId: registerModel.data.customerId,)));
+        Fluttertoast.showToast(
+            msg: 'success',
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
 
-        _scaffoldKey.currentState.showSnackBar(
-            SnackBar(content: Text("success")));
         SharedPref sharedPref = SharedPref();
         await sharedPref.save(kUserModel, registerModel);
         await sharedPref.saveBool(kIsLogin, true);
@@ -279,9 +298,18 @@ uniqueId = await UniqueIdentifier.serial;
         await sharedPref.saveString("password", _password);
         Navigator.pushReplacementNamed(context,MainScreen.id);
       } else {
+
         ErrorModel errorModel = ErrorModel.fromJson(response);
-        _scaffoldKey.currentState.showSnackBar(
-            SnackBar(content: Text(errorModel.data.msg)));
+        Fluttertoast.showToast(
+            msg: errorModel.data.msg,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
+
       }
 
     }

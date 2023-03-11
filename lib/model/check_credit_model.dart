@@ -3,18 +3,18 @@
 /// data : {"expiry_date":"28/05/2021 06:28:47","credit":"1998"}
 
 class CheckCreditModel {
-  String _status;
-  String _message;
-  Data _data;
+  String? _status;
+  String? _message;
+  Data? _data;
 
-  String get status => _status;
-  String get message => _message;
-  Data get data => _data;
+  String get status => _status!;
+  String get message => _message!;
+  Data get data => _data!;
 
   CheckCreditModel({
-      String status, 
-      String message, 
-      Data data}){
+      String? status,
+      String? message,
+      Data? data}){
     _status = status;
     _message = message;
     _data = data;
@@ -31,7 +31,7 @@ class CheckCreditModel {
     map["status"] = _status;
     map["message"] = _message;
     if (_data != null) {
-      map["data"] = _data.toJson();
+      map["data"] = _data!.toJson();
     }
     return map;
   }
@@ -42,15 +42,15 @@ class CheckCreditModel {
 /// credit : "1998"
 
 class Data {
-  String _expiryDate;
-  String _credit;
+  String? _expiryDate;
+  String? _credit;
 
-  String get expiryDate => _expiryDate;
-  String get credit => _credit;
+  String get expiryDate => _expiryDate!;
+  String get credit => _credit!;
 
   Data({
-      String expiryDate, 
-      String credit}){
+      String? expiryDate,
+      String? credit}){
     _expiryDate = expiryDate;
     _credit = credit;
 }

@@ -1,8 +1,8 @@
 class ShopdetailsModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   ShopdetailsModel({this.ok, this.error, this.status, this.data});
 
@@ -19,15 +19,15 @@ class ShopdetailsModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Shop> shop;
-  List<Items> items;
+  List<Shop>? shop;
+  List<Items>? items;
 
   Data({this.shop, this.items});
 
@@ -35,13 +35,13 @@ class Data {
     if (json['shop'] != null) {
       shop = <Shop>[];
       json['shop'].forEach((v) {
-        shop.add(new Shop.fromJson(v));
+        shop!.add(new Shop.fromJson(v));
       });
     }
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
-        items.add(new Items.fromJson(v));
+        items!.add(new Items.fromJson(v));
       });
     }
   }
@@ -49,25 +49,25 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.shop != null) {
-      data['shop'] = this.shop.map((v) => v.toJson()).toList();
+      data['shop'] = this.shop!.map((v) => v.toJson()).toList();
     }
     if (this.items != null) {
-      data['items'] = this.items.map((v) => v.toJson()).toList();
+      data['items'] = this.items!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Shop {
-  String id;
-  String arTitle;
-  String enTitle;
-  String arDetails;
-  String enDetails;
-  String shares;
-  String views;
-  String mobile;
-  String logo;
+  String? id;
+  String? arTitle;
+  String? enTitle;
+  String? arDetails;
+  String? enDetails;
+  String? shares;
+  String? views;
+  String? mobile;
+  String? logo;
 
   Shop(
       {this.id,
@@ -108,17 +108,17 @@ class Shop {
 }
 
 class Items {
-  String id;
-  String arTitle;
-  String enTitle;
-  String arDetails;
-  String enDetails;
-  String price;
-  String video;
-  String shares;
-  String views;
-  String mobile;
-  List<String> image;
+  String? id;
+  String? arTitle;
+  String? enTitle;
+  String? arDetails;
+  String? enDetails;
+  String? price;
+  String? video;
+  String? shares;
+  String? views;
+  String? mobile;
+  List<String>? image;
 
   Items(
       {this.id,

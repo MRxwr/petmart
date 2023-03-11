@@ -13,9 +13,9 @@ class PasswordDialogTextField extends StatelessWidget {
   final IconData icon;
   final Function onClick;
   final String mText;
-  BuildContext context;
+  final BuildContext context;
 
-  String _errorMessage(String str){
+  String? _errorMessage(String str){
     switch(str){
       case 'Full Name':
 
@@ -24,11 +24,11 @@ class PasswordDialogTextField extends StatelessWidget {
     }
   }
 
-  PasswordDialogTextField({Key key, @required this.hint,@required this.icon,@required this.onClick, this.mText}) : super(key: key);
+  PasswordDialogTextField({Key? key, required this.hint,required this.icon,required this.onClick, required this.mText,required this.context}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
+
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     TextEditingController myController = TextEditingController()..text = mText;
@@ -52,7 +52,7 @@ class PasswordDialogTextField extends StatelessWidget {
               textAlign: TextAlign.center,
               textCapitalization: TextCapitalization.words,
               keyboardType: TextInputType.text ,
-              onSaved: onClick,
+              onSaved: onClick(),
               textInputAction: TextInputAction.done,
               maxLines: 1,
               minLines: 1,
@@ -132,9 +132,9 @@ class PasswordDialogTextField extends StatelessWidget {
     );
 
   }
-  String validateName(String value) {
+  String? validateName(String? value) {
 
-    if (value.length == 0) {
+    if (value!.length == 0) {
       return "";
     }
 

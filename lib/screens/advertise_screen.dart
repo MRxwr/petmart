@@ -9,7 +9,7 @@ import 'package:pet_mart/utilities/constants.dart';
 class AdvertiseScreen extends StatefulWidget {
   Home.HomeModel homeModel;
   String langCode ;
-  AdvertiseScreen({Key key,@required this.homeModel, @required this.langCode}): super(key: key);
+  AdvertiseScreen({Key? key,required this.homeModel, required this.langCode}): super(key: key);
 
   @override
   _AdvertiseScreenState createState() => _AdvertiseScreenState();
@@ -18,7 +18,15 @@ class AdvertiseScreen extends StatefulWidget {
 class _AdvertiseScreenState extends State<AdvertiseScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print("widget.homeModel.data.banners --->${widget.homeModel.data!.banners!.length}");
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -29,7 +37,7 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'advertisement_string'),
+              getTranslated(context, 'advertisement_string')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -41,25 +49,26 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
             ),
           ),
         ),
-        leading: Container(
+        leading:
+        GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
 
-          width: width,
-          height: 60.h,
+          },
+          child: Padding(
+            padding:  EdgeInsets.symmetric(horizontal: 10.h),
+            child: Center(
+                child: Icon(Icons.arrow_back_ios_new,color: Colors.white,size: 20,)
+            ),
+          ),
         ),
 
         actions: [
-          GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
+          Container(
 
-            },
-            child: Padding(
-              padding:  EdgeInsets.symmetric(horizontal: 10.h),
-              child: Center(
-                  child: Icon(Icons.arrow_forward_ios,color: Colors.white,size: 20,)
-              ),
-            ),
-          )
+            width: 30.w,
+            height: 60.h,
+          ),
         ],
 
       ),
@@ -75,13 +84,24 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
               color: Color(0xFFFFFFFF),
               child: GestureDetector(
                   onTap: (){
-                    Home.Banners item = widget.homeModel.data.banners[index];
-                    String url = item.image.trim();
-                    String link = item.url;
-                    String title = widget.langCode == "en"? item.enTitle:item.arTitle;
-                    if(link != null||link.trim() !=""){
-                      Navigator.of(context,rootNavigator: true).push(MaterialPageRoute(
-                          builder: (BuildContext context) =>  WebScreen(url: link, name: title)));
+                    Home.Banners item = widget.homeModel.data!.banners![index];
+                    String url = item.image!.trim();
+                    print('url ----> ${url}');
+                    String link = item.url!;
+                    String title = widget.langCode == "en"? item.enTitle!:item.arTitle!;
+                    if(link != null || link.trim() !=""){
+                      if(link.trim() == "#"){
+                        Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
+                          return new PhotoScreen(imageProvider: NetworkImage(
+                            KImageUrl+url,
+                          ),);
+                        }));
+                      }else {
+                        Navigator.of(context, rootNavigator: true).push(
+                            MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    WebScreen(url: link, name: title)));
+                      }
                     }else{
                       if(url.isNotEmpty) {
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
@@ -93,13 +113,13 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
                       }
 
                     }},
-                  child: buildItem(widget.homeModel.data.banners[index],context))
+                  child: buildItem(widget.homeModel.data!.banners![index],context))
           );
         },
             separatorBuilder: (context,index){
           return Container(height: 10.h,
             color: Color(0xFFefeef3),);
-        }, itemCount: widget.homeModel.data.banners.length),
+        }, itemCount: widget.homeModel.data!.banners!.length),
       ),
     );
   }
@@ -113,7 +133,7 @@ class _AdvertiseScreenState extends State<AdvertiseScreen> {
               CachedNetworkImage(
                 width:width ,
                 height: 120.h,
-                imageUrl:KImageUrl+data.image,
+                imageUrl:KImageUrl+data.image!,
                 imageBuilder: (context, imageProvider) => Stack(
                   children: [
                     ClipRRect(

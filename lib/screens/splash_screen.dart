@@ -36,8 +36,8 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  StreamSubscription sub;
-    FirebaseMessaging _messaging;
+  StreamSubscription? sub;
+    FirebaseMessaging? _messaging;
   int _counter = 0;
   Future<void> init()async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
       super.initState();
       FirebaseMessaging.instance
           .getInitialMessage()
-          .then((RemoteMessage message) {
+          .then((RemoteMessage? message) {
         print('remoteMessgae sss${message.toString()}');
 
         print('remoteMessgae sss${message.toString()}');
@@ -77,9 +77,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
             }).whenComplete((){
               getLanguageSelected().then((value){
-                bool isSelectLanguage =   value['isSelectLanguage'] ;
-                bool isUserLoginIn =   value['isUserLoginIn'] ;
-                if(isSelectLanguage & isUserLoginIn){
+                bool? isSelectLanguage =   value['isSelectLanguage'] ;
+                bool? isUserLoginIn =   value['isUserLoginIn'] ;
+                if(isSelectLanguage! & isUserLoginIn!){
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (BuildContext context) => MainScreen()));
                 }else if(isSelectLanguage & !isUserLoginIn){
@@ -99,9 +99,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
           }).whenComplete((){
             getLanguageSelected().then((value){
-              bool isSelectLanguage =   value['isSelectLanguage'] ;
-              bool isUserLoginIn =   value['isUserLoginIn'] ;
-              if(isSelectLanguage & isUserLoginIn){
+              bool? isSelectLanguage =   value['isSelectLanguage'] ;
+              bool? isUserLoginIn =   value['isUserLoginIn'] ;
+              if(isSelectLanguage! & isUserLoginIn!){
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (BuildContext context) => MainScreen()));
               }else if(isSelectLanguage & !isUserLoginIn){
@@ -152,21 +152,21 @@ class _SplashScreenState extends State<SplashScreen> {
     map['isUserLoginIn'] = isLoggedIn;
     return map;
 }
-  Future<HomeModel> home() async{
+  Future<HomeModel?> home() async{
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String loginData = sharedPreferences.getString(kUserModel);
+    String? loginData = sharedPreferences.getString(kUserModel);
     String deviceToken =sharedPreferences.getString("token")??"";
     print('loginData --> ${loginData}');
-    LoginModel  loginModel = null;
+    LoginModel?  loginModel ;
     bool isLoggedIn =  sharedPreferences.getBool(kIsLogin)??false;
-    String id ="";
-    String uniqueId;
+    String? id ;
+    String? uniqueId;
     if(isLoggedIn){
       String token =deviceToken;
-      final body = json.decode(loginData);
-      String fullName = sharedPreferences.getString('email');
-      String password= sharedPreferences.getString('password');
+      final body = json.decode(loginData!)??"";
+      String fullName = sharedPreferences.getString('email')??"";
+      String password= sharedPreferences.getString('password')??"";
       SharedPreferences _preferences = await SharedPreferences.getInstance();
       String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
@@ -200,7 +200,7 @@ class _SplashScreenState extends State<SplashScreen> {
         sharedPreferences.setBool(kIsLogin,true);
         await sharedPref.saveString("emil", fullName);
         await sharedPref.saveString("password", password);
-        id = loginModel.data.id;
+        id = loginModel.data!.id;
       }else{
         id ="";
         SharedPref sharedPref = SharedPref();
@@ -217,14 +217,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    Map map ;
 
-
-
-    print('map --> ${map}');
     PetMartService petMartService = PetMartService();
 
-    HomeModel home = await petMartService.home(id);
+    HomeModel? home = await petMartService.home(id!);
     return home;
   }
   @override

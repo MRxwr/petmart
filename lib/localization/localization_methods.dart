@@ -6,8 +6,8 @@ import 'package:pet_mart/localization/set_localization.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
-String getTranslated(BuildContext context, String key) {
-  return SetLocalization.of(context).getTranslateValue(key);
+String? getTranslated(BuildContext context, String key) {
+  return SetLocalization.of(context)?.getTranslateValue(key);
 }
 
 const String ENGLISH = 'en';

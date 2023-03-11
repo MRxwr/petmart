@@ -6,9 +6,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
+import 'package:pet_mart/api/pusher_helper.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/BidNewModel.dart';
 import 'package:pet_mart/model/auction_details_model.dart';
@@ -24,6 +26,7 @@ import 'package:pet_mart/screens/vedio_screen.dart';
 import 'package:pet_mart/screens/youtube_screen.dart';
 import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
+import 'package:pusher_channels_flutter/pusher_channels_flutter.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timer_count_down/timer_count_down.dart';
@@ -32,8 +35,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../model/MyNewAuctionDetailsModel.dart';
 class AuctionDetailsScreen extends StatefulWidget {
   static String id = 'AuctionDetailsScreen';
-  AuctionModel.Data mAuctionModel;
-  AuctionDetailsScreen({Key key,@required this.mAuctionModel}): super(key: key);
+  AuctionModel.Data? mAuctionModel;
+  AuctionDetailsScreen({Key? key, this.mAuctionModel}): super(key: key);
 
 
   @override
@@ -41,53 +44,73 @@ class AuctionDetailsScreen extends StatefulWidget {
 }
 
 class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
-  MyNewAuctionDetailsModel mAuctionDetailsModel = null;
+  MyNewAuctionDetailsModel? mAuctionDetailsModel ;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final CarouselController _controller = CarouselController();
   ScreenUtil screenUtil = ScreenUtil();
+  String _channelName="";
   int _current =0;
   int currentBid  =0;
 
-   double _rating;
+   double? _rating;
 
   double _userRating = 3.0;
   int _ratingBarMode = 1;
-  double _initialRating ;
+  double? _initialRating ;
   bool _isRTLMode = false;
   bool _isVertical = false;
-  String languageCode;
-  String userId;
-  Future<MyNewAuctionDetailsModel> auction() async{
+  String? languageCode;
+  String? userId;
+  Future<MyNewAuctionDetailsModel?> auction() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
     Map<String,String> map = Map() ;
 
     if(loginData == null){
-      map['auctionId']= widget.mAuctionModel.id;
+      map['auctionId']= widget.mAuctionModel!.id;
       map['customerId']= "";
     }else{
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
-      userId = loginModel.data.id;
-      map['auctionId']= widget.mAuctionModel.id;
-      map['customerId']= loginModel.data.id;
+      userId = loginModel.data!.id;
+      map['auctionId']= widget.mAuctionModel!.id;
+      map['customerId']= loginModel!.data!.id!;
 
 
       print(map);
+    }
+    _channelName='private-auction-${widget.mAuctionModel!.id}';
+
+    PusherHelper.instance.onConnectPressed(_channelName);
+    PusherHelper.instance.stream.listen((message) {
+      print('message from singleTone ${message}');
+      onEvent(message);
+    });
+
+
+    PetMartService petMartService = PetMartService();
+    MyNewAuctionDetailsModel? auctionDetailsModel = await petMartService.myNewAuctionDetails(map);
+    return auctionDetailsModel;
+  }
+  onEvent(String eventName) async {
+    print('Event Name ---> ${eventName }');
+    if(eventName == "bid"){
+      auctionLoad();
     }
 
 
 
 
-    PetMartService petMartService = PetMartService();
-    MyNewAuctionDetailsModel auctionDetailsModel = await petMartService.myNewAuctionDetails(map);
-    return auctionDetailsModel;
+
+
+
+
   }
   Future<void> auctionLoad() async{
-    mAuctionDetailsModel = null;
+
      _current =0;
      currentBid  =0;
 
@@ -97,18 +120,18 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
 
     Map<String,String> map = Map() ;
 
     if(loginData == null){
-      map['auctionId']= widget.mAuctionModel.id;
+      map['auctionId']= widget.mAuctionModel!.id;
       map['customerId']= "";
     }else{
       final body = json.decode(loginData);
       LoginModel   loginModel = LoginModel.fromJson(body);
-      map['auctionId']= widget.mAuctionModel.id;
-      map['customerId']= loginModel.data.id;
+      map['auctionId']= widget.mAuctionModel!.id;
+      map['customerId']= loginModel!.data!.id!;
 
       print(map);
     }
@@ -117,7 +140,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
 
     PetMartService petMartService = PetMartService();
     mAuctionDetailsModel = await petMartService.myNewAuctionDetails(map);
-    _rating =double.parse(mAuctionDetailsModel.data[0].customer.rating);
+    _rating =double.parse(mAuctionDetailsModel!.data![0].customer!.rating!);
     setState(() {
 
     });
@@ -129,7 +152,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
     auction().then((value){
       setState(() {
         mAuctionDetailsModel = value;
-        _rating = double.parse(mAuctionDetailsModel.data[0].customer.rating);
+        _rating = double.parse(mAuctionDetailsModel!.data![0].customer!.rating!);
 
       });
     });
@@ -150,7 +173,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
               child: Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 10.h),
                 child: Text(
-                  languageCode == "en"?widget.mAuctionModel.enTitle:widget.mAuctionModel.arTitle,
+                  languageCode == "en"?widget.mAuctionModel!.enTitle:widget.mAuctionModel!.arTitle,
                   style: TextStyle(
                       color: Color(0xFFFFFFFF),
                       fontSize: screenUtil.setSp(16),
@@ -226,7 +249,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                             });
                           }
                       ),
-                      items: mAuctionDetailsModel.data[0].image.map((item) =>
+                      items: mAuctionDetailsModel!.data![0].image!.map((item) =>
                           Stack(
 
 
@@ -336,11 +359,11 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                       start: 0,
                       end:0,
                       child: Opacity(
-                        opacity: mAuctionDetailsModel.data[0].image.length>1?1.0:0.0,
+                        opacity: mAuctionDetailsModel!.data![0].image!.length>1?1.0:0.0,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: mAuctionDetailsModel.data[0].image.map((item) {
-                            int index =mAuctionDetailsModel.data[0].image.indexOf(item);
+                          children: mAuctionDetailsModel!.data![0].image!.map((item) {
+                            int index =mAuctionDetailsModel!.data![0].image!.indexOf(item);
                             return Container(
                               width: 8.0.w,
                               height: 8.0.h,
@@ -374,7 +397,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                   children: [
                     Text(
                       languageCode =="en"?
-                      mAuctionDetailsModel.data[0].enTitle:mAuctionDetailsModel.data[0].enTitle,
+                      mAuctionDetailsModel!.data![0].enTitle!:mAuctionDetailsModel!.data![0].enTitle!,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -384,12 +407,12 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                     ),
                     GestureDetector(
                       onTap: (){
-                        String vedioUrl= mAuctionDetailsModel.data[0].video;
+                        String vedioUrl= mAuctionDetailsModel!.data![0].video!;
                         String title = "";
                         if(languageCode == "en"){
-                          title = mAuctionDetailsModel.data[0].enTitle;
+                          title = mAuctionDetailsModel!.data![0].enTitle!;
                         }else{
-                          title = mAuctionDetailsModel.data[0].arTitle;
+                          title = mAuctionDetailsModel!.data![0].arTitle!;
                         }
                         if(vedioUrl.trim()!=""){
                           if(vedioUrl.contains("youtu")){
@@ -407,7 +430,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                       },
                       child: Image.asset('assets/images/play-button.png',
                         height: 30.w,width: 30.w,fit: BoxFit.fill,
-                        color:mAuctionDetailsModel.data[0].video== ""?Color(0xFFAAAAAA):kMainColor ,
+                        color:mAuctionDetailsModel!.data![0].video== ""?Color(0xFFAAAAAA):kMainColor ,
                       ),
                     )
                   ],
@@ -416,7 +439,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
               Container(
                 padding: EdgeInsets.all(6.h),
                 child: Text(
-                  languageCode == "en"?mAuctionDetailsModel.data[0].arTitle:mAuctionDetailsModel.data[0].arTitle,
+                  languageCode == "en"?mAuctionDetailsModel!.data![0].arTitle!:mAuctionDetailsModel!.data![0].arTitle!,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(12),
@@ -444,7 +467,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                         CachedNetworkImage(
                           width: 50.w,
                           height: 50.h,
-                          imageUrl: KImageUrl+mAuctionDetailsModel.data[0].customer.logo,
+                          imageUrl: KImageUrl+mAuctionDetailsModel!.data![0].customer!.logo!,
                           imageBuilder: (context, imageProvider) =>
                               Container(
                                   width: 50.w,
@@ -487,35 +510,41 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Text(
-                              '${mAuctionDetailsModel.data[0].customer.name}' ,
-                              style: TextStyle(
-                                  color: Color(0xFF000000),
-                                  fontSize: screenUtil.setSp(13),
-                                  fontWeight: FontWeight.bold
+                            Expanded(
+                        flex:1,
+                              child: Text(
+                                '${mAuctionDetailsModel!.data![0].customer!.name}' ,
+                                style: TextStyle(
+                                    color: Color(0xFF000000),
+                                    fontSize: screenUtil.setSp(13),
+                                    fontWeight: FontWeight.bold
+                                ),
                               ),
                             ),
-                            RatingBar.builder(
-                              initialRating: _rating,
-                              minRating: 0,
-                              direction: _isVertical ? Axis.vertical : Axis.horizontal,
-                              allowHalfRating: true,
-                              unratedColor: Colors.amber.withAlpha(50),
-                              itemCount: 5,
-                              itemSize: 20.0.h,
-                              tapOnlyMode: true,
-                              itemPadding: EdgeInsets.symmetric(horizontal: 2.0.w),
-                              itemBuilder: (context, _) => Icon(
-                                 Icons.star,
-                                color: Colors.amber,
-                              ),
+                            Expanded(
+                              flex: 1,
+                              child: RatingBar.builder(
+                                initialRating: _rating!,
+                                minRating: 0,
+                                direction: _isVertical ? Axis.vertical : Axis.horizontal,
+                                allowHalfRating: true,
+                                unratedColor: Colors.amber.withAlpha(50),
+                                itemCount: 5,
+                                itemSize: 20.0.h,
+                                tapOnlyMode: true,
+                                itemPadding: EdgeInsets.symmetric(horizontal: 2.0.w),
+                                itemBuilder: (context, _) => Icon(
+                                   Icons.star,
+                                  color: Colors.amber,
+                                ),
 
-                              // onRatingUpdate: (rating) {
-                              //   setState(() {
-                              //     _rating = rating;
-                              //   });
-                              // },
-                              updateOnDrag: false,
+                                onRatingUpdate: (rating) {
+                                  setState(() {
+                                    _rating = rating;
+                                  });
+                                },
+                                updateOnDrag: false,
+                              ),
                             ),
                           ],
                         ),
@@ -535,14 +564,14 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
               Container(
                 padding: EdgeInsets.all(10.h),
                 alignment: AlignmentDirectional.center,
-                child: Text(getTranslated(context, 'auction_remaining_time'),style: TextStyle(
+                child: Text(getTranslated(context, 'auction_remaining_time')!,style: TextStyle(
                   color: Color(0xFF000000),
                   fontWeight: FontWeight.bold,
                   fontSize: screenUtil.setSp(13)
                 ),),
               ),
               Countdown(
-                seconds: getRemainingTime(mAuctionDetailsModel.data[0].endDate),
+                seconds: getRemainingTime(mAuctionDetailsModel!.data![0].endDate!,mAuctionDetailsModel!.data![0].date!),
                 build: (BuildContext context, double time) => Container(
                   alignment: AlignmentDirectional.center,
                   child: Text(
@@ -564,7 +593,7 @@ class _AuctionDetailsScreenState extends State<AuctionDetailsScreen> {
               Container(
                 padding: EdgeInsets.all(10.h),
                 alignment: AlignmentDirectional.centerStart,
-                child: Text('${getTranslated(context,'current_auction_bid')} ${mAuctionDetailsModel.data[0].reach} ${getTranslated(context, 'kwd')}',style: TextStyle(
+                child: Text('${getTranslated(context,'current_auction_bid')} ${mAuctionDetailsModel!.data![0].reach} ${getTranslated(context, 'kwd')}',style: TextStyle(
                     color: Color(0xFF000000),
                     fontWeight: FontWeight.bold,
                     fontSize: screenUtil.setSp(13)
@@ -578,11 +607,11 @@ children: [
   GestureDetector(
     onTap: (){
         setState(() {
-          currentBid = int.parse(mAuctionDetailsModel.data[0].bids[0]);
+          currentBid = int.parse(mAuctionDetailsModel!.data![0].bids![0]);
         });
     },
     child: Container(
-        child: currentBid == int.parse(mAuctionDetailsModel.data[0].bids[0])?
+        child: currentBid == int.parse(mAuctionDetailsModel!.data![0].bids![0])?
         Container(
           padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
           decoration: BoxDecoration(
@@ -591,7 +620,7 @@ children: [
 
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data[0].bids[0])} ${getTranslated(context, 'kwd')}',
+            '${int.parse(mAuctionDetailsModel!.data![0].bids![0])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: Color(0xFFFFFFFF),
                 fontSize: screenUtil.setSp(14),
@@ -611,7 +640,7 @@ children: [
               )
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data[0].bids[0])} ${getTranslated(context, 'kwd')}',
+            '${int.parse(mAuctionDetailsModel!.data![0].bids![0])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: kMainColor,
                 fontSize: screenUtil.setSp(14),
@@ -627,11 +656,11 @@ children: [
   GestureDetector(
         onTap: (){
           setState(() {
-            currentBid = int.parse(mAuctionDetailsModel.data[0].bids[1]);
+            currentBid = int.parse(mAuctionDetailsModel!.data![0].bids![1]);
           });
         },
     child: Container(
-        child: currentBid == int.parse(mAuctionDetailsModel.data[0].bids[1])?
+        child: currentBid == int.parse(mAuctionDetailsModel!.data![0].bids![1])?
         Container(
           padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
           decoration: BoxDecoration(
@@ -640,7 +669,7 @@ children: [
 
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data[0].bids[1])} ${getTranslated(context, 'kwd')}',
+            '${int.parse(mAuctionDetailsModel!.data![0].bids![1])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: Color(0xFFFFFFFF),
                 fontSize: screenUtil.setSp(14),
@@ -660,7 +689,7 @@ children: [
               )
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data[0].bids[1])} ${getTranslated(context, 'kwd')}',
+            '${int.parse(mAuctionDetailsModel!.data![0].bids![1])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: kMainColor,
                 fontSize: screenUtil.setSp(14),
@@ -675,11 +704,11 @@ children: [
   GestureDetector(
         onTap: (){
           setState(() {
-            currentBid = int.parse(mAuctionDetailsModel.data[0].bids[2]);
+            currentBid = int.parse(mAuctionDetailsModel!.data![0].bids![2]);
           });
         },
     child: Container(
-        child:currentBid == int.parse(mAuctionDetailsModel.data[0].bids[2])?
+        child:currentBid == int.parse(mAuctionDetailsModel!.data![0].bids![2])?
         Container(
           padding: EdgeInsets.symmetric(vertical: 5.h,horizontal: 10.w),
           decoration: BoxDecoration(
@@ -688,7 +717,7 @@ children: [
 
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data[0].bids[2])} ${getTranslated(context, 'kwd')}',
+            '${int.parse(mAuctionDetailsModel!.data![0].bids![2])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: Color(0xFFFFFFFF),
                 fontSize: screenUtil.setSp(14),
@@ -708,7 +737,7 @@ children: [
               )
           ),
           child: Text(
-            '${int.parse(mAuctionDetailsModel.data[0].bids[2])} ${getTranslated(context, 'kwd')}',
+            '${int.parse(mAuctionDetailsModel!.data![0].bids![2])} ${getTranslated(context, 'kwd')}',
             style: TextStyle(
                 color: kMainColor,
                 fontSize: screenUtil.setSp(14),
@@ -727,7 +756,7 @@ children: [
                 alignment: AlignmentDirectional.center,
                 padding: EdgeInsets.symmetric(horizontal:10.h),
                 child: Text(
-                 getTranslated(context, 'update_bid_value'),
+                 getTranslated(context, 'update_bid_value')!,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -739,7 +768,7 @@ children: [
                 alignment: AlignmentDirectional.center,
                 padding: EdgeInsets.symmetric(horizontal:4.h),
                 child: Text(
-                  '${double.parse(mAuctionDetailsModel.data[0].reach)+currentBid} ${getTranslated(context, 'kwd')}',
+                  '${double.parse(mAuctionDetailsModel!.data![0].reach!)+currentBid} ${getTranslated(context, 'kwd')}',
                   style: TextStyle(
                       color: kMainColor,
                       fontSize: screenUtil.setSp(20),
@@ -750,7 +779,7 @@ children: [
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                   width: screenUtil.screenWidth,
-                  child: previewButton(getTranslated(context, 'sumbit_bid'), context)),
+                  child: previewButton(getTranslated(context, 'sumbit_bid')!, context)),
               SizedBox(height: 20.w,),
               SizedBox(height: 1.h,
                 width: width,
@@ -763,7 +792,7 @@ children: [
                 padding: EdgeInsets.symmetric(horizontal:10.h),
                 child: Text(
 
-                  getTranslated(context, 'highest_bidder'),
+                  getTranslated(context, 'highest_bidder')!,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(14),
@@ -792,7 +821,7 @@ children: [
                             child: CachedNetworkImage(
                               width: 120.w,
                               height: 120.h,
-                              imageUrl: KImageUrl+mAuctionDetailsModel.data[0].bidders[index].logo,
+                              imageUrl: KImageUrl+mAuctionDetailsModel!.data![0].bidders![index].logo!,
                               imageBuilder: (context, imageProvider) =>
                                   Container(
 
@@ -830,9 +859,11 @@ children: [
                           ), Expanded(flex:2,child:Column(
                             children: [
                               Expanded(
-                                flex:1,
+                                flex:2,
                                 child: Container(
-                                  child: Text(mAuctionDetailsModel.data[0].bidders[index].name,
+                                  alignment: AlignmentDirectional.center,
+                                  child: Text(mAuctionDetailsModel!.data![0].bidders![index].name!,
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
                                         fontSize: screenUtil.setSp(16),
@@ -843,7 +874,7 @@ children: [
                               Expanded(
                                 flex:1,
                                 child: Container(
-                                  child: Text(mAuctionDetailsModel.data[0].bidders[index].date,
+                                  child: Text(mAuctionDetailsModel!.data![0].bidders![index].date!,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
                                         fontSize: screenUtil.setSp(16),
@@ -854,7 +885,7 @@ children: [
                               Expanded(
                                 flex:1,
                                 child: Container(
-                                  child: Text(mAuctionDetailsModel.data[0].bidders[index].bid+" " +getTranslated(context, "kwd"),
+                                  child: Text(mAuctionDetailsModel!.data![0].bidders![index].bid!+" " +getTranslated(context, "kwd")!,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
                                         fontSize: screenUtil.setSp(16),
@@ -872,7 +903,8 @@ children: [
                   }, separatorBuilder: (context,index){
                 return Container(height: 1.h,
                   color: Color(0xFF000000),);}
-                  , itemCount:mAuctionDetailsModel.data[0].bidders.length),
+                  , itemCount:mAuctionDetailsModel!.data![0].bidders!.length),
+              SizedBox(height: 20.h,)
 
             ],
           ),
@@ -880,9 +912,9 @@ children: [
     ),
       );
   }
-  int  getRemainingTime(String date ){
+  int  getRemainingTime(String date,String startDate ){
     print('endDate ${date}');
-    var now = new DateTime.now();
+    var now =  DateTime.parse(startDate);
     print(now);
     DateTime tempDate = DateTime.parse(date);
     Duration difference = tempDate.difference(now);
@@ -941,32 +973,54 @@ children: [
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
     if(loginData == null){
       Navigator.pushReplacementNamed(context, LoginScreen.id);
 
     }else{
       if(currentBid !=0) {
         final body = json.decode(loginData);
-        LoginModel loginModel = LoginModel.fromJson(body);
+        LoginModel? loginModel = LoginModel.fromJson(body);
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
         Map<String,String> map  =  Map();
-        map['customerId']=loginModel.data.id;
-        map['bidderId']=loginModel.data.id;
-        map['auctionId']=mAuctionDetailsModel.data[0].id;
-        map['bid']='${double.parse(mAuctionDetailsModel.data[0].reach)+currentBid}';
+        map['customerId']=loginModel.data!.id!;
+        map['bidderId']=loginModel.data!.id!;
+        map['auctionId']=mAuctionDetailsModel!.data![0].id!;
+        map['bid']='${double.parse(mAuctionDetailsModel!.data![0].reach!)+currentBid}';
 
         PetMartService petMartService = PetMartService();
-        BidNewModel bidModel = await petMartService.bid(map);
-        bool success = bidModel.ok;
+        BidNewModel? bidModel = await petMartService.bid(map);
+        bool success = bidModel!.ok!;
         if (success) {
+          PusherHelper.instance.pusher.trigger(PusherEvent(
+              channelName: _channelName,
+              eventName: 'client-bid',
+              data: "bid"));
           modelHud.changeIsLoading(false);
           auctionLoad();
         }
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(bidModel.data.msg)));
+        Fluttertoast.showToast(
+            msg: bidModel.data!.msg,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
+
       }else{
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'bid_error'))));
+        Fluttertoast.showToast(
+            msg: getTranslated(context, 'bid_error')!,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
+
       }
 
     }
@@ -979,7 +1033,7 @@ children: [
       sumbitAuction(context);
 
     }else{
-      ShowAlertDialog(context,getTranslated(context, 'not_login'));
+      ShowAlertDialog(context,getTranslated(context, 'not_login')!);
     }
 
   }
@@ -1019,7 +1073,7 @@ children: [
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1035,7 +1089,7 @@ children: [
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

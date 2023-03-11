@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:images_picker/images_picker.dart';
 
 import 'package:path_provider/path_provider.dart' as path_provider;
@@ -9,7 +10,7 @@ import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -32,7 +33,7 @@ import '../model/InterestModel.dart' as Interest;
 import '../model/home_model.dart';
 import 'main_sceen.dart';
 class CreateAuctionScreen extends StatefulWidget {
-  const CreateAuctionScreen({Key key}) : super(key: key);
+  const CreateAuctionScreen({Key? key}) : super(key: key);
 
   @override
   _CreateAuctionScreenState createState() => _CreateAuctionScreenState();
@@ -40,40 +41,40 @@ class CreateAuctionScreen extends StatefulWidget {
 
 class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  String mLanguage;
+  String? mLanguage;
   final TextEditingController _titleController = new TextEditingController();
   final TextEditingController _descriptionController = new TextEditingController();
   final TextEditingController _priceController = new TextEditingController();
 
 
-  LoginModel loginModel;
-  List<File> mImages = List();
-  NAlertDialog nAlertDialog;
-  List<String> Paths= List();
-  List<File> vedios = List();
+  LoginModel? loginModel;
+  List<File> mImages =[];
+  NAlertDialog? nAlertDialog;
+  List<String> Paths= [];
+  List<File> vedios = [];
   String categoryId ="";
   String subCategoryId ="";
-  CategoryParent.HomeModel homeModel;
-  List<CategoryParent.Categories> categoryList;
-  SubCategory.CategoryModel mSubCategoryModel;
-  String path =null;
+  CategoryParent.HomeModel? homeModel;
+  List<CategoryParent.Categories>? categoryList;
+  SubCategory.CategoryModel? mSubCategoryModel;
+  String? path ;
   String vedioUrl ="";
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   bool isSelected = false;
   String mChooseImage="اختار الصورة";
-  Future<NAlertDialog> showPickerDialog(BuildContext context)async {
+  Future<NAlertDialog?> showPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text(getTranslated(context, 'select_image')),
+      content: Padding(child: Text(getTranslated(context, 'select_image')!),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'camera')!),onPressed: () {
 
           _getImageFromCamera(context);
         }),
-        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'gallery')!),onPressed: () {
           _getImageFromGallery(context);
         }),
 
@@ -82,18 +83,18 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     return nAlertDialog;
   }
 
-  Future<NAlertDialog> showVedioPickerDialog(BuildContext context)async {
+  Future<NAlertDialog?> showVedioPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text(getTranslated(context, 'select_vedio')),
+      content: Padding(child: Text(getTranslated(context, 'select_vedio')!),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'camera')!),onPressed: () {
 
           _getVedioFromCamera(context);
         }),
-        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'gallery')!),onPressed: () {
           _getVedioFromGallery(context);
         }),
 
@@ -158,22 +159,31 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       await testLengthController.initialize();
       if (testLengthController.value.duration.inSeconds > 15) {
         pickedFile = null;
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'select_vedio_error'))));
+        Fluttertoast.showToast(
+            msg: getTranslated(context, 'select_vedio_error')!,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
+
       }else {
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
         await VideoCompress.setLogLevel(0);
-        final MediaInfo info = await VideoCompress.compressVideo(
+        final MediaInfo? info = await VideoCompress.compressVideo(
           pickedFile.path,
           quality: VideoQuality.MediumQuality,
           deleteOrigin: false,
           includeAudio: true,
         );
-        print(info.path);
+        print(info!.path);
 
 
         isSelected = true;
-        File _image = File(info.path);
+        File _image = File(info.path!);
 
         vedios.add(_image);
         Navigator.pop(context);
@@ -242,7 +252,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok_string'),
+            getTranslated(context, 'ok_string')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -270,20 +280,20 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
       await VideoCompress.setLogLevel(0);
-      final MediaInfo  info = await VideoCompress.compressVideo(
+      final MediaInfo?  info = await VideoCompress.compressVideo(
         pickedFile.path,
         quality: VideoQuality.MediumQuality,
         deleteOrigin: false,
         includeAudio: true,
       );
-      print(info.path);
+      print(info!.path);
 
 
 
 
 
       isSelected = true;
-      File _image = File(info.path);
+      File _image = File(info.path!);
 
       vedios.add(_image) ;
 
@@ -321,8 +331,8 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    String homeString = _preferences.getString('home');
-    final body = json.decode(homeString);
+    String? homeString = _preferences.getString('home');
+    final body = json.decode(homeString!);
     CategoryParent.HomeModel   homeModel =CategoryParent.HomeModel.fromJson(body);
     return homeModel;
   }
@@ -330,7 +340,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
     List<XFile> pickedFile = [];
 
     try {
-      List<Media> res = await ImagesPicker.pick(
+      List<Media>? res = await ImagesPicker.pick(
         count: 10,
         pickType: PickType.all,
         language: Language.System,
@@ -342,7 +352,7 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
         ),
       );
 
-      if (res!= null || res.isNotEmpty) {
+      if (res!= null || res!.isNotEmpty) {
         isSelected = true;
         for (int i = 0; i < res.length; i++) {
           File _image = File(res[i].path);
@@ -402,23 +412,23 @@ class _CreateAuctionScreenState extends State<CreateAuctionScreen> {
 
 
 String userId ="";
-  Future<HomeModel> interest() async{
+  Future<HomeModel?> interest() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
 
 
 
-    final body = json.decode(loginData);
+    final body = json.decode(loginData!);
     loginModel = LoginModel.fromJson(body);
-    userId = loginModel.data.id;
+    userId = loginModel!.data!.id!;
 
 
 
     PetMartService petMartService = PetMartService();
-   HomeModel interestModel = await petMartService.home(userId);
+   HomeModel? interestModel = await petMartService.home(userId);
 
 
 
@@ -428,9 +438,9 @@ String userId ="";
 
     return interestModel;
   }
-  String mStartDate;
-  String mEndDate;
-  HomeModel interestModel;
+  String? mStartDate;
+  String? mEndDate;
+  HomeModel? interestModel;
   @override
   void initState() {
     // TODO: implement initState
@@ -440,8 +450,8 @@ String userId ="";
 
     mStartDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
     mEndDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(end);
-    print("mStartDate-->"+mStartDate);
-    print("mEndDate-->"+mEndDate);
+    print("mStartDate-->"+mStartDate!);
+    print("mEndDate-->"+mEndDate!);
     interest().then((value) {
       setState(() {
         interestModel = value;
@@ -475,7 +485,7 @@ String userId ="";
               child: Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 10.h),
                 child: Text(
-                  getTranslated(context, 'create_auction'),
+                  getTranslated(context, 'create_auction')!,
                   style: TextStyle(
                       color: Color(0xFFFFFFFF),
                       fontSize: screenUtil.setSp(16),
@@ -529,7 +539,7 @@ String userId ="";
                   physics: const AlwaysScrollableScrollPhysics(),
 
                   children: [
-                    Text(getTranslated(context, 'auction_cover_photo'),
+                    Text(getTranslated(context, 'auction_cover_photo')!,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(16),
@@ -551,7 +561,7 @@ String userId ="";
                           GestureDetector(
                             onTap: (){
                               showPickerDialog(context).then((value){
-                                value.show(context);
+                                value!.show(context);
                               });
                             },
                             child:
@@ -590,7 +600,7 @@ String userId ="";
                     ),
                     SizedBox(height: 5.h,width: screenUtil.screenWidth,
                     ),
-                    Text(getTranslated(context, 'add_vedio'),
+                    Text(getTranslated(context, 'add_vedio')!,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(16),
@@ -612,7 +622,7 @@ String userId ="";
                             Container():GestureDetector(
                               onTap: (){
                                 showVedioPickerDialog(context).then((value){
-                                  value.show(context);
+                                  value!.show(context);
                                 });
                               },
                               child:
@@ -668,7 +678,7 @@ String userId ="";
 
 
 
-                        items: interestModel.data.categories,
+                        items: interestModel!.data!.categories!,
 
 
 
@@ -681,8 +691,8 @@ String userId ="";
 
 
 
-                        customWidgets: interestModel.data.categories.map((p) => buildDropDownRow(p)).toList(),
-                        hint:  Text(getTranslated(context, 'select_category'),
+                        customWidgets: interestModel!.data!.categories!.map((p) => buildDropDownRow(p)).toList(),
+                        hint:  Text(getTranslated(context, 'select_category')!,
                           textAlign: TextAlign.start,
                           style: TextStyle(
 
@@ -690,8 +700,8 @@ String userId ="";
                               fontWeight: FontWeight.w600,
                               fontSize: screenUtil.setSp(15)
                           ),),
-                        onChanged: (Categories category){
-                          categoryId = category.id;
+                        onChanged: (Categories? category){
+                          categoryId = category!.id!;
                           setState(() {
 
 
@@ -822,7 +832,7 @@ String userId ="";
                         )
                     ),
                     SizedBox(height: 10.h,),
-                    sumbitButton(getTranslated(context, 'create_auction'),context)
+                    sumbitButton(getTranslated(context, 'create_auction')!,context)
                   ],
                 ),
               ),
@@ -867,7 +877,7 @@ String userId ="";
     );
   }
 
-  Future<SubCategory.CategoryModel> subCategory(String categoryId) async{
+  Future<SubCategory.CategoryModel?> subCategory(String categoryId) async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
@@ -884,7 +894,7 @@ String userId ="";
 
 
     PetMartService petMartService = PetMartService();
-    SubCategory.CategoryModel auctionDetailsModel = await petMartService.category(categoryId);
+    SubCategory.CategoryModel? auctionDetailsModel = await petMartService.category(categoryId);
     return auctionDetailsModel;
   }
   Widget buildDropDownRow(Categories category) {
@@ -897,7 +907,7 @@ String userId ="";
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(mLanguage =="en"?category.enTitle:category.arTitle ,
+        child: Text(mLanguage =="en"?category.enTitle!:category.arTitle! ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
@@ -915,7 +925,7 @@ String userId ="";
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(mLanguage == "en"?category.enTitle:category.arTitle ,
+        child: Text(mLanguage == "en"?category.enTitle!:category.arTitle! ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
@@ -961,41 +971,87 @@ String userId ="";
 
     String price = _priceController.text;
     if(mImages.isEmpty){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'image_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }
     else if(categoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'category_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'category_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }
     else if(postTitle==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'auction_title_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'auction_title_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else if(postDescription==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'auction_desc_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'auction_desc_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else if(price==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'bid_price_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'bid_price_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
+
 
     }else{
-      List<File> mCompressedImages  = List();
+      List<File> mCompressedImages  = [];
 
 
-      String userId = loginModel.data.id;
+      String userId = loginModel!.data!.id!;
 
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
       for(int i =0;i<mImages.length;i++){
-        File compressImage = await  CompressFile(mImages[i]);
-        mCompressedImages.add(compressImage);
+        File? compressImage = await  CompressFile(mImages[i]);
+        mCompressedImages.add(compressImage!);
 
       }
       PetMartService petMartService = PetMartService();
-      dynamic response = await petMartService.addAuction(postTitle, postTitle, postDescription, postDescription, mStartDate,mEndDate, replaceArabicNumber(price),"running",categoryId, userId, subCategoryId, mLanguage, mCompressedImages, vedios,vedioUrl);
+      dynamic response = await petMartService.addAuction(postTitle, postTitle, postDescription, postDescription, mStartDate!,mEndDate!, replaceArabicNumber(price),"running",categoryId, userId, subCategoryId, mLanguage!, mCompressedImages, vedios,vedioUrl);
       modelHud.changeIsLoading(false);
       bool status = response['ok'];
       if(status){
-        ShowAlertDialog(context, getTranslated(context, "auction_success"),true);
+        ShowAlertDialog(context, getTranslated(context, "auction_success")!,true);
 
       }else{
         ShowAlertDialog(context, response['data']['msg'],false);
@@ -1039,7 +1095,7 @@ String userId ="";
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1059,7 +1115,7 @@ String userId ="";
     alert.show();
 
   }
-  Future<File> CompressFile(File file) async {
+  Future<File?> CompressFile(File file) async {
     final dir = await path_provider.getTemporaryDirectory();
     String targetPath = "${dir.absolute.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
 

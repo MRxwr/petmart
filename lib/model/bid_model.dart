@@ -3,18 +3,18 @@
 /// data : {"auction_id":"1","user_id":"93","bid_value":"50","created_at":"2021-05-05 05:33:52","updated_at":"2021-05-05 05:33:52","bid_id":"549","auction_name":null,"user_name":null}
 
 class BidModel {
-  String _status;
-  String _message;
-  Data _data;
+  String? _status;
+  String? _message;
+  Data? _data;
 
-  String get status => _status;
-  String get message => _message;
-  Data get data => _data;
+  String get status => _status!;
+  String get message => _message!;
+  Data get data => _data!;
 
   BidModel({
-      String status, 
-      String message, 
-      Data data}){
+    String? status,
+    String? message,
+      Data? data}){
     _status = status;
     _message = message;
     _data = data;
@@ -31,7 +31,7 @@ class BidModel {
     map["status"] = _status;
     map["message"] = _message;
     if (_data != null) {
-      map["data"] = _data.toJson();
+      map["data"] = _data!.toJson();
     }
     return map;
   }
@@ -48,31 +48,31 @@ class BidModel {
 /// user_name : null
 
 class Data {
-  String _auctionId;
-  String _userId;
-  String _bidValue;
-  String _createdAt;
-  String _updatedAt;
-  String _bidId;
+  String? _auctionId;
+  String? _userId;
+  String? _bidValue;
+  String? _createdAt;
+  String? _updatedAt;
+  String? _bidId;
   dynamic _auctionName;
   dynamic _userName;
 
-  String get auctionId => _auctionId;
-  String get userId => _userId;
-  String get bidValue => _bidValue;
-  String get createdAt => _createdAt;
-  String get updatedAt => _updatedAt;
-  String get bidId => _bidId;
+  String get auctionId => _auctionId!;
+  String get userId => _userId!;
+  String get bidValue => _bidValue!;
+  String get createdAt => _createdAt!;
+  String get updatedAt => _updatedAt!;
+  String get bidId => _bidId!;
   dynamic get auctionName => _auctionName;
   dynamic get userName => _userName;
 
   Data({
-      String auctionId, 
-      String userId, 
-      String bidValue, 
-      String createdAt, 
-      String updatedAt, 
-      String bidId, 
+    String? auctionId,
+    String? userId,
+    String? bidValue,
+    String? createdAt,
+    String? updatedAt,
+    String? bidId,
       dynamic auctionName, 
       dynamic userName}){
     _auctionId = auctionId;

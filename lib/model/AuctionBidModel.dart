@@ -1,8 +1,8 @@
 class AuctionBidModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   AuctionBidModel({this.ok, this.error, this.status, this.data});
 
@@ -19,26 +19,26 @@ class AuctionBidModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  String id;
-  String enTitle;
-  String arTitle;
-  String reach;
-  String enDetails;
-  String arDetails;
-  String startDate;
-  String endDate;
-  String winnerRated;
-  String ownerRated;
+  String? id;
+  String? enTitle;
+  String? arTitle;
+  String? reach;
+  String? enDetails;
+  String? arDetails;
+  String? startDate;
+  String? endDate;
+  String? winnerRated;
+  String? ownerRated;
   dynamic image;
-  Owner owner;
-  Owner winner;
+  Owner? owner;
+  Owner? winner;
 
   Data(
       {this.id,
@@ -85,22 +85,22 @@ class Data {
     data['ownerRated'] = this.ownerRated;
     data['image'] = this.image;
     if (this.owner != null) {
-      data['owner'] = this.owner.toJson();
+      data['owner'] = this.owner!.toJson();
     }
     if (this.winner != null) {
-      data['winner'] = this.winner.toJson();
+      data['winner'] = this.winner!.toJson();
     }
     return data;
   }
 }
 
 class Owner {
-  String id;
-  String email;
-  String mobile;
-  String name;
-  String logo;
-  String oRate;
+  String? id;
+  String? email;
+  String? mobile;
+  String? name;
+  String? logo;
+  String? oRate;
 
   Owner({this.id, this.email, this.mobile, this.name, this.logo, this.oRate});
 

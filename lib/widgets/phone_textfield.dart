@@ -11,12 +11,12 @@ import 'package:pet_mart/utilities/constants.dart';
 
 class PhoneTextField extends StatelessWidget {
   final String hint;
-  final IconData icon;
+
   final Function onClick;
   final String mText;
-  BuildContext context;
+  final BuildContext context;
 
-  String _errorMessage(String str){
+   _errorMessage(String str){
     switch(str){
       case 'Full Name':
 
@@ -25,11 +25,11 @@ class PhoneTextField extends StatelessWidget {
     }
   }
 
-  PhoneTextField({Key key, @required this.hint,@required this.icon,@required this.onClick, this.mText}) : super(key: key);
+  PhoneTextField({Key? key, required this.hint,required this.onClick, required this.mText,required this.context}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
+
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     TextEditingController myController = TextEditingController()..text = mText;
@@ -55,7 +55,11 @@ class PhoneTextField extends StatelessWidget {
 
 
               keyboardType: TextInputType.phone ,
-              onSaved: onClick,
+              onSaved: (value){
+                onClick(value);
+
+
+              },
               textInputAction: TextInputAction.done,
               maxLines: 1,
               minLines: 1,
@@ -137,10 +141,10 @@ class PhoneTextField extends StatelessWidget {
     );
 
   }
-  String validateName(String value) {
+  String? validateName(String? value) {
 
 
-    if (value.length == 0) {
+    if (value!.length == 0) {
       return getTranslated(context, 'mobile_error');
     }
 

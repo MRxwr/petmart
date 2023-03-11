@@ -1,8 +1,8 @@
 class PostDetailsModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   PostDetailsModel({this.ok, this.error, this.status, this.data});
 
@@ -19,14 +19,14 @@ class PostDetailsModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Items> items;
+  List<Items>? items;
 
   Data({this.items});
 
@@ -34,7 +34,7 @@ class Data {
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
-        items.add(new Items.fromJson(v));
+        items!.add(new Items.fromJson(v));
       });
     }
   }
@@ -42,33 +42,33 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.items != null) {
-      data['items'] = this.items.map((v) => v.toJson()).toList();
+      data['items'] = this.items!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Items {
-  String id;
-  String categoryId;
-  String date;
-  String arTitle;
-  String enTitle;
-  String arDetails;
-  String enDetails;
-  String video;
-  String age;
-  String price;
-  String gender;
-  String genderAr;
-  String ageType;
-  String ageTypeAr;
-  String shares;
-  String views;
-  String mobile;
-  List<String> image;
-  List<Similar> similar;
-  Customer customer;
+  String? id;
+  String? categoryId;
+  String? date;
+  String? arTitle;
+  String? enTitle;
+  String? arDetails;
+  String? enDetails;
+  String? video;
+  String? age;
+  String? price;
+  String? gender;
+  String? genderAr;
+  String? ageType;
+  String? ageTypeAr;
+  String? shares;
+  String? views;
+  String? mobile;
+  List<String>? image;
+  List<Similar>? similar;
+  Customer? customer;
 
   Items(
       {this.id,
@@ -114,7 +114,7 @@ class Items {
     if (json['similar'] != null) {
       similar = <Similar>[];
       json['similar'].forEach((v) {
-        similar.add(new Similar.fromJson(v));
+        similar!.add(new Similar.fromJson(v));
       });
     }
     customer = json['customer'] != null
@@ -143,23 +143,23 @@ class Items {
     data['mobile'] = this.mobile;
     data['image'] = this.image;
     if (this.similar != null) {
-      data['similar'] = this.similar.map((v) => v.toJson()).toList();
+      data['similar'] = this.similar!.map((v) => v.toJson()).toList();
     }
     if (this.customer != null) {
-      data['customer'] = this.customer.toJson();
+      data['customer'] = this.customer!.toJson();
     }
     return data;
   }
 }
 
 class Similar {
-  String id;
-  String enTitle;
-  String arTitle;
-  String date;
-  String price;
-  String image;
-  int images;
+  String? id;
+  String? enTitle;
+  String? arTitle;
+  String? date;
+  String? price;
+  String? image;
+  int? images;
 
   Similar(
       {this.id,
@@ -194,10 +194,10 @@ class Similar {
 }
 
 class Customer {
-  String id;
-  String name;
-  String phone;
-  String logo;
+  String? id;
+  String? name;
+  String? phone;
+  String? logo;
 
   Customer({this.id, this.name, this.phone, this.logo});
 

@@ -2,13 +2,15 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:device_info/device_info.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -26,7 +28,7 @@ import 'package:pet_mart/widgets/user_name_textfield.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sweetalert/sweetalert.dart';
+
 import 'package:unique_identifier/unique_identifier.dart';
 
 import '../model/DeleteUserModel.dart';
@@ -35,34 +37,34 @@ import 'login_screen.dart';
 import 'main_sceen.dart';
 class MyAccountScreen extends StatefulWidget {
   static String id = 'MyAccountScreen';
-  bool isFromPayment;
-  String paymentId;
-  MyAccountScreen({Key key,@required this.isFromPayment,@ required this.paymentId}) : super(key: key);
+  bool? isFromPayment;
+  String? paymentId;
+  MyAccountScreen({Key? key, this.isFromPayment,  this.paymentId}) : super(key: key);
 
   @override
   _MyAccountScreenState createState() => _MyAccountScreenState();
 }
 
 class _MyAccountScreenState extends State<MyAccountScreen> {
-  NAlertDialog nAlertDialog;
-  String path =null;
+  NAlertDialog? nAlertDialog;
+  String path ="" ;
   String mChooseImage="اختار الصورة";
-  File _image = null;
+  File? _image ;
   bool isSelected = false;
   String userId ="";
 
-  Future<NAlertDialog> showPickerDialog(BuildContext context)async {
+  Future<NAlertDialog?> showPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text(getTranslated(context, 'select_image')),
+      content: Padding(child: Text(getTranslated(context, 'select_image')!),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'camera')!),onPressed: () {
 
           _getImageFromCamera(context);
         }),
-        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'gallery')!),onPressed: () {
           _getImageFromGallery(context);
         }),
 
@@ -84,7 +86,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
 
       _image = File(pickedFile.path);
-      path = _image.path;
+      path = _image!.path;
       // updateImage(context);
 
 
@@ -106,7 +108,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
       isSelected = true;
       _image = File(pickedFile.path);
-      path = _image.path;
+      path = _image!.path;
       mChooseImage="تم اختيار الصورة";
 
 
@@ -127,8 +129,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     Navigator.pop(context);
 
   }
-  LoginModel   loginModel;
-  UserModel userModel;
+  LoginModel?   loginModel;
+  UserModel? userModel;
 
   ScreenUtil screenUtil = ScreenUtil();
   String imageUrl ="";
@@ -138,18 +140,18 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
   String email ="";
   String mLanguage="";
 
-  Future<UserModel> user() async{
+  Future<UserModel?> user() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
 
 
 
-      final body = json.decode(loginData);
+      final body = json.decode(loginData!);
          loginModel = LoginModel.fromJson(body);
-      userId = loginModel.data.id;
+      userId = loginModel!.data!.id!;
 
     Map<String, String> map = Map();
     map['id']=userId;
@@ -159,10 +161,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    UserModel userModel = await petMartService.user(map);
-    if(widget.isFromPayment) {
-      SuccessModel successModel = await petMartService.successPayment(
-          widget.paymentId);
+    UserModel? userModel = await petMartService.user(map);
+    if(widget.isFromPayment!) {
+
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
       sharedPreferences.setBool("isSuccess", true);
     }
@@ -173,19 +174,19 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
     return userModel;
   }
-  Future<CreditModel> credit() async{
+  Future<CreditModel?> credit() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
     Map map ;
 
 
-    final body = json.decode(loginData);
+    final body = json.decode(loginData!);
     LoginModel   loginModel = LoginModel.fromJson(body);
     map = {
-      "user_id":loginModel.data.id,
+      "user_id":loginModel.data!.id,
       "language":languageCode};
 
 
@@ -193,7 +194,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
 
     PetMartService petMartService = PetMartService();
-    CreditModel creditModel = await petMartService.credit(map);
+    CreditModel? creditModel = await petMartService.credit(map);
     return creditModel;
   }
   @override
@@ -203,8 +204,8 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     user().then((value){
       setState(() {
         userModel = value;
-        imageUrl = value.data.logo;
-        if(widget.isFromPayment){
+        imageUrl = value!.data!.logo!;
+        if(widget.isFromPayment!){
           showSuccessDialog(context);
         }
       });
@@ -214,22 +215,24 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
 
   }
-  void showSuccessDialog(BuildContext context) {
-    SweetAlert.show(context,
-        title: getTranslated(context, 'success'),
-        subtitle: getTranslated(context, 'payment_success'),
-
-        showCancelButton: false,
-        confirmButtonColor: kMainColor,
-        confirmButtonText: getTranslated(context, 'ok'),
-        style: SweetAlertStyle.success,
-        onPress: (bool isConfirm){
-          Navigator.pop(context,true);
-
+  void showSuccessDialog(BuildContext context) async{
+    ArtDialogResponse response = await ArtSweetAlert.show(
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+          type: ArtSweetAlertType.success,
+          title: getTranslated(context, 'success'),
+          text: getTranslated(context, 'payment_success'),
+          confirmButtonText: getTranslated(context, 'ok')!,
+          confirmButtonColor: kMainColor,
+          showCancelBtn: false,
 
 
-          return true;
-        });
+        )
+    );
+    if(response.isTapConfirmButton) {
+      Navigator.pop(context,true);
+    }
+
   }
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
@@ -249,7 +252,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-              getTranslated(context, 'my_account'),
+              getTranslated(context, 'my_account')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -316,7 +319,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('${getTranslated(context, 'your_credit')} ${ userModel.data.points}',
+                              Text('${getTranslated(context, 'your_credit')} ${ userModel!.data!.points}',
                               style: TextStyle(
                                 color: Color(0xFFFFFFFF),
                                 fontWeight: FontWeight.normal,
@@ -326,7 +329,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 onTap: (){
                                   _buttonTapped();
                                 },
-                                child: Text(getTranslated(context,'purchase_credit'),
+                                child: Text(getTranslated(context,'purchase_credit')!,
                                   style: TextStyle(
                                       color: Color(0xFF000000),
                                       fontWeight: FontWeight.bold,
@@ -371,7 +374,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                             image: DecorationImage(
                                                 fit: BoxFit.fill,
 
-                                                image: FileImage(File(path))),
+                                                image: FileImage(File(path!))),
                                           )
                                       ),
                                     ),
@@ -451,7 +454,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                 GestureDetector(
                                   onTap: (){
                                     showPickerDialog(context).then((value){
-                                      value.show(context);
+                                      value!.show(context);
                                     });
                                   },
                                   child: Center(
@@ -464,7 +467,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                                           shape: BoxShape.circle,
 
                                           image: DecorationImage(
-                                              image: FileImage(File(path)),
+                                              image: FileImage(File(path!)),
                                               fit: BoxFit.fill),
                                         )
                                     )
@@ -527,22 +530,13 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                       SizedBox(height: 10.h,width: width,),
                       Container(
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
-                        child: UserNameTextField(hint:getTranslated(context,'first_name'),onClick: (value){
-                          firstName = value;
-
-                        },mText: userModel.data.name.split(" ")[0],
-
-                        ),
-                      ),
-                      SizedBox(height: 10.h,width: width,),
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 10.h),
                         child: Directionality(
                           textDirection: TextDirection.ltr,
-                          child: UserNameTextField(hint:getTranslated(context, 'last_name'),onClick: (value){
-                            lastName = value;
+                          child: UserNameTextField(hint:getTranslated(context,'first_name')!,onClick: (value){
+                            firstName = value;
 
-                          },mText: userModel.data.name.split(" ")[1],
+                          },mText: userModel!.data!.name!.split(" ")[0],
+                            context: context,
 
                           ),
                         ),
@@ -552,11 +546,26 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         margin: EdgeInsets.symmetric(horizontal: 10.h),
                         child: Directionality(
                           textDirection: TextDirection.ltr,
-                          child: NameTextField(hint:getTranslated(context, 'email_address'),onClick: (value){
+                          child: UserNameTextField(hint:getTranslated(context, 'last_name')!,onClick: (value){
+                            lastName = value;
+
+                          },mText: userModel!.data!.name!.split(" ")[1],
+                            context: context,
+
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 10.h,width: width,),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 10.h),
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: NameTextField(hint:getTranslated(context, 'email_address')!,onClick: (value){
                             email = value;
 
                           },
-                            mText: userModel.data.email,
+                            mText: userModel!.data!.email,
+                            context: context,
                           ),
                         ),
                       ),
@@ -566,20 +575,21 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
                         child:
                         Directionality(
                           textDirection: TextDirection.ltr,
-                          child: PhoneTextField(hint:getTranslated(context, 'mobile'),onClick: (value){
+                          child: PhoneTextField(hint:getTranslated(context, 'mobile')!,onClick: (value){
                             phone = value;
 
                           },
-                            mText: userModel.data.mobile,
+                            mText: userModel!.data!.mobile!,
+                            context: context,
                           ),
                         ),
                       ),
                       SizedBox(height: 20.h,width: width,),
                       Container(margin: EdgeInsets.symmetric(horizontal: 20.w),
-                          child: confirmButton(getTranslated(context, 'update_profile'),context)),
+                          child: confirmButton(getTranslated(context, 'update_profile')!,context)),
                       SizedBox(height: 20.h,width: width,),
                       Container(margin: EdgeInsets.symmetric(horizontal: 20.w),
-                          child: deleteButton(getTranslated(context, 'delete_account'),context)),
+                          child: deleteButton(getTranslated(context, 'delete_account')!,context)),
                     ],
                   )
                   ,
@@ -627,7 +637,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
       buttons: [
         DialogButton(
           child: Text(
-            getTranslated(context, 'yes'),
+            getTranslated(context, 'yes')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async{
@@ -642,7 +652,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -667,15 +677,15 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
     PetMartService petMartService = PetMartService();
     String deviceType="";
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
 
 
 
-    final body = json.decode(loginData);
+    final body = json.decode(loginData!);
     LoginModel   loginModel = LoginModel.fromJson(body);
-    String  mUser = loginModel.data.id;
+    String?  mUser = loginModel.data!.id;
 
-    DeleteUserModel  deleteUserModel = await petMartService.deleteUser(mUser);
+    DeleteUserModel?  deleteUserModel = await petMartService.deleteUser(mUser!);
 
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -735,9 +745,9 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
     );
   }
   void validate(BuildContext context) async {
-    if(_globalKey.currentState.validate()) {
-      _globalKey.currentState.save();
-      if(path != null)
+    if(_globalKey.currentState!.validate()) {
+      _globalKey.currentState!.save();
+      if(path != "")
       {
         dynamic response;
         final modelHud = Provider.of<ModelHud>(context,listen: false);
@@ -747,7 +757,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         // print(_img64);
         PetMartService petMartService = PetMartService();
         String deviceType="";
-        String uniqueId="";
+        String? uniqueId="";
 
         if(Platform.isAndroid){
           deviceType = "a";
@@ -764,7 +774,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
         map['email']=email;
         map['mobile']=phone;
 
-          String imagePath = File(path).absolute.path;
+          String imagePath = File(path!).absolute.path;
 
 
           String childFileName = imagePath
@@ -776,14 +786,32 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
 
 
-        UserModel userModel  =await petMartService.updateProfile(userId,firstName+" "+lastName,email,phone,path);
-        bool  status = userModel.ok;
+        UserModel? userModel  =await petMartService.updateProfile(userId,firstName+" "+lastName,email,phone,path!);
+        bool  status = userModel!.ok!;
         modelHud.changeIsLoading(false);
         if(status ){
-          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(userModel.status)));
+          Fluttertoast.showToast(
+              msg: userModel.status!,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: screenUtil.setSp(16)
+          );
+
           Navigator.pushReplacementNamed(context,MainScreen.id);
         }else{
-          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(userModel.status)));
+          Fluttertoast.showToast(
+              msg: userModel.status!,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: screenUtil.setSp(16)
+          );
+
 
         }
 
@@ -791,10 +819,19 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
 
       }else {
-        if (firstName == userModel.data.name.split(" ")[0] &&
-            lastName == userModel.data.name.split(" ")[1] &&
-            email == userModel.data.email && phone == userModel.data.mobile) {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'update_data'))));
+        if (firstName == userModel!.data!.name!.split(" ")[0] &&
+            lastName == userModel!.data!.name!.split(" ")[1] &&
+            email == userModel!.data!.email && phone == userModel!.data!.mobile) {
+          Fluttertoast.showToast(
+              msg: getTranslated(context, 'update_data')!,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: screenUtil.setSp(16)
+          );
+
 
         }else{
           dynamic response;
@@ -802,7 +839,7 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
           modelHud.changeIsLoading(true);
           PetMartService petMartService = PetMartService();
           String deviceType="";
-          String uniqueId="";
+          String? uniqueId="";
           Map<String, String> map = Map();
           map['id']=userId;
           map['name']= firstName+" "+lastName;
@@ -817,14 +854,33 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
             var data = await deviceInfoPlugin.iosInfo;
             uniqueId = data.identifierForVendor;
           }
-          UserModel userModel  =await petMartService.updateProfile(userId,firstName+" "+lastName,email,phone,path);
+          UserModel? userModel  =await petMartService.updateProfile(userId,firstName+" "+lastName,email,phone,path!);
           modelHud.changeIsLoading(false);
-          bool status = userModel.ok;
+          bool status = userModel!.ok!;
           if(status){
-            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(userModel.status)));
+            Fluttertoast.showToast(
+                msg: userModel.status!,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: screenUtil.setSp(16)
+            );
+
             Navigator.pushReplacementNamed(context,MainScreen.id);
           }else{
-            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(userModel.status)));
+            Fluttertoast.showToast(
+                msg: userModel.status!,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.red,
+                textColor: Colors.white,
+                fontSize: screenUtil.setSp(16)
+            );
+
+
 
           }
 
@@ -837,44 +893,50 @@ class _MyAccountScreenState extends State<MyAccountScreen> {
 
   }
   Future _buttonTapped() async {
-    Map results =  await Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) {
+    var results =  await Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context) {
       return new CreditScreen();
     }
     ));
-
-    if (results != null && results.containsKey('selection')) {
+    print(results.toString());
+    if(results!= null){
       userModel = null;
       setState(() {
 
       });
-
-      SharedPreferences _preferences = await SharedPreferences.getInstance();
-      String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-      mLanguage = languageCode;
-      String loginData = _preferences.getString(kUserModel);
+        PetMartService petMartService = PetMartService();
+        SuccessModel? successModel = await petMartService.successPayment(
+            results.toString());
 
 
-
-      final body = json.decode(loginData);
-      loginModel = LoginModel.fromJson(body);
-      userId = loginModel.data.id;
-
-      Map<String, String> map = Map();
-      map['id']=userId;
-      map['email']= email;
+        SharedPreferences _preferences = await SharedPreferences.getInstance();
+        String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+        mLanguage = languageCode;
+        String? loginData = _preferences.getString(kUserModel);
 
 
 
+        final body = json.decode(loginData!);
+        loginModel = LoginModel.fromJson(body);
+        userId = loginModel!.data!.id!;
 
-      PetMartService petMartService = PetMartService();
-       userModel = await petMartService.user(map);
-      imageUrl = userModel.data.logo;
-      setState(() {
+        Map<String, String> map = Map();
+        map['id']=userId;
+        map['email']= email;
 
-      });
 
+
+
+
+        userModel = await petMartService.user(map);
+        imageUrl = userModel!.data!.logo!;
+        setState(() {
+
+        });
+      }
     }
-  }
+
+
+
 }
 
 

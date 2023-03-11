@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:grouped_list/grouped_list.dart';
 import 'package:intl/intl.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/message_model.dart';
@@ -12,17 +13,17 @@ import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class MessageScreen extends StatefulWidget {
-  String  contactName;
-  String contactImage;
-  String contactId;
-  String postId;
-  String userId;
-  MessageModel messageModel;
+  final String  contactName;
+  final String contactImage;
+  final String contactId;
+  final String postId;
+  final String userId;
+   MessageModel? messageModel;
 
 
 
 
-  MessageScreen({Key key,@required this.contactName,@required this.contactImage,@required this.contactId,@required this.userId,@required this.postId}) : super(key: key);
+  MessageScreen({Key? key,required this.contactName,required this.contactImage,required this.contactId,required this.userId,required this.postId,  this.messageModel}) : super(key: key);
 
 
   @override
@@ -32,10 +33,10 @@ class MessageScreen extends StatefulWidget {
 class _MessageScreenState extends State<MessageScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  List<Element> elements = List();
+  List<Element> elements = [];
   final TextEditingController _commentController = new TextEditingController();
 
-  Future<MessageModel> messages() async{
+  Future<MessageModel?> messages() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
@@ -54,7 +55,7 @@ class _MessageScreenState extends State<MessageScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    MessageModel messageModel = await petMartService.getMessages(map);
+    MessageModel? messageModel = await petMartService.getMessages(map);
 
     return messageModel;
   }
@@ -64,7 +65,7 @@ class _MessageScreenState extends State<MessageScreen> {
     // TODO: implement initState
     super.initState();
     messages().then((value) {
-      for(int i =0;i<value.data.length;i++){
+      for(int i =0;i<value!.data.length;i++){
         String date = value.data[i].createdAt;
         String message = value.data[i].message;
         String sender = value.data[i].sender;
@@ -344,7 +345,16 @@ class _MessageScreenState extends State<MessageScreen> {
                           postComment(comment);
 
                         }else{
-                          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'message_error'))));
+
+                          Fluttertoast.showToast(
+                              msg: getTranslated(context, 'message_error')!,
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.white,
+                              fontSize: screenUtil.setSp(16)
+                          );
 
 
                         }
@@ -385,9 +395,9 @@ class _MessageScreenState extends State<MessageScreen> {
     print('map --> ${map}');
 
     PetMartService petMartService = PetMartService();
-    MessageModel messageModel = await petMartService.postMessages(map);
+    MessageModel? messageModel = await petMartService.postMessages(map);
     elements.clear();
-    for(int i =0;i<messageModel.data.length;i++){
+    for(int i =0;i<messageModel!.data.length;i++){
       String date = messageModel.data[i].createdAt;
       String message = messageModel.data[i].message;
       String sender = messageModel.data[i].sender;

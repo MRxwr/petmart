@@ -1,8 +1,8 @@
 class PetsModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   PetsModel({this.ok, this.error, this.status, this.data});
 
@@ -19,14 +19,14 @@ class PetsModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Items> items;
+  List<Items>? items;
 
   Data({this.items});
 
@@ -34,7 +34,7 @@ class Data {
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
-        items.add(new Items.fromJson(v));
+        items!.add(new Items.fromJson(v));
       });
     }
   }
@@ -42,20 +42,20 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.items != null) {
-      data['items'] = this.items.map((v) => v.toJson()).toList();
+      data['items'] = this.items!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Items {
-  String id;
-  String arTitle;
-  String enTitle;
-  String price;
-  String date;
-  String image;
-  int images;
+  String? id;
+  String? arTitle;
+  String? enTitle;
+  String? price;
+  String? date;
+  String? image;
+  int? images;
 
   Items(
       {this.id,

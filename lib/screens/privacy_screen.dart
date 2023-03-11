@@ -8,13 +8,13 @@ import 'package:pet_mart/utilities/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class PrivacyScreen extends StatefulWidget {
   static String id = 'PrivacyScreen';
-  CmsModel cmsModel;
+  CmsModel? cmsModel;
   @override
   _PrivacyScreenState createState() => _PrivacyScreenState();
 }
 
 class _PrivacyScreenState extends State<PrivacyScreen> {
-  CmsModel cmsModel;
+  CmsModel? cmsModel;
   String languageCode ="";
   @override
   void initState() {
@@ -26,11 +26,11 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
       });
     });
   }
-  Future<CmsModel> privacyPolicy() async{
+  Future<CmsModel?> privacyPolicy() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     PetMartService petMartService = PetMartService();
-    CmsModel  cmsModel = await petMartService.cms();
+    CmsModel?  cmsModel = await petMartService.cms();
     return cmsModel;
     
   }
@@ -47,7 +47,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'privacy_policy'),
+              getTranslated(context, 'privacy_policy')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -89,7 +89,7 @@ class _PrivacyScreenState extends State<PrivacyScreen> {
 
 
 
-                  languageCode == "en"? cmsModel.data.enPolicy:cmsModel.data.arPolicy,
+                  languageCode == "en"? cmsModel!.data!.enPolicy!:cmsModel!.data!.arPolicy!,
                   textStyle: TextStyle(
 
                       color: Color(0xFF000000),

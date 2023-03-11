@@ -1,19 +1,19 @@
 class AuctionDetailsModel {
-  String _status;
-  String _message;
-  Data _data;
+  String? _status;
+  String? _message;
+  Data? _data;
 
-  AuctionDetailsModel({String status, String message, Data data}) {
+  AuctionDetailsModel({String? status, String? message, Data? data}) {
     this._status = status;
     this._message = message;
     this._data = data;
   }
 
-  String get status => _status;
+  String get status => _status!;
   set status(String status) => _status = status;
-  String get message => _message;
+  String get message => _message!;
   set message(String message) => _message = message;
-  Data get data => _data;
+  Data get data => _data!;
   set data(Data data) => _data = data;
 
   AuctionDetailsModel.fromJson(Map<String, dynamic> json) {
@@ -27,69 +27,69 @@ class AuctionDetailsModel {
     data['status'] = this._status;
     data['message'] = this._message;
     if (this._data != null) {
-      data['data'] = this._data.toJson();
+      data['data'] = this._data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  String _auctionId;
-  String _auctionName;
-  String _auctionDescription;
-  String _auctionStatus;
-  String _auctionRemaining;
-  String _highestBidderImage;
-  String _highestBidderName;
-  String _highestBidderValue;
-  BidderData _bidderData;
-  OwnerData _ownerData;
-  int _totalParticipate;
-  String _minBidValue;
-  String _currentBidValue;
-  List<String> _bidRange;
-  String _auctionDate;
-  String _category;
-  String _categoryId;
-  String _subCategory;
-  String _subCategoryId;
-  String _stateDate;
-  String _endDate;
-  String _bidValue;
-  String _auctionImage;
-  int _isSubmit;
-  String _rating;
+  String? _auctionId;
+  String? _auctionName;
+  String? _auctionDescription;
+  String? _auctionStatus;
+  String? _auctionRemaining;
+  String? _highestBidderImage;
+  String? _highestBidderName;
+  String? _highestBidderValue;
+  BidderData? _bidderData;
+  OwnerData? _ownerData;
+  int? _totalParticipate;
+  String? _minBidValue;
+  String? _currentBidValue;
+  List<String>? _bidRange;
+  String? _auctionDate;
+  String? _category;
+  String? _categoryId;
+  String? _subCategory;
+  String? _subCategoryId;
+  String? _stateDate;
+  String? _endDate;
+  String? _bidValue;
+  String? _auctionImage;
+  int? _isSubmit;
+  String? _rating;
   dynamic _userRating;
-  List<Gallery> _gallery;
+  List<Gallery>? _gallery;
 
   Data(
-      {String auctionId,
-        String auctionName,
-        String auctionDescription,
-        String auctionStatus,
-        String auctionRemaining,
-        String highestBidderImage,
-        String highestBidderName,
-        String highestBidderValue,
-        BidderData bidderData,
-        OwnerData ownerData,
-        int totalParticipate,
-        String minBidValue,
-        String currentBidValue,
-        List<String> bidRange,
-        String auctionDate,
-        String category,
-        String categoryId,
-        String subCategory,
-        String subCategoryId,
-        String stateDate,
-        String endDate,
-        String bidValue,
-        String auctionImage,
-        int isSubmit,
-        String rating,
+      {String? auctionId,
+        String? auctionName,
+        String? auctionDescription,
+        String? auctionStatus,
+        String? auctionRemaining,
+        String? highestBidderImage,
+        String? highestBidderName,
+        String? highestBidderValue,
+        BidderData? bidderData,
+        OwnerData? ownerData,
+        int? totalParticipate,
+        String? minBidValue,
+        String? currentBidValue,
+        List<String>? bidRange,
+        String? auctionDate,
+        String? category,
+        String? categoryId,
+        String? subCategory,
+        String? subCategoryId,
+        String? stateDate,
+        String? endDate,
+        String? bidValue,
+        String? auctionImage,
+        int? isSubmit,
+        String? rating,
         dynamic userRating,
-        List<Gallery> gallery}) {
+        List<Gallery>? gallery}) {
     this._auctionId = auctionId;
     this._auctionName = auctionName;
     this._auctionDescription = auctionDescription;
@@ -119,66 +119,66 @@ class Data {
     this._gallery = gallery;
   }
 
-  String get auctionId => _auctionId;
+  String get auctionId => _auctionId!;
   set auctionId(String auctionId) => _auctionId = auctionId;
-  String get auctionName => _auctionName;
+  String get auctionName => _auctionName!;
   set auctionName(String auctionName) => _auctionName = auctionName;
-  String get auctionDescription => _auctionDescription;
+  String get auctionDescription => _auctionDescription!;
   set auctionDescription(String auctionDescription) =>
       _auctionDescription = auctionDescription;
-  String get auctionStatus => _auctionStatus;
+  String get auctionStatus => _auctionStatus!;
   set auctionStatus(String auctionStatus) => _auctionStatus = auctionStatus;
-  String get auctionRemaining => _auctionRemaining;
+  String get auctionRemaining => _auctionRemaining!;
   set auctionRemaining(String auctionRemaining) =>
       _auctionRemaining = auctionRemaining;
-  String get highestBidderImage => _highestBidderImage;
+  String get highestBidderImage => _highestBidderImage!;
   set highestBidderImage(String highestBidderImage) =>
       _highestBidderImage = highestBidderImage;
-  String get highestBidderName => _highestBidderName;
+  String get highestBidderName => _highestBidderName!;
   set highestBidderName(String highestBidderName) =>
       _highestBidderName = highestBidderName;
-  String get highestBidderValue => _highestBidderValue;
+  String get highestBidderValue => _highestBidderValue!;
   set highestBidderValue(String highestBidderValue) =>
       _highestBidderValue = highestBidderValue;
-  BidderData get bidderData => _bidderData;
+  BidderData get bidderData => _bidderData!;
   set bidderData(BidderData bidderData) => _bidderData = bidderData;
-  OwnerData get ownerData => _ownerData;
+  OwnerData get ownerData => _ownerData!;
   set ownerData(OwnerData ownerData) => _ownerData = ownerData;
-  int get totalParticipate => _totalParticipate;
+  int get totalParticipate => _totalParticipate!;
   set totalParticipate(int totalParticipate) =>
       _totalParticipate = totalParticipate;
-  String get minBidValue => _minBidValue;
+  String get minBidValue => _minBidValue!;
   set minBidValue(String minBidValue) => _minBidValue = minBidValue;
-  String get currentBidValue => _currentBidValue;
+  String get currentBidValue => _currentBidValue!;
   set currentBidValue(String currentBidValue) =>
       _currentBidValue = currentBidValue;
-  List<String> get bidRange => _bidRange;
+  List<String> get bidRange => _bidRange!;
   set bidRange(List<String> bidRange) => _bidRange = bidRange;
-  String get auctionDate => _auctionDate;
+  String get auctionDate => _auctionDate!;
   set auctionDate(String auctionDate) => _auctionDate = auctionDate;
-  String get category => _category;
+  String get category => _category!;
   set category(String category) => _category = category;
-  String get categoryId => _categoryId;
+  String get categoryId => _categoryId!;
   set categoryId(String categoryId) => _categoryId = categoryId;
-  String get subCategory => _subCategory;
+  String get subCategory => _subCategory!;
   set subCategory(String subCategory) => _subCategory = subCategory;
-  String get subCategoryId => _subCategoryId;
+  String get subCategoryId => _subCategoryId!;
   set subCategoryId(String subCategoryId) => _subCategoryId = subCategoryId;
-  String get stateDate => _stateDate;
+  String get stateDate => _stateDate!;
   set stateDate(String stateDate) => _stateDate = stateDate;
-  String get endDate => _endDate;
+  String get endDate => _endDate!;
   set endDate(String endDate) => _endDate = endDate;
-  String get bidValue => _bidValue;
+  String get bidValue => _bidValue!;
   set bidValue(String bidValue) => _bidValue = bidValue;
-  String get auctionImage => _auctionImage;
+  String get auctionImage => _auctionImage!;
   set auctionImage(String auctionImage) => _auctionImage = auctionImage;
-  int get isSubmit => _isSubmit;
+  int get isSubmit => _isSubmit!;
   set isSubmit(int isSubmit) => _isSubmit = isSubmit;
-  String get rating => _rating;
+  String get rating => _rating!;
   set rating(String rating) => _rating = rating;
   dynamic get userRating => _userRating;
   set userRating(dynamic userRating) => _userRating = userRating;
-  List<Gallery> get gallery => _gallery;
+  List<Gallery> get gallery => _gallery!;
   set gallery(List<Gallery> gallery) => _gallery = gallery;
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -213,9 +213,9 @@ class Data {
     _rating = json['rating'];
     _userRating = json['user_rating'];
     if (json['gallery'] != null) {
-      _gallery = new List<Gallery>();
+      _gallery = [];
       json['gallery'].forEach((v) {
-        _gallery.add(new Gallery.fromJson(v));
+        _gallery!.add(new Gallery.fromJson(v));
       });
     }
   }
@@ -231,10 +231,10 @@ class Data {
     data['highest_bidder_name'] = this._highestBidderName;
     data['highest_bidder_value'] = this._highestBidderValue;
     if (this._bidderData != null) {
-      data['bidder_data'] = this._bidderData.toJson();
+      data['bidder_data'] = this._bidderData!.toJson();
     }
     if (this._ownerData != null) {
-      data['owner_data'] = this._ownerData.toJson();
+      data['owner_data'] = this._ownerData!.toJson();
     }
     data['total_participate'] = this._totalParticipate;
     data['min_bid_value'] = this._minBidValue;
@@ -253,63 +253,63 @@ class Data {
     data['rating'] = this._rating;
     data['user_rating'] = this._userRating;
     if (this._gallery != null) {
-      data['gallery'] = this._gallery.map((v) => v.toJson()).toList();
+      data['gallery'] = this._gallery!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class BidderData {
-  String _auctionId;
-  String _bidValue;
-  String _customerId;
-  String _firstname;
-  String _lastname;
-  String _email;
-  String _mobile;
-  String _gender;
-  String _profileImage;
-  String _dateOfBirth;
-  String _password;
-  String _confirmPassword;
-  String _countryName;
-  String _createdAt;
-  String _updatedAt;
-  String _lastLogin;
-  String _status;
-  String _isNotify;
-  String _otp;
-  String _availableCredit;
-  String _randomToken;
-  String _deviceToken;
-  String _imeiNumber;
-  String _deviceType;
+  String? _auctionId;
+  String? _bidValue;
+  String? _customerId;
+  String? _firstname;
+  String? _lastname;
+  String? _email;
+  String? _mobile;
+  String? _gender;
+  String? _profileImage;
+  String? _dateOfBirth;
+  String? _password;
+  String? _confirmPassword;
+  String? _countryName;
+  String? _createdAt;
+  String? _updatedAt;
+  String? _lastLogin;
+  String? _status;
+  String? _isNotify;
+  String? _otp;
+  String? _availableCredit;
+  String? _randomToken;
+  String? _deviceToken;
+  String? _imeiNumber;
+  String? _deviceType;
 
   BidderData(
-      {String auctionId,
-        String bidValue,
-        String customerId,
-        String firstname,
-        String lastname,
-        String email,
-        String mobile,
-        String gender,
-        String profileImage,
-        String dateOfBirth,
-        String password,
-        String confirmPassword,
-        String countryName,
-        String createdAt,
-        String updatedAt,
-        String lastLogin,
-        String status,
-        String isNotify,
-        String otp,
-        String availableCredit,
-        String randomToken,
-        String deviceToken,
-        String imeiNumber,
-        String deviceType}) {
+      {String? auctionId,
+        String? bidValue,
+        String? customerId,
+        String? firstname,
+        String? lastname,
+        String? email,
+        String? mobile,
+        String? gender,
+        String? profileImage,
+        String? dateOfBirth,
+        String? password,
+        String? confirmPassword,
+        String? countryName,
+        String? createdAt,
+        String? updatedAt,
+        String? lastLogin,
+        String? status,
+        String? isNotify,
+        String? otp,
+        String? availableCredit,
+        String? randomToken,
+        String? deviceToken,
+        String? imeiNumber,
+        String? deviceType}) {
     this._auctionId = auctionId;
     this._bidValue = bidValue;
     this._customerId = customerId;
@@ -336,55 +336,55 @@ class BidderData {
     this._deviceType = deviceType;
   }
 
-  String get auctionId => _auctionId;
+  String get auctionId => _auctionId!;
   set auctionId(String auctionId) => _auctionId = auctionId;
-  String get bidValue => _bidValue;
+  String get bidValue => _bidValue!;
   set bidValue(String bidValue) => _bidValue = bidValue;
-  String get customerId => _customerId;
+  String get customerId => _customerId!;
   set customerId(String customerId) => _customerId = customerId;
-  String get firstname => _firstname;
+  String get firstname => _firstname!;
   set firstname(String firstname) => _firstname = firstname;
-  String get lastname => _lastname;
+  String get lastname => _lastname!;
   set lastname(String lastname) => _lastname = lastname;
-  String get email => _email;
+  String get email => _email!;
   set email(String email) => _email = email;
-  String get mobile => _mobile;
+  String get mobile => _mobile!;
   set mobile(String mobile) => _mobile = mobile;
-  String get gender => _gender;
+  String get gender => _gender!;
   set gender(String gender) => _gender = gender;
-  String get profileImage => _profileImage;
+  String get profileImage => _profileImage!;
   set profileImage(String profileImage) => _profileImage = profileImage;
-  String get dateOfBirth => _dateOfBirth;
+  String get dateOfBirth => _dateOfBirth!;
   set dateOfBirth(String dateOfBirth) => _dateOfBirth = dateOfBirth;
-  String get password => _password;
+  String get password => _password!;
   set password(String password) => _password = password;
-  String get confirmPassword => _confirmPassword;
+  String get confirmPassword => _confirmPassword!;
   set confirmPassword(String confirmPassword) =>
       _confirmPassword = confirmPassword;
-  String get countryName => _countryName;
+  String get countryName => _countryName!;
   set countryName(String countryName) => _countryName = countryName;
-  String get createdAt => _createdAt;
+  String get createdAt => _createdAt!;
   set createdAt(String createdAt) => _createdAt = createdAt;
-  String get updatedAt => _updatedAt;
+  String get updatedAt => _updatedAt!;
   set updatedAt(String updatedAt) => _updatedAt = updatedAt;
-  String get lastLogin => _lastLogin;
+  String get lastLogin => _lastLogin!;
   set lastLogin(String lastLogin) => _lastLogin = lastLogin;
-  String get status => _status;
+  String get status => _status!;
   set status(String status) => _status = status;
-  String get isNotify => _isNotify;
+  String get isNotify => _isNotify!;
   set isNotify(String isNotify) => _isNotify = isNotify;
-  String get otp => _otp;
+  String get otp => _otp!;
   set otp(String otp) => _otp = otp;
-  String get availableCredit => _availableCredit;
+  String get availableCredit => _availableCredit!;
   set availableCredit(String availableCredit) =>
       _availableCredit = availableCredit;
-  String get randomToken => _randomToken;
+  String get randomToken => _randomToken!;
   set randomToken(String randomToken) => _randomToken = randomToken;
-  String get deviceToken => _deviceToken;
+  String get deviceToken => _deviceToken!;
   set deviceToken(String deviceToken) => _deviceToken = deviceToken;
-  String get imeiNumber => _imeiNumber;
+  String get imeiNumber => _imeiNumber!;
   set imeiNumber(String imeiNumber) => _imeiNumber = imeiNumber;
-  String get deviceType => _deviceType;
+  String get deviceType => _deviceType!;
   set deviceType(String deviceType) => _deviceType = deviceType;
 
   BidderData.fromJson(Map<String, dynamic> json) {
@@ -445,52 +445,52 @@ class BidderData {
 }
 
 class OwnerData {
-  String _customerId;
-  String _firstname;
-  String _lastname;
-  String _email;
-  String _mobile;
-  String _gender;
-  String _profileImage;
-  String _dateOfBirth;
-  String _password;
-  String _confirmPassword;
-  String _countryName;
-  String _createdAt;
-  String _updatedAt;
-  String _lastLogin;
-  String _status;
-  String _isNotify;
-  String _otp;
-  String _availableCredit;
-  String _randomToken;
-  String _deviceToken;
-  String _imeiNumber;
-  String _deviceType;
+  String? _customerId;
+  String? _firstname;
+  String? _lastname;
+  String? _email;
+  String? _mobile;
+  String? _gender;
+  String? _profileImage;
+  String? _dateOfBirth;
+  String? _password;
+  String? _confirmPassword;
+  String? _countryName;
+  String? _createdAt;
+  String? _updatedAt;
+  String? _lastLogin;
+  String? _status;
+  String? _isNotify;
+  String? _otp;
+  String? _availableCredit;
+  String? _randomToken;
+  String? _deviceToken;
+  String? _imeiNumber;
+  String? _deviceType;
 
   OwnerData(
-      {String customerId,
-        String firstname,
-        String lastname,
-        String email,
-        String mobile,
-        String gender,
-        String profileImage,
-        String dateOfBirth,
-        String password,
-        String confirmPassword,
-        String countryName,
-        String createdAt,
-        String updatedAt,
-        String lastLogin,
-        String status,
-        String isNotify,
-        String otp,
-        String availableCredit,
-        String randomToken,
-        String deviceToken,
-        String imeiNumber,
-        String deviceType}) {
+      {String? customerId,
+        String? firstname,
+        String? lastname,
+        String? email,
+        String? mobile,
+        String? gender,
+        String? profileImage,
+        String? dateOfBirth,
+        String? password,
+        String? confirmPassword,
+        String? countryName,
+        String? createdAt,
+        String? updatedAt,
+        String? lastLogin,
+        String? status,
+        String? isNotify,
+        String? otp,
+        String? availableCredit,
+        String? randomToken,
+        String? deviceToken,
+        String? imeiNumber,
+        String? deviceType}) {
     this._customerId = customerId;
     this._firstname = firstname;
     this._lastname = lastname;
@@ -515,51 +515,51 @@ class OwnerData {
     this._deviceType = deviceType;
   }
 
-  String get customerId => _customerId;
+  String get customerId => _customerId!;
   set customerId(String customerId) => _customerId = customerId;
-  String get firstname => _firstname;
+  String get firstname => _firstname!;
   set firstname(String firstname) => _firstname = firstname;
-  String get lastname => _lastname;
+  String get lastname => _lastname!;
   set lastname(String lastname) => _lastname = lastname;
-  String get email => _email;
+  String get email => _email!;
   set email(String email) => _email = email;
-  String get mobile => _mobile;
+  String get mobile => _mobile!;
   set mobile(String mobile) => _mobile = mobile;
-  String get gender => _gender;
+  String get gender => _gender!;
   set gender(String gender) => _gender = gender;
-  String get profileImage => _profileImage;
+  String get profileImage => _profileImage!;
   set profileImage(String profileImage) => _profileImage = profileImage;
-  String get dateOfBirth => _dateOfBirth;
+  String get dateOfBirth => _dateOfBirth!;
   set dateOfBirth(String dateOfBirth) => _dateOfBirth = dateOfBirth;
-  String get password => _password;
+  String get password => _password!;
   set password(String password) => _password = password;
-  String get confirmPassword => _confirmPassword;
+  String get confirmPassword => _confirmPassword!;
   set confirmPassword(String confirmPassword) =>
       _confirmPassword = confirmPassword;
-  String get countryName => _countryName;
+  String get countryName => _countryName!;
   set countryName(String countryName) => _countryName = countryName;
-  String get createdAt => _createdAt;
+  String get createdAt => _createdAt!;
   set createdAt(String createdAt) => _createdAt = createdAt;
-  String get updatedAt => _updatedAt;
+  String get updatedAt => _updatedAt!;
   set updatedAt(String updatedAt) => _updatedAt = updatedAt;
-  String get lastLogin => _lastLogin;
+  String get lastLogin => _lastLogin!;
   set lastLogin(String lastLogin) => _lastLogin = lastLogin;
-  String get status => _status;
+  String get status => _status!;
   set status(String status) => _status = status;
-  String get isNotify => _isNotify;
+  String get isNotify => _isNotify!;
   set isNotify(String isNotify) => _isNotify = isNotify;
-  String get otp => _otp;
+  String get otp => _otp!;
   set otp(String otp) => _otp = otp;
-  String get availableCredit => _availableCredit;
+  String get availableCredit => _availableCredit!;
   set availableCredit(String availableCredit) =>
       _availableCredit = availableCredit;
-  String get randomToken => _randomToken;
+  String get randomToken => _randomToken!;
   set randomToken(String randomToken) => _randomToken = randomToken;
-  String get deviceToken => _deviceToken;
+  String get deviceToken => _deviceToken!;
   set deviceToken(String deviceToken) => _deviceToken = deviceToken;
-  String get imeiNumber => _imeiNumber;
+  String get imeiNumber => _imeiNumber!;
   set imeiNumber(String imeiNumber) => _imeiNumber = imeiNumber;
-  String get deviceType => _deviceType;
+  String get deviceType => _deviceType!;
   set deviceType(String deviceType) => _deviceType = deviceType;
 
   OwnerData.fromJson(Map<String, dynamic> json) {
@@ -616,21 +616,21 @@ class OwnerData {
 }
 
 class Gallery {
-  String _image;
-  String _thumbnail;
-  String _type;
+  String? _image;
+  String? _thumbnail;
+  String? _type;
 
-  Gallery({String image, String thumbnail, String type}) {
+  Gallery({String? image, String? thumbnail, String? type}) {
     this._image = image;
     this._thumbnail = thumbnail;
     this._type = type;
   }
 
-  String get image => _image;
+  String get image => _image!;
   set image(String image) => _image = image;
-  String get thumbnail => _thumbnail;
+  String get thumbnail => _thumbnail!;
   set thumbnail(String thumbnail) => _thumbnail = thumbnail;
-  String get type => _type;
+  String get type => _type!;
   set type(String type) => _type = type;
 
   Gallery.fromJson(Map<String, dynamic> json) {

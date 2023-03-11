@@ -1,8 +1,8 @@
 class LoginModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   LoginModel({this.ok, this.error, this.status, this.data});
 
@@ -19,16 +19,16 @@ class LoginModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  String id;
-  String points;
-  String validity;
+  String? id;
+  String? points;
+  String? validity;
 
   Data({this.id, this.points, this.validity});
 

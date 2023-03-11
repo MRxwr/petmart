@@ -110,8 +110,8 @@ void main() async{
 class MyApp extends StatefulWidget {
 
   static void setLocale(BuildContext context, Locale locale) {
-    _MyAppState state = context.findAncestorStateOfType<_MyAppState>();
-    state.setLocale(locale);
+    _MyAppState? state = context.findAncestorStateOfType<_MyAppState>();
+    state!.setLocale(locale);
   }
 
   @override
@@ -147,9 +147,9 @@ class _MyAppState extends State<MyApp> {
 
   String messageTitle = "Empty";
   String notificationAlert = "alert";
-  String _token;
+  String? _token;
 
-  Locale _local;
+  Locale? _local;
   void setLocale(Locale locale) {
     setState(() {
       _local = locale;
@@ -162,10 +162,10 @@ class _MyAppState extends State<MyApp> {
       setState(() {
 
         this._local = locale;
-        print('LanguageCode = ${_local.languageCode}');
+        print('LanguageCode = ${_local!.languageCode}');
       });
     }).whenComplete((){
-      setDefaultLang(_local.languageCode);
+      setDefaultLang(_local!.languageCode);
     });
     super.didChangeDependencies();
   }
@@ -181,13 +181,13 @@ class _MyAppState extends State<MyApp> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String mToken =_preferences.getString("token")??"";
     if(mToken ==""){
-      String toke = await FirebaseMessaging.instance.getToken(vapidKey: "BEp83hChFvm1ckxAt291kepX_T43rkk1e6j3ltN_tyxmk6CICMvnGN0BISLDX6VWjR46QaYuX0OJ51VS7Wy1b6M");
+      String? toke = await FirebaseMessaging.instance.getToken(vapidKey: "BEp83hChFvm1ckxAt291kepX_T43rkk1e6j3ltN_tyxmk6CICMvnGN0BISLDX6VWjR46QaYuX0OJ51VS7Wy1b6M");
       print('token --> ${toke}');
       SharedPreferences _preferences = await SharedPreferences.getInstance();
 
 
       String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-      _preferences.setString("token", toke);
+      _preferences.setString("token", toke!);
       print('Token Saved!');
       PetMartService petMartService  = PetMartService();
       String deviceType = "";
@@ -202,8 +202,8 @@ class _MyAppState extends State<MyApp> {
       map['device_type']= deviceType;
       print(map);
 
-      TokenModel tokenModel = await petMartService.registerToken(map);
-      print('message ----> ${tokenModel.message}');
+      TokenModel? tokenModel = await petMartService.registerToken(map);
+      print('message ----> ${tokenModel!.message}');
     }
 
   }
@@ -220,7 +220,7 @@ class _MyAppState extends State<MyApp> {
 
     FirebaseMessaging.instance
         .getInitialMessage()
-        .then((RemoteMessage message) {
+        .then((RemoteMessage? message) {
       // if(message != null){
       //   print('remoteMessgae sss${message.toString()}');
       //   dynamic dataObject=  message.data;
@@ -255,9 +255,9 @@ class _MyAppState extends State<MyApp> {
 
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification notification = message.notification;
+      RemoteNotification? notification = message.notification;
 
-      AndroidNotification android = message.notification?.android;
+      AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
         flutterLocalNotificationsPlugin.show(
             notification.hashCode,
@@ -308,7 +308,7 @@ class _MyAppState extends State<MyApp> {
 
   }
 
-  Stream<String> _tokenStream;
+  Stream<String>? _tokenStream;
 
   void setToken(String token) {
     print('FCM Token: $token');
@@ -328,7 +328,7 @@ class _MyAppState extends State<MyApp> {
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
-        body: constructFCMPayload(_token),
+        body: constructFCMPayload(_token!),
       );
       print('FCM request for device sent!');
     } catch (e) {
@@ -365,7 +365,7 @@ class _MyAppState extends State<MyApp> {
               ScreenUtilInit(
 
 
-                  builder:(child) =>
+                  builder:(context,child) =>
 
                       MultiProvider(
                         providers: [
@@ -398,7 +398,7 @@ class _MyAppState extends State<MyApp> {
                             builder: (context, child) {
 
                               return MediaQuery(
-                                child: child,
+                                child: child!,
                                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
                               );
                             },
@@ -419,7 +419,7 @@ class _MyAppState extends State<MyApp> {
                             ],
                             localeResolutionCallback: (deviceLocal, supportedLocales) {
                               for (var local in supportedLocales) {
-                                if (local.languageCode == deviceLocal.languageCode &&
+                                if (local.languageCode == deviceLocal!.languageCode &&
                                     local.countryCode == deviceLocal.countryCode) {
                                   return deviceLocal;
                                 }
@@ -441,7 +441,7 @@ class _MyAppState extends State<MyApp> {
                               LoginScreen.id: (context) => LoginScreen(),
                               ForgetPasswordScreen.id: (context) => ForgetPasswordScreen(),
                               RegisterScreen.id: (context) => RegisterScreen(),
-                              VerifyOtpScreen.id: (context) => VerifyOtpScreen(),
+                              VerifyOtpScreen.id: (context) => VerifyOtpScreen(otp: "",mobile: "",userId: "",),
                               MyAccountScreen.id: (context) => MyAccountScreen(),
                               MyPostScreen.id: (context) => MyPostScreen(),
                               MyAuctionScreen.id: (context) => MyAuctionScreen(),

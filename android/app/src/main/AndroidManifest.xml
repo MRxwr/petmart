@@ -33,6 +33,15 @@
 
         android:icon="@mipmap/launcher_icon"
         android:label="Pet Mart">
+        <provider
+            android:name="com.ko2ic.imagedownloader.FileProvider"
+            android:authorities="${applicationId}.image_downloader.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -92,6 +101,9 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="high_importance_channel" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
     </application>
 

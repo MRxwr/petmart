@@ -12,7 +12,7 @@ import '../utilities/constants.dart';
 class WebScreen extends StatefulWidget {
   String url;
   String name;
-  WebScreen({Key key,@required this.url,@required this.name,}) : super(key: key);
+  WebScreen({Key? key,required this.url,required this.name,}) : super(key: key);
 
   @override
   State<WebScreen> createState() => _WebScreenState();
@@ -22,7 +22,7 @@ class _WebScreenState extends State<WebScreen> {
   ScreenUtil screenUtil = ScreenUtil();
   bool isLoading=true;
   final _key = UniqueKey();
-  InAppWebViewController webView;
+  InAppWebViewController? webView;
   @override
   void initState() {
     // TODO: implement initState
@@ -86,10 +86,10 @@ class _WebScreenState extends State<WebScreen> {
           },
 
 
-          onLoadStart: (InAppWebViewController controller, Uri url) {
+          onLoadStart: (InAppWebViewController? controller, Uri? url) {
 
           },
-          onLoadStop: (InAppWebViewController controller, Uri url)  {
+          onLoadStop: (InAppWebViewController? controller, Uri? url)  {
 
 
 

@@ -6,8 +6,9 @@ import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/AuctionStatusModel.dart';
@@ -31,43 +32,43 @@ import 'notification_details_screen.dart';
 class MyAuctionDetails extends StatefulWidget {
   String id;
   String postName;
-  MyAuctionDetails({Key key,@required this.id,@required this.postName}): super(key: key);
+  MyAuctionDetails({Key? key,required this.id,required this.postName}): super(key: key);
 
   @override
   _MyAuctionDetailsState createState() => _MyAuctionDetailsState();
 }
 
 class _MyAuctionDetailsState extends State<MyAuctionDetails> {
-  MyNewAuctionDetailsModel mAuctionDetailsModel = null;
+  MyNewAuctionDetailsModel? mAuctionDetailsModel ;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final CarouselController _controller = CarouselController();
   ScreenUtil screenUtil = ScreenUtil();
   int _current =0;
   int currentBid  =0;
 
-  double _rating;
+  double? _rating;
 
   double _userRating = 3.0;
   int _ratingBarMode = 1;
-  double _initialRating ;
+  double? _initialRating ;
   bool _isRTLMode = false;
   bool _isVertical = false;
-  String languageCode;
-  LoginModel   loginModel;
-  Future<MyNewAuctionDetailsModel> auction() async{
+  String? languageCode;
+  LoginModel?   loginModel;
+  Future<MyNewAuctionDetailsModel?> auction() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
     Map<String,String> map  = Map();
 
 
 
-      final body = json.decode(loginData);
+      final body = json.decode(loginData!);
          loginModel = LoginModel.fromJson(body);
     map['auctionId']= widget.id;
-    map['customerId']= loginModel.data.id;
+    map['customerId']= loginModel!.data!.id!;
       print(map);
 
 
@@ -75,7 +76,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
 
 
     PetMartService petMartService = PetMartService();
-    MyNewAuctionDetailsModel auctionDetailsModel = await petMartService.myNewAuctionDetails(map);
+    MyNewAuctionDetailsModel? auctionDetailsModel = await petMartService.myNewAuctionDetails(map);
     return auctionDetailsModel;
   }
   // Future<void> auctionLoad() async{
@@ -113,8 +114,8 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     super.initState();
     auction().then((value){
       setState(() {
-        mAuctionDetailsModel = value;
-        print("mAuctionDetailsModel.data[0].status ---> ${mAuctionDetailsModel.data[0].status}");
+        mAuctionDetailsModel = value!;
+        print("mAuctionDetailsModel.data[0].status ---> ${mAuctionDetailsModel!.data![0].status}");
         // _rating = double.parse(mAuctionDetailsModel.data.rating.toString());
 
       });
@@ -210,7 +211,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                       });
                                     }
                                 ),
-                                items: mAuctionDetailsModel.data[0].image.map((item) =>
+                                items: mAuctionDetailsModel!.data![0].image!.map((item) =>
                                     Stack(
 
 
@@ -318,11 +319,11 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                 start: 0,
                                 end:0,
                                 child: Opacity(
-                                  opacity: mAuctionDetailsModel.data[0].image.length>1?1.0:0.0,
+                                  opacity: mAuctionDetailsModel!.data![0].image!.length>1?1.0:0.0,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    children: mAuctionDetailsModel.data[0].image.map((item) {
-                                      int index =mAuctionDetailsModel.data[0].image.indexOf(item);
+                                    children: mAuctionDetailsModel!.data![0].image!.map((item) {
+                                      int index =mAuctionDetailsModel!.data![0].image!.indexOf(item);
                                       return Container(
                                         width: 8.0.w,
                                         height: 8.0.h,
@@ -357,7 +358,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                   children: [
                     Text(
                       languageCode =="en"?
-                      mAuctionDetailsModel.data[0].enTitle:mAuctionDetailsModel.data[0].arTitle,
+                      mAuctionDetailsModel!.data![0].enTitle!:mAuctionDetailsModel!.data![0].arTitle!,
                       style: TextStyle(
                           color: Color(0xFF000000),
                           fontSize: screenUtil.setSp(14),
@@ -367,12 +368,12 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                     ),
                     GestureDetector(
                       onTap: (){
-                        String vedioUrl= mAuctionDetailsModel.data[0].video;
+                        String vedioUrl= mAuctionDetailsModel!.data![0].video!;
                         String title = "";
                         if(languageCode == "en"){
-                          title = mAuctionDetailsModel.data[0].enTitle;
+                          title = mAuctionDetailsModel!.data![0].enTitle!;
                         }else{
-                          title = mAuctionDetailsModel.data[0].arTitle;
+                          title = mAuctionDetailsModel!.data![0].arTitle!;
                         }
                         if(vedioUrl.trim()!=""){
                           if(vedioUrl.contains("youtu")){
@@ -390,7 +391,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                       },
                       child: Image.asset('assets/images/play-button.png',
                         height: 30.w,width: 30.w,fit: BoxFit.fill,
-                        color:mAuctionDetailsModel.data[0].video== ""?Color(0xFFAAAAAA):kMainColor ,
+                        color:mAuctionDetailsModel!.data![0].video== ""?Color(0xFFAAAAAA):kMainColor ,
                       ),
                     )
                   ],
@@ -398,7 +399,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
               ),
                         Container(
                           margin: EdgeInsets.symmetric(horizontal: 10.w),
-                          child: Text(languageCode == "en"?mAuctionDetailsModel.data[0].arTitle:mAuctionDetailsModel.data[0].arTitle,
+                          child: Text(languageCode == "en"?mAuctionDetailsModel!.data![0].arTitle!:mAuctionDetailsModel!.data![0].arTitle!,
                               textAlign: TextAlign.start,
                               style: TextStyle(
                                   color: Color(0xFF000000),
@@ -416,7 +417,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text(getTranslated(context, 'start_date'),
+                                child: Text(getTranslated(context, 'start_date')!,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -431,7 +432,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${getFormattedDate(mAuctionDetailsModel.data[0].endDate,1)}',
+                                child: Text('${getFormattedDate(mAuctionDetailsModel!.data![0].endDate!,1)}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -451,7 +452,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text(getTranslated(context, 'end_date'),
+                                child: Text(getTranslated(context, 'end_date')!,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -466,7 +467,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text(getFormattedDate(mAuctionDetailsModel.data[0].endDate,0),
+                                child: Text(getFormattedDate(mAuctionDetailsModel!.data![0].endDate!,0),
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -486,7 +487,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text(getTranslated(context, 'bid_value'),
+                                child: Text(getTranslated(context, 'bid_value')!,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -501,7 +502,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data[0].price}',
+                                child: Text('${mAuctionDetailsModel!.data![0].price}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -521,7 +522,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text(getTranslated(context, 'current_value'),
+                                child: Text(getTranslated(context, 'current_value')!,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -536,7 +537,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data[0].reach} ${getTranslated(context, 'kwd')}',
+                                child: Text('${mAuctionDetailsModel!.data![0].reach} ${getTranslated(context, 'kwd')}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -556,7 +557,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child: Container(
                                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text(getTranslated(context,'participate'),
+                                child: Text(getTranslated(context,'participate')!,
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -571,7 +572,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                               child:
                               Container(
                                 alignment: AlignmentDirectional.centerStart,
-                                child: Text('${mAuctionDetailsModel.data[0].bidders.length} ${getTranslated(context,'person')}',
+                                child: Text('${mAuctionDetailsModel!.data![0].bidders!.length} ${getTranslated(context,'person')}',
                                     textAlign: TextAlign.start,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
@@ -602,7 +603,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                       child: CachedNetworkImage(
                                         width: 120.w,
                                         height: 120.h,
-                                        imageUrl: KImageUrl+mAuctionDetailsModel.data[0].bidders[index].logo,
+                                        imageUrl: KImageUrl+mAuctionDetailsModel!.data![0].bidders![index].logo!,
                                         imageBuilder: (context, imageProvider) =>
                                             Container(
 
@@ -642,7 +643,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                         Expanded(
                                           flex:1,
                                           child: Container(
-                                            child: Text(mAuctionDetailsModel.data[0].bidders[index].name,
+                                            child: Text(mAuctionDetailsModel!.data![0].bidders![index].name!,
                                               style: TextStyle(
                                                   color: Color(0xFF000000),
                                                   fontSize: screenUtil.setSp(16),
@@ -653,7 +654,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                         Expanded(
                                           flex:1,
                                           child: Container(
-                                            child: Text(mAuctionDetailsModel.data[0].bidders[index].date,
+                                            child: Text(mAuctionDetailsModel!.data![0].bidders![index].date!,
                                               style: TextStyle(
                                                   color: Color(0xFF000000),
                                                   fontSize: screenUtil.setSp(16),
@@ -664,7 +665,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                         Expanded(
                                           flex:1,
                                           child: Container(
-                                            child: Text(mAuctionDetailsModel.data[0].bidders[index].bid+" " +getTranslated(context, "kwd"),
+                                            child: Text(mAuctionDetailsModel!.data![0].bidders![index].bid!+" " +getTranslated(context, "kwd")!,
                                               style: TextStyle(
                                                   color: Color(0xFF000000),
                                                   fontSize: screenUtil.setSp(16),
@@ -682,7 +683,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                             }, separatorBuilder: (context,index){
                           return Container(height: 1.h,
                             color: Color(0xFF000000),);}
-                            , itemCount:mAuctionDetailsModel.data[0].bidders.length),
+                            , itemCount:mAuctionDetailsModel!.data![0].bidders!.length),
                       ],
                     ),
                   ),
@@ -692,8 +693,8 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                       end: 0,
                       child: Container(
 
-                          child:mAuctionDetailsModel.data[0].status== "0"? deleteButton(getTranslated(context, 'stop_auction'),context):
-                              mAuctionDetailsModel.data[0].accept == "0"?
+                          child:mAuctionDetailsModel!.data![0].status== "0"? deleteButton(getTranslated(context, 'stop_auction')!,context):
+                              mAuctionDetailsModel!.data![0].accept == "0"?
                               Container(
 
                                   padding:
@@ -702,11 +703,11 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                     children: [
                                       Expanded(flex:1,
-                                          child: AcceptButton(getTranslated(context, 'accept'), context)),
+                                          child: AcceptButton(getTranslated(context, 'accept')!, context)),
                                       SizedBox(width: 30.w,),
 
                                       Expanded(flex: 1,
-                                          child: RefuseButton(getTranslated(context, 'refuse'), context)),
+                                          child: RefuseButton(getTranslated(context, 'refuse')!, context)),
 
                                     ],
                                   )):
@@ -762,12 +763,21 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
         map['auctionId'] = widget.id;
         map['accept'] = "1";
         PetMartService petMartService = PetMartService();
-        AuctionStatusModel deleteModel = await petMartService.sendAuctionStatus(map);
-        bool status = deleteModel.ok;
+        AuctionStatusModel? deleteModel = await petMartService.sendAuctionStatus(map);
+        bool status = deleteModel!.ok;
         modelHud.changeIsLoading(false);
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.data.msg)));
+        Fluttertoast.showToast(
+            msg: deleteModel.data.msg,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
+
      String result =  await Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-          return new NotificationDetailsScreen(id:widget.id,name: getTranslated(context, 'auction_details'),);
+          return new NotificationDetailsScreen(id:widget.id,name: getTranslated(context, 'auction_details')!,);
         }));
      if(result == "true"){
        Navigator.pop(context,"true");
@@ -843,7 +853,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
       buttons: [
         DialogButton(
           child: Text(
-           getTranslated(context, 'ok'),
+           getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async{
@@ -860,7 +870,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFF000000), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -882,10 +892,19 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
     PetMartService petMartService = PetMartService();
-    AuctionStatusModel deleteModel = await petMartService.sendAuctionStatus(map);
-    bool status = deleteModel.ok;
+    AuctionStatusModel? deleteModel = await petMartService.sendAuctionStatus(map);
+    bool status = deleteModel!.ok;
     modelHud.changeIsLoading(false);
-    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.data.msg)));
+    Fluttertoast.showToast(
+        msg: deleteModel.data.msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: screenUtil.setSp(16)
+    );
+
 
     if(status ){
       Navigator.pushReplacementNamed(context,MainScreen.id);
@@ -897,14 +916,23 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     Map<String,String> map = new Map();
-    map['customerId'] = loginModel.data.id;
+    map['customerId'] = loginModel!.data!.id!;
     map['auctionId'] = widget.id;
 
     PetMartService petMartService = PetMartService();
-    StopAuctionModel deleteModel = await petMartService.stopAuction(map);
-    bool status = deleteModel.ok;
+    StopAuctionModel? deleteModel = await petMartService.stopAuction(map);
+    bool status = deleteModel!.ok;
     modelHud.changeIsLoading(false);
-    _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.data.msg)));
+    Fluttertoast.showToast(
+        msg: deleteModel.data.msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: screenUtil.setSp(16)
+    );
+
 
     if(status ){
       Navigator.pushReplacementNamed(context,MainScreen.id);
@@ -980,7 +1008,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
       buttons: [
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async{
@@ -993,10 +1021,19 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
             map['auctionId'] = widget.id;
             map['accept'] = "2";
             PetMartService petMartService = PetMartService();
-            AuctionStatusModel deleteModel = await petMartService.sendAuctionStatus(map);
-            bool status = deleteModel.ok;
+            AuctionStatusModel? deleteModel = await petMartService.sendAuctionStatus(map);
+            bool status = deleteModel!.ok;
             modelHud.changeIsLoading(false);
-            _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(deleteModel.data.msg)));
+            Fluttertoast.showToast(
+                msg: deleteModel.data.msg,
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.green,
+                textColor: Colors.white,
+                fontSize: screenUtil.setSp(16)
+            );
+
             Navigator.pop(context,"true");
 
             // _changeLanguage('en').then((value) {
@@ -1010,7 +1047,7 @@ class _MyAuctionDetailsState extends State<MyAuctionDetails> {
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFF000000), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

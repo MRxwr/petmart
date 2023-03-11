@@ -1,8 +1,8 @@
 class PostModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   PostModel({this.ok, this.error, this.status, this.data});
 
@@ -19,15 +19,15 @@ class PostModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Categories> categories;
-  List<Items> items;
+  List<Categories>? categories;
+  List<Items>? items;
 
   Data({this.categories, this.items});
 
@@ -35,13 +35,13 @@ class Data {
     if (json['categories'] != null) {
       categories = <Categories>[];
       json['categories'].forEach((v) {
-        categories.add(new Categories.fromJson(v));
+        categories!.add(new Categories.fromJson(v));
       });
     }
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
-        items.add(new Items.fromJson(v));
+        items!.add(new Items.fromJson(v));
       });
     }
   }
@@ -49,19 +49,19 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.categories != null) {
-      data['categories'] = this.categories.map((v) => v.toJson()).toList();
+      data['categories'] = this.categories!.map((v) => v.toJson()).toList();
     }
     if (this.items != null) {
-      data['items'] = this.items.map((v) => v.toJson()).toList();
+      data['items'] = this.items!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Categories {
-  String id;
-  String arTitle;
-  String enTitle;
+  String? id;
+  String? arTitle;
+  String? enTitle;
 
   Categories({this.id, this.arTitle, this.enTitle});
 
@@ -81,13 +81,13 @@ class Categories {
 }
 
 class Items {
-  String id;
-  String arTitle;
-  String enTitle;
-  String date;
-  String price;
-  String image;
-  int images;
+  String? id;
+  String? arTitle;
+  String? enTitle;
+  String? date;
+  String? price;
+  String? image;
+  int? images;
 
   Items(
       {this.id,

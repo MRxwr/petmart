@@ -39,20 +39,20 @@ class _AuctionScreenState extends State<AuctionScreen> {
   ScreenUtil screenUtil = ScreenUtil();
 
 
-  HomeModel homeModel;
+  HomeModel? homeModel;
 
-  double itemWidth;
-  double itemHeight;
+  double? itemWidth;
+  double? itemHeight;
   String languageCode="";
 
 
-  String loginData = "";
+  String? loginData ;
   String userId="";
-MyNewAuctionModel myNewAuctionModel = null;
-  NewAcutionListModel. NewAcutionListModel mNewAuctionListModel = null;
+MyNewAuctionModel? myNewAuctionModel ;
+  NewAcutionListModel. NewAcutionListModel? mNewAuctionListModel ;
   String myAuctionErrorString="";
   String AuctionErrorString ="";
-  HomeModel interestModel;
+  HomeModel? interestModel;
   List<bool> selectedList =[];
   Future<void> auctions() async{
     isLoading = true;
@@ -67,9 +67,9 @@ MyNewAuctionModel myNewAuctionModel = null;
 
      loginData = _preferences.getString(kUserModel)??null;
      if(loginData != null) {
-       final body = json.decode(loginData);
+       final body = json.decode(loginData!);
        LoginModel loginModel = LoginModel.fromJson(body);
-       userId = loginModel.data.id;
+       userId = loginModel!.data!.id!;
      }
     PetMartService petMartService = PetMartService();
     interestModel = await petMartService.home(userId);
@@ -78,8 +78,8 @@ MyNewAuctionModel myNewAuctionModel = null;
      Categories data = Categories(id: "0",enTitle:"ALL",arTitle: "الكل",logo: "");
     interestModelList.add(data);
     selectedList.add(true);
-    for(int i =0;i<interestModel.data.categories.length;i++){
-      interestModelList.add(interestModel.data.categories[i]);
+    for(int i =0;i<interestModel!.data!.categories!.length;i++){
+      interestModelList.add(interestModel!.data!.categories![i]);
       selectedList.add(false);
     }
 
@@ -145,23 +145,23 @@ isLoading = false;
 //     return homeModel;
 //   }
   List<Live> myAuctionList =[];
-  bool isLoading;
+  bool? isLoading;
   List<AuctionType> auctionTypeList =[];
   List<Categories> interestModelList =[];
   int position=0;
-  LoginModel loginModel;
-  Future<UserModel> user() async{
+  LoginModel? loginModel;
+  Future<UserModel?> user() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
 
 
 
-    final body = json.decode(loginData);
+    final body = json.decode(loginData!);
     loginModel = LoginModel.fromJson(body);
-    userId = loginModel.data.id;
+    userId = loginModel!.data!.id!;
 
     Map<String, String> map = Map();
     map['id']=userId;
@@ -171,7 +171,7 @@ isLoading = false;
 
 
     PetMartService petMartService = PetMartService();
-    UserModel userModel = await petMartService.user(map);
+    UserModel? userModel = await petMartService.user(map);
 
 
 
@@ -227,7 +227,7 @@ isLoading = false;
     return Scaffold(
       body: Container(
 
-        child: isLoading?
+        child: isLoading!?
         Container(
           child: CircularProgressIndicator(
 
@@ -255,11 +255,11 @@ isLoading = false;
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Expanded(flex:1,
-                          child: myAuctionButton(getTranslated(context, 'my_auction'), context)),
+                          child: myAuctionButton(getTranslated(context, 'my_auction')!, context)),
                       SizedBox(width: 30.w,),
 
                       Expanded(flex: 1,
-                          child: previewButton(getTranslated(context, 'create_auction'), context)),
+                          child: previewButton(getTranslated(context, 'create_auction')!, context)),
 
                     ],
                   )),
@@ -268,7 +268,7 @@ isLoading = false;
             Container(
               alignment: AlignmentDirectional.centerStart,
               padding: EdgeInsets.all(10.h),
-              child: Text(getTranslated(context, 'run_auction')
+              child: Text(getTranslated(context, 'run_auction')!
               ,style: TextStyle(color: Color(0xFF000000),fontSize: screenUtil.setSp(16),
                 fontWeight: FontWeight.bold),),
             ),
@@ -305,7 +305,7 @@ isLoading = false;
 
                             });
                             PetMartService petMartService = PetMartService();
-                            Map<String, dynamic>   responseList  = await petMartService.NewAuctionList(userId,interestModelList[index].id);
+                            Map<String, dynamic>   responseList  = await petMartService.NewAuctionList(userId,interestModelList[index].id!);
                             bool isNewOk = responseList['ok'];
                             if(isNewOk){
                               mNewAuctionListModel = NewAcutionListModel.NewAcutionListModel.fromJson(responseList);
@@ -341,7 +341,7 @@ isLoading = false;
 
               Container(
                 child: Text(
-                  getTranslated(context, "no_available_auctions"),
+                  getTranslated(context, "no_available_auctions")!,
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: screenUtil.setSp(16),
@@ -367,14 +367,14 @@ isLoading = false;
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                      childAspectRatio:itemWidth/itemHeight),
-                  itemCount: mNewAuctionListModel.data.length,
+                      childAspectRatio:itemWidth!/itemHeight!),
+                  itemCount: mNewAuctionListModel!.data.length,
 
                   itemBuilder: (context,index){
                     return GestureDetector(
                       onTap: (){
                         Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                          return new AuctionDetailsScreen(mAuctionModel:mNewAuctionListModel.data[index]);
+                          return new AuctionDetailsScreen(mAuctionModel:mNewAuctionListModel!.data[index]);
                         }));
                       },
                       child: Container(
@@ -389,7 +389,7 @@ isLoading = false;
                                 borderRadius: BorderRadius.circular(10.0.h),
                               ),
                               color: Color(0xFFFFFFFF),
-                              child: buildItem(mNewAuctionListModel.data[index],context))),
+                              child: buildItem(mNewAuctionListModel!.data[index],context,index))),
                     );
                   },
                 ),
@@ -415,7 +415,7 @@ isLoading = false;
           ),
           child: Text(
             languageCode == "en"?
-            category.enTitle:category.arTitle,
+            category.enTitle!:category.arTitle!,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -436,7 +436,7 @@ isLoading = false;
           ),
           child: Text(
             languageCode == "en"?
-            category.enTitle:category.arTitle,
+            category.enTitle!:category.arTitle!,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -493,7 +493,7 @@ isLoading = false;
             return new MyAuctionScreen();
           }));
         }else{
-          ShowAlerLogintDialog(context,getTranslated(context, 'not_login'));
+          ShowAlerLogintDialog(context,getTranslated(context, 'not_login')!);
         }
 
 
@@ -505,7 +505,7 @@ isLoading = false;
       ),),
     );
   }
-  Widget buildItem(NewAcutionListModel.Data data, BuildContext context) {
+  Widget buildItem(NewAcutionListModel.Data data, BuildContext context,int index) {
     print(data.id);
     return Container(
       child: Column(
@@ -598,12 +598,12 @@ isLoading = false;
                 Expanded(child: Container(
                   margin: EdgeInsetsDirectional.only(start: 4.w),
                   child:    Countdown(
-                    seconds: getRemainingTime(data.endDate),
+                    seconds: getRemainingTime(data.endDate,data.date),
                     build: (BuildContext context, double time) => Container(
                       alignment: AlignmentDirectional.centerStart,
                       child: Text(
 
-                          time.toInt()<=0 ? getTranslated(context, 'complete_string') :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
+                          time.toInt()<=0 ? getTranslated(context, 'complete_string')! :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
                           style: TextStyle(
                             color: Color(0xFF000000),
                             fontSize: screenUtil.setSp(12),
@@ -613,7 +613,11 @@ isLoading = false;
                       ),
                     ),
                     interval: Duration(seconds: 1),
-                    onFinished: () {
+                    onFinished: (){
+    mNewAuctionListModel!.data.removeAt(index);
+    setState(() {
+
+    });
                       print('Timer is done!');
                     },
                   ),
@@ -759,14 +763,14 @@ isLoading = false;
                     ):
 
                     Countdown(
-                      seconds: getRemainingTime(data.endDate),
+                      seconds: getRemainingTime(data.endDate,data.date),
                       build: (BuildContext context, double time) => Container(
                         alignment: AlignmentDirectional.centerStart,
                         margin: EdgeInsetsDirectional.only(start: 4.w),
                         child: Text(
 
 
-                            time.toInt()<=0 ? getTranslated(context, 'complete_string') :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
+                            time.toInt()<=0 ? getTranslated(context, 'complete_string')! :'${getTranslated(context, 'remainning')}  ${formatDuration(time.toInt())} ',
                             style: TextStyle(
 
                               color: Color(0xFF000000),
@@ -792,8 +796,8 @@ isLoading = false;
     );
 
   }
-  int  getRemainingTime(String date ){
-    var now = new DateTime.now();
+  int  getRemainingTime(String date, String startDate ){
+    var now =  DateTime.parse(startDate);
     print(now);
     DateTime tempDate =  DateTime.parse(date);
     print(date);
@@ -812,14 +816,24 @@ isLoading = false;
     final List<String> tokens = [];
     if (days != 0) {
       tokens.add('${days}d');
+    }else{
+      tokens.add('00');
     }
     if (tokens.isNotEmpty || hours != 0){
       tokens.add('${hours}h');
+    }else{
+      tokens.add('00');
     }
     if (tokens.isNotEmpty || minutes != 0) {
       tokens.add('${minutes}m');
+    }else{
+      tokens.add('00');
     }
-    tokens.add('${seconds}s');
+    if (tokens.isNotEmpty || seconds != 0){
+      tokens.add('${seconds}s');
+    }else{
+      tokens.add('00');
+    }
 
     return tokens.join(':');
   }
@@ -852,7 +866,7 @@ isLoading = false;
       modelHud.changeIsLoading(true);
       user().then((value){
         modelHud.changeIsLoading(false);
-        String points = value.data.points;
+        String points = value!.data!.points!;
         int credit =0;
         if(points.toString() == "null" || points.trim()==""){
           credit = 0;
@@ -865,13 +879,13 @@ isLoading = false;
         if(credit>0){
           _buttonTapped();
         }else{
-          ShowAlertDialog(context, getTranslated(context, "credit_not_enough"));
+          ShowAlertDialog(context, getTranslated(context, "credit_not_enough")!);
         }
       });
       print("true");
 
     }else{
-      ShowAlerLogintDialog(context,getTranslated(context, 'not_login'));
+      ShowAlerLogintDialog(context,getTranslated(context, 'not_login')!);
     }
 
   }
@@ -911,7 +925,7 @@ isLoading = false;
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'oks'),
+            getTranslated(context, 'oks')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -927,7 +941,7 @@ isLoading = false;
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -978,7 +992,7 @@ isLoading = false;
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -994,7 +1008,7 @@ isLoading = false;
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

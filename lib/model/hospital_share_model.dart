@@ -3,18 +3,18 @@
 /// data : {"hospital_id":"1","shared":20,"most_view":"183"}
 
 class HospitalShareModel {
-  String _status;
-  String _message;
-  Data _data;
+  String? _status;
+  String? _message;
+  Data? _data;
 
-  String get status => _status;
-  String get message => _message;
-  Data get data => _data;
+  String get status => _status!;
+  String get message => _message!;
+  Data get data => _data!;
 
   HospitalShareModel({
-      String status, 
-      String message, 
-      Data data}){
+    String? status,
+    String? message,
+      Data? data}){
     _status = status;
     _message = message;
     _data = data;
@@ -31,7 +31,7 @@ class HospitalShareModel {
     map["status"] = _status;
     map["message"] = _message;
     if (_data != null) {
-      map["data"] = _data.toJson();
+      map["data"] = _data!.toJson();
     }
     return map;
   }
@@ -43,18 +43,18 @@ class HospitalShareModel {
 /// most_view : "183"
 
 class Data {
-  String _hospitalId;
-  int _shared;
-  String _mostView;
+  String? _hospitalId;
+  int? _shared;
+  String? _mostView;
 
-  String get hospitalId => _hospitalId;
-  int get shared => _shared;
-  String get mostView => _mostView;
+  String get hospitalId => _hospitalId!;
+  int get shared => _shared!;
+  String get mostView => _mostView!;
 
   Data({
-      String hospitalId, 
-      int shared, 
-      String mostView}){
+    String? hospitalId,
+      int? shared,
+      String? mostView}){
     _hospitalId = hospitalId;
     _shared = shared;
     _mostView = mostView;

@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/change_password_model.dart';
@@ -15,7 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class ChangePasswordScreen extends StatefulWidget {
   static String id = 'ChangePasswordScreen';
-  const ChangePasswordScreen({Key key}) : super(key: key);
+  const ChangePasswordScreen({Key? key}) : super(key: key);
 
   @override
   _ChangePasswordScreenState createState() => _ChangePasswordScreenState();
@@ -23,9 +24,9 @@ class ChangePasswordScreen extends StatefulWidget {
 
 class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  String oldPassword;
-  String newPassword;
-  String confirmPassword;
+  String? oldPassword;
+  String? newPassword;
+  String? confirmPassword;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   @override
@@ -43,7 +44,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                getTranslated(context, 'change_password'),
+                getTranslated(context, 'change_password')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -78,32 +79,38 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
               children: [
                 Directionality(
                   textDirection: TextDirection.ltr,
-                  child: PasswordTextField(hint:getTranslated(context, 'old_password'),onClick: (value){
+                  child: PasswordTextField(hint:getTranslated(context, 'old_password')!,onClick: (value){
                     oldPassword = value;
 
                   },
+mText: "",
+                    context: context,
                   ),
                 ),
                 SizedBox(height: 10.h,),
                 Directionality(
                   textDirection: TextDirection.ltr,
-                  child: PasswordTextField(hint:getTranslated(context, 'new_password'),onClick: (value){
+                  child: PasswordTextField(hint:getTranslated(context, 'new_password')!,onClick: (value){
                     newPassword = value;
 
                   },
+                    mText: "",
+                    context: context,
                   ),
                 ),
                 SizedBox(height: 10.h,),
                 Directionality(
                   textDirection: TextDirection.ltr,
-                  child: PasswordTextField(hint:getTranslated(context, 'confirm_password'),onClick: (value){
+                  child: PasswordTextField(hint:getTranslated(context, 'confirm_password')!,onClick: (value){
                     confirmPassword = value;
 
                   },
+                    mText: "",
+                    context: context,
                   ),
                 ),
                 SizedBox(height: 10.h,),
-                Center(child: confirmButton(getTranslated(context, 'change_password'),context))
+                Center(child: confirmButton(getTranslated(context, 'change_password')!,context))
               ],
             ),
           ),
@@ -125,14 +132,22 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     return TextButton(
       style: flatButtonStyle,
       onPressed: () {
-      if(_globalKey.currentState.validate()) {
-        _globalKey.currentState.save();
+      if(_globalKey.currentState!.validate()) {
+        _globalKey.currentState!.save();
         if (confirmPassword == newPassword) {
           validate();
 
         }else{
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text(getTranslated(context, 'password_not_equal'))));
+          Fluttertoast.showToast(
+              msg: getTranslated(context, 'password_not_equal')!,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: screenUtil.setSp(16)
+          );
+
         }
       }
 
@@ -150,26 +165,34 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     PetMartService petMartService = PetMartService();
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
 
 
-    final body = json.decode(loginData);
+    final body = json.decode(loginData!);
     LoginModel   loginModel = LoginModel.fromJson(body);
     Map<String, String> map = Map();
 
-    map['id']= loginModel.data.id;
-    map['oldPassword']= oldPassword;
+    map['id']= loginModel!.data!.id!;
+    map['oldPassword']= oldPassword!;
 
-    map['newPassword']= newPassword;
-    map['confirmPassword']= newPassword;
+    map['newPassword']= newPassword!;
+    map['confirmPassword']= newPassword!;
 
 
-     ChangePasswordModel changePasswordModel = await petMartService.changePassword(map);
+     ChangePasswordModel? changePasswordModel = await petMartService.changePassword(map);
 
     modelHud.changeIsLoading(false);
-     String status = changePasswordModel.status;
-    _scaffoldKey.currentState.showSnackBar(
-        SnackBar(content: Text(changePasswordModel.data.msg)));
+     String status = changePasswordModel!.status!;
+    Fluttertoast.showToast(
+        msg: changePasswordModel.data!.msg!,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: screenUtil.setSp(16)
+    );
+
      if(status == 'success'){
        SharedPref sharedPref = SharedPref();
        await sharedPref.saveString("password", newPassword);

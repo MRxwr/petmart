@@ -8,21 +8,21 @@ class YouTubeScreen extends StatefulWidget {
   static String id = 'YouTubeScreen';
    String youtubeId;
    String auctionName;
-  YouTubeScreen({Key key,@required this.youtubeId,@required this.auctionName}): super(key: key);
+  YouTubeScreen({Key? key,required this.youtubeId,required this.auctionName}): super(key: key);
   @override
   _YouTubeScreenState createState() => _YouTubeScreenState();
 }
 
 class _YouTubeScreenState extends State<YouTubeScreen> {
 
-  YoutubePlayerController _controller;
+  YoutubePlayerController? _controller;
 
 
 
   @override
   Widget build(BuildContext context) {
     ScreenUtil screenUtil = ScreenUtil();
-    String videoId;
+    String? videoId;
     videoId = YoutubePlayer.convertUrlToId(widget.youtubeId);
      _controller = YoutubePlayerController(
       flags: YoutubePlayerFlags(
@@ -31,7 +31,7 @@ class _YouTubeScreenState extends State<YouTubeScreen> {
 
 
       ),
-      initialVideoId: videoId,
+      initialVideoId: videoId!,
 
     );
     return Scaffold(
@@ -80,7 +80,7 @@ class _YouTubeScreenState extends State<YouTubeScreen> {
             Container(
               child: Center(
                 child:
-                YoutubePlayer(controller: _controller,
+                YoutubePlayer(controller: _controller!,
                 showVideoProgressIndicator: true,
 
 
@@ -95,7 +95,7 @@ class _YouTubeScreenState extends State<YouTubeScreen> {
   }
   @override
   void dispose() {
-    _controller.dispose();
+    _controller!.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);

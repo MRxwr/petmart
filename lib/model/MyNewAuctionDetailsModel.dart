@@ -1,8 +1,8 @@
 class MyNewAuctionDetailsModel {
-  bool ok;
-  String error;
-  String status;
-  List<Data> data;
+  bool? ok;
+  String? error;
+  String? status;
+  List<Data>? data;
 
   MyNewAuctionDetailsModel({this.ok, this.error, this.status, this.data});
 
@@ -13,7 +13,7 @@ class MyNewAuctionDetailsModel {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data.add(new Data.fromJson(v));
+        data!.add(new Data.fromJson(v));
       });
     }
   }
@@ -24,29 +24,31 @@ class MyNewAuctionDetailsModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Data {
-  String id;
-  String endDate;
-  String enTitle;
-  String arTitle;
-  String price;
-  String reach;
-  String video;
-  String status;
-  String accept;
-  List<String> bids;
-  List<String> image;
-  Customer customer;
-  List<Bidders> bidders;
+  String? date;
+  String? id;
+  String? endDate;
+  String? enTitle;
+  String? arTitle;
+  String? price;
+  String? reach;
+  String? video;
+  String? status;
+  String? accept;
+  List<String>? bids;
+  List<String>? image;
+  Customer? customer;
+  List<Bidders>? bidders;
 
   Data(
       {this.id,
+        this.date,
         this.endDate,
         this.enTitle,
         this.arTitle,
@@ -62,6 +64,7 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    date = json['date'];
     endDate = json['endDate'];
     enTitle = json['enTitle'];
     arTitle = json['arTitle'];
@@ -78,7 +81,7 @@ class Data {
     if (json['bidders'] != null) {
       bidders = <Bidders>[];
       json['bidders'].forEach((v) {
-        bidders.add(new Bidders.fromJson(v));
+        bidders!.add(new Bidders.fromJson(v));
       });
     }
   }
@@ -86,6 +89,7 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['date'] = this.date;
     data['endDate'] = this.endDate;
     data['enTitle'] = this.enTitle;
     data['arTitle'] = this.arTitle;
@@ -97,21 +101,21 @@ class Data {
     data['bids'] = this.bids;
     data['image'] = this.image;
     if (this.customer != null) {
-      data['customer'] = this.customer.toJson();
+      data['customer'] = this.customer!.toJson();
     }
     if (this.bidders != null) {
-      data['bidders'] = this.bidders.map((v) => v.toJson()).toList();
+      data['bidders'] = this.bidders!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Customer {
-  String name;
-  String mobile;
-  String email;
-  String logo;
-  String rating;
+  String? name;
+  String? mobile;
+  String? email;
+  String? logo;
+  String? rating;
 
   Customer({this.name, this.mobile, this.email, this.logo, this.rating});
 
@@ -135,10 +139,10 @@ class Customer {
 }
 
 class Bidders {
-  String name;
-  String logo;
-  String bid;
-  String date;
+  String? name;
+  String? logo;
+  String? bid;
+  String? date;
 
   Bidders({this.name, this.logo, this.bid, this.date});
 

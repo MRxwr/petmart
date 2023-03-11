@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/model/ServiceDetailsModel.dart';
 import 'package:pet_mart/screens/photo-screen.dart';
 import 'package:provider/provider.dart';
@@ -22,25 +22,25 @@ import 'login_screen.dart';
 class ServiceDetailsScreen extends StatefulWidget {
   String id;
   String name;
-  ServiceDetailsScreen({Key key,@required this.id,@required this.name}): super(key: key);
+  ServiceDetailsScreen({Key? key,required this.id,required this.name}): super(key: key);
 
   @override
   State<ServiceDetailsScreen> createState() => _ServiceDetailsScreenState();
 }
 
 class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
-  String mLanguage;
+  String? mLanguage;
 
-  ServiceDetailsModel hospitalDetailsModel;
+  ServiceDetailsModel? hospitalDetailsModel;
   final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
   ScreenUtil screenUtil = ScreenUtil();
-  Future<ServiceDetailsModel> getHospitals()async{
+  Future<ServiceDetailsModel?> getHospitals()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
     PetMartService petMartService = PetMartService();
-    ServiceDetailsModel hospitalModel =await petMartService.serviceDetails(widget.id);
-    ShareModel petsModel = await petMartService.sharePet("view","hospital",widget.id);
+    ServiceDetailsModel? hospitalModel =await petMartService.serviceDetails(widget.id);
+    ShareModel? petsModel = await petMartService.sharePet("view","hospital",widget.id);
     return hospitalModel;
   }
   String noOfShares="";
@@ -52,8 +52,8 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     getHospitals().then((value) {
       setState(() {
         hospitalDetailsModel = value;
-        noOfShares = hospitalDetailsModel.data.services[0].shares;
-        noOfViews = hospitalDetailsModel.data.services[0].views;
+        noOfShares = hospitalDetailsModel!.data.services[0].shares;
+        noOfViews = hospitalDetailsModel!.data.services[0].views;
         noOfViews = "${int.parse(noOfViews)+1}";
       });
     });
@@ -112,11 +112,11 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                   children: [
                     GestureDetector(
                       onTap: (){
-                        String url = KImageUrl+hospitalDetailsModel.data.services[0].logo;
+                        String url = KImageUrl+hospitalDetailsModel!.data.services[0].logo;
                         if(url.isNotEmpty) {
                           Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                             return new PhotoScreen(imageProvider: NetworkImage(
-                                '${KImageUrl+hospitalDetailsModel.data.services[0].logo}'
+                                '${KImageUrl+hospitalDetailsModel!.data.services[0].logo}'
                             ),);
                           }));
                         }
@@ -129,7 +129,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                           height: 150.h,
 
                           fit: BoxFit.fill,
-                          imageUrl:'${KImageUrl+hospitalDetailsModel.data.services[0].logo}',
+                          imageUrl:'${KImageUrl+hospitalDetailsModel!.data.services[0].logo}',
                           imageBuilder: (context, imageProvider) => Container(
                               width: screenUtil.screenWidth,
 
@@ -195,15 +195,15 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          callButton(getTranslated(context, 'call_now'),context),
+                          callButton(getTranslated(context, 'call_now')!,context),
 
                         ],
                       ),
                     ),
                     Container(
                       margin: EdgeInsets.symmetric(vertical: 10.h),
-                      child: Text(mLanguage=="en"?hospitalDetailsModel.data.services[0].enDetails:
-                      hospitalDetailsModel.data.services[0].arDetails,
+                      child: Text(mLanguage=="en"?hospitalDetailsModel!.data.services[0].enDetails:
+                      hospitalDetailsModel!.data.services[0].arDetails,
                         style: TextStyle(
                             color: Color(0xFF000000),
                             fontSize: screenUtil.setSp(18),
@@ -296,7 +296,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     return TextButton(
       style: flatButtonStyle,
       onPressed: () {
-        _service.call(hospitalDetailsModel.data.services[0].mobile.replaceAll('+', ''));
+        _service.call(hospitalDetailsModel!.data.services[0].mobile.replaceAll('+', ''));
 
 
       },
@@ -339,7 +339,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
       ShareDialog(context);
 
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login')!);
     }
 
 
@@ -381,7 +381,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -395,7 +395,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -416,18 +416,18 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
     String description;
     String title;
     if (mLanguage == 'ar') {
-      description = hospitalDetailsModel.data.services[0].arDetails;
-      title = hospitalDetailsModel.data.services[0].arTitle;
+      description = hospitalDetailsModel!.data.services[0].arDetails;
+      title = hospitalDetailsModel!.data.services[0].arTitle;
     } else {
-      description = hospitalDetailsModel.data.services[0].enDetails;;
-      title = hospitalDetailsModel.data.services[0].enTitle;
+      description = hospitalDetailsModel!.data.services[0].enDetails;;
+      title = hospitalDetailsModel!.data.services[0].enTitle;
     }
     final modelHud = Provider.of<ModelHud>(context, listen: false);
     modelHud.changeIsLoading(true);
 
 
     PetMartService petMartService = PetMartService();
-    ShareModel petsModel = await petMartService.sharePet("share","hospital",hospitalDetailsModel.data.services[0].id);
+    ShareModel? petsModel = await petMartService.sharePet("share","hospital",hospitalDetailsModel!.data.services[0].id);
     setState(() {
       noOfShares = "${int.parse(noOfShares)+1}";
 
@@ -438,7 +438,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
           '${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
     } else {
       Share.share(
-          '${title}' '\n ${description}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
+          '${title}' '\n ${description}' '\nhttps://onelink.to/3eq98v');
     }
 
 
@@ -480,7 +480,7 @@ class _ServiceDetailsScreenState extends State<ServiceDetailsScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'reg_now'),
+            getTranslated(context, 'reg_now')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

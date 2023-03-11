@@ -208,5 +208,6 @@
   "delete_account": "Delete My Account",
   "yes": "Continue",
   "auction_success": "Auction has been added successfully",
-  "oks": "yes"
+  "oks": "yes",
+  "payment": "Payment"
 }

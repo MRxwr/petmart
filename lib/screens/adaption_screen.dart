@@ -23,25 +23,25 @@ class AdaptionScreen extends StatefulWidget {
 
 class _AdaptionScreenState extends State<AdaptionScreen> {
 
-  List<bool> selectedList = List();
-  PostModel.PostModel postModel;
+  List<bool> selectedList = [];
+  PostModel.PostModel? postModel;
   List<PostModel.Categories> categories = [];
   ScreenUtil screenUtil = ScreenUtil();
-  double itemWidth;
-  String languageCode;
-  double itemHeight;
+  double? itemWidth;
+  String? languageCode;
+  double? itemHeight;
   int selectedIndex =0;
-  HomeModel homeModel;
+  HomeModel? homeModel;
 
-  Future<HomeModel> getHomeModel() async{
+  Future<HomeModel?> getHomeModel() async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String homeString = sharedPreferences.getString("home");
+    String? homeString = sharedPreferences.getString("home");
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
 
-      final body = json.decode(homeString);
+      final body = json.decode(homeString!);
     homeModel = HomeModel.fromJson(body);
 
 
@@ -58,13 +58,13 @@ class _AdaptionScreenState extends State<AdaptionScreen> {
 
 
     PetMartService petMartService = PetMartService();
-   PostModel.PostModel postModel = await petMartService.post("adoption",catId);
+   PostModel.PostModel? postModel = await petMartService.post("adoption",catId);
     PostModel.Categories category = PostModel.Categories(id:"0",enTitle:getTranslated(context, 'all'),arTitle:getTranslated(context, 'all'));
     categories.add(category);
     selectedList.add(true);
 
-    for(int i =0;i<postModel.data.categories.length;i++){
-      categories.add(postModel.data.categories[i]);
+    for(int i =0;i<postModel!.data!.categories!.length;i++){
+      categories.add(postModel.data!.categories![i]);
       selectedList.add(false);
     }
     return postModel;
@@ -138,7 +138,7 @@ postModel = null;
                                   setState(() {
 
                                   });
-                                   getList(categories[index].id);
+                                   getList(categories![index].id!);
 
 
                                 }
@@ -175,11 +175,11 @@ postModel = null;
                       ),
                       alignment: AlignmentDirectional.center,
                     ):
-                        postModel.data.items.isEmpty?
+                        postModel!.data!.items!.isEmpty?
 
                         Container(
                           child: Text(
-                            getTranslated(context, 'no_product_available'),
+                            getTranslated(context, 'no_product_available')!,
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: screenUtil.setSp(16),
@@ -196,15 +196,15 @@ postModel = null;
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                          childAspectRatio:itemWidth/itemHeight),
-                      itemCount: postModel.data.items.length,
+                          childAspectRatio:itemWidth!/itemHeight!),
+                      itemCount: postModel!.data!.items!.length,
 
                       itemBuilder: (context,index){
                         return
                           GestureDetector(
                             onTap: (){
                               Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                                return new AdaptionDetailsScreen(postId:postModel.data.items[index].id,postName:languageCode =="en"? postModel.data.items[index].enTitle:postModel.data.items[index].arTitle);
+                                return new AdaptionDetailsScreen(postId:postModel!.data!.items![index].id!,postName:languageCode =="en"? postModel!.data!.items![index].enTitle!:postModel!.data!.items![index].arTitle!);
                               }));
                             },
                             child: Container(
@@ -218,7 +218,7 @@ postModel = null;
                                     borderRadius: BorderRadius.circular(10.0.h),
                                   ),
                                   color: Color(0xFFFFFFFF),
-                                  child: buildItem(postModel.data.items[index],context))),
+                                  child: buildItem(postModel!.data!.items![index],context))),
                           );
                       },
                     ),
@@ -247,7 +247,7 @@ postModel = null;
       onPressed: () {
 
       },
-      child: Text(languageCode == "en"?category.enTitle:category.arTitle,style: TextStyle(
+      child: Text(languageCode == "en"?category.enTitle!:category.arTitle!,style: TextStyle(
           color: Color(0xFFFFFFFF),
           fontSize: screenUtil.setSp(14),
           fontWeight: FontWeight.w500
@@ -267,7 +267,7 @@ postModel = null;
               color: kMainColor
           ),
           child: Text(
-            languageCode == "en"?category.enTitle:category.arTitle,
+            languageCode == "en"?category.enTitle!:category.arTitle!,
             style: TextStyle(
                 color: Color(0xCC000000),
                 fontSize: screenUtil.setSp(14),
@@ -287,7 +287,7 @@ postModel = null;
               )
           ),
         child: Text(
-          languageCode == "en"?category.enTitle:category.arTitle,
+          languageCode == "en"?category.enTitle!:category.arTitle!,
           style: TextStyle(
             color: Color(0xCC000000),
               fontSize: screenUtil.setSp(14),
@@ -309,7 +309,7 @@ children: [
       children: [
         CachedNetworkImage(
           width: itemWidth,
-          imageUrl:kImagePath+data.image,
+          imageUrl:KImageUrl+data.image!,
           imageBuilder: (context, imageProvider) => Stack(
             children: [
               ClipRRect(
@@ -348,7 +348,7 @@ children: [
       bottom: 2.h,
       start: 10.w,
       child: Text(
-        data.date.split(" ")[0],
+        data.date!.split(" ")[0],
         style: TextStyle(
           color: Color(0xFFFFFFFF)
 
@@ -365,7 +365,7 @@ children: [
         Container(
           alignment: AlignmentDirectional.centerStart,
           child: Text(
-           languageCode =="en"? data.enTitle:data.arTitle,
+           languageCode =="en"? data.enTitle!:data.arTitle!,
             style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.normal,

@@ -5,14 +5,14 @@
 
 class PaymentUrlModel {
   PaymentUrlModel({
-      bool ok, 
-      String error, 
-      String status, 
-      Data data,}){
-    _ok = ok;
-    _error = error;
-    _status = status;
-    _data = data;
+      bool? ok,
+      String? error,
+      String? status,
+      Data? data,}){
+    _ok = ok!;
+    _error = error!;
+    _status = status!;
+    _data = data!;
 }
 
   PaymentUrlModel.fromJson(dynamic json) {
@@ -21,23 +21,23 @@ class PaymentUrlModel {
     _status = json['status'];
     _data = json['data'] != null ? Data.fromJson(json['data']) : null;
   }
-  bool _ok;
-  String _error;
-  String _status;
-  Data _data;
-PaymentUrlModel copyWith({  bool ok,
-  String error,
-  String status,
-  Data data,
+  bool? _ok;
+  String? _error;
+  String? _status;
+  Data? _data;
+PaymentUrlModel copyWith({  bool? ok,
+  String? error,
+  String? status,
+  Data? data,
 }) => PaymentUrlModel(  ok: ok ?? _ok,
   error: error ?? _error,
   status: status ?? _status,
   data: data ?? _data,
 );
-  bool get ok => _ok;
-  String get error => _error;
-  String get status => _status;
-  Data get data => _data;
+  bool get ok => _ok!;
+  String get error => _error!;
+  String get status => _status!;
+  Data get data => _data!;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -45,7 +45,7 @@ PaymentUrlModel copyWith({  bool ok,
     map['error'] = _error;
     map['status'] = _status;
     if (_data != null) {
-      map['data'] = _data.toJson();
+      map['data'] = _data!.toJson();
     }
     return map;
   }
@@ -57,9 +57,9 @@ PaymentUrlModel copyWith({  bool ok,
 
 class Data {
   Data({
-      String url,
+      String? url,
     dynamic id,}){
-    _url = url;
+    _url = url!;
     _id = id;
 }
 
@@ -67,14 +67,14 @@ class Data {
     _url = json['url'];
     _id = json['id'];
   }
-  String _url;
+  String? _url;
   dynamic _id;
-Data copyWith({  String url,
+Data copyWith({  String? url,
   dynamic id,
 }) => Data(  url: url ?? _url,
   id: id ?? _id,
 );
-  String get url => _url;
+  String get url => _url!;
   dynamic get id => _id;
 
   Map<String, dynamic> toJson() {

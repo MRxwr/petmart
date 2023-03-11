@@ -3,18 +3,18 @@
 /// data : {"post_id":"34","post_count":40}
 
 class ViewModel {
-  String _status;
-  String _message;
-  Data _data;
+  String? _status;
+  String? _message;
+  Data? _data;
 
-  String get status => _status;
-  String get message => _message;
-  Data get data => _data;
+  String get status => _status!;
+  String get message => _message!;
+  Data get data => _data!;
 
   ViewModel({
-      String status, 
-      String message, 
-      Data data}){
+    String? status,
+    String? message,
+      Data? data}){
     _status = status;
     _message = message;
     _data = data;
@@ -31,7 +31,7 @@ class ViewModel {
     map["status"] = _status;
     map["message"] = _message;
     if (_data != null) {
-      map["data"] = _data.toJson();
+      map["data"] = _data!.toJson();
     }
     return map;
   }
@@ -42,15 +42,15 @@ class ViewModel {
 /// post_count : 40
 
 class Data {
-  String _postId;
-  int _postCount;
+  String? _postId;
+  int? _postCount;
 
-  String get postId => _postId;
-  int get postCount => _postCount;
+  String get postId => _postId!;
+  int get postCount => _postCount!;
 
   Data({
-      String postId, 
-      int postCount}){
+    String? postId,
+      int? postCount}){
     _postId = postId;
     _postCount = postCount;
 }

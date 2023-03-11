@@ -13,7 +13,7 @@ class TermsScreen extends StatefulWidget {
 }
 
 class _TermsScreenState extends State<TermsScreen> {
-  CmsModel cmsModel;
+  CmsModel? cmsModel;
   @override
   void initState() {
     // TODO: implement initState
@@ -29,8 +29,8 @@ class _TermsScreenState extends State<TermsScreen> {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     PetMartService petMartService = PetMartService();
-    CmsModel  cmsModel = await petMartService.cms();
-    return cmsModel;
+    CmsModel?  cmsModel = await petMartService.cms();
+    return cmsModel!;
 
   }
   @override
@@ -46,7 +46,7 @@ class _TermsScreenState extends State<TermsScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'terms_conditions'),
+              getTranslated(context, 'terms_conditions')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -87,7 +87,7 @@ class _TermsScreenState extends State<TermsScreen> {
                     languageCode == "en"?
 
 
-                    cmsModel.data.enTerms: cmsModel.data.arTerms,
+                    cmsModel!.data!.enTerms!: cmsModel!.data!.arTerms!,
                     textStyle: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.w500,

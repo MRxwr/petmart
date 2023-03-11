@@ -43,7 +43,7 @@ class _LanguageScreenState extends State<LanguageScreen> {
                   Container(
                     padding: EdgeInsets.all(20.h),
                     alignment: AlignmentDirectional.topStart,
-                    child: Text(getTranslated(context, 'select_language')
+                    child: Text(getTranslated(context, 'select_language')!
                       ,
                     style: TextStyle(
                       color: Color(0xFF000000),
@@ -59,10 +59,10 @@ class _LanguageScreenState extends State<LanguageScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(flex:1,
-                                child: previewButton(getTranslated(context, 'english'),context)),
+                                child: previewButton(getTranslated(context, 'english')!,context)),
                     SizedBox(width: 20.w,),
                     Expanded(flex: 1,
-                        child: previewButton(getTranslated(context, 'arabic'),context))
+                        child: previewButton(getTranslated(context, 'arabic')!,context))
                       ]
                         )
 

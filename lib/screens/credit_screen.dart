@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/PaymentUrlModel.dart';
@@ -14,13 +15,13 @@ import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sweetalert/sweetalert.dart';
+
 
 import '../model/login_model.dart';
 import '../providers/model_hud.dart';
 class CreditScreen extends StatefulWidget {
 
-  CreditScreen({Key key}) : super(key: key);
+  CreditScreen({Key? key}) : super(key: key);
 
   @override
   _CreditScreenState createState() => _CreditScreenState();
@@ -29,7 +30,7 @@ class CreditScreen extends StatefulWidget {
 class _CreditScreenState extends State<CreditScreen> {
   String mLanguage ="";
   String userId ="";
-  Future<Model.PackageModel> package() async{
+  Future<Model.PackageModel?> package() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
@@ -40,21 +41,21 @@ mLanguage = languageCode;
 
     map = {"language":languageCode};
 
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
 
 
 
-    final body = json.decode(loginData);
+    final body = json.decode(loginData!);
    LoginModel loginModel = LoginModel.fromJson(body);
-    userId = loginModel.data.id;
+    userId = loginModel!.data!.id!;
 
 
     PetMartService petMartService = PetMartService();
-    Model.PackageModel packageModel = await petMartService.package();
+    Model.PackageModel? packageModel = await petMartService.package();
     return packageModel;
   }
   ScreenUtil screenUtil = ScreenUtil();
-  Model.PackageModel packageModel;
+  Model.PackageModel? packageModel;
   @override
   void initState() {
     // TODO: implement initState
@@ -77,7 +78,7 @@ mLanguage = languageCode;
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                getTranslated(context, 'package'),
+                getTranslated(context, 'package')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -140,7 +141,7 @@ mLanguage = languageCode;
                                 child: CachedNetworkImage(
                                   width: 50.w,
                                   height: 50.h,
-                                  imageUrl: KImageUrl+packageModel.data.package[index].image,
+                                  imageUrl: KImageUrl+packageModel!.data!.package![index].image!,
                                   imageBuilder: (context, imageProvider) =>
                                       Container(
 
@@ -176,7 +177,7 @@ mLanguage = languageCode;
                                 ),
                               )
                               ), Expanded(flex:2,child:Container(
-                                child: Text(mLanguage == "en"?packageModel.data.package[index].enDetails:packageModel.data.package[index].arDetails,
+                                child: Text(mLanguage == "en"?packageModel!.data!.package![index].enDetails!:packageModel!.data!.package![index].arDetails!,
                                 style: TextStyle(
                                   color: Color(0xAAAAAAAA),
                                   fontSize: screenUtil.setSp(10),
@@ -193,13 +194,13 @@ mLanguage = languageCode;
                           children: [
                             Column(
                               children: [
-                                Text(mLanguage == "en"?packageModel.data.package[index].enTitle:packageModel.data.package[index].arTitle,
+                                Text(mLanguage == "en"?packageModel!.data!.package![index].enTitle!:packageModel!.data!.package![index].arTitle!,
                                   style: TextStyle(
                                       color: kMainColor,
                                       fontSize: screenUtil.setSp(10),
                                       fontWeight: FontWeight.bold
                                   ),),
-                                Text(packageModel.data.package[index].points +" "+getTranslated(context, "point"),
+                                Text(packageModel!.data!.package![index].points! +" "+getTranslated(context, "point")!,
                                   style: TextStyle(
                                       color: kMainColor,
                                       fontSize: screenUtil.setSp(10),
@@ -209,13 +210,13 @@ mLanguage = languageCode;
                             ),
                             Column(
                               children: [
-                                Text('${getTranslated(context, 'valid_for')} ${packageModel.data.package[index].validity} ${getTranslated(context, "days")}',
+                                Text('${getTranslated(context, 'valid_for')} ${packageModel!.data!.package![index].validity} ${getTranslated(context, "days")}',
                                   style: TextStyle(
                                       color: kMainColor,
                                       fontSize: screenUtil.setSp(10),
                                       fontWeight: FontWeight.normal
                                   ),),
-                                Text(packageModel.data.package[index].price+" "+getTranslated(context, "K_D"),
+                                Text(packageModel!.data!.package![index].price!+" "+getTranslated(context, "K_D")!,
                                   style: TextStyle(
                                       color: kMainColor,
                                       fontSize: screenUtil.setSp(10),
@@ -223,7 +224,7 @@ mLanguage = languageCode;
                                   ),),
                               ],
                             ),
-                            confirmButton(getTranslated(context, 'buy'),context,index)
+                            confirmButton(getTranslated(context, 'buy')!,context,index)
                           ],
                         )
                       ))
@@ -234,7 +235,7 @@ mLanguage = languageCode;
               }, separatorBuilder: (context,index){
       return Container(height: 10.h,
       color: Color(0xFFFFFFFF),);}
-      , itemCount:packageModel.data.package.length),
+      , itemCount:packageModel!.data!.package!.length),
         ),
       ),
     );
@@ -258,7 +259,7 @@ mLanguage = languageCode;
         //
         // }));
 
-        ShowPaymentDialog(context,packageModel.data.package[index]);
+        ShowPaymentDialog(context,packageModel!.data!.package![index]);
 
       },
       child: Text(text,style: TextStyle(
@@ -304,7 +305,7 @@ mLanguage = languageCode;
         DialogButton(
           child: Text(
 
-            getTranslated(context, 'knet'),
+            getTranslated(context, 'knet')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
             textAlign: TextAlign.center,
           ),
@@ -318,11 +319,12 @@ mLanguage = languageCode;
             final modelHud = Provider.of<ModelHud>(context,listen: false);
             modelHud.changeIsLoading(true);
             PetMartService petmartService = PetMartService();
-            PaymentUrlModel paymentUrlModel =  await petmartService.paymentUrl(map);
+            PaymentUrlModel? paymentUrlModel =  await petmartService.paymentUrl(map);
             modelHud.changeIsLoading(false);
-            if(paymentUrlModel.ok){
+            if(paymentUrlModel!.ok){
               String url = paymentUrlModel.data.url;
               String id = paymentUrlModel.data.id.toString();
+              print("paymentId ---> ${id}");
               _buttonTapped(package, url, id,context);
 
             }
@@ -336,22 +338,22 @@ mLanguage = languageCode;
         DialogButton(
           child: Text(
 
-            getTranslated(context, 'master'),
+            getTranslated(context, 'master')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
             textAlign: TextAlign.center,
           ),
           onPressed: ()async {
             await alert.dismiss();
-            Map map = Map<String,dynamic>();
+            Map<String,dynamic> map = {};
             map['packageId']= package.id;
             map['customerId'] = userId;
             map['paymentMethod'] = "2";
             final modelHud = Provider.of<ModelHud>(context,listen: false);
             modelHud.changeIsLoading(true);
             PetMartService petmartService = PetMartService();
-            PaymentUrlModel paymentUrlModel =  await petmartService.paymentUrl(map);
+            PaymentUrlModel? paymentUrlModel =  await petmartService.paymentUrl(map);
             modelHud.changeIsLoading(false);
-            if(paymentUrlModel.ok){
+            if(paymentUrlModel!.ok){
               String url = paymentUrlModel.data.url;
               String id = paymentUrlModel.data.id.toString();
               // Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
@@ -371,22 +373,22 @@ mLanguage = languageCode;
     alert.show();
 
   }
-  Future<void> _buttonTapped(Model.Package package,String url,String id,BuildContext context) async {
+  Future<void> _buttonTapped(Model.Package package,String url,String id,BuildContext mContext) async {
     String  results =  await Navigator.of(context,
     ).push(new MaterialPageRoute(builder: (BuildContext context) {
       return new PaymentScreen(packageModel: package, url: url, id: id,);
     }
     ));
-    if(results == "true"){
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-      sharedPreferences.setBool("isSuccess", false);
-      showFailDialog();
+    if(results != null) {
+      if (results == "fail") {
+        // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+        // sharedPreferences.setBool("isSuccess", false);
+        showFailDialog();
+      } else {
+        Navigator.of(context).pop(results);
+      }
     }
-    SharedPreferences sharedPreferences  =await SharedPreferences.getInstance();
-    bool isSucccess = sharedPreferences.getBool("isSuccess");
-    if(isSucccess){
-      Navigator.of(context).pop({'selection':true});
-    }
+
 
 
 
@@ -396,21 +398,34 @@ mLanguage = languageCode;
   }
 
 
-  Future<void> showFailDialog() {
-    SweetAlert.show(context,
-        title: getTranslated(context, 'fail'),
-        subtitle: getTranslated(context, 'payment_fail'),
-        showCancelButton: false,
-        confirmButtonColor: Color(0xFFFF0000),
-        confirmButtonText: getTranslated(context, 'ok'),
-        style: SweetAlertStyle.error,
-        onPress: (bool isConfirm) {
+  Future<void> showFailDialog() async {
+    ArtSweetAlert.show(
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+            type: ArtSweetAlertType.danger,
+            title: getTranslated(context, 'fail'),
+            text: getTranslated(context, 'payment_fail'),
+          confirmButtonText: getTranslated(context, 'ok')!,
+          confirmButtonColor: Color(0xFFFF0000),
+          showCancelBtn: false,
 
 
-
-
-
-          return true;
-        });
+        )
+    );
+    // ArtSweetAlert.show(context,
+    //     title: getTranslated(context, 'fail'),
+    //     subtitle: getTranslated(context, 'payment_fail'),
+    //     showCancelButton: false,
+    //     confirmButtonColor: Color(0xFFFF0000),
+    //     confirmButtonText: getTranslated(context, 'ok'),
+    //     style: SweetAlertStyle.error,
+    //     onPress: (bool isConfirm) {
+    //
+    //
+    //
+    //
+    //
+    //       return true;
+    //     });
   }
 }

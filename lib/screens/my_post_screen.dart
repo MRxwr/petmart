@@ -24,15 +24,15 @@ class MyPostScreen extends StatefulWidget {
 
 class _MyPostScreenState extends State<MyPostScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  List<TypeModel> typesList = List();
-  double itemWidth;
-  double itemHeight;
+  List<TypeModel> typesList = [];
+  double? itemWidth;
+  double? itemHeight;
   int selectedIndex =0;
   String mLanguage ="";
   String userId = "";
-  MyPostsModel postModel;
-  List<Sale> products =null;
-  bool isOk ;
+  MyPostsModel? postModel;
+  List<Sale>? products ;
+  bool? isOk ;
 
   @override
   void initState() {
@@ -50,20 +50,18 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
           isOk  = value['ok'];
         products = [];
-        if(isOk){
+        if(isOk!){
          postModel = MyPostsModel.fromJson(Map<String, dynamic>.from(value));
 
              // MyPostsModel.fromJson(value);
-         if(postModel.data.items.lost != null){
-           products..addAll(postModel.data.items.lost);
-         }
+         products!..addAll(postModel!.data.items.lost);
 
-         if(postModel.data.items.adoption != null){
-           products..addAll(postModel.data.items.adoption);
-         }
-         if(postModel.data.items.sale != null){
-           products..addAll(postModel.data.items.sale);
-         }
+         // if(postModel!.data.items.adoption.isNotEmpty){
+           products!..addAll(postModel!.data.items.adoption);
+         // }
+         // if(postModel!.data.items.sale.isNotEmpty){
+           products!..addAll(postModel!.data.items.sale);
+         // }
 
 
         }
@@ -89,17 +87,17 @@ class _MyPostScreenState extends State<MyPostScreen> {
 
 
   }
-  String languageCode;
+  String? languageCode;
   Future<Map> map() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
      languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
-    mLanguage = languageCode;
-    String loginData = _preferences.getString(kUserModel);
-    final body = json.decode(loginData);
+    mLanguage = languageCode!;
+    String? loginData = _preferences.getString(kUserModel);
+    final body = json.decode(loginData!);
     LoginModel   loginModel = LoginModel.fromJson(body);
     Map map ;
     map = {"language":languageCode,
-    "userId":loginModel.data.id};
+    "userId":loginModel.data!.id};
     return map;
   }
   Future<Map<String, dynamic>> posts(String type) async{
@@ -119,7 +117,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
   }
   Future<void> postList(String type) async{
     products = [];
-    if(isOk) {
+    if(isOk!) {
       if (type == "all") {
         products = [];
         // for(int i =0;i< postModel.data.items.lost.length;i++){
@@ -134,28 +132,28 @@ class _MyPostScreenState extends State<MyPostScreen> {
         //   products.add(postModel.data.items.sale[i]);
         //
         // }
-        if(postModel.data.items.lost != null){
-          products..addAll(postModel.data.items.lost);
+        if(postModel!.data.items.lost!.isNotEmpty){
+          products!..addAll(postModel!.data.items.lost!);
         }
 
-        if(postModel.data.items.adoption != null){
-          products..addAll(postModel.data.items.adoption);
+        if(postModel!.data.items.adoption !.isNotEmpty){
+          products!..addAll(postModel!.data.items.adoption!);
         }
-        if(postModel.data.items.sale != null){
-          products..addAll(postModel.data.items.sale);
+        if(postModel!.data.items.sale !.isNotEmpty){
+          products!..addAll(postModel!.data.items.sale!);
         }
       } else if (type == "adoption") {
         products = [];
-        products..addAll(postModel.data.items.adoption);
+        products!..addAll(postModel!.data.items.adoption!);
       } else if (type == "lost-animal") {
         products = [];
-        products..addAll(postModel.data.items.lost);
+        products!..addAll(postModel!.data.items.lost!);
         // for (int i = 0; i < postModel.data.items.lost.length; i++) {
         //   products.add(postModel.data.items.lost[i]);
         // }
       } else if (type == "sell") {
         products = [];
-        products..addAll(postModel.data.items.sale);
+        products!..addAll(postModel!.data.items.sale!);
         // for(int i =0;i< postModel.data.items.sale.length;i++){
         //   products.add(postModel.data.items.sale[i]);
         //
@@ -180,7 +178,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'my_post'),
+              getTranslated(context, 'my_post')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -289,11 +287,11 @@ class _MyPostScreenState extends State<MyPostScreen> {
                 ),
                 alignment: AlignmentDirectional.center,
               ):
-              products.isEmpty?
+              products!.isEmpty?
 
               Container(
                 child: Text(
-                  getTranslated(context, 'no_product_available'),
+                  getTranslated(context, 'no_product_available')!,
                   style: TextStyle(
                       color: Colors.black,
                       fontSize: screenUtil.setSp(16),
@@ -309,14 +307,14 @@ class _MyPostScreenState extends State<MyPostScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                    childAspectRatio:itemWidth/itemHeight),
-                itemCount: products.length,
+                    childAspectRatio:itemWidth!/itemHeight!),
+                itemCount: products!.length,
 
                 itemBuilder: (context,index){
                   return GestureDetector(
                     onTap: (){
                       Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                        return new MyPostDetailsScreen(postId:products[index].id,postName:languageCode =="en"? products[index].enTitle:products[index].arTitle ,);
+                        return new MyPostDetailsScreen(postId:products![index].id,postName:languageCode =="en"? products![index].enTitle:products![index].arTitle ,);
                       }));
                     },
                     child: Container(
@@ -330,7 +328,7 @@ class _MyPostScreenState extends State<MyPostScreen> {
                               borderRadius: BorderRadius.circular(10.0.h),
                             ),
                             color: Color(0xFFFFFFFF),
-                            child: buildItem(products[index],context))),
+                            child: buildItem(products![index],context))),
                   );
                 },
               ),

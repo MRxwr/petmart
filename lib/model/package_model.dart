@@ -1,8 +1,8 @@
 class PackageModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   PackageModel({this.ok, this.error, this.status, this.data});
 
@@ -19,14 +19,14 @@ class PackageModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Package> package;
+  List<Package>? package;
 
   Data({this.package});
 
@@ -34,7 +34,7 @@ class Data {
     if (json['package'] != null) {
       package = <Package>[];
       json['package'].forEach((v) {
-        package.add(new Package.fromJson(v));
+        package!.add(new Package.fromJson(v));
       });
     }
   }
@@ -42,22 +42,22 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.package != null) {
-      data['package'] = this.package.map((v) => v.toJson()).toList();
+      data['package'] = this.package!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Package {
-  String id;
-  String arTitle;
-  String enTitle;
-  String arDetails;
-  String enDetails;
-  String points;
-  String validity;
-  String price;
-  String image;
+  String? id;
+  String? arTitle;
+  String? enTitle;
+  String? arDetails;
+  String? enDetails;
+  String? points;
+  String? validity;
+  String? price;
+  String? image;
 
   Package(
       {this.id,

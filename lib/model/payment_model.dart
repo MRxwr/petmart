@@ -4,21 +4,21 @@
 /// payment_url : "https://portal.myfatoorah.com/KWT/ie/0508417992820489469"
 
 class PaymentModel {
-  String _status;
-  String _message;
-  String _data;
-  String _paymentUrl;
+  String? _status;
+  String? _message;
+  String? _data;
+  String? _paymentUrl;
 
-  String get status => _status;
-  String get message => _message;
-  String get data => _data;
-  String get paymentUrl => _paymentUrl;
+  String get status => _status!;
+  String get message => _message!;
+  String get data => _data!;
+  String get paymentUrl => _paymentUrl!;
 
   PaymentModel({
-      String status, 
-      String message, 
-      String data, 
-      String paymentUrl}){
+      String? status,
+      String? message,
+      String? data,
+      String? paymentUrl}){
     _status = status;
     _message = message;
     _data = data;

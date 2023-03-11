@@ -12,17 +12,17 @@ class VideoScreen extends StatefulWidget {
   String vedioUrl;
   String auctionName;
 
-   VideoScreen({Key key,@required this.vedioUrl,@required this.auctionName}) : super(key: key);
+   VideoScreen({Key? key,required this.vedioUrl,required this.auctionName}) : super(key: key);
 
   @override
   _VideoScreenState createState() => _VideoScreenState();
 }
 
 class _VideoScreenState extends State<VideoScreen> {
-  VideoPlayerController _videoPlayerController;
-  ChewieController _chewieController;
+  VideoPlayerController? _videoPlayerController;
+  ChewieController? _chewieController;
   double _aspectRatio = 3/2;
-  Future<void> _initializeVideoPlayerFuture;
+  Future<void>? _initializeVideoPlayerFuture;
   @override
   void initState() {
     super.initState();
@@ -49,7 +49,7 @@ class _VideoScreenState extends State<VideoScreen> {
         widget.vedioUrl
     );
 
-    await _videoPlayerController.initialize();
+    await _videoPlayerController!.initialize();
     _chewieController = ChewieController(
       allowedScreenSleep: false,
       showOptions: false,
@@ -61,15 +61,15 @@ class _VideoScreenState extends State<VideoScreen> {
         DeviceOrientation.portraitDown,
       ],
 
-      videoPlayerController: _videoPlayerController,
+      videoPlayerController: _videoPlayerController!,
       aspectRatio: _aspectRatio,
       autoInitialize: true,
       autoPlay: true,
       showControls: true,
       fullScreenByDefault: true
     );
-    _chewieController.addListener(() {
-      if (_chewieController.isFullScreen) {
+    _chewieController!.addListener(() {
+      if (_chewieController!.isFullScreen) {
         SystemChrome.setPreferredOrientations([
           DeviceOrientation.landscapeRight,
           DeviceOrientation.landscapeLeft,
@@ -87,8 +87,8 @@ class _VideoScreenState extends State<VideoScreen> {
 
   @override
   void dispose() {
-    _videoPlayerController.dispose();
-    _chewieController.dispose();
+    _videoPlayerController!.dispose();
+    _chewieController!.dispose();
     AutoOrientation.portraitAutoMode();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
@@ -142,10 +142,10 @@ class _VideoScreenState extends State<VideoScreen> {
       body: Container(
           color: Color(0xFFFFFFFF),
           child: _chewieController != null&&
-              _chewieController.videoPlayerController.value.isInitialized
+              _chewieController!.videoPlayerController.value.isInitialized
               ?
           Chewie(
-            controller: _chewieController,
+            controller: _chewieController!,
           )
               : Container(
             child: CircularProgressIndicator(

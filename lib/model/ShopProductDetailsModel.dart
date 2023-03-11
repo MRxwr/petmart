@@ -1,8 +1,8 @@
 class ShopProductDetailsModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   ShopProductDetailsModel({this.ok, this.error, this.status, this.data});
 
@@ -19,14 +19,14 @@ class ShopProductDetailsModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Items> items;
+  List<Items>? items;
 
   Data({this.items});
 
@@ -34,7 +34,7 @@ class Data {
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
-        items.add(new Items.fromJson(v));
+        items!.add(new Items.fromJson(v));
       });
     }
   }
@@ -42,24 +42,24 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.items != null) {
-      data['items'] = this.items.map((v) => v.toJson()).toList();
+      data['items'] = this.items!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Items {
-  String id;
-  String arTitle;
-  String enTitle;
-  String arDetails;
-  String enDetails;
-  String price;
-  String video;
-  String shares;
-  String views;
+  String? id;
+  String? arTitle;
+  String? enTitle;
+  String? arDetails;
+  String? enDetails;
+  String? price;
+  String? video;
+  String? shares;
+  String? views;
   dynamic mobile;
-  List<String> image;
+  List<String>? image;
 
   Items(
       {this.id,

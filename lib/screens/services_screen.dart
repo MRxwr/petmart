@@ -10,16 +10,16 @@ import '../localization/localization_methods.dart';
 import '../utilities/constants.dart';
 import 'hospital_details_screen.dart';
 class ServicesScreen extends StatefulWidget {
-  const ServicesScreen({Key key}) : super(key: key);
+  const ServicesScreen({Key? key}) : super(key: key);
 
   @override
   State<ServicesScreen> createState() => _ServicesScreenState();
 }
 
 class _ServicesScreenState extends State<ServicesScreen> {
-  ServicesModel hospitalModel;
-  double itemWidth;
-  double itemHeight;
+  ServicesModel? hospitalModel;
+  double? itemWidth;
+  double? itemHeight;
   ScreenUtil screenUtil = ScreenUtil();
   String mLanguage ="";
   @override
@@ -32,12 +32,12 @@ class _ServicesScreenState extends State<ServicesScreen> {
       });
     });
   }
-  Future<ServicesModel> getHospitals()async{
+  Future<ServicesModel?> getHospitals()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
     PetMartService petMartService = PetMartService();
-    ServicesModel hospitalModel =await petMartService.services();
+    ServicesModel? hospitalModel =await petMartService.services();
     return hospitalModel;
   }
   @override
@@ -54,7 +54,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'service'),
+              getTranslated(context, 'service')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -96,11 +96,11 @@ class _ServicesScreenState extends State<ServicesScreen> {
             shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                childAspectRatio:itemWidth/itemHeight),
-            itemCount: hospitalModel.data.services.length,
+                childAspectRatio:itemWidth!/itemHeight!),
+            itemCount: hospitalModel!.data.services.length,
             itemBuilder: (context,index){
               return GestureDetector(child:
-              Card(child: buildItem(hospitalModel.data.services[index],context),
+              Card(child: buildItem(hospitalModel!.data.services[index],context),
                 margin: EdgeInsets.all(4.h),
                 clipBehavior: Clip.antiAliasWithSaveLayer,
                 elevation: 1.w,
@@ -109,9 +109,9 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 ),
                 color: Color(0xFFFFFFFF),)
                 ,onTap: (){
-                  String mHospitalName = mLanguage=="ar"?hospitalModel.data.services[index].arTitle:hospitalModel.data.services[index].enTitle;
+                  String mHospitalName = mLanguage=="ar"?hospitalModel!.data.services[index].arTitle:hospitalModel!.data.services[index].enTitle;
                   Navigator.of(context).push(new MaterialPageRoute(builder: (BuildContext context){
-                    return new ServiceDetailsScreen(id:hospitalModel.data.services[index].id,name: mHospitalName);
+                    return new ServiceDetailsScreen(id:hospitalModel!.data.services[index].id,name: mHospitalName);
                   }));
                 },);
             },

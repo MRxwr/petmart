@@ -1,8 +1,8 @@
 class InterestModel {
-  bool ok;
-  String error;
-  String status;
-  List<Data> data;
+  bool? ok;
+  String? error;
+  String? status;
+  List<Data>? data;
 
   InterestModel({this.ok, this.error, this.status, this.data});
 
@@ -13,7 +13,7 @@ class InterestModel {
     if (json['data'] != null) {
       data = <Data>[];
       json['data'].forEach((v) {
-        data.add(new Data.fromJson(v));
+        data!.add(new Data.fromJson(v));
       });
     }
   }
@@ -24,17 +24,17 @@ class InterestModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.map((v) => v.toJson()).toList();
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Data {
-  String id;
-  String enTitle;
-  String arTitle;
-  int interest;
+  String? id;
+  String? enTitle;
+  String? arTitle;
+  int? interest;
 
   Data({this.id, this.enTitle, this.arTitle, this.interest});
 

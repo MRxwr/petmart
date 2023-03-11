@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:pet_mart/model/InitEditModel.dart';
 
@@ -13,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -43,7 +44,7 @@ class EditPostScreen extends StatefulWidget {
   PostDetailsModel  postDetailsModel;
   String userId;
 
-  EditPostScreen({Key key,@required this.postDetailsModel,@required this.userId}) : super(key: key);
+  EditPostScreen({Key? key,required this.postDetailsModel,required this.userId}) : super(key: key);
 
   @override
   _EditPostScreenState createState() => _EditPostScreenState();
@@ -52,7 +53,7 @@ class EditPostScreen extends StatefulWidget {
 class _EditPostScreenState extends State<EditPostScreen> {
 
   ScreenUtil screenUtil = ScreenUtil();
-  List<TypeModel> typesList = List();
+  List<TypeModel> typesList = [];
   bool hidePrice = false;
   String mLanguage='';
   String userId ='';
@@ -60,12 +61,12 @@ class _EditPostScreenState extends State<EditPostScreen> {
   String vedioUrl ="";
   List<AgeModel> agesList = [];
   List<GenderModel> genderList = [];
-  List<Category> categories = null;
-  List<Sub> subCategory = null;
-  List<File> mImages = List();
-  NAlertDialog nAlertDialog;
-  List<String> Paths= List();
-  String path =null;
+  List<Category>? categories ;
+  List<Sub>? subCategory ;
+  List<File> mImages = [];
+  NAlertDialog? nAlertDialog;
+  List<String> Paths= [];
+  String? path ;
   bool isSelected = false;
   String mChooseImage="اختار الصورة";
   String categoryId ="";
@@ -75,32 +76,32 @@ class _EditPostScreenState extends State<EditPostScreen> {
   String ageName="";
   String genderName ="";
   String key ="";
-  LoginModel loginModel;
-  String categoryName;
-  String subCategoryName;
-  SubCategory.CategoryModel mSubCategoryModel;
+  LoginModel? loginModel;
+  String? categoryName;
+  String? subCategoryName;
+  SubCategory.CategoryModel? mSubCategoryModel;
   final TextEditingController _titleController = new TextEditingController();
   final TextEditingController _descriptionController = new TextEditingController();
   final TextEditingController _ageController = new TextEditingController();
   final TextEditingController _priceController = new TextEditingController();
-  Future<NAlertDialog> showPickerDialog(BuildContext context)async {
+  Future<NAlertDialog?> showPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text(getTranslated(context, 'select_image')),
+      content: Padding(child: Text(getTranslated(context, 'select_image')!),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'camera')!),onPressed: () {
 
           _getImageFromCamera(context);
         }),
-        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'gallery')!),onPressed: () {
           _getImageFromGallery(context);
         }),
 
       ],
     );
-    return nAlertDialog;
+    return nAlertDialog!;
   }
   final picker = ImagePicker();
   String ageId ="";
@@ -109,7 +110,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
     List<XFile> pickedFile = [];
     ImagePicker picker = ImagePicker();
     try {
-      List<Media> res = await ImagesPicker.pick(
+      List<Media>? res = await ImagesPicker.pick(
         count: 10,
         pickType: PickType.all,
         language: Language.System,
@@ -121,7 +122,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
         ),
       );
 
-      if (res!= null || res.isNotEmpty) {
+      if (res!= null || res!.isNotEmpty) {
         isSelected = true;
         for (int i = 0; i < res.length; i++) {
           File _image = File(res[i].path);
@@ -177,16 +178,16 @@ class _EditPostScreenState extends State<EditPostScreen> {
     Navigator.pop(context);
 
   }
-  InitEditModel initModel;
+  InitEditModel? initModel;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  CategoryParent.HomeModel homeModel;
+  CategoryParent.HomeModel? homeModel;
 
   List<String> galleryList = [];
   List<String> imagesUrl =[];
   List<String> vediosUrl =[];
-  Category category;
-  Sub mSubCategory;
+  Category? category;
+  Sub? mSubCategory;
 
   @override
   void initState() {
@@ -206,16 +207,16 @@ class _EditPostScreenState extends State<EditPostScreen> {
     agesList.add(AgeModel("3", "عام", "year"));
     galleryList.clear() ;
 
-    categoryId = widget.postDetailsModel.data.items[0].categoryId;
-    subCategoryId = widget.postDetailsModel.data.items[0].categoryId;
+    categoryId = widget.postDetailsModel!.data!.items![0].categoryId!;
+    subCategoryId = widget.postDetailsModel!.data!.items![0].categoryId!;
 
-    _titleController.text =mLanguage == "en"? widget.postDetailsModel.data.items[0].enTitle:widget.postDetailsModel.data.items[0].arTitle;
-    _descriptionController.text = mLanguage == "en"? widget.postDetailsModel.data.items[0].enDetails:widget.postDetailsModel.data.items[0].arTitle;
-    _priceController.text = widget.postDetailsModel.data.items[0].price;
-    _ageController.text = widget.postDetailsModel.data.items[0].age;
-    genderName = mLanguage == "en"?widget.postDetailsModel.data.items[0].gender:widget.postDetailsModel.data.items[0].genderAr;
-    ageId = widget.postDetailsModel.data.items[0].ageType;
-    subCategoryId = widget.postDetailsModel.data.items[0].categoryId;
+    _titleController.text =mLanguage == "en"? widget.postDetailsModel!.data!.items![0].enTitle!:widget.postDetailsModel!.data!.items![0].arTitle!;
+    _descriptionController.text = mLanguage == "en"? widget.postDetailsModel!.data!.items![0].enDetails!:widget.postDetailsModel!.data!.items![0].arTitle!;
+    _priceController.text = widget.postDetailsModel!.data!.items![0].price!;
+    _ageController.text = widget.postDetailsModel!.data!.items![0].age!;
+    genderName = mLanguage == "en"?widget.postDetailsModel!.data!.items![0].gender!:widget.postDetailsModel!.data!.items![0].genderAr!;
+    ageId = widget.postDetailsModel!.data!.items![0].ageType!;
+    subCategoryId = widget.postDetailsModel!.data!.items![0].categoryId!;
 
 
 
@@ -225,24 +226,24 @@ class _EditPostScreenState extends State<EditPostScreen> {
       initModel = value;
       categories =[];
       subCategory =[];
-      galleryList = initModel.data.post[0].image;
-      imagesUrl = initModel.data.post[0].imageId;
-      ageId = initModel.data.post[0].ageType;
-      vedioUrl = initModel.data.post[0].video;
+      galleryList = initModel!.data!.post![0].image!;
+      imagesUrl = initModel!.data!.post![0].imageId!;
+      ageId = initModel!.data!.post![0].ageType!;
+      vedioUrl = initModel!.data!.post![0].video!;
       if(vedioUrl.trim() !=""){
         vediosUrl.add(vedioUrl);
       }
-      genderId = initModel.data.post[0].gender;
-      for(int i =0;i<initModel.data.category.length;i++)
+      genderId = initModel!.data!.post![0].gender!;
+      for(int i =0;i<initModel!.data!.category!.length;i++)
         {
-          for(int j=0;j<initModel.data.category[i].sub.length;j++){
-            String id = initModel.data.category[i].sub[j].id;
+          for(int j=0;j<initModel!.data!.category![i].sub!.length;j++){
+            String id = initModel!.data!.category![i].sub![j].id!;
             if(id == subCategoryId){
-              categories = initModel.data.category;
-              category = categories[i];
-              subCategory = initModel.data.category[i].sub;
-              mSubCategory = subCategory[j];
-              categoryId = initModel.data.category[i].sub[j].id;
+              categories = initModel!.data!.category!;
+              category = categories![i];
+              subCategory = initModel!.data!.category![i].sub;
+              mSubCategory = subCategory![j];
+              categoryId = initModel!.data!.category![i].sub![j].id!;
               typesList[0].selected  = true;
               typesList[1].selected  = false;
 
@@ -252,16 +253,16 @@ class _EditPostScreenState extends State<EditPostScreen> {
           }
 
         }
-      for(int i =0;i<initModel.data.lost.length;i++)
+      for(int i =0;i<initModel!.data!.lost!.length!;i++)
       {
-        for(int j=0;j<initModel.data.lost[i].sub.length;j++){
-          String id = initModel.data.lost[i].sub[j].id;
+        for(int j=0;j<initModel!.data!.lost![i].sub!.length;j++){
+          String id = initModel!.data!.lost![i].sub![j].id!;
           if(id == subCategoryId){
-            categories = initModel.data.lost;
-            category = categories[i];
-            subCategory = initModel.data.lost[i].sub;
-            mSubCategory = subCategory[j];
-            categoryId = initModel.data.lost[i].sub[j].id;
+            categories = initModel!.data!.lost!;
+            category = categories![i];
+            subCategory = initModel!.data!.lost![i].sub;
+            mSubCategory = subCategory![j];
+            categoryId = initModel!.data!.lost![i].sub![j].id!;
             typesList[0].selected  = false;
             typesList[1].selected  = false;
 
@@ -271,16 +272,16 @@ class _EditPostScreenState extends State<EditPostScreen> {
         }
 
       }
-      for(int i =0;i<initModel.data.adoption.length;i++)
+      for(int i =0;i<initModel!.data!.adoption!.length;i++)
       {
-        for(int j=0;j<initModel.data.adoption[i].sub.length;j++){
-          String id = initModel.data.adoption[i].sub[j].id;
+        for(int j=0;j<initModel!.data!.adoption![i].sub!.length;j++){
+          String id = initModel!.data!.adoption![i].sub![j].id!;
           if(id == subCategoryId){
-            categories = initModel.data.adoption;
-            category = categories[i];
-            subCategory = initModel.data.adoption[i].sub;
-            mSubCategory = subCategory[j];
-            categoryId = initModel.data.adoption[i].sub[j].id;
+            categories = initModel!.data!.adoption!;
+            category = categories![i];
+            subCategory = initModel!.data!.adoption![i].sub;
+            mSubCategory = subCategory![j];
+            categoryId = initModel!.data!.adoption![i].sub![j].id!;
             typesList[0].selected  = false;
             typesList[1].selected  = true;
 
@@ -301,38 +302,38 @@ class _EditPostScreenState extends State<EditPostScreen> {
   }
 
 
-  Future<CheckCreditModel> checkCreditModel() async{
+  Future<CheckCreditModel?> checkCreditModel() async{
 
 
 
     Map map ;
 
 
-    map = {"user_id":loginModel.data.id};
+    map = {"user_id":loginModel!.data!.id};
 
 
 
 
 
     PetMartService petMartService = PetMartService();
-    CheckCreditModel creditModel = await petMartService.checkCredit(map);
+    CheckCreditModel? creditModel = await petMartService.checkCredit(map);
     return creditModel;
   }
-  Future<InitEditModel> map() async{
+  Future<InitEditModel?> map() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
 
     PetMartService petMartService = PetMartService();
-    InitEditModel initModel =  await petMartService.initEdit(widget.postDetailsModel.data.items[0].id);
+    InitEditModel? initModel =  await petMartService.initEdit(widget.postDetailsModel!.data!.items![0].id!);
 
 
-    String loginData = _preferences.getString(kUserModel);
-    final body = json.decode(loginData);
+    String? loginData = _preferences.getString(kUserModel);
+    final body = json.decode(loginData!);
     loginModel = LoginModel.fromJson(body);
 
 
-    userId = loginModel.data.id;
+    userId = loginModel!.data!.id!;
 
     // agesList = initModel.data.age;
 
@@ -354,7 +355,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
               child: Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 10.h),
                 child: Text(
-                  getTranslated(context, 'edit_post'),
+                  getTranslated(context, 'edit_post')!,
                   style: TextStyle(
                       color: Color(0xFFFFFFFF),
                       fontSize: screenUtil.setSp(16),
@@ -403,7 +404,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
 
                 children: [
-                  Text(getTranslated(context, 'select_post_type'),
+                  Text(getTranslated(context, 'select_post_type')!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -443,7 +444,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                                     modelHud.changeIsLoading(true);
                                     checkCreditModel().then((value){
                                       modelHud.changeIsLoading(false);
-                                      int credit = int.parse(value.data.credit);
+                                      int credit = int.parse(value!.data.credit);
                                       print('credit --->${credit}');
 
                                       if(credit>0){
@@ -461,13 +462,13 @@ class _EditPostScreenState extends State<EditPostScreen> {
                                       categories = null;
                                       subCategory = null;
 
-                                      categories = initModel.data.adoption;
+                                      categories = initModel!.data!.adoption;
 
-                                      print(categories.length);
-                                      subCategory = initModel.data.adoption[0].sub;
+                                      print(categories!.length);
+                                      subCategory = initModel!.data!.adoption![0].sub;
 
 
-                                      categoryId = initModel.data.adoption[0].sub[0].id;
+                                      categoryId = initModel!.data!.adoption![0].sub![0].id!;
                                       print(subCategory);
 
                                     });
@@ -481,14 +482,14 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
 
 
-                                      categories=initModel.data.lost;
-                                      print(categories.length);
-                                      subCategory = categories[0].sub;
+                                      categories=initModel!.data!.lost;
+                                      print(categories!.length);
+                                      subCategory = categories![0].sub;
 
 
-                                      print("enTitlte--->"+category.enTitle);
-                                      subCategory = initModel.data.lost[0].sub;
-                                      categoryId = initModel.data.lost[0].sub[0].id;
+                                      print("enTitlte--->"+category!.enTitle!);
+                                      subCategory = initModel!.data!.lost![0].sub;
+                                      categoryId = initModel!.data!.lost![0].sub![0].id!;
                                     });
                                   }if(key == 'sell'){
 
@@ -497,9 +498,9 @@ class _EditPostScreenState extends State<EditPostScreen> {
                                       categories = null;
                                       subCategory = null;
 
-                                      categories = initModel.data.category;
-                                      subCategory = initModel.data.category[0].sub;
-                                      categoryId = initModel.data.category[0].sub[0].id;
+                                      categories = initModel!.data!.category;
+                                      subCategory = initModel!.data!.category![0].sub;
+                                      categoryId = initModel!.data!.category![0].sub![0].id!;
 
 
                                     });
@@ -524,7 +525,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                   ),
                   SizedBox(height: 5.h,width: screenUtil.screenWidth,
                   ),
-                  Text(getTranslated(context, 'add_photo'),
+                  Text(getTranslated(context, 'add_photo')!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -545,7 +546,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                         GestureDetector(
                           onTap: (){
                             showPickerDialog(context).then((value){
-                              value.show(context);
+                              value!.show(context);
                             });
                           },
                           child:
@@ -596,7 +597,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                   ),
                   SizedBox(height: 5.h,width: screenUtil.screenWidth,
                   ),
-                  Text(getTranslated(context, 'add_vedio'),
+                  Text(getTranslated(context, 'add_vedio')!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -618,7 +619,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                           Container():GestureDetector(
                             onTap: (){
                               showVedioPickerDialog(context).then((value){
-                                value.show(context);
+                                value!.show(context);
                               });
                             },
                             child:
@@ -652,9 +653,9 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
                                       String title = "";
                                       if(mLanguage == "en"){
-                                        title = initModel.data.post[0].enTitle;
+                                        title = initModel!.data!.post![0].enTitle!;
                                       }else{
-                                        title =  initModel.data.post[0].arTitle;
+                                        title =  initModel!.data!.post![0].arTitle!;
                                       }
                                       if(vedioUrl.trim()!=""){
                                         if(vedioUrl.contains("youtu")){
@@ -712,8 +713,8 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
 
 
-                      items: categories,
-                      initialValue: categories.first,
+                      items: categories!,
+                      initialValue: categories!.first,
 
 
 
@@ -725,8 +726,8 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
 
 
-                      customWidgets: categories.map((p) => buildDropDownRow(p)).toList(),
-                      hint:  Text(mLanguage == "en"?categories[0].enTitle:categories[0].arTitle,
+                      customWidgets: categories!.map((p) => buildDropDownRow(p)).toList(),
+                      hint:  Text(mLanguage == "en"?categories![0].enTitle!:categories![0].arTitle!,
                         textAlign: TextAlign.start,
                         style: TextStyle(
 
@@ -734,12 +735,12 @@ class _EditPostScreenState extends State<EditPostScreen> {
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (Category category){
+                      onChanged: (Category? category){
 
                         setState(() {
 
                           this.category = category;
-                          subCategory = category.sub;
+                          subCategory = category!.sub;
                           mSubCategory = null;
 
                         });
@@ -777,11 +778,11 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
 
 
-                        items: subCategory,
+                        items: subCategory!,
 
 
-                        hint:  Text( mLanguage == "en"?subCategory.isNotEmpty?subCategory[0].enTitle:"":
-                        subCategory.isNotEmpty? subCategory[0].arTitle:"",
+                        hint:  Text( mLanguage == "en"?subCategory!.isNotEmpty?subCategory![0].enTitle!:"":
+                        subCategory!.isNotEmpty? subCategory![0].arTitle!:"",
                           textAlign: TextAlign.start,
                           style: TextStyle(
 
@@ -789,8 +790,8 @@ class _EditPostScreenState extends State<EditPostScreen> {
                               fontWeight: FontWeight.w600,
                               fontSize: screenUtil.setSp(15)
                           ),),
-                        onChanged: (Sub category){
-                          categoryId = category.id;
+                        onChanged: (Sub? category){
+                          categoryId = category!.id!;
 
                           setState(() {
                             mSubCategory = category;
@@ -801,7 +802,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
 
                         },
-                        customWidgets: subCategory.map((p) => buildSubCategoryRow(p)).toList(),
+                        customWidgets: subCategory!.map((p) => buildSubCategoryRow(p)).toList(),
                         isExpanded: true,
                         showUnderline: false,
                         isCleared: mSubCategory == null?true:false,
@@ -924,15 +925,15 @@ class _EditPostScreenState extends State<EditPostScreen> {
                           flex: 1,
                           child:
                           DropDown<String>(
-                            initialValue:mLanguage == "en"?initModel.data.ageType.english[int.parse(initModel.data.post[0].ageType)]:initModel.data.ageType.arabic[int.parse(initModel.data.post[0].ageType)],
+                            initialValue:mLanguage == "en"?initModel!.data!.ageType!.english![int.parse(initModel!.data!.post![0].ageType!)]:initModel!.data!.ageType!.arabic![int.parse(initModel!.data!.post![0].ageType!)],
 
 
 
 
 
-                            items: mLanguage == "en"?initModel.data.ageType.english:initModel.data.ageType.arabic,
+                            items: mLanguage == "en"?initModel!.data!.ageType!.english!:initModel!.data!.ageType!.arabic!,
 
-                            hint:  Text(mLanguage == "en"?initModel.data.ageType.english[int.parse(initModel.data.post[0].ageType)]:initModel.data.ageType.arabic[int.parse(initModel.data.post[0].ageType)],
+                            hint:  Text(mLanguage == "en"?initModel!.data!.ageType!.english![int.parse(initModel!.data!.post![0].ageType!)]:initModel!.data!.ageType!.arabic![int.parse(initModel!.data!.post![0].ageType!)],
                               textAlign: TextAlign.start,
                               style: TextStyle(
 
@@ -940,19 +941,19 @@ class _EditPostScreenState extends State<EditPostScreen> {
                                   fontWeight: FontWeight.w600,
                                   fontSize: screenUtil.setSp(15)
                               ),),
-                            onChanged: (String age){
+                            onChanged: (String? age){
 
                               if(mLanguage == "en"){
-                                ageId = "${initModel.data.ageType.english.indexOf(age)}";
+                                ageId = "${initModel!.data!.ageType!.english!.indexOf(age!)}";
                               }else {
-                                ageId = "${initModel.data.gender.arabic.indexOf(age)}";
+                                ageId = "${initModel!.data!.gender!.arabic!.indexOf(age!)}";
                               }
                               print(ageId);
 
 
                             },
-                            customWidgets:mLanguage =="en"? initModel.data.ageType.english.map((p) => buildAgeRow(p)).toList():
-                            initModel.data.ageType.arabic.map((p) => buildAgeRow(p)).toList(),
+                            customWidgets:mLanguage =="en"? initModel!.data!.ageType!.english!.map((p) => buildAgeRow(p)).toList():
+                            initModel!.data!.ageType!.arabic!.map((p) => buildAgeRow(p)).toList(),
                             isExpanded: true,
                             showUnderline: false,
                           ),
@@ -989,9 +990,9 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
 
 
-                      items:mLanguage == "en"? initModel.data.gender.english:initModel.data.gender.arabic,
+                      items:mLanguage == "en"? initModel!.data!.gender!.english!:initModel!.data!.gender!.arabic!,
 
-                      hint:  Text(mLanguage == "en"?initModel.data.gender.english[int.parse(initModel.data.post[0].gender)]:initModel.data.gender.arabic[int.parse(initModel.data.post[0].gender)],
+                      hint:  Text(mLanguage == "en"?initModel!.data!.gender!.english![int.parse(initModel!.data!.post![0].gender!)]:initModel!.data!.gender!.arabic![int.parse(initModel!.data!.post![0].gender!)],
                         textAlign: TextAlign.start,
                         style: TextStyle(
 
@@ -999,11 +1000,11 @@ class _EditPostScreenState extends State<EditPostScreen> {
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (String gender){
+                      onChanged: (String? gender){
                         if(mLanguage == "en"){
-                          genderId = "${initModel.data.gender.english.indexOf(gender)}";
+                          genderId = "${initModel!.data!.gender!.english!.indexOf(gender!)}";
                         }else {
-                          genderId = "${initModel.data.gender.arabic.indexOf(gender)}";
+                          genderId = "${initModel!.data!.gender!.arabic!.indexOf(gender!)}";
                         }
                         print(genderId);
 
@@ -1011,7 +1012,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
                       },
                       customWidgets:
-                      mLanguage == "en"? initModel.data.gender.english.map((p) => builGenderRow(p)).toList():initModel.data.gender.arabic.map((p) => builGenderRow(p)).toList(),
+                      mLanguage == "en"? initModel!.data!.gender!.english!.map((p) => builGenderRow(p)).toList():initModel!.data!.gender!.arabic!.map((p) => builGenderRow(p)).toList(),
 
                       isExpanded: true,
                       showUnderline: false,
@@ -1071,7 +1072,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
                       ):Container()
                   ),
                   SizedBox(height: 10.h,),
-                  sumbitButton(getTranslated(context, 'sumbit_post'),context)
+                  sumbitButton(getTranslated(context, 'sumbit_post')!,context)
 
 
                 ],
@@ -1131,7 +1132,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(mLanguage == "en"?category.enTitle:category.arTitle ,
+        child: Text(mLanguage == "en"?category.enTitle!:category.arTitle! ,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
@@ -1165,7 +1166,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
         alignment: AlignmentDirectional.centerStart,
 
-        child: Text(mLanguage=="en"?category.enTitle:category.arTitle ,
+        child: Text(mLanguage=="en"?category!.enTitle!:category!.arTitle!,
           style: TextStyle(
               color: Color(0xFF000000),
               fontWeight: FontWeight.w600,
@@ -1257,37 +1258,100 @@ class _EditPostScreenState extends State<EditPostScreen> {
     String age = replaceArabicNumber(_ageController.text);
     String price = _priceController.text.trim().isEmpty?"0.5":replaceArabicNumber(_priceController.text);
     if(subCategoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'category_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'category_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else if(categoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'sub_category_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'sub_category_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
 
     }
     else if(postTitle==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'title_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'title_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else if(postDescription==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'description_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'description_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else if(age==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'age_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'age_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else if(genderId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'gender_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'gender_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else{
       if(key =='sell') {
         if(price == ""){
-          _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'price_error'))));
+          Fluttertoast.showToast(
+              msg: getTranslated(context, 'price_error')!,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: screenUtil.setSp(16)
+          );
+
 
         }else {
-          String userId = loginModel.data.id;
+          String userId = loginModel!.data!.id!;
           String phoneNumber = "";
           final modelHud = Provider.of<ModelHud>(context, listen: false);
           modelHud.changeIsLoading(true);
           PetMartService petMartService = PetMartService();
+          File? vedio;
           dynamic response = await petMartService.editPost(
-              widget.postDetailsModel.data.items[0].id,
+              widget.postDetailsModel!.data!.items![0].id!,
               postTitle,
               postTitle,
               key,
@@ -1303,24 +1367,25 @@ class _EditPostScreenState extends State<EditPostScreen> {
               phoneNumber,
               mLanguage,
               mImages,
-              null,
+              vedio!,
           vedioUrl);
           modelHud.changeIsLoading(false);
           bool status = response['ok'];
           if (status) {
-            ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly"), true);
+            ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly")!, true);
           } else {
             ShowPostAlertDialog(context, response['data']['msg'], false);
           }
         }
       }else{
-        String userId = loginModel.data.id;
+        String userId = loginModel!.data!.id!;
         String phoneNumber = "";
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
         PetMartService petMartService = PetMartService();
+        File? vedio;
         dynamic response = await petMartService.editPost(
-            widget.postDetailsModel.data.items[0].id,
+            widget.postDetailsModel!.data!.items![0].id!,
             postTitle,
             postTitle,
             key,
@@ -1336,12 +1401,12 @@ class _EditPostScreenState extends State<EditPostScreen> {
             phoneNumber,
             mLanguage,
             mImages,
-            null,vedioUrl);
+            vedio!,vedioUrl);
         modelHud.changeIsLoading(false);
 
         bool status = response['ok'];
         if (status) {
-          ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly"), true);
+          ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly")!, true);
         } else {
           ShowPostAlertDialog(context, response['data']['msg'], false);
         }
@@ -1385,7 +1450,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1436,7 +1501,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1531,9 +1596,9 @@ class _EditPostScreenState extends State<EditPostScreen> {
     final modelHud = Provider.of<ModelHud>(context, listen: false);
     modelHud.changeIsLoading(true);
     PetMartService petMartService = PetMartService();
-    DeletePostImageModel deletePostImageModel =await petMartService.deleteImage(id);
+    DeletePostImageModel? deletePostImageModel =await petMartService.deleteImage(id);
     modelHud.changeIsLoading(false);
-    if(deletePostImageModel.ok){
+    if(deletePostImageModel!.ok){
       imagesUrl.removeAt(index);
       galleryList.removeAt(index);
       setState(() {
@@ -1544,18 +1609,18 @@ class _EditPostScreenState extends State<EditPostScreen> {
 
 
   }
-  Future<NAlertDialog> showVedioPickerDialog(BuildContext context)async {
+  Future<NAlertDialog?> showVedioPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text(getTranslated(context, 'select_vedio')),
+      content: Padding(child: Text(getTranslated(context, 'select_vedio')!),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'camera')!),onPressed: () {
 
           _getVedioFromCamera(context);
         }),
-        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'gallery')!),onPressed: () {
           _getVedioFromGallery(context);
         }),
 
@@ -1664,22 +1729,31 @@ class _EditPostScreenState extends State<EditPostScreen> {
       await testLengthController.initialize();
       if (testLengthController.value.duration.inSeconds > 15) {
         pickedFile = null;
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'select_vedio_error'))));
+        Fluttertoast.showToast(
+            msg: getTranslated(context, 'select_vedio_error')!,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
+
       }else {
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
         await VideoCompress.setLogLevel(0);
-        final MediaInfo info = await VideoCompress.compressVideo(
+        final MediaInfo? info = await VideoCompress.compressVideo(
           pickedFile.path,
           quality: VideoQuality.MediumQuality,
           deleteOrigin: false,
           includeAudio: true,
         );
-        print(info.path);
+        print(info!.path);
 
 
         isSelected = true;
-        File _image = File(info.path);
+        File _image = File(info.path!);
 
         vedios.add(_image);
         Navigator.pop(context);
@@ -1720,20 +1794,20 @@ class _EditPostScreenState extends State<EditPostScreen> {
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
       await VideoCompress.setLogLevel(0);
-      final MediaInfo  info = await VideoCompress.compressVideo(
+      final MediaInfo?  info = await VideoCompress.compressVideo(
         pickedFile.path,
         quality: VideoQuality.MediumQuality,
         deleteOrigin: false,
         includeAudio: true,
       );
-      print(info.path);
+      print(info!.path);
 
 
 
 
 
       isSelected = true;
-      File _image = File(info.path);
+      File _image = File(info!.path!);
 
       vedios.add(_image) ;
 

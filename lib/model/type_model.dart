@@ -3,5 +3,5 @@ class TypeModel{
   String typeNameEn;
   String key;
   bool selected;
-  TypeModel({this.typeNameAr,this.typeNameEn,this.key,this.selected});
+  TypeModel({required this.typeNameAr,required this.typeNameEn,required this.key,required this.selected});
 }

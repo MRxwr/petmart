@@ -1,8 +1,8 @@
 class ResetModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   ResetModel({this.ok, this.error, this.status, this.data});
 
@@ -19,14 +19,14 @@ class ResetModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  String msg;
+  String? msg;
 
   Data({this.msg});
 

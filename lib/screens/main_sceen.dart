@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/DeleteUserModel.dart';
@@ -53,8 +53,8 @@ import '../main.dart';
 import 'auction_screen.dart';
 class MainScreen extends StatefulWidget {
   static String id = 'MainScreen';
-  String title;
-  MainScreen({Key key,this.title}): super(key: key);
+  String? title;
+  MainScreen({Key? key, this.title}): super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -70,7 +70,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
 
   ScreenUtil screenUtil = ScreenUtil();
   bool isLogIn = false;
-  LoginModel loginModel;
+  LoginModel? loginModel;
   int index =0;
   final navigatorKey = GlobalKey<NavigatorState>();
   bool isStart = true;
@@ -90,7 +90,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     });
   }
   int notificationCount = 0;
-  BuildContext context;
+
   @override
   void initState()  {
     // TODO: implement initState
@@ -157,7 +157,7 @@ class _MainScreenState extends State<MainScreen>  with AutomaticKeepAliveClientM
     print('isLogIn ${isLoggedIn}');
     return isLoggedIn;
   }
-  Future<LoginModel> getLoginModel() async{
+  Future<LoginModel?> getLoginModel() async{
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String loginData = sharedPreferences.getString(kUserModel)??"";
@@ -204,21 +204,21 @@ if(loginData != null) {
     print("notificationCount ---->${notificationCount}");
     return loginModel;
   }
-  Future<HomeModel> home() async{
+  Future<HomeModel?> home() async{
 
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String loginData = sharedPreferences.getString(kUserModel);
+    String? loginData = sharedPreferences.getString(kUserModel);
     String deviceToken =sharedPreferences.getString("token")??"";
     print('loginData --> ${loginData}');
-    LoginModel  loginModel = null;
+    LoginModel?  loginModel ;
     bool isLoggedIn =  sharedPreferences.getBool(kIsLogin)??false;
-    String uniqueId;
+    String? uniqueId;
     if(isLoggedIn){
 
       String token =deviceToken;
-      final body = json.decode(loginData);
-      String fullName = sharedPreferences.getString('email');
-      String password= sharedPreferences.getString('password');
+      final body = json.decode(loginData!);
+      String? fullName = sharedPreferences.getString('email');
+      String? password= sharedPreferences.getString('password');
       SharedPreferences _preferences = await SharedPreferences.getInstance();
       String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
 
@@ -236,7 +236,8 @@ if(loginData != null) {
         var data = await deviceInfoPlugin.iosInfo;
         uniqueId = data.identifierForVendor;
       }
-      Map map = {
+
+      Map<String,dynamic> map = {
         'email':fullName,
         'password':password,
         'device_token':token,
@@ -247,8 +248,8 @@ if(loginData != null) {
 
       };
       loginModel = await petMartService.loginModel(map);
-      String mStatus = loginModel.status;
-      if(mStatus.trim() == 'success') {
+      String? mStatus = loginModel!.status;
+      if(mStatus!.trim() == 'success') {
         SharedPref sharedPref = SharedPref();
         await sharedPref.save(kUserModel, loginModel);
         await sharedPref.saveBool(kIsLogin, true);
@@ -267,25 +268,26 @@ if(loginData != null) {
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     Map map ;
-    String id ="";
+    String? id ="";
     if(loginModel == null){
      id ="";
     }else{
-      id= loginModel.data.id;
+      id= loginModel.data!.id;
 
     }
 
-    print('map --> ${map}');
+
     PetMartService petMartService = PetMartService();
 
-    HomeModel home = await petMartService.home(id);
+    HomeModel? home = await petMartService.home(id!);
     return home;
   }
   String _title = '' ;
 
+
   @override
   Widget build(BuildContext context) {
-    this.context = context;
+
     if(isStart){
 
       isStart = false;
@@ -356,7 +358,7 @@ if(loginData != null) {
 
                       Navigator.pushNamed(context, PushNotificationScreen.id);
                     }else{
-                      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+                      ShowLoginAlertDialog(context,getTranslated(context, 'not_login')!);
                     }
 
                   },
@@ -374,7 +376,7 @@ if(loginData != null) {
 
         ),
         drawer: isLogIn?
-            loginModel!= null?loggedDrawer(context,loginModel):
+            loginModel!= null?loggedDrawer(context,loginModel!):
 
         Container():visitorDrawer(context),
 
@@ -429,7 +431,7 @@ if(loginData != null) {
 
 
           backgroundColor: kMainColor,
-          centerItemText: getTranslated(context, 'add_post'),
+          centerItemText: getTranslated(context, 'add_post')!,
 
           color: Color(0xFFFFFFFF),
           selectedColor: Color(0xFFFFFFFF),
@@ -445,11 +447,11 @@ if(loginData != null) {
 
 
 
-            FABBottomAppBarItem(iconPath:'assets/images/img_home.png', text: getTranslated(context, 'home')),
-            FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: getTranslated(context, 'adaption')),
-            FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: getTranslated(context, 'lost')),
+            FABBottomAppBarItem(iconPath:'assets/images/img_home.png', text: getTranslated(context, 'home')!),
+            FABBottomAppBarItem(iconPath:'assets/images/img_adoption.png', text: getTranslated(context, 'adaption')!),
+            FABBottomAppBarItem(iconPath: 'assets/images/img_lost_animal.png', text: getTranslated(context, 'lost')!),
             FABBottomAppBarItem(iconPath:
-            'assets/images/img_auction.png', text: getTranslated(context, 'auction')),
+            'assets/images/img_auction.png', text: getTranslated(context, 'auction')!),
           ],
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -484,7 +486,7 @@ if(loginData != null) {
                 ShowLanguageDialog(context);
               },
 
-              title: Text(getTranslated(context, 'select_language'),
+              title: Text(getTranslated(context, 'select_language')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -498,7 +500,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context,'contact_us' ),
+              title: Text(getTranslated(context,'contact_us' )!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -512,7 +514,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context, 'terms_conditions'),
+              title: Text(getTranslated(context, 'terms_conditions')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -526,7 +528,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context, 'privacy_policy'),
+              title: Text(getTranslated(context, 'privacy_policy')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -540,7 +542,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context, 'login'),
+              title: Text(getTranslated(context, 'login')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -618,13 +620,13 @@ if(loginData != null) {
             ListTile(
               onTap: (){
                 Navigator.pop(context);
-                Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+                Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                   return new MyAccountScreen(isFromPayment: false,paymentId: "",);
                 }));
 
               },
 
-              title: Text(getTranslated(context, 'my_account'),
+              title: Text(getTranslated(context, 'my_account')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -637,7 +639,7 @@ if(loginData != null) {
                 Navigator.pushNamed(context, MyPostScreen.id);
               },
 
-              title: Text(getTranslated(context, 'my_post'),
+              title: Text(getTranslated(context, 'my_post')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -676,7 +678,7 @@ if(loginData != null) {
                 Navigator.pushNamed(context, PushNotificationScreen.id);
               },
 
-              title: Text(getTranslated(context, 'push_notification'),
+              title: Text(getTranslated(context, 'push_notification')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -689,7 +691,7 @@ if(loginData != null) {
                 ShowLanguageDialog(context);
               },
 
-              title: Text(getTranslated(context, 'select_language'),
+              title: Text(getTranslated(context, 'select_language')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -703,7 +705,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context, 'change_password'),
+              title: Text(getTranslated(context, 'change_password')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -717,7 +719,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context, 'contact_us'),
+              title: Text(getTranslated(context, 'contact_us')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -731,7 +733,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context, 'terms_conditions'),
+              title: Text(getTranslated(context, 'terms_conditions')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -745,7 +747,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context, 'privacy_policy'),
+              title: Text(getTranslated(context, 'privacy_policy')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -756,7 +758,7 @@ if(loginData != null) {
               onTap: (){
                 logout(context).then((value) {
                   setState(() {
-                    isLogIn = value;
+                    isLogIn = value!;
                     Navigator.pushReplacementNamed(context, MainScreen.id);
                     print('log---> ${isLogIn}');
                   });
@@ -767,7 +769,7 @@ if(loginData != null) {
 
               },
 
-              title: Text(getTranslated(context, 'log_out'),
+              title: Text(getTranslated(context, 'log_out')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(17),
@@ -792,15 +794,15 @@ if(loginData != null) {
 
       PetMartService petMartService = PetMartService();
       String deviceType="";
-      String loginData = _preferences.getString(kUserModel);
+      String? loginData = _preferences.getString(kUserModel);
 
 
 
-      final body = json.decode(loginData);
+      final body = json.decode(loginData!);
    LoginModel   loginModel = LoginModel.fromJson(body);
-    String  mUser = loginModel.data.id;
+    String?  mUser = loginModel.data!.id;
 
-      DeleteUserModel  deleteUserModel = await petMartService.deleteUser(mUser);
+      DeleteUserModel?  deleteUserModel = await petMartService.deleteUser(mUser!);
 
 
       SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -830,8 +832,8 @@ if(loginData != null) {
       switch (val) {
         case 0:
           print(val);
-          _title=getTranslated(context, 'home');
-          _homeScreen.currentState.popUntil((route) => route.isFirst);
+          _title=getTranslated(context, 'home')!;
+          _homeScreen.currentState!.popUntil((route) => route.isFirst);
 
           setState(() {
 
@@ -840,8 +842,8 @@ if(loginData != null) {
           break;
         case 1:
           print(val);
-          _title=getTranslated(context, 'adaption');
-          _competitionNewsScreen.currentState.popUntil((route) => route.isFirst);
+          _title=getTranslated(context, 'adaption')!;
+          _competitionNewsScreen.currentState!.popUntil((route) => route.isFirst);
 
           WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {
 
@@ -850,8 +852,8 @@ if(loginData != null) {
           break;
         case 2:
           print(val);
-          _title=getTranslated(context, 'lost');
-          _amateursNews.currentState.popUntil((route) => route.isFirst);
+          _title=getTranslated(context, 'lost')!;
+          _amateursNews.currentState!.popUntil((route) => route.isFirst);
 
            setState(() {
 
@@ -859,11 +861,11 @@ if(loginData != null) {
           break;
         case 3:
           print(val);
-          _title=getTranslated(context, 'auction');
+          _title=getTranslated(context, 'auction')!;
           setState(() {
 
           });
-          _vediosScreen.currentState.popUntil((route) => route.isFirst);
+          _vediosScreen.currentState!.popUntil((route) => route.isFirst);
 
 
           break;
@@ -874,29 +876,29 @@ if(loginData != null) {
     else {
       index = val;
       if(index ==3){
-        _title=getTranslated(context, 'auction');
-        _vediosScreen.currentState.pushReplacementNamed(AuctionScreen.id);
+        _title=getTranslated(context, 'auction')!;
+        _vediosScreen.currentState!.pushReplacementNamed(AuctionScreen.id);
         setState(() {
 
         });
 
       }else if(index == 2){
-        _title=getTranslated(context, 'lost');
-        _amateursNews.currentState.pushReplacementNamed(LostScreen.id);
+        _title=getTranslated(context, 'lost')!;
+        _amateursNews.currentState!.pushReplacementNamed(LostScreen.id);
          setState(() {
 
         });
 
       }else if(index == 1){
-        _title=getTranslated(context, 'adaption');
-        _competitionNewsScreen.currentState.pushReplacementNamed(AdaptionScreen.id);
+        _title=getTranslated(context, 'adaption')!;
+        _competitionNewsScreen.currentState!.pushReplacementNamed(AdaptionScreen.id);
          setState(() {
 
         });
 
       }else if(index == 0){
-        _title=getTranslated(context, 'home');
-        _homeScreen.currentState.pushReplacementNamed(HomeScreen.id);
+        _title=getTranslated(context, 'home')!;
+        _homeScreen.currentState!.pushReplacementNamed(HomeScreen.id);
          setState(() {
 
         });
@@ -945,7 +947,7 @@ if(loginData != null) {
       buttons: [
         DialogButton(
           child: Text(
-            getTranslated(context, 'english'),
+            getTranslated(context, 'english')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async{
@@ -961,7 +963,7 @@ if(loginData != null) {
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'arabic'),
+            getTranslated(context, 'arabic')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1013,7 +1015,7 @@ if(loginData != null) {
       buttons: [
         DialogButton(
           child: Text(
-            getTranslated(context, 'yes'),
+            getTranslated(context, 'yes')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async{
@@ -1028,7 +1030,7 @@ if(loginData != null) {
         ),
         DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1051,7 +1053,7 @@ if(loginData != null) {
 
   }
 
-  Future<bool> logout(BuildContext context) async{
+  Future<bool?> logout(BuildContext context) async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setBool(kIsLogin, false);
     sharedPreferences.remove(kUserModel);
@@ -1060,21 +1062,21 @@ if(loginData != null) {
     return sharedPreferences.getBool(kIsLogin);
 
   }
-  Future<CheckCreditModel> checkCreditModel() async{
+  Future<CheckCreditModel?> checkCreditModel() async{
 
 
 
     Map map ;
 
 
-    map = {"user_id":loginModel.data.id};
+    map = {"user_id":loginModel!.data!.id};
 
 
 
 
 
     PetMartService petMartService = PetMartService();
-    CheckCreditModel creditModel = await petMartService.checkCredit(map);
+    CheckCreditModel? creditModel = await petMartService.checkCredit(map);
     return creditModel;
   }
   Future<void> ShowAlertDialog(BuildContext context ,String title) async{
@@ -1113,7 +1115,7 @@ if(loginData != null) {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1134,7 +1136,7 @@ if(loginData != null) {
     if(isLoggedIn){
       Navigator.of(context,rootNavigator: true).pushNamed(AddAdvertiseScreen.id);
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login')!);
     }
 
   }
@@ -1174,7 +1176,7 @@ if(loginData != null) {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'reg_now'),
+            getTranslated(context, 'reg_now')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1204,7 +1206,7 @@ if(loginData != null) {
       }));
 
     }else{
-      ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+      ShowLoginAlertDialog(context,getTranslated(context, 'not_login')!);
     }
 
   }

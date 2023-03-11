@@ -6,9 +6,9 @@ class AnchoredOverlay extends StatelessWidget {
   final Widget child;
 
   AnchoredOverlay({
-    this.showOverlay,
-    this.overlayBuilder,
-    this.child,
+    required this.showOverlay,
+    required this.overlayBuilder,
+    required this.child,
   });
 
   @override
@@ -37,8 +37,8 @@ class OverlayBuilder extends StatefulWidget {
 
   OverlayBuilder({
     this.showOverlay = false,
-    this.overlayBuilder,
-    this.child,
+    required this.overlayBuilder,
+    required this.child,
   });
 
   @override
@@ -46,7 +46,7 @@ class OverlayBuilder extends StatefulWidget {
 }
 
 class _OverlayBuilderState extends State<OverlayBuilder> {
-  OverlayEntry overlayEntry;
+  OverlayEntry? overlayEntry;
 
   @override
   void initState() {
@@ -82,19 +82,19 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
 
   void showOverlay() {
     overlayEntry = new OverlayEntry(
-      builder: widget.overlayBuilder,
+      builder: widget.overlayBuilder(context),
     );
-    addToOverlay(overlayEntry);
+    addToOverlay(overlayEntry!);
   }
 
   void addToOverlay(OverlayEntry entry) async {
     print('addToOverlay');
-    Overlay.of(context).insert(entry);
+    Overlay.of(context)!.insert(entry);
   }
 
   void hideOverlay() {
     print('hideOverlay');
-    overlayEntry.remove();
+    overlayEntry!.remove();
     overlayEntry = null;
   }
 
@@ -117,8 +117,8 @@ class CenterAbout extends StatelessWidget {
   final Widget child;
 
   CenterAbout({
-    this.position,
-    this.child,
+    required this.position,
+    required this.child,
   });
 
   @override

@@ -11,12 +11,12 @@ import 'package:pet_mart/utilities/constants.dart';
 
 class PasswordTextField extends StatelessWidget {
   final String hint;
-  final IconData icon;
+
   final Function onClick;
   final String mText;
-  BuildContext context;
+  final BuildContext context;
 
-  String _errorMessage(String str){
+  String? _errorMessage(String str){
     switch(str){
       case 'Full Name':
 
@@ -25,11 +25,11 @@ class PasswordTextField extends StatelessWidget {
     }
   }
 
-  PasswordTextField({Key key, @required this.hint,@required this.icon,@required this.onClick, this.mText}) : super(key: key);
+  PasswordTextField({Key? key, required this.hint,required this.onClick, required this.mText,required this.context}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
+
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     TextEditingController myController = TextEditingController()..text = mText;
@@ -55,7 +55,11 @@ class PasswordTextField extends StatelessWidget {
               textAlign: TextAlign.start,
               textCapitalization: TextCapitalization.words,
               keyboardType: TextInputType.text ,
-              onSaved: onClick,
+              onSaved: (value){
+                onClick(value);
+
+
+              },
               textInputAction: TextInputAction.done,
               maxLines: 1,
               minLines: 1,
@@ -135,9 +139,9 @@ class PasswordTextField extends StatelessWidget {
     );
 
   }
-  String validateName(String value) {
+  String? validateName(String? value) {
 
-    if (value.length == 0) {
+    if (value!.length == 0) {
       return getTranslated(context, 'password_error');
     }
 

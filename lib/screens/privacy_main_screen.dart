@@ -20,16 +20,16 @@ import '../utilities/service_locator.dart';
 import 'hospital_details_screen.dart';
 class PrivacyMainScreen extends StatefulWidget {
   static String id = 'PrivacyMainScreen';
-  const PrivacyMainScreen({Key key}) : super(key: key);
+  const PrivacyMainScreen({Key? key}) : super(key: key);
 
   @override
   _PrivacyMainScreenState createState() => _PrivacyMainScreenState();
 }
 
 class _PrivacyMainScreenState extends State<PrivacyMainScreen> {
-  HospitalsModel hospitalModel;
-  double itemWidth;
-  double itemHeight;
+  HospitalsModel? hospitalModel;
+  double? itemWidth;
+  double? itemHeight;
   ScreenUtil screenUtil = ScreenUtil();
   String mLanguage ="";
   @override
@@ -42,12 +42,12 @@ class _PrivacyMainScreenState extends State<PrivacyMainScreen> {
       });
     });
   }
-  Future<HospitalsModel> getHospitals()async{
+  Future<HospitalsModel?> getHospitals()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
     PetMartService petMartService = PetMartService();
-    HospitalsModel hospitalModel =await petMartService.hospital();
+    HospitalsModel? hospitalModel =await petMartService.hospital();
     return hospitalModel;
   }
   @override
@@ -74,11 +74,11 @@ class _PrivacyMainScreenState extends State<PrivacyMainScreen> {
             shrinkWrap: true,
             physics: const AlwaysScrollableScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                childAspectRatio:itemWidth/itemHeight),
-            itemCount: hospitalModel.data.hospital.length,
+                childAspectRatio:itemWidth!/itemHeight!),
+            itemCount: hospitalModel!.data!.hospital!.length,
             itemBuilder: (context,index){
               return GestureDetector(child:
-              Card(child: buildItem(hospitalModel.data.hospital[index],context),
+              Card(child: buildItem(hospitalModel!.data!.hospital![index],context),
                 margin: EdgeInsets.all(4.h),
                 clipBehavior: Clip.antiAliasWithSaveLayer,
                 elevation: 1.w,
@@ -87,9 +87,9 @@ class _PrivacyMainScreenState extends State<PrivacyMainScreen> {
                 ),
                 color: Color(0xFFFFFFFF),)
                 ,onTap: (){
-                  String mHospitalName = mLanguage=="ar"?hospitalModel.data.hospital[index].arTitle:hospitalModel.data.hospital[index].enTitle;
+                  String mHospitalName = mLanguage=="ar"?hospitalModel!.data!.hospital![index].arTitle!:hospitalModel!.data!.hospital![index].enTitle!;
                   Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                    return new HospitalDetailsScreen(id:hospitalModel.data.hospital[index].id,name: mHospitalName);
+                    return new HospitalDetailsScreen(id:hospitalModel!.data!.hospital![index].id!,name: mHospitalName);
                   }));
                 },);
             },
@@ -109,7 +109,7 @@ class _PrivacyMainScreenState extends State<PrivacyMainScreen> {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:kImagePath+data.logo,
+                  imageUrl:kImagePath+data.logo!,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -156,7 +156,7 @@ class _PrivacyMainScreenState extends State<PrivacyMainScreen> {
                   margin: EdgeInsets.symmetric(horizontal: 4.h),
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
-                    mLanguage== "en"?data.enTitle:data.arTitle,
+                    mLanguage== "en"?data.enTitle!:data.arTitle!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,
@@ -186,7 +186,7 @@ class _PrivacyMainScreenState extends State<PrivacyMainScreen> {
                                   alignment: Alignment.center,
                                 ),
                                 Text(
-                                  data.shares,
+                                  data.shares!,
                                   style: TextStyle(
                                       color: Color(0xFFB7B7B7),
                                       fontSize: screenUtil.setSp(18),
@@ -210,7 +210,7 @@ class _PrivacyMainScreenState extends State<PrivacyMainScreen> {
                                   alignment: Alignment.center,
                                 ),
                                 Text(
-                                  data.views,
+                                  data.views!,
                                   style: TextStyle(
                                       color: Color(0xFFB7B7B7),
                                       fontSize: screenUtil.setSp(18),

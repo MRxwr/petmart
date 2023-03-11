@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FABBottomAppBarItem {
-  FABBottomAppBarItem({this.iconPath, this.text});
+  FABBottomAppBarItem({required this.iconPath, required this.text});
   String iconPath;
   String text;
 }
@@ -10,15 +10,15 @@ class FABBottomAppBarItem {
 class FABBottomAppBar extends StatefulWidget {
   ScreenUtil screenUtil = ScreenUtil();
   FABBottomAppBar({
-    this.items,
-    this.centerItemText,
+    required this.items,
+    required this.centerItemText,
     this.height: 70,
     this.iconSize: 24.0,
-    this.backgroundColor,
-    this.color,
-    this.selectedColor,
-    this.notchedShape,
-    this.onTabSelected,
+    required this.backgroundColor,
+    required this.color,
+    required this.selectedColor,
+    required this.notchedShape,
+    required this.onTabSelected,
   }) {
     assert(this.items.length == 2 || this.items.length == 4);
   }
@@ -89,9 +89,9 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
   }
 
   Widget _buildTabItem({
-    FABBottomAppBarItem item,
-    int index,
-    ValueChanged<int> onPressed,
+    FABBottomAppBarItem? item,
+    int? index,
+    ValueChanged<int>? onPressed,
   }) {
     ScreenUtil screenUtil = ScreenUtil();
     Color color = _selectedIndex == index ? widget.selectedColor : widget.color;
@@ -102,19 +102,19 @@ class FABBottomAppBarState extends State<FABBottomAppBar> {
         child: Material(
           type: MaterialType.transparency,
           child: InkWell(
-            onTap: () => onPressed(index),
+            onTap: () => onPressed!(index!),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 ImageIcon(
-                  AssetImage(item.iconPath
+                  AssetImage(item!.iconPath
                   ),size: 30.h,
                   color: Colors.white,
                 )
                ,
                 Text(
-                  item.text,
+                  item!.text,
                   style: TextStyle(color: color,
                   fontSize: screenUtil.setSp(8)),
                 )

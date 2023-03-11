@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'dart:io';
-
+import 'dart:typed_data';
+import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_downloader/image_downloader.dart';
 
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/hospital_details_model.dart';
@@ -16,33 +20,35 @@ import 'package:pet_mart/utilities/constants.dart';
 import 'package:pet_mart/utilities/service_locator.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../model/login_model.dart';
 import '../model/share_model.dart';
 import 'login_screen.dart';
 class HospitalDetailsScreen extends StatefulWidget {
   String id;
   String name;
-  HospitalDetailsScreen({Key key,@required this.id,@required this.name}): super(key: key);
+  HospitalDetailsScreen({Key? key,required this.id,required this.name}): super(key: key);
 
   @override
   _HospitalDetailsScreenState createState() => _HospitalDetailsScreenState();
 }
 
 class _HospitalDetailsScreenState extends State<HospitalDetailsScreen> {
-String mLanguage;
+String? mLanguage;
 
-HospitalDetailsModel hospitalDetailsModel;
+HospitalDetailsModel? hospitalDetailsModel;
 final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
   ScreenUtil screenUtil = ScreenUtil();
-  Future<HospitalDetailsModel> getHospitals()async{
+  Future<HospitalDetailsModel?> getHospitals()async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
     PetMartService petMartService = PetMartService();
-    HospitalDetailsModel hospitalModel =await petMartService.hospitalDetails(widget.id);
-    ShareModel petsModel = await petMartService.sharePet("view","hospital",widget.id);
+    HospitalDetailsModel? hospitalModel =await petMartService.hospitalDetails(widget.id);
+    ShareModel? petsModel = await petMartService.sharePet("view","hospital",widget.id);
     return hospitalModel;
   }
   String noOfShares="";
@@ -54,8 +60,8 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
     getHospitals().then((value) {
       setState(() {
         hospitalDetailsModel = value;
-        noOfShares = hospitalDetailsModel.data.hospital[0].shares;
-        noOfViews = hospitalDetailsModel.data.hospital[0].views;
+        noOfShares = hospitalDetailsModel!.data!.hospital![0].shares!;
+        noOfViews = hospitalDetailsModel!.data!.hospital![0].views!;
         noOfViews = "${int.parse(noOfViews)+1}";
       });
     });
@@ -114,11 +120,11 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
               children: [
                 GestureDetector(
                   onTap: (){
-                    String url = KImageUrl+hospitalDetailsModel.data.hospital[0].logo;
+                    String url = KImageUrl+hospitalDetailsModel!.data!.hospital![0].logo!;
                     if(url.isNotEmpty) {
                       Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
                         return new PhotoScreen(imageProvider: NetworkImage(
-                            '${KImageUrl+hospitalDetailsModel.data.hospital[0].logo}'
+                            '${KImageUrl+hospitalDetailsModel!.data!.hospital![0].logo!}'
                         ),);
                       }));
                     }
@@ -131,7 +137,7 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                       height: 150.h,
 
                       fit: BoxFit.fill,
-                      imageUrl:'${KImageUrl+hospitalDetailsModel.data.hospital[0].logo}',
+                      imageUrl:'${KImageUrl+hospitalDetailsModel!.data!.hospital![0].logo!}',
                       imageBuilder: (context, imageProvider) => Container(
                           width: screenUtil.screenWidth,
 
@@ -197,15 +203,15 @@ final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      callButton(getTranslated(context, 'call_now'),context),
+                      callButton(getTranslated(context, 'call_now')!,context),
 
                     ],
                   ),
                 ),
                 Container(
                   margin: EdgeInsets.symmetric(vertical: 10.h),
-                  child: Text(mLanguage=="en"?hospitalDetailsModel.data.hospital[0].enDetails:
-                  hospitalDetailsModel.data.hospital[0].arDetails,
+                  child: Text(mLanguage=="en"?hospitalDetailsModel!.data!.hospital![0].enDetails!:
+                  hospitalDetailsModel!.data!.hospital![0].arDetails!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(18),
@@ -298,7 +304,7 @@ TextButton callButton(String text,BuildContext context){
   return TextButton(
     style: flatButtonStyle,
     onPressed: () {
-      _service.call(hospitalDetailsModel.data.hospital[0].mobile.replaceAll('+', ''));
+      _service.call(hospitalDetailsModel!.data!.hospital![0].mobile!.replaceAll('+', ''));
 
 
     },
@@ -341,7 +347,7 @@ share(BuildContext context) async {
     ShareDialog(context);
 
   }else{
-    ShowLoginAlertDialog(context,getTranslated(context, 'not_login'));
+    ShowLoginAlertDialog(context,getTranslated(context, 'not_login')!);
   }
 
 
@@ -383,7 +389,7 @@ Future<void> ShareDialog(BuildContext context ) async{
 
       DialogButton(
         child: Text(
-          getTranslated(context, 'ok'),
+          getTranslated(context, 'ok')!,
           style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
         ),
         onPressed: ()async {
@@ -397,7 +403,7 @@ Future<void> ShareDialog(BuildContext context ) async{
       ),
       DialogButton(
         child: Text(
-          getTranslated(context, 'no'),
+          getTranslated(context, 'no')!,
           style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
         ),
         onPressed: ()async {
@@ -414,38 +420,120 @@ Future<void> ShareDialog(BuildContext context ) async{
 
 }
 Future<void> ShareHospital() async{
+  final modelHud = Provider.of<ModelHud>(context,listen: false);
+  modelHud.changeIsLoading(true);
 
-    String description;
-    String title;
-    if (mLanguage == 'ar') {
-      description = hospitalDetailsModel.data.hospital[0].arDetails;
-      title = hospitalDetailsModel.data.hospital[0].arTitle;
-    } else {
-      description = hospitalDetailsModel.data.hospital[0].enDetails;;
-      title = hospitalDetailsModel.data.hospital[0].enTitle;
+  List<String> imagePaths = [];
+  List<String> fileNames = [];
+  String imageUrl =KImageUrl+ hospitalDetailsModel!.data!.hospital![0].logo!;
+  var response = await http.get(Uri.parse(imageUrl));
+  Uint8List imageBytes =  response.bodyBytes;
+  final tempDir = await getTemporaryDirectory();
+  String path = '${tempDir.path}/${hospitalDetailsModel!.data!.hospital![0].logo}.png';
+  File file = await File('${tempDir.path}/${hospitalDetailsModel!.data!.hospital![0].logo}.png').create();
+  file.writeAsBytesSync(imageBytes);
+  SharedPreferences _preferences = await SharedPreferences.getInstance();
+  String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
+
+  mLanguage = languageCode;
+  String loginData = _preferences.getString(kUserModel)??"";
+  Map map;
+
+  final body = json.decode(loginData);
+  LoginModel   loginModel = LoginModel.fromJson(body);
+  map = {
+    'post_id': hospitalDetailsModel!.data!.hospital![0].id!,
+    'user_id': loginModel.data!.id
+  };
+
+  print('map --> ${map}');
+
+  PetMartService petMartService = PetMartService();
+
+  ShareModel? petsModel = await petMartService.sharePet("share","hospital",hospitalDetailsModel!.data!.hospital![0].id!);
+  modelHud.changeIsLoading(false);
+  String? title;
+  title = languageCode == "en"?hospitalDetailsModel!.data!.hospital![0].enTitle:hospitalDetailsModel!.data!.hospital![0].arTitle;
+  String? description;
+  description = languageCode== "en"?hospitalDetailsModel!.data!.hospital![0].enDetails:hospitalDetailsModel!.data!.hospital![0].arDetails;
+  //
+  // if(Platform.isIOS){
+  //   Share.share('${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
+  //
+  // }else{
+  //   Share.share('${title}' '\n ${description}' '\nhttps://onelink.to/3eq98v');
+  //
+  // }
+  final box = context.findRenderObject() as RenderBox?;
+  final scaffoldMessenger = ScaffoldMessenger.of(context);
+  ShareResult shareResult;
+  imagePaths.add(path);
+  var filename = path.split("/").last;
+  fileNames.add(filename);
+  String subject = "";
+  if(Platform.isIOS){
+    subject = ' ${title}\n${description} \n https://onelink.to/3eq98v';
+  }else{
+    subject = ' ${title}\n${description} \n https://onelink.to/3eq98v';
+  }
+
+  if (imagePaths.isNotEmpty) {
+    final files = <XFile>[];
+    for (var i = 0; i < imagePaths.length; i++) {
+      files.add(XFile(imagePaths[i], name: fileNames[i]));
     }
-    final modelHud = Provider.of<ModelHud>(context, listen: false);
-    modelHud.changeIsLoading(true);
+    shareResult = await Share.shareXFiles(files,
+        text: subject,
+        subject: subject,
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+  } else {
+    shareResult = await Share.shareWithResult(subject!,
+        subject: subject,
+        sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size);
+  }
 
+  setState(() {
+    noOfShares = "${int.parse(noOfShares)+1}";
 
-    PetMartService petMartService = PetMartService();
-    ShareModel petsModel = await petMartService.sharePet("share","hospital",hospitalDetailsModel.data.hospital[0].id);
-    setState(() {
-      noOfShares = "${int.parse(noOfShares)+1}";
-
-    });
-    modelHud.changeIsLoading(false);
-    if (Platform.isIOS) {
-      Share.share(
-          '${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
-    } else {
-      Share.share(
-          '${title}' '\n ${description}' '\n https://play.google.com/store/apps/details?id=com.createq8.petMart');
-    }
-
-
+  });
+  ///
+  ///
+  ///
 
 }
+// Future<void> ShareHospital() async{
+//
+//     String description;
+//     String title;
+//     if (mLanguage == 'ar') {
+//       description = hospitalDetailsModel!.data!.hospital![0].arDetails!;
+//       title = hospitalDetailsModel!.data!.hospital![0].arTitle!;
+//     } else {
+//       description = hospitalDetailsModel!.data!.hospital![0].enDetails!;;
+//       title = hospitalDetailsModel!.data!.hospital![0].enTitle!;
+//     }
+//     final modelHud = Provider.of<ModelHud>(context, listen: false);
+//     modelHud.changeIsLoading(true);
+//
+//
+//     PetMartService petMartService = PetMartService();
+//     ShareModel? petsModel = await petMartService.sharePet("share","hospital",hospitalDetailsModel!.data!.hospital![0].id!);
+//     setState(() {
+//       noOfShares = "${int.parse(noOfShares)+1}";
+//
+//     });
+//     modelHud.changeIsLoading(false);
+//     if (Platform.isIOS) {
+//       Share.share(
+//           '${title}' '\n ${description}' '\n market://details?id=com.createq8.petMart');
+//     } else {
+//       Share.share(
+//           '${title}' '\n ${description}' '\nhttps://onelink.to/3eq98v');
+//     }
+//
+//
+//
+// }
 Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
   var alert;
   var alertStyle = AlertStyle(
@@ -482,7 +570,7 @@ Future<void> ShowLoginAlertDialog(BuildContext context ,String title) async{
 
       DialogButton(
         child: Text(
-          getTranslated(context, 'reg_now'),
+          getTranslated(context, 'reg_now')!,
           style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
         ),
         onPressed: ()async {

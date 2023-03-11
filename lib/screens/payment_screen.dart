@@ -2,10 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:art_sweetalert/art_sweetalert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:my_fatoorah/my_fatoorah.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -23,7 +24,7 @@ import 'package:pet_mart/utilities/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sweetalert/sweetalert.dart';
+
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../providers/model_hud.dart';
@@ -36,17 +37,17 @@ class PaymentScreen extends StatefulWidget {
   Model.Package  packageModel;
   String url ;
   String id;
-  PaymentScreen({Key key,@required this.packageModel,this.url,this.id}) : super(key: key);
+  PaymentScreen({Key? key,required this.packageModel,required this.url,required this.id}) : super(key: key);
 
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  String mLanguage;
+  String? mLanguage;
   ScreenUtil screenUtil = ScreenUtil();
 
-  PostPaymentModel paymentModel;
+  PostPaymentModel? paymentModel;
 
 
   String mUrl ='';
@@ -89,22 +90,24 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
 
 
-  Future<void> showFailDialog() {
-    SweetAlert.show(context,
-        title: getTranslated(context, 'fail'),
-        subtitle: getTranslated(context, 'payment_fail'),
-        showCancelButton: false,
-        confirmButtonColor: Color(0xFFFF0000),
-        confirmButtonText: getTranslated(context, 'go_to_credit'),
-        style: SweetAlertStyle.error,
-        onPress: (bool isConfirm) {
+  Future<void> showFailDialog() async {
+    ArtDialogResponse response =  ArtSweetAlert.show(
+        context: context,
+        artDialogArgs: ArtDialogArgs(
+          type: ArtSweetAlertType.danger,
+          title: getTranslated(context, 'fail'),
+          text: getTranslated(context, 'payment_fail'),
+          confirmButtonText: getTranslated(context, 'ok')!,
+          confirmButtonColor: Color(0xFFFF0000),
+          showCancelBtn: false,
 
 
+        )
+    );
+    if(response.isTapConfirmButton) {
+      Navigator.pop(context,true);
+    }
 
-
-         Navigator.pop(context);
-          return true;
-        });
   }
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
@@ -120,6 +123,39 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return ModalProgressHUD(
       inAsyncCall: Provider.of<ModelHud>(context).isLoading,
       child: Scaffold(
+        appBar:  AppBar(
+          backgroundColor: kMainColor,
+          title: Container(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding:  EdgeInsets.symmetric(horizontal: 10.h),
+              child: Text(
+                getTranslated(context, 'payment')!,
+                style: TextStyle(
+                    color: Color(0xFFFFFFFF),
+                    fontSize: screenUtil.setSp(16),
+                    fontWeight: FontWeight.bold
+
+                ),
+
+
+              ),
+            ),
+          ),
+          leading: GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+
+            },
+            child: Icon(Icons.arrow_back_ios_outlined,color: Colors.white,size: 20.h,),
+          ),
+
+          actions: [
+            SizedBox(width: 30.h,)
+
+          ],
+
+        ),
         backgroundColor: Color(0xFFFFFFFF),
 
         body: Container(
@@ -142,20 +178,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
             },
 
 
-            onLoadStart: (InAppWebViewController controller, Uri url) {
+            onLoadStart: (InAppWebViewController? controller, Uri? url) {
 
             },
-            onLoadStop: (InAppWebViewController controller, Uri url)  async{
+            onLoadStop: (InAppWebViewController? controller, Uri? url)  async{
+              print(url);
 
               if(url.toString().toLowerCase().contains('https://createkwservers.com/petmart2/request/index.php?action=success')){
 
-                Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
-                  return new MyAccountScreen(paymentId: widget.id,isFromPayment: true,);
-                }));
+                // Navigator.of(context,rootNavigator: true).pushReplacement(new MaterialPageRoute(builder: (BuildContext context){
+                //   return new MyAccountScreen(paymentId: widget.id,isFromPayment: true,);
+                // }));
 
+                Navigator.pop(context,widget.id);
               }else if(url.toString().toLowerCase().contains('https://createkwservers.com/petmart2/request/index.php?action=failure')){
+               Navigator.pop(context,"fail");
 
-                Navigator.pop(context,"true");
 
               }
 

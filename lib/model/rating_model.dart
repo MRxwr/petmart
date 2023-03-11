@@ -3,18 +3,18 @@
 /// data : {"rating":3.3333333333333335}
 
 class RatingModel {
-  String _status;
-  String _message;
-  Data _data;
+  String? _status;
+  String? _message;
+  Data? _data;
 
-  String get status => _status;
-  String get message => _message;
-  Data get data => _data;
+  String get status => _status!;
+  String get message => _message!;
+  Data get data => _data!;
 
   RatingModel({
-      String status, 
-      String message, 
-      Data data}){
+    String? status,
+    String? message,
+      Data? data}){
     _status = status;
     _message = message;
     _data = data;
@@ -31,7 +31,7 @@ class RatingModel {
     map["status"] = _status;
     map["message"] = _message;
     if (_data != null) {
-      map["data"] = _data.toJson();
+      map["data"] = _data!.toJson();
     }
     return map;
   }

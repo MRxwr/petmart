@@ -2,15 +2,15 @@
 /// message : "User update successully."
 
 class UpdateProfileModel {
-  String _status;
-  String _message;
+  String? _status;
+  String? _message;
 
-  String get status => _status;
-  String get message => _message;
+  String get status => _status!;
+  String get message => _message!;
 
   UpdateProfileModel({
-      String status, 
-      String message}){
+    String? status,
+    String? message}){
     _status = status;
     _message = message;
 }

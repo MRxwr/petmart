@@ -1,7 +1,7 @@
 class PushNotification {
   PushNotification({
-    this.title,
-    this.body,
+    required this.title,
+    required this.body,
   });
   String title;
   String body;

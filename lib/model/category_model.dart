@@ -1,8 +1,8 @@
 class CategoryModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   CategoryModel({this.ok, this.error, this.status, this.data});
 
@@ -19,14 +19,14 @@ class CategoryModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Categories> categories;
+  List<Categories>? categories;
 
   Data({this.categories});
 
@@ -34,7 +34,7 @@ class Data {
     if (json['categories'] != null) {
       categories = <Categories>[];
       json['categories'].forEach((v) {
-        categories.add(new Categories.fromJson(v));
+        categories!.add(new Categories.fromJson(v));
       });
     }
   }
@@ -42,17 +42,17 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.categories != null) {
-      data['categories'] = this.categories.map((v) => v.toJson()).toList();
+      data['categories'] = this.categories!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Categories {
-  String id;
-  String arTitle;
-  String  enTitle;
-  String image;
+  String? id;
+  String? arTitle;
+  String?  enTitle;
+  String? image;
 
   Categories({this.id, this.arTitle, this.enTitle, this.image});
 

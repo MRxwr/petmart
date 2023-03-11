@@ -11,12 +11,12 @@ import 'package:pet_mart/utilities/constants.dart';
 
 class UserNameTextField extends StatelessWidget {
   final String hint;
-  final IconData icon;
+
   final Function onClick;
   final String mText;
-  BuildContext context;
+  final  BuildContext context;
 
-  String _errorMessage(String str){
+   _errorMessage(String str){
     switch(str){
       case 'Full Name':
 
@@ -25,11 +25,11 @@ class UserNameTextField extends StatelessWidget {
     }
   }
 
-  UserNameTextField({Key key, @required this.hint,@required this.icon,@required this.onClick, this.mText}) : super(key: key);
+ const  UserNameTextField({Key? key, required this.hint,required this.onClick, required this.mText,required this.context}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    this.context = context;
+
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
     TextEditingController myController = TextEditingController()..text = mText;
@@ -54,7 +54,11 @@ class UserNameTextField extends StatelessWidget {
               textAlign: TextAlign.start,
               textCapitalization: TextCapitalization.words,
               keyboardType: TextInputType.name ,
-              onSaved: onClick,
+              onSaved: (value){
+                onClick(value);
+
+
+              },
               textInputAction: TextInputAction.next,
               maxLines: 1,
               minLines: 1,
@@ -133,14 +137,14 @@ class UserNameTextField extends StatelessWidget {
     );
 
   }
-  String validateName(String value) {
-    String errorMessage ;
+  String? validateName(String? value) {
+    String? errorMessage ;
     if(hint == getTranslated(context, 'first_name')){
-      if(value.length == 0){
+      if(value!.length == 0){
         errorMessage = getTranslated(context, 'first_name_error');
       }
     }else if(hint == getTranslated(context, 'last_name')){
-      if(value.length == 0){
+      if(value!.length == 0){
         errorMessage = getTranslated(context, 'last_name_error');
       }
     }

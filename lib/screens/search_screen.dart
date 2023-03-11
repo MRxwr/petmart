@@ -4,8 +4,9 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:group_radio_button/group_radio_button.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/home_model.dart';
@@ -20,7 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pet_mart/model/category_model.dart'as SubCategory;
 import '../model/login_model.dart';
 class SearcgScreen extends StatefulWidget {
-  const SearcgScreen({Key key}) : super(key: key);
+  const SearcgScreen({Key? key}) : super(key: key);
 
   @override
   _SearcgScreenState createState() => _SearcgScreenState();
@@ -34,7 +35,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
   String subCategoryId ="";
   bool isLoading = false;
   String errorMessage = "";
-  SearchModel searchModel;
+  SearchModel? searchModel;
 
 
   String _singleValue = "Text alignment right";
@@ -43,17 +44,17 @@ class _SearcgScreenState extends State<SearcgScreen> {
   List<String> _statusEn = ["For Sale", "Adaption", "Lost"];
   List<String> _statusAr = ["للبيع", "تبني", "مفقود"];
   List<String> _statusKey =["sell","adoption","animal"];
-  List<bool> selectedList = List();
-  List<bool> selectedSubList = List();
+  List<bool> selectedList = [];
+  List<bool> selectedSubList = [];
   final TextEditingController _commentController = new TextEditingController();
   final TextEditingController _startPriceController = new TextEditingController();
   final TextEditingController _endPriceController = new TextEditingController();
-  List<TypeModel> typesList = List();
-  double itemWidth;
-  double itemHeight;
+  List<TypeModel> typesList = [];
+  double? itemWidth;
+  double? itemHeight;
   int _groupValue = -1;
-  List<String> selectedSubCategoriesId = List();
-  List<Categories> _categoryList = List();
+  List<String> selectedSubCategoriesId = [];
+  List<Categories> _categoryList = [];
   String  categoryId ="";
   bool forSaleSelected = true;
   String type="sell";
@@ -64,6 +65,18 @@ class _SearcgScreenState extends State<SearcgScreen> {
     typesList.add(TypeModel(typeNameAr: 'للبيع',typeNameEn: 'For Sale',key: 'sell',selected:  true));
     typesList.add(TypeModel(typeNameAr: 'تبني',typeNameEn: 'Adaption',key: 'adoption',selected: false));
     typesList.add(TypeModel(typeNameAr: 'مفقود',typeNameEn: 'Lost',key: 'lost-animal',selected: false));
+    _commentController.addListener(() {
+      if(_commentController.text.length>=3){
+        search(_commentController.text);
+      }else if(_commentController.text.length == 0){
+        searchModel = null;
+        setState(() {
+
+        });
+
+      }
+
+    });
     getLanguage().then((value) {
 
 
@@ -102,7 +115,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                getTranslated(context, 'advanced_search'),
+                getTranslated(context, 'advanced_search')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -170,14 +183,14 @@ class _SearcgScreenState extends State<SearcgScreen> {
                     physics: const NeverScrollableScrollPhysics(),
 
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2,
-                        childAspectRatio:itemWidth/itemHeight),
-                    itemCount: searchModel.data.items.length,
+                        childAspectRatio:itemWidth!/itemHeight!),
+                    itemCount: searchModel!.data!.items!.length,
 
                     itemBuilder: (context,index){
                       return GestureDetector(
                         onTap: (){
                           Navigator.of(context,rootNavigator: true).push(new MaterialPageRoute(builder: (BuildContext context){
-                            return new PetsDetailsScreen(postId:searchModel.data.items[index].id,postName: mLanguage == "en"?searchModel.data.items[index].enTitle:searchModel.data.items[index].arTitle,);
+                            return new PetsDetailsScreen(postId:searchModel!.data!.items![index]!.id!,postName: mLanguage == "en"?searchModel!.data!.items![index].enTitle!:searchModel!.data!.items![index].arTitle!,);
                           }));
                         },
                         child: Container(
@@ -191,7 +204,7 @@ class _SearcgScreenState extends State<SearcgScreen> {
                                   borderRadius: BorderRadius.circular(10.0.h),
                                 ),
                                 color: Color(0xFFFFFFFF),
-                                child: buildItem(searchModel.data.items[index],context))),
+                                child: buildItem(searchModel!.data!.items![index],context))),
                       );
                     },
                   ),
@@ -284,8 +297,16 @@ class _SearcgScreenState extends State<SearcgScreen> {
 
 
                               }else{
-                                _scaffoldKey.currentState.showSnackBar(
-                                    SnackBar(content: Text(getTranslated(context, "write_search_text"))));
+                                Fluttertoast.showToast(
+                                    msg: getTranslated(context, "write_search_text")!,
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.BOTTOM,
+                                    timeInSecForIosWeb: 1,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                    fontSize: screenUtil.setSp(16)
+                                );
+
                               }
                             },
                               child: Icon(Icons.search,size: 30.w,color: Colors.white,)),
@@ -321,8 +342,8 @@ class _SearcgScreenState extends State<SearcgScreen> {
 
     }else{
       errorMessage = response['data'];
-      _scaffoldKey.currentState.showSnackBar(
-          SnackBar(content: Text(response['data'])));
+      // _scaffoldKey.currentState.showSnackBar(
+      //     SnackBar(content: Text(response['data'])));
 
     }
 setState(() {
@@ -365,7 +386,7 @@ setState(() {
               children: [
                 CachedNetworkImage(
                   width: itemWidth,
-                  imageUrl:KImageUrl+data.image,
+                  imageUrl:KImageUrl+data.image!,
                   imageBuilder: (context, imageProvider) => Stack(
                     children: [
                       ClipRRect(
@@ -406,7 +427,7 @@ setState(() {
                   start: 4.w,
                   child:
                   Text(
-                    data.date.split(" ").first,
+                    data.date!.split(" ").first,
                     style: TextStyle(
                         color: Color(0xFFFFFFFF)
 
@@ -425,7 +446,7 @@ setState(() {
                   alignment: AlignmentDirectional.centerStart,
                   child: Text(
                    mLanguage == "en"?
-                    data.enTitle:data.arTitle,
+                    data.enTitle!:data.arTitle!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontWeight: FontWeight.normal,

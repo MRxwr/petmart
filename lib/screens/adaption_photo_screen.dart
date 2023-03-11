@@ -6,7 +6,7 @@ import 'package:photo_view/photo_view.dart';
 import 'package:pinch_zoom_image_last/pinch_zoom_image_last.dart';
 class ZoomClass extends StatefulWidget {
   String url;
-   ZoomClass({Key  key,@required this.url}) : super(key: key);
+   ZoomClass({Key?  key,required this.url}) : super(key: key);
 
   @override
   _ZoomClassState createState() => _ZoomClassState();

@@ -1,8 +1,8 @@
 class OtpModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   OtpModel({this.ok, this.error, this.status, this.data});
 
@@ -19,15 +19,15 @@ class OtpModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  int code;
-  String response;
+  int? code;
+  String? response;
 
   Data({this.code, this.response});
 

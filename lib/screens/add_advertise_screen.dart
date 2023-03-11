@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:images_picker/images_picker.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
@@ -11,7 +12,7 @@ import 'package:flutter_dropdown/flutter_dropdown.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
@@ -46,30 +47,30 @@ class AddAdvertiseScreen extends StatefulWidget {
 
 class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   ScreenUtil screenUtil = ScreenUtil();
-  List<TypeModel> typesList = List();
+  List<TypeModel> typesList = [];
   String mLanguage='';
-  String userId ='';
-  List<File> mImages = List();
-  NAlertDialog nAlertDialog;
-  List<String> Paths= List();
+  String? userId ;
+  List<File> mImages = [];
+  NAlertDialog? nAlertDialog;
+  List<String> Paths=[];
   String vedioUrl ="";
-  String path =null;
+  String? path ;
   bool isSelected = false;
   String mChooseImage="اختار الصورة";
   String categoryId ="";
   String subCategoryId ="";
-  Category category;
-  Sub mSubCategory;
+  Category? category;
+  Sub? mSubCategory;
   List<File> vedios =[];
 
   List<AgeModel> agesList = [];
   List<GenderModel> genderList = [];
-  List<Category> categories = null;
-  List<Sub> subCategory = null;
+  List<Category>? categories = [];
+  List<Sub>? subCategory = [];
   String genderId ="3";
   String ageName="";
   String key ="sell";
-  LoginModel loginModel;
+  LoginModel? loginModel;
   bool hidePrice = false;
 
   final TextEditingController _titleController = new TextEditingController();
@@ -77,18 +78,18 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
 
   final TextEditingController _ageController = new TextEditingController();
   final TextEditingController _priceController = new TextEditingController();
-  Future<NAlertDialog> showPickerDialog(BuildContext context)async {
+  Future<NAlertDialog?> showPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text(getTranslated(context, 'select_image')),
+      content: Padding(child: Text(getTranslated(context, 'select_image')!),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'camera')!),onPressed: () {
 
           _getImageFromCamera(context);
         }),
-        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'gallery')!),onPressed: () {
           _getImageFromGallery(context);
         }),
 
@@ -102,7 +103,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     List<XFile> pickedFile = [];
     ImagePicker picker = ImagePicker();
     try {
-      List<Media> res = await ImagesPicker.pick(
+      List<Media>? res = await ImagesPicker.pick(
         count: 10,
         pickType: PickType.all,
         language: Language.System,
@@ -114,7 +115,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
         ),
       );
 
-      if (res!= null || res.isNotEmpty) {
+      if (res!= null || res!.isNotEmpty) {
         isSelected = true;
         for (int i = 0; i < res.length; i++) {
           File _image = File(res[i].path);
@@ -173,7 +174,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   }
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  InitModel initModel;
+  InitModel? initModel;
   @override
   void initState() {
     // TODO: implement initState
@@ -196,11 +197,11 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
         categories =[];
         subCategory =[];
 
-        categories = initModel.data.category;
-        category = categories[0];
-        subCategory = initModel.data.category[0].sub;
-        mSubCategory = subCategory[0];
-        categoryId = initModel.data.category[0].sub[0].id;
+        categories = initModel!.data.category;
+        category = categories![0];
+        subCategory = initModel!.data.category[0].sub;
+        mSubCategory = subCategory![0];
+        categoryId = initModel!.data.category[0].sub[0].id;
 
       });
 
@@ -211,38 +212,38 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
   }
 
 
-  Future<CheckCreditModel> checkCreditModel() async{
+  Future<CheckCreditModel?> checkCreditModel() async{
 
 
 
     Map map ;
 
 
-    map = {"user_id":loginModel.data.id};
+    map = {"user_id":loginModel!.data!.id};
 
 
 
 
 
     PetMartService petMartService = PetMartService();
-    CheckCreditModel creditModel = await petMartService.checkCredit(map);
+    CheckCreditModel? creditModel = await petMartService.checkCredit(map);
     return creditModel;
   }
-  Future<InitModel> map() async{
+  Future<InitModel?> map() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
 
     PetMartService petMartService = PetMartService();
-    InitModel initModel =  await petMartService.initModel();
+    InitModel? initModel =  await petMartService.initModel();
 
 
-    String loginData = _preferences.getString(kUserModel);
-    final body = json.decode(loginData);
+    String? loginData = _preferences.getString(kUserModel);
+    final body = json.decode(loginData!);
        loginModel = LoginModel.fromJson(body);
-    String initData = _preferences.getString("initModel");
+    String? initData = _preferences.getString("initModel");
     print('initData --> ${initData}');
-    userId = loginModel.data.id;
+    userId = loginModel!.data!.id;
 
     // agesList = initModel.data.age;
     ageId = agesList[0].id;
@@ -250,7 +251,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
     // genderList = initModel.data.genderList;
     Map map ;
     map = {"language":languageCode,
-      "userId":loginModel.data.id};
+      "userId":loginModel!.data!.id};
     return initModel;
   }
   @override
@@ -272,7 +273,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
               child: Padding(
                 padding:  EdgeInsets.symmetric(horizontal: 10.h),
                 child: Text(
-                  getTranslated(context, 'create_post'),
+                  getTranslated(context, 'create_post')!,
                   style: TextStyle(
                       color: Color(0xFFFFFFFF),
                       fontSize: screenUtil.setSp(16),
@@ -321,7 +322,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
 
                 children: [
-                  Text(getTranslated(context, 'select_post_type'),
+                  Text(getTranslated(context, 'select_post_type')!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -361,7 +362,7 @@ class _AddAdvertiseScreenState extends State<AddAdvertiseScreen> {
                                     modelHud.changeIsLoading(true);
                                     checkCreditModel().then((value){
                                       modelHud.changeIsLoading(false);
-                                    int credit = int.parse(value.data.credit);
+                                    int credit = int.parse(value!.data.credit);
                                     print('credit --->${credit}');
 
                                     if(credit>0){
@@ -379,15 +380,15 @@ setState(() {
   categories = null;
   subCategory = null;
 
-  categories = initModel.data.adoption;
+  categories = initModel!.data.adoption;
 
 
-  print(categories.length);
+  print(categories!.length);
   print("Categories -----> ${categories}");
-  subCategory = initModel.data.adoption[0].sub;
+  subCategory = initModel!.data.adoption[0].sub;
 
 
-  categoryId = initModel.data.adoption[0].sub[0].id;
+  categoryId = initModel!.data.adoption[0].sub[0].id;
   print(subCategory);
 
 });
@@ -401,14 +402,14 @@ setState(() {
 
 
 
-                                      categories=initModel.data.lost;
-                                      print(categories.length);
-                                      subCategory = categories[0].sub;
+                                      categories=initModel!.data.lost;
+                                      print(categories!.length);
+                                      subCategory = categories![0].sub;
 
 
-                                      print("enTitlte--->"+category.enTitle);
-                                      subCategory = initModel.data.lost[0].sub;
-                                      categoryId = initModel.data.lost[0].sub[0].id;
+                                      print("enTitlte--->"+category!.enTitle);
+                                      subCategory = initModel!.data.lost[0].sub;
+                                      categoryId = initModel!.data.lost[0].sub[0].id;
                                     });
                                   }if(key == 'sell'){
 
@@ -417,9 +418,9 @@ setState(() {
                                       categories = null;
                                       subCategory = null;
 
-                                      categories = initModel.data.category;
-                                      subCategory = initModel.data.category[0].sub;
-                                      categoryId = initModel.data.category[0].sub[0].id;
+                                      categories = initModel!.data.category;
+                                      subCategory = initModel!.data.category[0].sub;
+                                      categoryId = initModel!.data.category[0].sub[0].id;
 
 
                                     });
@@ -444,7 +445,7 @@ setState(() {
                   ),
                   SizedBox(height: 5.h,width: screenUtil.screenWidth,
                   ),
-                  Text(getTranslated(context,'add_photo'),
+                  Text(getTranslated(context,'add_photo')!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -464,7 +465,7 @@ setState(() {
                         GestureDetector(
                           onTap: (){
                             showPickerDialog(context).then((value){
-                              value.show(context);
+                              value!.show(context);
                             });
                           },
                           child:
@@ -502,7 +503,7 @@ setState(() {
                   ),
                   SizedBox(height: 5.h,width: screenUtil.screenWidth,
                   ),
-                  Text(getTranslated(context, 'add_vedio'),
+                  Text(getTranslated(context, 'add_vedio')!,
                     style: TextStyle(
                         color: Color(0xFF000000),
                         fontSize: screenUtil.setSp(16),
@@ -524,7 +525,7 @@ setState(() {
                           Container():GestureDetector(
                             onTap: (){
                               showVedioPickerDialog(context).then((value){
-                                value.show(context);
+                                value!.show(context);
                               });
                             },
                             child:
@@ -579,8 +580,8 @@ setState(() {
 
 
 
-                      items: categories,
-                      initialValue: categories.first,
+                      items: categories!,
+                      initialValue: categories!.first,
 
 
 
@@ -592,8 +593,8 @@ setState(() {
 
 
 
-                      customWidgets: categories.map((p) => buildDropDownRow(p)).toList(),
-                      hint:  Text(mLanguage == "en"?categories[0].enTitle:categories[0].arTitle,
+                      customWidgets: categories!.map((p) => buildDropDownRow(p)).toList(),
+                      hint:  Text(mLanguage == "en"?categories![0].enTitle:categories![0].arTitle,
                         textAlign: TextAlign.start,
                         style: TextStyle(
 
@@ -601,12 +602,12 @@ setState(() {
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (Category category){
+                      onChanged: (Category? category){
 
                         setState(() {
 
                           this.category = category;
-                          subCategory = category.sub;
+                          subCategory = category!.sub;
                           mSubCategory = null;
 
                         });
@@ -644,11 +645,11 @@ setState(() {
 
 
 
-                        items: subCategory,
+                        items: subCategory!,
 
 
-                        hint:  Text( mLanguage == "en"?subCategory.isNotEmpty?subCategory[0].enTitle:"":
-                        subCategory.isNotEmpty? subCategory[0].arTitle:"",
+                        hint:  Text( mLanguage == "en"?subCategory!.isNotEmpty?subCategory![0].enTitle:"":
+                        subCategory!.isNotEmpty? subCategory![0].arTitle:"",
                           textAlign: TextAlign.start,
                           style: TextStyle(
 
@@ -656,8 +657,8 @@ setState(() {
                               fontWeight: FontWeight.w600,
                               fontSize: screenUtil.setSp(15)
                           ),),
-                        onChanged: (Sub category){
-                          categoryId = category.id;
+                        onChanged: (Sub? category){
+                          categoryId = category!.id;
 
                          setState(() {
                            mSubCategory = category;
@@ -668,7 +669,7 @@ setState(() {
 
 
                         },
-                        customWidgets: subCategory.map((p) => buildSubCategoryRow(p)).toList(),
+                        customWidgets: subCategory!.map((p) => buildSubCategoryRow(p)).toList(),
                         isExpanded: true,
                         showUnderline: false,
                         isCleared: mSubCategory == null?true:false,
@@ -801,9 +802,9 @@ setState(() {
 
 
 
-                            items: mLanguage == "en"?initModel.data.ageType.english:initModel.data.ageType.arabic,
+                            items: mLanguage == "en"?initModel!.data.ageType.english:initModel!.data.ageType.arabic,
 
-                            hint:  Text(mLanguage == "en" ?initModel.data.ageType.english[0]:initModel.data.ageType.arabic[0],
+                            hint:  Text(mLanguage == "en" ?initModel!.data.ageType.english[0]:initModel!.data.ageType.arabic[0],
                               textAlign: TextAlign.start,
                               style: TextStyle(
 
@@ -811,20 +812,20 @@ setState(() {
                                   fontWeight: FontWeight.w600,
                                   fontSize: screenUtil.setSp(15)
                               ),),
-                            onChanged: (String age){
-                              ageId = age;
+                            onChanged: (String? age){
+                              ageId = age!;
                               ageName = age;
                               if(mLanguage == "en"){
-                                ageId = "${initModel.data.ageType.english.indexOf(age)}";
+                                ageId = "${initModel!.data.ageType.english.indexOf(age)}";
                               }else {
-                                ageId = "${initModel.data.gender.arabic.indexOf(age)}";
+                                ageId = "${initModel!.data.gender.arabic.indexOf(age)}";
                               }
                               print(ageId);
 
 
                             },
-                            customWidgets:mLanguage =="en"? initModel.data.ageType.english.map((p) => buildAgeRow(p)).toList():
-                            initModel.data.ageType.arabic.map((p) => buildAgeRow(p)).toList(),
+                            customWidgets:mLanguage =="en"? initModel!.data.ageType.english.map((p) => buildAgeRow(p)).toList():
+                            initModel!.data.ageType.arabic.map((p) => buildAgeRow(p)).toList(),
                             isExpanded: true,
                             showUnderline: false,
                           ),
@@ -858,9 +859,9 @@ setState(() {
 
 
 
-                      items:mLanguage == "en"? initModel.data.gender.english:initModel.data.gender.arabic,
+                      items:mLanguage == "en"? initModel!.data.gender.english:initModel!.data.gender.arabic,
 
-                      hint:  Text(getTranslated(context, 'select_gender') ,
+                      hint:  Text(getTranslated(context, 'select_gender') !,
                         textAlign: TextAlign.start,
                         style: TextStyle(
 
@@ -868,11 +869,11 @@ setState(() {
                             fontWeight: FontWeight.w600,
                             fontSize: screenUtil.setSp(15)
                         ),),
-                      onChanged: (String gender){
+                      onChanged: (String? gender){
                         if(mLanguage == "en"){
-                          genderId = "${initModel.data.gender.english.indexOf(gender)}";
+                          genderId = "${initModel!.data.gender.english.indexOf(gender!)}";
                         }else {
-                          genderId = "${initModel.data.gender.arabic.indexOf(gender)}";
+                          genderId = "${initModel!.data.gender.arabic.indexOf(gender!)}";
                         }
                         print(genderId);
 
@@ -880,7 +881,7 @@ setState(() {
 
                       },
                       customWidgets:
-                      mLanguage == "en"? initModel.data.gender.english.map((p) => builGenderRow(p)).toList():initModel.data.gender.arabic.map((p) => builGenderRow(p)).toList(),
+                      mLanguage == "en"? initModel!.data.gender.english.map((p) => builGenderRow(p)).toList():initModel!.data.gender.arabic.map((p) => builGenderRow(p)).toList(),
 
                       isExpanded: true,
                       showUnderline: false,
@@ -944,7 +945,7 @@ setState(() {
                       ],
                     ),
                   ),
-                  sumbitButton(getTranslated(context, 'sumbit_post'),context)
+                  sumbitButton(getTranslated(context, 'sumbit_post')!,context)
 
 
                 ],
@@ -1144,33 +1145,79 @@ setState(() {
     String price = _priceController.text  ==""?"0.5":replaceArabicNumber(_priceController.text) ;
     print("price --->"+price);
     if(mImages.isEmpty){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'image_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'image_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else if(categoryId==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'sub_category_error'))));
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'sub_category_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }
     else if(postTitle.trim()==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'title_error'))));
+      Fluttertoast.showToast(
+          msg:getTranslated(context, 'title_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
+
 
     }else if(postDescription==""){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'description_error'))));
+      Fluttertoast.showToast(
+          msg:getTranslated(context, 'description_error')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+
 
     }else {
-      List<File> mCompressedImages  = List();
+      List<File> mCompressedImages  = [];
 
       for(int i =0;i<mImages.length;i++){
-        File compressImage = await  CompressFile(mImages[i]);
-        mCompressedImages.add(compressImage);
+        File? compressImage = await  CompressFile(mImages[i]);
+        mCompressedImages.add(compressImage!);
 
       }
       if (key == 'sell') {
 
         if (price == "") {
-          _scaffoldKey.currentState.showSnackBar(
-              SnackBar(content: Text(getTranslated(context, 'price_error'))));
+          Fluttertoast.showToast(
+              msg:getTranslated(context, 'price_error')!,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.BOTTOM,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              fontSize: screenUtil.setSp(16)
+          );
+
         }else{
-          String userId = loginModel.data.id;
+          Null file=null;
+          String? userId = loginModel!.data!.id;
           String phoneNumber ="";
           final modelHud = Provider.of<ModelHud>(context, listen: false);
           modelHud.changeIsLoading(true);
@@ -1188,23 +1235,24 @@ setState(() {
               age,
               ageId,
               genderId,
-              userId,
+              userId!,
               categoryId,
               phoneNumber,
               mLanguage,
               mCompressedImages,
-              null,
+
           vedioUrl);
           modelHud.changeIsLoading(false);
           bool status = response['ok'];
           if (status) {
-            ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly"), true);
+            ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly")!, true);
           } else {
             ShowPostAlertDialog(context, response['data']['msg'], false);
           }
         }
       } else {
-        String userId = loginModel.data.id;
+        String? userId = loginModel!.data!.id;
+        File? vedio;
         String phoneNumber ="";
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
@@ -1220,16 +1268,16 @@ setState(() {
             age,
             ageId,
             genderId,
-            userId,
+            userId!,
             categoryId,
             phoneNumber,
             mLanguage,
             mCompressedImages,
-            null,vedioUrl);
+            vedioUrl);
         modelHud.changeIsLoading(false);
         bool status = response['ok'];
         if (status) {
-          ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly"), true);
+          ShowPostAlertDialog(context, getTranslated(context, "post_add_successfuly")!, true);
         } else {
           ShowPostAlertDialog(context, response['data']['msg'], false);
         }
@@ -1237,7 +1285,7 @@ setState(() {
     }
 
   }
-  Future<File> CompressFile(File file) async {
+  Future<File?> CompressFile(File file) async {
     final dir = await path_provider.getTemporaryDirectory();
     String targetPath = "${dir.absolute.path}/${DateTime.now().millisecondsSinceEpoch}.jpg";
 
@@ -1298,7 +1346,7 @@ setState(() {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok_string'),
+            getTranslated(context, 'ok_string')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1313,7 +1361,7 @@ setState(() {
           radius: BorderRadius.circular(6.w),
         ),DialogButton(
           child: Text(
-            getTranslated(context, 'no'),
+            getTranslated(context, 'no')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1364,7 +1412,7 @@ setState(() {
 
         DialogButton(
           child: Text(
-            getTranslated(context, 'ok_string'),
+            getTranslated(context, 'ok_string')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -1384,18 +1432,18 @@ setState(() {
     alert.show();
 
   }
-  Future<NAlertDialog> showVedioPickerDialog(BuildContext context)async {
+  Future<NAlertDialog?> showVedioPickerDialog(BuildContext context)async {
     nAlertDialog =   await NAlertDialog(
       dialogStyle: DialogStyle(titleDivider: true,borderRadius: BorderRadius.circular(10)),
 
-      content: Padding(child: Text(getTranslated(context, 'select_vedio')),
+      content: Padding(child: Text(getTranslated(context, 'select_vedio')!),
         padding: EdgeInsets.all(10),),
       actions: <Widget>[
-        FlatButton(child: Text(getTranslated(context, 'camera')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'camera')!),onPressed: () {
 
           _getVedioFromCamera(context);
         }),
-        FlatButton(child: Text(getTranslated(context, 'gallery')),onPressed: () {
+        TextButton(child: Text(getTranslated(context, 'gallery')!),onPressed: () {
           _getVedioFromGallery(context);
         }),
 
@@ -1459,22 +1507,31 @@ setState(() {
       await testLengthController.initialize();
       if (testLengthController.value.duration.inSeconds > 15) {
         pickedFile = null;
-        _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'select_vedio_error'))));
+        Fluttertoast.showToast(
+            msg: getTranslated(context, 'select_vedio_error')!,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
+
       }else {
         final modelHud = Provider.of<ModelHud>(context, listen: false);
         modelHud.changeIsLoading(true);
         await VideoCompress.setLogLevel(0);
-        final MediaInfo info = await VideoCompress.compressVideo(
+        final MediaInfo? info = await VideoCompress.compressVideo(
           pickedFile.path,
           quality: VideoQuality.MediumQuality,
           deleteOrigin: false,
           includeAudio: true,
         );
-        print(info.path);
+        print(info!.path!);
 
 
         isSelected = true;
-        File _image = File(info.path);
+        File _image = File(info.path!);
 
         vedios.add(_image);
         Navigator.pop(context);
@@ -1515,20 +1572,20 @@ setState(() {
       final modelHud = Provider.of<ModelHud>(context,listen: false);
       modelHud.changeIsLoading(true);
       await VideoCompress.setLogLevel(0);
-      final MediaInfo  info = await VideoCompress.compressVideo(
+      final MediaInfo?  info = await VideoCompress.compressVideo(
         pickedFile.path,
         quality: VideoQuality.MediumQuality,
         deleteOrigin: false,
         includeAudio: true,
       );
-      print(info.path);
+      print(info!.path);
 
 
 
 
 
       isSelected = true;
-      File _image = File(info.path);
+      File _image = File(info.path!);
 
       vedios.add(_image) ;
 

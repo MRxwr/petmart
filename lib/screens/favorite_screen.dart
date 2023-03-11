@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/model/AddInterestModel.dart';
 import 'package:pet_mart/model/InterestModel.dart';
 import 'package:pet_mart/model/login_model.dart';
@@ -15,7 +16,7 @@ import '../providers/model_hud.dart';
 import '../utilities/constants.dart';
 import 'main_sceen.dart';
 class FavoriteScreen extends StatefulWidget {
-  const FavoriteScreen({Key key}) : super(key: key);
+  const FavoriteScreen({Key? key}) : super(key: key);
 
   @override
   State<FavoriteScreen> createState() => _FavoriteScreenState();
@@ -25,30 +26,30 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   ScreenUtil screenUtil = ScreenUtil();
-  String mLanguage;
-  LoginModel loginModel;
-  InterestModel interestModel;
+  String? mLanguage;
+  LoginModel? loginModel;
+  InterestModel? interestModel;
   String userId ="";
   List<bool> selectedList =[];
 
-  Future<InterestModel> interest() async{
+  Future<InterestModel?> interest() async{
 
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     mLanguage = languageCode;
-    String loginData = _preferences.getString(kUserModel);
+    String? loginData = _preferences.getString(kUserModel);
 
 
 
-    final body = json.decode(loginData);
+    final body = json.decode(loginData!);
     loginModel = LoginModel.fromJson(body);
-    userId = loginModel.data.id;
+    userId = loginModel!.data!.id!;
 
     Map<String, String> map = Map();
     map['id']=userId;
 
     PetMartService petMartService = PetMartService();
-    InterestModel interestModel = await petMartService.interests(userId);
+    InterestModel? interestModel = await petMartService.interests(userId);
 
 
 
@@ -65,8 +66,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     interest().then((value){
       setState(() {
         interestModel = value;
-        for(int i =0;i<interestModel.data.length;i++){
-          int isInterested = interestModel.data[i].interest;
+        for(int i =0;i<interestModel!.data!.length;i++){
+          int isInterested = interestModel!.data![i].interest!;
           if(isInterested == 1){
             selectedList.add(true);
           }else{
@@ -93,7 +94,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                getTranslated(context, 'intersts'),
+                getTranslated(context, 'intersts')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -163,8 +164,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                             alignment: AlignmentDirectional.centerStart,
                             margin: EdgeInsetsDirectional.only(start: 10.w),
                             child: Text(
-                             mLanguage == "en"? interestModel.data[index].enTitle:
-                                 interestModel.data[index].arTitle,
+                             mLanguage == "en"? interestModel!.data![index].enTitle!:
+                                 interestModel!.data![index].arTitle!,
                               style: TextStyle(
                                 color: Color(0xFF000000),
                                 fontWeight: FontWeight.w500,
@@ -199,12 +200,12 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                   return Container(width: screenUtil.screenWidth,
                   height: 1.w,
                   color: Color(0xFF000000),);
-                }, itemCount: interestModel.data.length),
+                }, itemCount: interestModel!.data!.length),
                 SizedBox(height: 20.h,width: screenUtil.screenWidth,),
                 Container(
                     margin: EdgeInsets.symmetric(horizontal: 20.w),
                     height: 50.w,
-                    child: isView()?confirmButton(getTranslated(context, 'add_to_interests'),context):Container()),
+                    child: isView()?confirmButton(getTranslated(context, 'add_to_interests')!,context):Container()),
 
                 SizedBox(height: 100.h,width: screenUtil.screenWidth,),
               ],
@@ -259,7 +260,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     List<String> selectedId = [];
     for(int i =0;i<selectedList.length;i++){
       if(selectedList[i]){
-        selectedId.add(interestModel.data[i].id);
+        selectedId.add(interestModel!.data![i].id!);
 
       }
 
@@ -270,12 +271,20 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
 
     print("interest Map---> ${map}");
     PetMartService petMartService = PetMartService();
-    AddInterestModel addInterestModel  =await petMartService.addInterest(map);
-    bool isOk = addInterestModel.ok;
+    AddInterestModel? addInterestModel  =await petMartService.addInterest(map);
+    bool isOk = addInterestModel!.ok;
     modelHud.changeIsLoading(false);
     if(isOk){
-      _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(getTranslated(context, 'interested_added_successfully'))));
-      Navigator.pushReplacementNamed(context,MainScreen.id);
+      Fluttertoast.showToast(
+          msg: getTranslated(context, 'interested_added_successfully')!,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: screenUtil.setSp(16)
+      );
+        Navigator.pushReplacementNamed(context,MainScreen.id);
     }
   }
 }

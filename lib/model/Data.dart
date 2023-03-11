@@ -7,8 +7,8 @@ class Data {
     url = json['url'];
     id = json['id'];
   }
-  String url;
-  String id;
+  String? url;
+  String? id;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

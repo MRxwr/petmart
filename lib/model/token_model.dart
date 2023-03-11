@@ -3,18 +3,18 @@
 /// data : 1
 
 class TokenModel {
-  String _status;
-  String _message;
-  int _data;
+  String? _status;
+  String? _message;
+  int? _data;
 
-  String get status => _status;
-  String get message => _message;
-  int get data => _data;
+  String get status => _status!;
+  String get message => _message!;
+  int get data => _data!;
 
   TokenModel({
-      String status, 
-      String message, 
-      int data}){
+    String? status,
+    String? message,
+      int? data}){
     _status = status;
     _message = message;
     _data = data;

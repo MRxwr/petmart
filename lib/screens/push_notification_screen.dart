@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_app_badger/flutter_app_badger.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/login_model.dart';
@@ -34,20 +34,20 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     String languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     language = languageCode;
     status = _preferences.getBool("enable")??true;
-    String loginData = _preferences.getString(kUserModel);
-    final body = json.decode(loginData);
+    String? loginData = _preferences.getString(kUserModel);
+    final body = json.decode(loginData!);
     LoginModel   loginModel = LoginModel.fromJson(body);
     PetMartService petMartService = PetMartService();
     Map map = {
-      "id":loginModel.data.id,
+      "id":loginModel.data!.id,
       "language":languageCode
     };
-    Map<String, dynamic> response =await petMartService.notification(loginModel.data.id);
+    Map<String, dynamic> response =await petMartService.notification(loginModel.data!.id!);
     bool  isOk  = response['ok'];
     if (isOk) {
       NotificationModel notificationModel = NotificationModel.fromJson(response);
 
-      Provider.of<NotificationNotifier>(context,listen: false).addCount(int.parse(notificationModel.data.total));
+      Provider.of<NotificationNotifier>(context,listen: false).addCount(int.parse(notificationModel.data!.total!));
     }
 
     // try {
@@ -65,8 +65,8 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
     return response;
   }
   String isOkey="";
-  NotificationModel notificationModel;
-  Map<String, dynamic>   response;
+  NotificationModel? notificationModel;
+  Map<String, dynamic> ?  response;
   @override
   void initState() {
     // TODO: implement initState
@@ -75,10 +75,10 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
 
       setState(() {
         response = value;
-        bool  isOk  = response['ok'];
+        bool  isOk  = response!['ok'];
         if (isOk) {
           isOkey = "1";
-           notificationModel = NotificationModel.fromJson(response);
+           notificationModel = NotificationModel.fromJson(response!);
         }else{
           isOkey = "0";
         }
@@ -100,7 +100,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                getTranslated(context, 'push_notification'),
+                getTranslated(context, 'push_notification')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -138,7 +138,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                   Text(
-                 getTranslated(context, 'turn_off_push'),
+                 getTranslated(context, 'turn_off_push')!,
                   style: TextStyle(
                       color: Color(0xFF000000),
                       fontSize: screenUtil.setSp(16),
@@ -190,7 +190,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                   child: isOkey == "0"?
                   Container(
                     child: Text(
-                      getTranslated(context, 'no_notification_available'),
+                      getTranslated(context, 'no_notification_available')!,
                       style: TextStyle(
                           color: Colors.black,
                           fontSize: screenUtil.setSp(16),
@@ -210,10 +210,10 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                         return
                           GestureDetector(
                             onTap: () async{
-                            String auctionId = notificationModel.data.notification[index].auctionId.toString();
+                            String auctionId = notificationModel!.data!.notification![index].auctionId.toString();
                             if(auctionId.trim() !="0") {
-                              String auctionType = notificationModel.data
-                                  .notification[index].auctionType;
+                              String auctionType = notificationModel!.data!
+                                  .notification![index].auctionType!;
                               if (auctionType == "1") {
                                 String results = await Navigator.of(
                                     context, rootNavigator: true).push(
@@ -222,7 +222,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                                           return new MyAuctionDetails(
                                               id: auctionId,
                                               postName: getTranslated(
-                                                  context, 'auction_details'));
+                                                  context, 'auction_details')!);
                                         }));
                                 if (results == "true") {
                                   isOkey = "";
@@ -232,19 +232,20 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                                   getNotificationList().then((value) {
                                     setState(() {
                                       response = value;
-                                      bool isOk = response['ok'];
+                                      bool isOk = response!['ok'];
                                       if (isOk) {
                                         isOkey = "1";
                                         notificationModel =
                                             NotificationModel.fromJson(
-                                                response);
+                                                response!);
                                       } else {
                                         isOkey = "0";
                                       }
                                     });
                                   });
                                 }
-                              } else if (auctionType == "2") {
+                              }
+                              else if (auctionType == "2") {
                                 String results = await Navigator.of(
                                     context).push(
                                     new MaterialPageRoute(
@@ -252,7 +253,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                                           return new NotificationDetailsScreen(
                                             id: auctionId,
                                             name: getTranslated(
-                                                context, 'auction_details'),);
+                                                context, 'auction_details')!,);
                                         }));
                                 if (results == "true") {
                                   isOkey = "";
@@ -262,12 +263,12 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                                   getNotificationList().then((value) {
                                     setState(() {
                                       response = value;
-                                      bool isOk = response['ok'];
+                                      bool isOk = response!['ok'];
                                       if (isOk) {
                                         isOkey = "1";
                                         notificationModel =
                                             NotificationModel.fromJson(
-                                                response);
+                                                response!);
                                       } else {
                                         isOkey = "0";
                                       }
@@ -288,7 +289,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                    notificationModel.data.notification[index].date.split(" ")[0],
+                                    notificationModel!.data!.notification![index].date!.split(" ")[0],
                                     style: TextStyle(
                                         color: Color(0xFF000000),
                                         fontSize: screenUtil.setSp(14),
@@ -296,7 +297,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
 
                                     )),
                                 Text(
-                                    notificationModel.data.notification[index].notification,
+                                    notificationModel!.data!.notification![index].notification!,
                                     style: TextStyle(
                                         color: Color(0xFF000000),
                                         fontSize: screenUtil.setSp(12),
@@ -310,7 +311,7 @@ class _PushNotificationScreenState extends State<PushNotificationScreen> {
                       }, separatorBuilder:  (context,index){
                     return Container(height: 1.h,
                       color: Colors.grey[400],);
-                  }, itemCount: notificationModel.data.notification.length),
+                  }, itemCount: notificationModel!.data!.notification!.length),
                 ),
               )
 

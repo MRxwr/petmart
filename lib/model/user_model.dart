@@ -1,8 +1,8 @@
 class UserModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   UserModel({this.ok, this.error, this.status, this.data});
 
@@ -19,20 +19,20 @@ class UserModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  String id;
-  String name;
-  String email;
-  String mobile;
-  String points;
-  String validity;
-  String logo;
+  String? id;
+  String? name;
+  String? email;
+  String? mobile;
+  String? points;
+  String? validity;
+  String? logo;
 
   Data(
       {this.id,

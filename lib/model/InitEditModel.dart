@@ -1,8 +1,8 @@
 class InitEditModel {
-  bool ok;
-  String error;
-  String status;
-  Data data;
+  bool? ok;
+  String? error;
+  String? status;
+  Data? data;
 
   InitEditModel({this.ok, this.error, this.status, this.data});
 
@@ -19,19 +19,19 @@ class InitEditModel {
     data['error'] = this.error;
     data['status'] = this.status;
     if (this.data != null) {
-      data['data'] = this.data.toJson();
+      data['data'] = this.data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<Category> category;
-  List<Category> lost;
-  List<Category> adoption;
-  Gender gender;
-  Gender ageType;
-  List<Post> post;
+  List<Category>? category;
+  List<Category>? lost;
+  List<Category>? adoption;
+  Gender? gender;
+  Gender? ageType;
+  List<Post>? post;
 
   Data(
       {this.category,
@@ -45,19 +45,19 @@ class Data {
     if (json['category'] != null) {
       category = <Category>[];
       json['category'].forEach((v) {
-        category.add(new Category.fromJson(v));
+        category!.add(new Category.fromJson(v));
       });
     }
     if (json['lost'] != null) {
       lost = <Category>[];
       json['lost'].forEach((v) {
-        lost.add(new Category.fromJson(v));
+        lost!.add(new Category.fromJson(v));
       });
     }
     if (json['adoption'] != null) {
       adoption = <Category>[];
       json['adoption'].forEach((v) {
-        adoption.add(new Category.fromJson(v));
+        adoption!.add(new Category.fromJson(v));
       });
     }
     gender =
@@ -67,7 +67,7 @@ class Data {
     if (json['post'] != null) {
       post = <Post>[];
       json['post'].forEach((v) {
-        post.add(new Post.fromJson(v));
+        post!.add(new Post.fromJson(v));
       });
     }
   }
@@ -75,33 +75,33 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.category != null) {
-      data['category'] = this.category.map((v) => v.toJson()).toList();
+      data['category'] = this.category!.map((v) => v.toJson()).toList();
     }
     if (this.lost != null) {
-      data['lost'] = this.lost.map((v) => v.toJson()).toList();
+      data['lost'] = this.lost!.map((v) => v.toJson()).toList();
     }
     if (this.adoption != null) {
-      data['adoption'] = this.adoption.map((v) => v.toJson()).toList();
+      data['adoption'] = this.adoption!.map((v) => v.toJson()).toList();
     }
     if (this.gender != null) {
-      data['gender'] = this.gender.toJson();
+      data['gender'] = this.gender!.toJson();
     }
     if (this.ageType != null) {
-      data['ageType'] = this.ageType.toJson();
+      data['ageType'] = this.ageType!.toJson();
     }
     if (this.post != null) {
-      data['post'] = this.post.map((v) => v.toJson()).toList();
+      data['post'] = this.post!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Category {
-  String id;
-  String parentId;
-  String arTitle;
-  String enTitle;
-  List<Sub> sub;
+  String? id;
+  String? parentId;
+  String? arTitle;
+  String? enTitle;
+  List<Sub>? sub;
 
   Category({this.id, this.parentId, this.arTitle, this.enTitle, this.sub});
 
@@ -113,7 +113,7 @@ class Category {
     if (json['sub'] != null) {
       sub = <Sub>[];
       json['sub'].forEach((v) {
-        sub.add(new Sub.fromJson(v));
+        sub!.add(new Sub.fromJson(v));
       });
     }
   }
@@ -125,17 +125,17 @@ class Category {
     data['arTitle'] = this.arTitle;
     data['enTitle'] = this.enTitle;
     if (this.sub != null) {
-      data['sub'] = this.sub.map((v) => v.toJson()).toList();
+      data['sub'] = this.sub!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Sub {
-  String id;
-  String parentId;
-  String arTitle;
-  String enTitle;
+  String? id;
+  String? parentId;
+  String? arTitle;
+  String? enTitle;
 
   Sub({this.id, this.parentId, this.arTitle, this.enTitle});
 
@@ -157,8 +157,8 @@ class Sub {
 }
 
 class Gender {
-  List<String> arabic;
-  List<String> english;
+  List<String>? arabic;
+  List<String>? english;
 
   Gender({this.arabic, this.english});
 
@@ -176,20 +176,20 @@ class Gender {
 }
 
 class Post {
-  String categoryId;
-  String customerId;
-  String enTitle;
-  String arTitle;
-  String enDetails;
-  String arDetails;
-  String price;
-  String date;
-  String age;
-  String ageType;
-  String gender;
-  String video;
-  List<String> image;
-  List<String> imageId;
+  String? categoryId;
+  String? customerId;
+  String? enTitle;
+  String? arTitle;
+  String? enDetails;
+  String? arDetails;
+  String? price;
+  String? date;
+  String? age;
+  String? ageType;
+  String? gender;
+  String? video;
+  List<String>? image;
+  List<String>? imageId;
 
   Post(
       {this.categoryId,

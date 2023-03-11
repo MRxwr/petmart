@@ -5,14 +5,14 @@
 
 class AddInterestModel {
   AddInterestModel({
-      bool ok, 
-      String error, 
-      String status, 
-      String data,}){
-    _ok = ok;
-    _error = error;
-    _status = status;
-    _data = data;
+      bool? ok,
+      String? error,
+      String? status,
+      String? data,}){
+    _ok = ok!;
+    _error = error!;
+    _status = status!;
+    _data = data!;
 }
 
   AddInterestModel.fromJson(dynamic json) {
@@ -21,23 +21,23 @@ class AddInterestModel {
     _status = json['status'];
     _data = json['data'];
   }
-  bool _ok;
-  String _error;
-  String _status;
-  String _data;
-AddInterestModel copyWith({  bool ok,
-  String error,
-  String status,
-  String data,
+  bool? _ok;
+  String? _error;
+  String? _status;
+  String? _data;
+AddInterestModel copyWith({  bool? ok,
+  String? error,
+  String? status,
+  String? data,
 }) => AddInterestModel(  ok: ok ?? _ok,
   error: error ?? _error,
   status: status ?? _status,
   data: data ?? _data,
 );
-  bool get ok => _ok;
-  String get error => _error;
-  String get status => _status;
-  String get data => _data;
+  bool get ok => _ok!;
+  String get error => _error!;
+  String get status => _status!;
+  String get data => _data!;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

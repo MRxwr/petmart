@@ -13,12 +13,12 @@ class NamedIcon extends StatelessWidget {
 
 
   const NamedIcon({
-    Key key,
+    Key? key,
 
 
 
 
-    this.notificationCount,
+    required this.notificationCount,
   }) : super(key: key);
 
   @override

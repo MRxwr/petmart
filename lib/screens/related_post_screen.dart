@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 class RelatedPostScreen extends StatefulWidget {
-  const RelatedPostScreen({Key key}) : super(key: key);
+  const RelatedPostScreen({Key? key}) : super(key: key);
 
   @override
   _RelatedPostScreenState createState() => _RelatedPostScreenState();

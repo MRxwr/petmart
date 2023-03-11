@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:pet_mart/api/pet_mart_service.dart';
 import 'package:pet_mart/localization/localization_methods.dart';
 import 'package:pet_mart/model/otp_model.dart';
@@ -23,7 +24,7 @@ class VerifyOtpScreen extends StatefulWidget {
    String otp ="";
    String userId ="";
 
-  VerifyOtpScreen({Key key,@required this.mobile,@required this.otp,@required this.userId}): super(key: key);
+  VerifyOtpScreen({Key? key,required this.mobile,required this.otp,required this.userId}): super(key: key);
 
   @override
   _VerifyOtpScreenState createState() => _VerifyOtpScreenState();
@@ -37,7 +38,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   // ..text = "123456";
 
   // ignore: close_sinks
-  StreamController<ErrorAnimationType>  errorController;
+  StreamController<ErrorAnimationType>?  errorController;
 
   bool hasError = false;
   String currentText = "";
@@ -50,7 +51,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
   @override
   void dispose() {
-    errorController.close();
+    errorController!.close();
 
     super.dispose();
   }
@@ -77,7 +78,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
             child: Padding(
               padding:  EdgeInsets.symmetric(horizontal: 10.h),
               child: Text(
-                getTranslated(context, 'verify_otp'),
+                getTranslated(context, 'verify_otp')!,
                 style: TextStyle(
                     color: Color(0xFFFFFFFF),
                     fontSize: screenUtil.setSp(16),
@@ -130,7 +131,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       blinkWhenObscuring: true,
                       animationType: AnimationType.fade,
                       validator: (v) {
-                        otpEntered = v;
+                        otpEntered = v!;
                         if(v == 6){
                           sendotp(context);
                         }
@@ -180,14 +181,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                     ),
                   ),
                   SizedBox(height: 20.h,),
-                  Center(child: confirmButton(getTranslated(context, 'submit'),context)),
+                  Center(child: confirmButton(getTranslated(context, 'submit')!,context)),
                   SizedBox(height: 10.h,),
                   GestureDetector(
                     onTap: (){
                       reSendotp(context);
                     },
                     child: Center(child:      Text(
-                      getTranslated(context, 'resend_otp'),
+                      getTranslated(context, 'resend_otp')!,
                       style: TextStyle(
                           color: Color(0xFF0000000),
                           fontSize: screenUtil.setSp(16),
@@ -216,14 +217,22 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     return TextButton(
       style: flatButtonStyle,
       onPressed: () {
-      if(formKey.currentState.validate()) {
-        formKey.currentState.save();
+      if(formKey.currentState!.validate()) {
+        formKey.currentState!.save();
         sendotp(context);
 
 
       }else{
-        _scaffoldKey.currentState.showSnackBar(
-            SnackBar(content: Text(getTranslated(context, 'enter_otp'))));
+        Fluttertoast.showToast(
+            msg: getTranslated(context, 'enter_otp')!,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: screenUtil.setSp(16)
+        );
+
       }
 
         // validate(context);
@@ -251,7 +260,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
     if (currentText == widget.otp) {
       modelHud.changeIsLoading(false);
-      successAlertDialog(context,getTranslated(context, 'success'));
+      successAlertDialog(context,getTranslated(context, 'success')!);
 
     }else{
       modelHud.changeIsLoading(false);
@@ -272,14 +281,21 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     map['mobile'] =widget.mobile;
 
     PetMartService petMartService = PetMartService();
-    OtpModel resp  = await petMartService.verifyOtp(widget.mobile);
-    widget.otp = resp.data.code.toString();
+    OtpModel? resp  = await petMartService.verifyOtp(widget.mobile);
+    widget.otp = resp!.data!.code.toString();
     print('widget.otp ---> ${widget.otp}');
     print(resp);
     modelHud.changeIsLoading(false);
+    Fluttertoast.showToast(
+        msg: resp!.data!.response!,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: screenUtil.setSp(16)
+    );
 
-    _scaffoldKey.currentState.showSnackBar(
-        SnackBar(content: Text(resp.data.response)));
   }
 
   Future<void> successAlertDialog(BuildContext context ,String title) async{
@@ -318,7 +334,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
         Alert.DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {
@@ -376,7 +392,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
         Alert.DialogButton(
           child: Text(
-            getTranslated(context, 'ok'),
+            getTranslated(context, 'ok')!,
             style: TextStyle(color: Color(0xFFFFFFFF), fontSize: screenUtil.setSp(18)),
           ),
           onPressed: ()async {

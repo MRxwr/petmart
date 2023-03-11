@@ -48,6 +48,9 @@
 	<string>Allow access to microphone to add  voice notes in chat</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Allow access to photo library to add  Advertisements with photos</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+        <string>Allow download photos to save it in photo library</string>
+        
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
@@ -71,6 +74,10 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 </dict>
 </plist>

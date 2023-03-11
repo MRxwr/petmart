@@ -1,19 +1,19 @@
 class MyAuctionsModel {
-  String _status;
-  String _message;
-  Data _data;
+  String? _status;
+  String? _message;
+  Data? _data;
 
-  MyAuctionsModel({String status, String message, Data data}) {
+  MyAuctionsModel({String? status, String? message, Data? data}) {
     this._status = status;
     this._message = message;
     this._data = data;
   }
 
-  String get status => _status;
+  String get status => _status!;
   set status(String status) => _status = status;
-  String get message => _message;
+  String get message => _message!;
   set message(String message) => _message = message;
-  Data get data => _data;
+  Data get data => _data!;
   set data(Data data) => _data = data;
 
   MyAuctionsModel.fromJson(Map<String, dynamic> json) {
@@ -27,27 +27,27 @@ class MyAuctionsModel {
     data['status'] = this._status;
     data['message'] = this._message;
     if (this._data != null) {
-      data['data'] = this._data.toJson();
+      data['data'] = this._data!.toJson();
     }
     return data;
   }
 }
 
 class Data {
-  List<AuctionData> _auctionData;
+  List<AuctionData>? _auctionData;
 
-  Data({List<AuctionData> auctionData}) {
+  Data({List<AuctionData>? auctionData}) {
     this._auctionData = auctionData;
   }
 
-  List<AuctionData> get auctionData => _auctionData;
+  List<AuctionData> get auctionData => _auctionData!;
   set auctionData(List<AuctionData> auctionData) => _auctionData = auctionData;
 
   Data.fromJson(Map<String, dynamic> json) {
     if (json['auction_data'] != null) {
-      _auctionData = new List<AuctionData>();
+      _auctionData = [];
       json['auction_data'].forEach((v) {
-        _auctionData.add(new AuctionData.fromJson(v));
+        _auctionData!.add(new AuctionData.fromJson(v));
       });
     }
   }
@@ -55,41 +55,41 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this._auctionData != null) {
-      data['auction_data'] = this._auctionData.map((v) => v.toJson()).toList();
+      data['auction_data'] = this._auctionData!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class AuctionData {
-  String _auctionId;
-  String _auctionName;
-  String _auctionStatus;
-  int _imageCount;
-  String _auctionDescription;
-  String _auctionRemaining;
-  String _auctionDate;
-  String _category;
-  String _stateDate;
-  String _endDate;
-  String _bidValue;
-  String _acutionImage;
-  List<Gallery> _gallery;
+  String? _auctionId;
+  String? _auctionName;
+  String? _auctionStatus;
+  int? _imageCount;
+  String? _auctionDescription;
+  String? _auctionRemaining;
+  String? _auctionDate;
+  String? _category;
+  String? _stateDate;
+  String? _endDate;
+  String? _bidValue;
+  String? _acutionImage;
+  List<Gallery>? _gallery;
 
   AuctionData(
-      {String auctionId,
-        String auctionName,
-        String auctionStatus,
-        int imageCount,
-        String auctionDescription,
-        String auctionRemaining,
-        String auctionDate,
-        String category,
-        String stateDate,
-        String endDate,
-        String bidValue,
-        String acutionImage,
-        List<Gallery> gallery}) {
+      {String? auctionId,
+        String? auctionName,
+        String? auctionStatus,
+        int? imageCount,
+        String? auctionDescription,
+        String? auctionRemaining,
+        String? auctionDate,
+        String? category,
+        String? stateDate,
+        String? endDate,
+        String? bidValue,
+        String? acutionImage,
+        List<Gallery>? gallery}) {
     this._auctionId = auctionId;
     this._auctionName = auctionName;
     this._auctionStatus = auctionStatus;
@@ -105,33 +105,33 @@ class AuctionData {
     this._gallery = gallery;
   }
 
-  String get auctionId => _auctionId;
+  String get auctionId => _auctionId!;
   set auctionId(String auctionId) => _auctionId = auctionId;
-  String get auctionName => _auctionName;
+  String get auctionName => _auctionName!;
   set auctionName(String auctionName) => _auctionName = auctionName;
-  String get auctionStatus => _auctionStatus;
+  String get auctionStatus => _auctionStatus!;
   set auctionStatus(String auctionStatus) => _auctionStatus = auctionStatus;
-  int get imageCount => _imageCount;
+  int get imageCount => _imageCount!;
   set imageCount(int imageCount) => _imageCount = imageCount;
-  String get auctionDescription => _auctionDescription;
+  String get auctionDescription => _auctionDescription!;
   set auctionDescription(String auctionDescription) =>
       _auctionDescription = auctionDescription;
-  String get auctionRemaining => _auctionRemaining;
+  String get auctionRemaining => _auctionRemaining!;
   set auctionRemaining(String auctionRemaining) =>
       _auctionRemaining = auctionRemaining;
-  String get auctionDate => _auctionDate;
+  String get auctionDate => _auctionDate!;
   set auctionDate(String auctionDate) => _auctionDate = auctionDate;
-  String get category => _category;
+  String get category => _category!;
   set category(String category) => _category = category;
-  String get stateDate => _stateDate;
+  String get stateDate => _stateDate!;
   set stateDate(String stateDate) => _stateDate = stateDate;
-  String get endDate => _endDate;
+  String get endDate => _endDate!;
   set endDate(String endDate) => _endDate = endDate;
-  String get bidValue => _bidValue;
+  String get bidValue => _bidValue!;
   set bidValue(String bidValue) => _bidValue = bidValue;
-  String get acutionImage => _acutionImage;
+  String get acutionImage => _acutionImage!;
   set acutionImage(String acutionImage) => _acutionImage = acutionImage;
-  List<Gallery> get gallery => _gallery;
+  List<Gallery> get gallery => _gallery!;
   set gallery(List<Gallery> gallery) => _gallery = gallery;
 
   AuctionData.fromJson(Map<String, dynamic> json) {
@@ -148,9 +148,9 @@ class AuctionData {
     _bidValue = json['bid_value'];
     _acutionImage = json['acution_image'];
     if (json['gallery'] != null) {
-      _gallery = new List<Gallery>();
+      _gallery = [];
       json['gallery'].forEach((v) {
-        _gallery.add(new Gallery.fromJson(v));
+        _gallery!.add(new Gallery.fromJson(v));
       });
     }
   }
@@ -170,28 +170,28 @@ class AuctionData {
     data['bid_value'] = this._bidValue;
     data['acution_image'] = this._acutionImage;
     if (this._gallery != null) {
-      data['gallery'] = this._gallery.map((v) => v.toJson()).toList();
+      data['gallery'] = this._gallery!.map((v) => v.toJson()).toList();
     }
     return data;
   }
 }
 
 class Gallery {
-  String _image;
-  String _thumbnail;
-  String _type;
+  String? _image;
+  String? _thumbnail;
+  String? _type;
 
-  Gallery({String image, String thumbnail, String type}) {
+  Gallery({String? image, String? thumbnail, String? type}) {
     this._image = image;
     this._thumbnail = thumbnail;
     this._type = type;
   }
 
-  String get image => _image;
+  String get image => _image!;
   set image(String image) => _image = image;
-  String get thumbnail => _thumbnail;
+  String get thumbnail => _thumbnail!;
   set thumbnail(String thumbnail) => _thumbnail = thumbnail;
-  String get type => _type;
+  String get type => _type!;
   set type(String type) => _type = type;
 
   Gallery.fromJson(Map<String, dynamic> json) {

@@ -28,7 +28,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   String _platformVersion = 'Unknown';
   final CallsAndMessagesService _service = locator<CallsAndMessagesService>();
   String languageCode="";
-  CmsModel cmsModel;
+  CmsModel? cmsModel;
 
 
 
@@ -45,11 +45,11 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
     });
 
   }
-  Future<CmsModel> privacyPolicy() async{
+  Future<CmsModel?> privacyPolicy() async{
     SharedPreferences _preferences = await SharedPreferences.getInstance();
     languageCode = _preferences.getString(LANG_CODE) ?? ENGLISH;
     PetMartService petMartService = PetMartService();
-    CmsModel  cmsModel = await petMartService.cms();
+    CmsModel?  cmsModel = await petMartService.cms();
     return cmsModel;
 
   }
@@ -66,7 +66,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
           child: Padding(
             padding:  EdgeInsets.symmetric(horizontal: 10.h),
             child: Text(
-              getTranslated(context, 'contact_us'),
+              getTranslated(context, 'contact_us')!,
               style: TextStyle(
                   color: Color(0xFFFFFFFF),
                   fontSize: screenUtil.setSp(16),
@@ -118,7 +118,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                    children: [
                      Padding(
                        padding:  EdgeInsets.all(2.0.h),
-                       child: Text(getTranslated(context, 'support'),
+                       child: Text(getTranslated(context, 'support')!,
                        style: TextStyle(
                          color: Color(0xFF000000),
                          fontSize: screenUtil.setSp(18),
@@ -127,21 +127,21 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _service.sendEmail(cmsModel.data.email);
+                         _service.sendEmail(cmsModel!.data!.email!);
                        },
                        child: Padding(
                          padding:  EdgeInsets.all(2.0.h),
                          child: Row(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
-                             Text(getTranslated(context, 'email'),
+                             Text(getTranslated(context, 'email')!,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text(cmsModel.data.email,
+                             Text(cmsModel!.data!.email!,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -153,7 +153,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _service.call(cmsModel.data.call);
+                         _service.call(cmsModel!.data!.call!);
 
 
                        },
@@ -163,14 +163,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                          Row(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
-                             Text(getTranslated(context, 'call'),
+                             Text(getTranslated(context, 'call')!,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text(cmsModel.data.call,
+                             Text(cmsModel!.data!.call!,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -182,7 +182,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                      ),
                      GestureDetector(
                        onTap: (){
-                         _openUrl(url("965"+cmsModel.data.whatsapp, ""));
+                         _openUrl(url("965"+cmsModel!.data!.whatsapp!, ""));
 
                        },
                        child: Padding(
@@ -190,14 +190,14 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                          child: Row(
                            mainAxisAlignment: MainAxisAlignment.center,
                            children: [
-                             Text(getTranslated(context,'whatsapp'),
+                             Text(getTranslated(context,'whatsapp')!,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
                                    fontWeight: FontWeight.bold
                                ),),
                              SizedBox(width: 4.w),
-                             Text(cmsModel.data.call,
+                             Text(cmsModel!.data!.call!,
                                style: TextStyle(
                                    color: Color(0xFF000000),
                                    fontSize: screenUtil.setSp(18),
@@ -218,7 +218,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
        ),
     );
   }
-  Future<void> _launched;
+  Future<void>? _launched;
 
 
   Future<void> _makePhoneCall(String url) async {
