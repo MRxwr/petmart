@@ -59,8 +59,8 @@ if ( isset($_GET["buy"]) && !empty($_GET["buy"]) ){
             "CustomerEmail"            => $settingsEmail,
             "invoiceValue"            => $totalPrice,
             "SourceInfo"            => '',
-            "CallBackUrl"            =>'https://createkwservers.com/petmart2/request/index.php?action=success',
-            "ErrorUrl"                => 'https://createkwservers.com/petmart2/request/index.php?action=failure', 
+            "CallBackUrl"            =>'https://petmartkw.com/request/index.php?action=success',
+            "ErrorUrl"                => 'https://petmartkw.com/request/index.php?action=failure', 
             );
 
 	if( $order = payment($paymentData) ){
