@@ -42,7 +42,7 @@ if ( isset($_GET["type"]) && !empty($_GET["type"]) ){
 			updateDB('customers',array("password"=>$random1),"`email` LIKE '".$_GET["email"]."'");
 			$curl = curl_init();
 			curl_setopt_array($curl, array(
-			  CURLOPT_URL => 'myid.createkwservers.com/api/v1/send/notify',
+			  CURLOPT_URL => 'https://createid.link/api/v1/send/notify',
 			  CURLOPT_RETURNTRANSFER => true,
 			  CURLOPT_ENCODING => '',
 			  CURLOPT_MAXREDIRS => 10,
@@ -50,7 +50,12 @@ if ( isset($_GET["type"]) && !empty($_GET["type"]) ){
 			  CURLOPT_FOLLOWLOCATION => true,
 			  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			  CURLOPT_CUSTOMREQUEST => 'POST',
-			  CURLOPT_POSTFIELDS => array('site' => '- Petmart','subject' => 'New Password','body' => 'Your new password is: '.$random.'<br><br>(Note: Please change your passowrd as soon as you login in app.)','from_email' => 'noreply@petmart.com','to_email' => $_GET["email"]),
+			  CURLOPT_POSTFIELDS => array(
+				'site' => '- Petmart',
+			  	'subject' => 'New Password',
+				'body' => 'Your new password is: '.$random.'<br><br>(Note: Please change your passowrd as soon as you login in app.)',
+				'from_email' => 'noreply@petmart.com',
+				'to_email' => $_GET["email"]),
 			));
 			$response = curl_exec($curl);
 			curl_close($curl);
