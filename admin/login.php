@@ -3,14 +3,27 @@ if ( isset($_POST["username"]) && !empty($_POST["username"] )){
 	$check = [';','"',"'"];
 	$_POST = str_replace($check,"",$_POST);
 	require_once('includes/config.php');
-	require_once('includes/functions.php');
-	if ( $user = selectDB("user","`username` LIKE '".$_POST['username']."' AND `password` LIKE '".sha1($_POST['password'])."' AND `status` LIKE '0'") ){
-		die();
+	$sql = "SELECT *
+			FROM `user`
+			WHERE
+			`username` LIKE '".$_POST['username']."'
+			AND
+			`password` LIKE '".sha1($_POST['password'])."'
+			AND
+			`status` LIKE '0'
+			";
+	$result = $dbconnect->query($sql);
+	if ($result->num_rows > 0 ){
 		setcookie('ezyoCreate', md5(time().$_POST['username']), time() + (3600*24*30) , '/');
-		$dataUpdate = array(
-			"cookie" => md5(time().$_POST['username']),
-		);
-		updateDB("user",$dataUpdate,"`id` = '{$user[0]["id"]}'");
+		$sql = "UPDATE `user`
+				SET
+				`cookie` = '".md5(time().$_POST['username'])."'
+				WHERE
+				`username` LIKE '".$_POST['username']."'
+				AND
+				`password` LIKE '".sha1($_POST['password'])."'
+				";
+		$result = $dbconnect->query($sql);
 		$error = 0;
 		header('LOCATION: index.php');die();
 	}else{
