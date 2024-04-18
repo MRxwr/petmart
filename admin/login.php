@@ -1,5 +1,6 @@
 <?php
 if ( isset($_POST["username"]) && !empty($_POST["username"] )){
+	die();
 	$check = [';','"',"'"];
 	$_POST = str_replace($check,"",$_POST);
 	require_once('includes/config.php');
