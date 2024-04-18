@@ -12,7 +12,7 @@ if ( isset($_POST["username"]) && !empty($_POST["username"] )){
 			AND
 			`status` LIKE '0'
 			";
-	$result = $dbconnect->query($sql);
+	$result = $dbconnect->query($sql); 
 	if ($result->num_rows > 0 ){
 		setcookie('ezyoCreate', md5(time().$_POST['username']), time() + (3600*24*30) , '/');
 		$sql = "UPDATE `user`
